@@ -8,46 +8,82 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { font-family: Arial, Helvetica, sans-serif; }
-    .hyper-green { color: #39FF14; font-weight: 800; }
-    .card { border-radius: 24px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08); }
+    .card { border-radius: 24px; box-shadow: 0 12px 30px rgba(15,23,42,0.08); }
     .input, select {
-      width: 100%; border: 1px solid #d1d5db; border-radius: 16px; background: #fff;
-      padding: 12px 14px; font-size: 14px; outline: none;
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 16px;
+      background: #ffffff;
+      padding: 12px 14px;
+      font-size: 14px;
+      outline: none;
     }
-    .input:focus, select:focus { border-color: #009688; box-shadow: 0 0 0 3px rgba(0,150,136,0.12); }
+    .input:focus, select:focus {
+      border-color: #009688;
+      box-shadow: 0 0 0 3px rgba(0,150,136,0.12);
+    }
+    .tiny-check { width: 16px; height: 16px; }
+    .hyper-green { color: #39FF14; font-weight: 800; }
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-teal-50 via-white to-slate-50 p-4 md:p-8 text-slate-900">
   <div class="mx-auto max-w-7xl space-y-8">
     <div class="card bg-white p-6 md:p-8">
-      <div class="inline-flex items-center gap-2 rounded-full px-4 py-1 text-sm font-medium" style="background: rgba(0,150,136,0.08); color:#009688;">
-        Funding Tier Calculator
-      </div>
+      <div class="inline-flex items-center gap-2 rounded-full px-4 py-1 text-sm font-medium" style="background: rgba(0,150,136,0.08); color:#009688;">Funding Tier Calculator</div>
       <h1 class="mt-3 text-3xl md:text-5xl font-semibold tracking-tight">Funding Tier AI - Deal Router</h1>
-      <p class="mt-3 max-w-3xl leading-7 text-slate-600">Compare the cost of doing nothing against a structured debt settlement program, route the deal instantly, and generate a branded PDF summary for the prospect.</p>
+      <p class="mt-3 max-w-3xl leading-7 text-slate-600">Compare the cost of doing nothing against structured debt relief options, route the deal instantly, and generate a branded PDF summary for the prospect.</p>
     </div>
 
-    <div class="grid gap-8 xl:grid-cols-[1.25fr,0.75fr]">
+    <div class="grid gap-8 xl:grid-cols-[1.35fr,0.65fr]">
       <div class="card bg-white p-6">
         <h2 class="text-2xl font-semibold">Deal Inputs</h2>
-        <p class="mt-1 text-slate-600">Add the state and up to 5 enrolled creditors.</p>
+        <p class="mt-1 text-slate-600">Enter state, underwriting inputs, and up to 5 creditors. Routing and comparison update automatically.</p>
 
-        <div class="mt-6 grid gap-4 md:grid-cols-2">
+        <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div>
             <label class="block mb-2 text-sm font-medium">State</label>
             <select id="state"></select>
           </div>
           <div>
+            <label class="block mb-2 text-sm font-medium">Creditor Score</label>
+            <input id="creditorScore" class="input" value="650" />
+          </div>
+          <div>
+            <label class="block mb-2 text-sm font-medium">Budget Surplus</label>
+            <input id="budgetSurplus" class="input" value="350" />
+          </div>
+          <div>
             <label class="block mb-2 text-sm font-medium">Total Enrolled Debt</label>
             <div id="totalDebt" class="rounded-2xl border bg-slate-50 px-4 py-3 text-lg font-semibold">$0</div>
+          </div>
+          <div>
+            <label class="block mb-2 text-sm font-medium">Monthly Draft</label>
+            <input id="monthlyDraft" class="input" value="300" />
+          </div>
+          <div>
+            <label class="block mb-2 text-sm font-medium">Bi-Weekly Draft</label>
+            <input id="biWeeklyDraft" class="input" value="" placeholder="Optional" />
+          </div>
+          <div class="rounded-2xl border p-3 bg-slate-50">
+            <label class="flex items-center gap-2 text-sm font-medium"><input id="privateStudentLoanProof" class="tiny-check" type="checkbox" /> Private student loan proof on file</label>
+          </div>
+          <div class="rounded-2xl border p-3 bg-slate-50">
+            <label class="flex items-center gap-2 text-sm font-medium"><input id="notEnrolledInSchool" class="tiny-check" type="checkbox" checked /> Client not enrolled in school</label>
+          </div>
+          <div class="rounded-2xl border p-3 bg-slate-50">
+            <label class="flex items-center gap-2 text-sm font-medium"><input id="cosignerAlsoEnrolled" class="tiny-check" type="checkbox" /> Co-signer also enrolled</label>
+          </div>
+          <div class="rounded-2xl border p-3 bg-slate-50">
+            <label class="flex items-center gap-2 text-sm font-medium"><input id="litigationApproved" class="tiny-check" type="checkbox" /> Litigation approval obtained</label>
           </div>
         </div>
 
         <div class="mt-6 overflow-hidden rounded-3xl border border-slate-200">
-          <div class="grid grid-cols-[1.2fr,0.7fr,0.8fr] gap-3 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
+          <div class="grid grid-cols-[1.1fr,0.55fr,0.95fr,1.2fr] gap-3 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
             <div>Creditor Name</div>
             <div>Debt Amount</div>
             <div>Debt Type</div>
+            <div>Conditions</div>
           </div>
           <div id="rows" class="space-y-2 p-3"></div>
         </div>
@@ -55,96 +91,328 @@
 
       <div class="space-y-6">
         <div class="card bg-white p-6">
-          <h2 class="text-2xl font-semibold">Routing & Internal Metrics</h2>
+          <h2 class="text-2xl font-semibold">Routing and Internal Metrics</h2>
           <div class="mt-4 flex flex-wrap gap-3" id="topBadges"></div>
           <div id="routeReason" class="mt-4 rounded-2xl bg-slate-50 p-4 text-sm text-slate-700"></div>
-          <div id="metricsGrid" class="mt-4 grid gap-3 rounded-2xl border border-slate-200 p-4 md:grid-cols-2 xl:grid-cols-3"></div>
+          <div id="metricsGrid" class="mt-4 grid gap-3 rounded-2xl border border-slate-200 p-4 md:grid-cols-2"></div>
           <div id="flags" class="mt-4 space-y-2"></div>
         </div>
 
         <div class="card bg-white p-6">
           <h2 class="text-2xl font-semibold">Actions</h2>
           <button id="pdfBtn" class="mt-4 w-full rounded-2xl py-4 text-base font-semibold text-white" style="background:#009688;">Download Prospect PDF</button>
-          <div class="mt-3 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">Generates a branded PDF with the do-nothing scenario, proposed program payments, payoff timeline, and estimated savings.</div>
+          <div class="mt-3 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">Generates a branded PDF with routing, comparison summary, savings, and creditor details.</div>
         </div>
       </div>
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-3">
-      <div class="card bg-slate-50 p-6">
-        <div class="text-xl font-semibold">Do Nothing</div>
-        <div class="mt-3 text-sm text-red-600 font-medium">Minimum payment path</div>
-        <div id="doNothingCard" class="mt-3 space-y-3"></div>
+    <div class="card bg-white overflow-hidden">
+      <div class="p-6 pb-0">
+        <h2 class="text-2xl font-semibold">Program Comparison</h2>
+        <p class="mt-1 text-slate-600">Scenarios run left to right. Details align vertically in rows for a cleaner comparison.</p>
       </div>
-      <div class="card bg-white p-6">
-        <div class="text-xl font-semibold">Shortest Payoff</div>
-        <div class="mt-3 text-sm text-slate-600 font-medium">Fastest available term</div>
-        <div id="shortestCard" class="mt-3 space-y-3"></div>
-      </div>
-      <div class="card bg-white ring-2 p-6" style="ring-color:#009688;">
-        <div class="inline-flex rounded-full px-3 py-1 text-xs font-medium text-white" style="background:#009688;">Best Option / Recommended</div>
-        <div class="mt-3 text-xl font-semibold">Max Term</div>
-        <div class="mt-3 text-sm font-medium" style="color:#009688;">Lowest structured monthly payment</div>
-        <div id="maxCard" class="mt-3 space-y-3"></div>
+      <div class="overflow-x-auto p-6">
+        <table class="w-full min-w-[960px] border-collapse">
+          <thead>
+            <tr>
+              <th class="border-b bg-slate-100 px-4 py-4 text-left text-sm font-semibold text-slate-700">Detail</th>
+              <th class="border-b bg-red-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">Do Nothing<div class="mt-1 text-xs font-medium text-red-600">Minimum payment path</div></th>
+              <th class="border-b bg-white px-4 py-4 text-left text-sm font-semibold text-slate-900">Shortest Payoff<div class="mt-1 text-xs font-medium text-slate-500">Fastest available term</div></th>
+              <th class="border-b bg-emerald-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">Max Term / Recommended<div class="mt-1 inline-flex rounded-full bg-teal-600 px-2 py-1 text-[11px] font-medium text-white">Best Option</div></th>
+            </tr>
+          </thead>
+          <tbody id="comparisonTable"></tbody>
+        </table>
       </div>
     </div>
 
-    <div class="card bg-white p-6 text-sm leading-6 text-slate-500">
-      * Estimates are based on average credit card interest and minimum payment assumptions. Actual program terms, creditor behavior, and final costs may vary.
-    </div>
+    <div class="card bg-white p-6 text-sm leading-6 text-slate-500">* Estimates are based on average credit card interest and minimum payment assumptions. Consumer Shield calculations use the minimum payment and term guidelines you provided. Final backend terms may vary.</div>
   </div>
 
   <script>
-    const BRAND = { teal:'#009688', slate:'#5B5E6D', white:'#FFFFFF', black:'#000000' };
-    const VERIFY_ONLY_STATES = ['GU','HI','ME','MT','PR','SC','SD','UT','WI'];
-    const NO_DS_STATES = ['AK','RI','VT','WV','OR'];
+    const BRAND = { teal:'#009688', red:'#DC2626', green:'#16A34A', hyperGreen:'#39FF14' };
+
     const STATE_NAMES = {
-      AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',GU:'Guam',PR:'Puerto Rico'
+      AL:'Alabama', AK:'Alaska', AZ:'Arizona', AR:'Arkansas', CA:'California', CO:'Colorado', CT:'Connecticut', DE:'Delaware', DC:'District of Columbia', FL:'Florida', GA:'Georgia', HI:'Hawaii', ID:'Idaho', IL:'Illinois', IN:'Indiana', IA:'Iowa', KS:'Kansas', KY:'Kentucky', LA:'Louisiana', ME:'Maine', MD:'Maryland', MA:'Massachusetts', MI:'Michigan', MN:'Minnesota', MS:'Mississippi', MO:'Missouri', MT:'Montana', NE:'Nebraska', NV:'Nevada', NH:'New Hampshire', NJ:'New Jersey', NM:'New Mexico', NY:'New York', NC:'North Carolina', ND:'North Dakota', OH:'Ohio', OK:'Oklahoma', OR:'Oregon', PA:'Pennsylvania', RI:'Rhode Island', SC:'South Carolina', SD:'South Dakota', TN:'Tennessee', TX:'Texas', UT:'Utah', VT:'Vermont', VA:'Virginia', WA:'Washington', WV:'West Virginia', WI:'Wisconsin', WY:'Wyoming', GU:'Guam', PR:'Puerto Rico'
     };
     const STATES = Object.entries(STATE_NAMES);
-    const CREDITOR_OPTIONS = ['','American Express','Bank of America','Capital One','Chase','Citi','Discover','Wells Fargo','Synchrony','Upstart','LendingClub','OneMain Financial','SoFi','Avant','Best Egg','Klarna','Goodleap','Sunbit','RBC Bank','Other / Manual Entry'];
-    const DEBT_TYPES = ['Credit Card','Personal Loan','Installment Loan','Medical','Credit Union','Auto Repo','Legal','Other'];
-    const VERIFY_REJECTED_CREDITORS = ['Bank of Guam','Goodleap','HSERVCOM','Klarna','Military Star/Army and Air Force Exchange Service (AAFES)','Pioneer Military/Pioneer Financial','RBC BANK','Rapid Finance','Sunbit','ENERB','Les Schwab','Omni Credit Company'];
-    const LEVEL_REJECTED_CREDITORS = ['ALLEVIATE TAX LLC','Acceptance Now','ACIMA','Advance Financial','AGCO FINANCE','STATE EMPLOYEE CREDIT UNION','STATEEMP','Aqua Finance','Bell Finance','BHG Financial','BHG Money','Bobs Discount Furniture','Bobs Finance','Bobs Furniture','Cornerstone Financial','CreditCentral','EMPOWER FCU','Enerbank','ESL Credit Union','Farmers Furniture','FRMRS FURN','Fort Worth Credit Union','Forth Worth CU','Fortera Credit Union','Garden Federal Credit Union','Golden One Credit Union','Goldman Sachs','GoodLeap','Hawaii CU','HC ROYA','HYCITE','Royal Prestige','Heights Financial','Island Finance','ISPC','Kabbage Loans','KIKOFF','Koalafi','Loan Pal','Local Government Federal Credit Union','Matco Tools Financing','Matco Fin','Military Star','Nebraska Furniture','Omni Loans','Opensky','PINNACLE FINANCIAL GROUP','Pioneer Loans','Popular Bank','Banco Popular','PowerPay','Preferred Loans','Quick Help Loans','Red River Credit','REDRIVERCR','REDSTONE Credit Union','RENT-A CENTER','RFFC FINANCIAL','Robinhood','Security Finance','STATE EMPLOYEES C U','Service Finance Company','SVCFIN','SRVFINCO','Snap On Credit','SOLAR MOSAIC','Southern Finance','Sunset Financial','Toledo Finance','Tower Loans','Unacceptable Creditors','West Creek Financial','WSECU','Yendo'];
-    const LEVEL_CONDITIONAL_CREDITORS = ['Lendmark','Mariner Finance','OneMain','Regional Finance','Republic Finance'];
-    const LEVEL_SETTLEMENT_RATE = 0.50;
+
+    const VERIFY_ONLY_STATES = ['GU','HI','ME','MT','PR','SC','SD','UT','WI'];
+    const NO_DS_STATES = ['AK','RI','VT','WV','OR'];
+
     const GREEN_STATES = new Set(['AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','IA','ID','IL','IN','KS','KY','LA','MA','MD','MI','MN','MO','MS','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','PA','TN','TX','VA','WA','WY']);
+
+    const CONSUMER_SHIELD_SERVICE_STATES = new Set(['AL','AK','AZ','AR','CA','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NH','NM','NV','NY','ND','OH','OK','RI','SC','SD','TN','TX','UT','VA','VT','WA','WV','WI','WY']);
+    const CONSUMER_SHIELD_RED_STATES = new Set(['CO','PA','NJ','OR','NC','PR','TX','WA']);
+
+    const CREDITOR_OPTIONS = ['', 'American Express','Bank of America','Capital One','Chase','Citi','Discover','Wells Fargo','Synchrony','Upstart','LendingClub','OneMain Financial','SoFi','Avant','Best Egg','Klarna','Goodleap','Sunbit','RBC Bank','USAA','Republic Finance','Mariner Finance','Regional Finance','Lendmark','Navient','Other / Manual Entry'];
+
+    const DEBT_TYPES = ['Unsecured Credit Card','Unsecured Personal Loan','Payday Loan','Tribal Loan','Medical Bill','Back Rent','Private Student Loan','Business Debt','Repossession Deficiency','Apartment Back Rent (Collections)','Unsecured Line of Credit','Cell Phone Bill','Utility Bill','USAA','Deficiency','Auto Repo Deficiency','Peer-to-Peer Loan','Timeshare','Mortgage','Federal Student Loan','Navient Student Loan','Judgment','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','SBA Loan','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Other'];
+
+    const CONSUMER_SHIELD_REJECTED_TYPES = ['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account'];
+    const CONSUMER_SHIELD_CONDITIONAL_TYPES = ['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt'];
+
+    const VERIFY_REJECTED_CREDITORS = ['Bank of Guam','Goodleap','HSERVCOM','Klarna','Military Star/Army and Air Force Exchange Service (AAFES)','Pioneer Military/Pioneer Financial','RBC BANK','Rapid Finance','Sunbit','ENERB','Les Schwab','Omni Credit Company'];
+
+    const LEVEL_REJECTED_CREDITORS = ['ALLEVIATE TAX LLC','Acceptance Now','ACIMA','Advance Financial','AGCO FINANCE','STATE EMPLOYEE CREDIT UNION','STATEEMP','Aqua Finance','Bell Finance','BHG Financial','BHG Money','Bobs Discount Furniture','Bobs Finance','Bobs Furniture','Cornerstone Financial','CreditCentral','EMPOWER FCU','Enerbank','ESL Credit Union','Farmers Furniture','FRMRS FURN','Fort Worth Credit Union','Forth Worth CU','Fortera Credit Union','Garden Federal Credit Union','Golden One Credit Union','Goldman Sachs','GoodLeap','Hawaii CU','HC ROYA','HYCITE','Royal Prestige','Heights Financial','Island Finance','ISPC','Kabbage Loans','KIKOFF','Koalafi','Loan Pal','Local Government Federal Credit Union','Matco Tools Financing','Matco Fin','Military Star','Nebraska Furniture','Omni Loans','Opensky','PINNACLE FINANCIAL GROUP','Pioneer Loans','Popular Bank','Banco Popular','PowerPay','Preferred Loans','Quick Help Loans','Red River Credit','REDRIVERCR','REDSTONE Credit Union','RENT-A CENTER','RFFC FINANCIAL','Robinhood','Security Finance','STATE EMPLOYEES C U','Service Finance Company','SVCFIN','SRVFINCO','Snap On Credit','SOLAR MOSAIC','Southern Finance','Sunset Financial','Toledo Finance','Tower Loans','Unacceptable Creditors','West Creek Financial','WSECU','Yendo'];
+
+    const LEVEL_CONDITIONAL_CREDITORS = ['Lendmark','Mariner Finance','OneMain','Regional Finance','Republic Finance'];
+    const LEVEL_REJECTED_TYPES = ['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt'];
+    const LEVEL_SETTLEMENT_RATE = 0.50;
 
     const state = {
       selectedState: '',
-      rows: Array.from({length:5}, (_,i)=>({ id:i+1, creditorName:'', manualName:'', amount:'', debtType:'Credit Card' }))
+      creditorScore: '650',
+      budgetSurplus: '350',
+      monthlyDraft: '300',
+      biWeeklyDraft: '',
+      privateStudentLoanProof: false,
+      notEnrolledInSchool: true,
+      cosignerAlsoEnrolled: false,
+      litigationApproved: false,
+      rows: Array.from({ length: 5 }, function (_, i) {
+        return {
+          id: i + 1,
+          creditorName: '',
+          manualName: '',
+          amount: '',
+          debtType: 'Unsecured Credit Card',
+          inCollections: false,
+          inLitigation: false,
+          isSecured: false,
+          paymentMade: true,
+          businessUnprofitable: false,
+          hasCosigner: false
+        };
+      })
     };
 
-    const el = id => document.getElementById(id);
-    const currency = value => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(value || 0);
-    const numberOrZero = value => { const n = parseFloat(String(value).replace(/[^0-9.]/g,'')); return Number.isFinite(n) ? n : 0; };
-    const normalizeCreditorName = value => String(value || '').toUpperCase().replace(/&/g,' AND ').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
-    const creditorMatches = (input, patterns) => { const a = normalizeCreditorName(input); if (!a) return false; return patterns.some(p => { const b = normalizeCreditorName(p); return a === b || a.includes(b) || b.includes(a); }); };
-    const getCreditorDisplayName = row => row.creditorName === 'Other / Manual Entry' ? (row.manualName || 'Manual Creditor') : (row.creditorName || '');
-    const getStateTier = code => GREEN_STATES.has(code) ? 'GREEN' : 'RED';
-    const getLevelMaxTerm = debt => debt < 10000 ? 24 : debt < 12500 ? 30 : debt < 15000 ? 36 : debt < 25000 ? 42 : debt < 35000 ? 48 : debt < 50000 ? 54 : 60;
-    const getVerifyMaxTerm = debt => debt > 35000 ? 56 : debt > 30000 ? 54 : debt > 25000 ? 52 : debt > 24000 ? 50 : debt > 23000 ? 49 : debt > 22000 ? 48 : debt > 20000 ? 47 : debt > 19000 ? 46 : debt > 18000 ? 45 : debt > 17000 ? 44 : debt > 16000 ? 43 : debt > 15000 ? 42 : debt > 14000 ? 41 : debt > 13000 ? 40 : debt > 12000 ? 39 : debt > 11000 ? 37 : debt > 10000 ? 35 : null;
-    const getVerifyPayableBalance = (amount, debtType, isManual) => debtType === 'Medical' ? Math.min(amount,5000) : ['Credit Union','Auto Repo','Legal'].includes(debtType) ? Math.min(amount,10000) : isManual ? Math.min(amount,10000) : amount;
-
-    function getRoute(totalDebt, stateCode) {
-      if (!stateCode) return { route:'', reason:'Select a state to calculate routing.' };
-      if (totalDebt <= 0) {
-        if (NO_DS_STATES.includes(stateCode)) return { route:'NO OPTION', reason:'No current debt settlement coverage in this state.' };
-        if (VERIFY_ONLY_STATES.includes(stateCode)) return { route:'VERIFY', reason:'This state is Verify-only when debt qualifies for debt settlement.' };
-        return { route:'LEVEL', reason:'This state is eligible for Level Debt when debt qualifies for debt settlement.' };
+    function el(id) { return document.getElementById(id); }
+    function currency(value) { return new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(value || 0); }
+    function numberOrZero(value) {
+      const text = String(value || '');
+      let out = '';
+      for (let i = 0; i < text.length; i += 1) {
+        const ch = text[i];
+        if ((ch >= '0' && ch <= '9') || ch === '.') out += ch;
       }
-      if (totalDebt < 7000) return { route:'CONSUMER SHIELD', reason:'Debt below $7,000 routes to Consumer Shield.' };
-      if (NO_DS_STATES.includes(stateCode)) return { route:'NO OPTION', reason:'No current debt settlement coverage in this state.' };
-      if (VERIFY_ONLY_STATES.includes(stateCode)) return { route:'VERIFY', reason:'Level Debt unavailable in this state, so Verify is the fallback.' };
-      return { route:'LEVEL', reason:'Level Debt is prioritized whenever available due to better economics.' };
+      const num = parseFloat(out);
+      return Number.isFinite(num) ? num : 0;
+    }
+    function normalizeCreditorName(value) {
+      const text = String(value || '').toUpperCase().replaceAll('&',' AND ');
+      let out = '';
+      for (let i = 0; i < text.length; i += 1) {
+        const ch = text[i];
+        const code = ch.charCodeAt(0);
+        const ok = (code >= 48 && code <= 57) || (code >= 65 && code <= 90) || ch === ' ';
+        out += ok ? ch : ' ';
+      }
+      return out.split(' ').filter(Boolean).join(' ');
+    }
+    function creditorMatches(input, patterns) {
+      const a = normalizeCreditorName(input);
+      if (!a) return false;
+      return patterns.some(function (p) {
+        const b = normalizeCreditorName(p);
+        return a === b || a.indexOf(b) >= 0 || b.indexOf(a) >= 0;
+      });
+    }
+    function getCreditorDisplayName(row) {
+      return row.creditorName === 'Other / Manual Entry' ? (row.manualName || 'Manual Creditor') : (row.creditorName || '');
+    }
+    function getStateTier(code) { return GREEN_STATES.has(code) ? 'GREEN' : 'RED'; }
+    function getLevelMaxTerm(debt) {
+      if (debt < 10000) return 24;
+      if (debt < 12500) return 30;
+      if (debt < 15000) return 36;
+      if (debt < 25000) return 42;
+      if (debt < 35000) return 48;
+      if (debt < 50000) return 54;
+      return 60;
+    }
+    function getVerifyMaxTerm(debt) {
+      if (debt > 35000) return 56;
+      if (debt > 30000) return 54;
+      if (debt > 25000) return 52;
+      if (debt > 24000) return 50;
+      if (debt > 23000) return 49;
+      if (debt > 22000) return 48;
+      if (debt > 20000) return 47;
+      if (debt > 19000) return 46;
+      if (debt > 18000) return 45;
+      if (debt > 17000) return 44;
+      if (debt > 16000) return 43;
+      if (debt > 15000) return 42;
+      if (debt > 14000) return 41;
+      if (debt > 13000) return 40;
+      if (debt > 12000) return 39;
+      if (debt > 11000) return 37;
+      if (debt > 10000) return 35;
+      return null;
+    }
+    function getVerifyPayableBalance(amount, debtType, isManual) {
+      if (debtType === 'Medical Bill') return Math.min(amount, 5000);
+      if (['Credit Union Loan','Auto Repo Deficiency','Judgment'].indexOf(debtType) >= 0) return Math.min(amount, 10000);
+      if (isManual) return Math.min(amount, 10000);
+      return amount;
+    }
+    function calcDoNothing(totalDebt, apr) {
+      const rate = typeof apr === 'number' ? apr : 0.24;
+      const monthlyPayment = totalDebt * 0.025;
+      const monthlyRate = rate / 12;
+      if (totalDebt <= 0 || monthlyPayment <= totalDebt * monthlyRate) {
+        return { monthlyPayment:0, totalDebt:totalDebt, monthsToPayoff:0, apr:rate, totalPayback:0 };
+      }
+      const months = Math.max(1, Math.round(Math.log(monthlyPayment / (monthlyPayment - totalDebt * monthlyRate)) / Math.log(1 + monthlyRate)));
+      return { monthlyPayment:monthlyPayment, totalDebt:totalDebt, monthsToPayoff:months, apr:rate, totalPayback:monthlyPayment * months };
     }
 
-    function calcDoNothing(totalDebt, apr=0.24) {
-      const monthlyPayment = totalDebt * 0.025;
-      const monthlyRate = apr / 12;
-      if (totalDebt <= 0 || monthlyPayment <= totalDebt * monthlyRate) return { monthlyPayment:0, totalDebt, monthsToPayoff:0, apr, totalPayback:0 };
-      const months = Math.max(1, Math.round(Math.log(monthlyPayment / (monthlyPayment - totalDebt * monthlyRate)) / Math.log(1 + monthlyRate)));
-      return { monthlyPayment, totalDebt, monthsToPayoff:months, apr, totalPayback: monthlyPayment * months };
+    function getConsumerShieldFlags(rows, totalDebt, stateCode) {
+      const flags = [];
+      if (totalDebt > 0 && totalDebt < 4000) flags.push('Consumer Shield requires at least $4,000 total enrolled debt.');
+      if (totalDebt >= 4000 && totalDebt < 5500) flags.push('For $4,000 to $5,500, Gabe Germino may need to manually add the $220 payment.');
+      if (stateCode && !CONSUMER_SHIELD_SERVICE_STATES.has(stateCode)) flags.push('Consumer Shield does not service this state.');
+      if (stateCode && CONSUMER_SHIELD_RED_STATES.has(stateCode)) flags.push('Consumer Shield marks this state as red or non-sell.');
+      rows.forEach(function (row) {
+        const amount = numberOrZero(row.amount);
+        if (!amount) return;
+        if (amount < 100) flags.push((getCreditorDisplayName(row) || row.debtType) + ' is below Consumer Shield minimum $100 per account.');
+        if (CONSUMER_SHIELD_REJECTED_TYPES.indexOf(row.debtType) >= 0) flags.push(row.debtType + ' is not accepted by Consumer Shield.');
+        if (row.debtType === 'Apartment Back Rent (Collections)' && !row.inCollections) flags.push('Apartment back rent is only accepted if in collections.');
+        if (row.debtType === 'USAA' && row.isSecured) flags.push('USAA is only accepted when there is no other secured debt.');
+      });
+      return Array.from(new Set(flags));
+    }
+
+    function getLevelFlags(rows, totalDebt, stateCode) {
+      const flags = [];
+      const discoverDebt = rows.filter(function (r) { return normalizeCreditorName(getCreditorDisplayName(r)).indexOf('DISCOVER') >= 0; }).reduce(function (s, r) { return s + numberOrZero(r.amount); }, 0);
+      const privateStudentDebt = rows.filter(function (r) { return r.debtType === 'Private Student Loan'; }).reduce(function (s, r) { return s + numberOrZero(r.amount); }, 0);
+      const medicalBackRentDebt = rows.filter(function (r) { return ['Medical Bill','Back Rent','Apartment Back Rent (Collections)'].indexOf(r.debtType) >= 0; }).reduce(function (s, r) { return s + numberOrZero(r.amount); }, 0);
+      const discoverDraftMin = discoverDebt > 0 ? (discoverDebt * 0.7) / 24 : 0;
+
+      if (numberOrZero(state.creditorScore) < 500) flags.push('Level requires creditor score of 500 or greater unless approved.');
+      if (numberOrZero(state.budgetSurplus) < 250) flags.push('Level requires budget surplus of at least $250.');
+      if (totalDebt > 0 && totalDebt < 7000) flags.push('Level requires at least $7,000 total enrolled debt.');
+      if (numberOrZero(state.monthlyDraft) > 0 && numberOrZero(state.monthlyDraft) < 250 && numberOrZero(state.biWeeklyDraft) < 125) flags.push('Level requires at least $250 monthly draft or $125 bi-weekly draft.');
+      if (discoverDebt > 0 && totalDebt > 0 && discoverDebt / totalDebt > 0.60) flags.push('Discover debt cannot exceed 60% of total enrolled debt without exception.');
+      if (discoverDraftMin > 0 && numberOrZero(state.monthlyDraft) > 0 && numberOrZero(state.monthlyDraft) < discoverDraftMin) flags.push('Discover guideline suggests draft should be close to at least ' + currency(discoverDraftMin) + '.');
+      if (privateStudentDebt > 0 && totalDebt > 0 && privateStudentDebt / totalDebt > 0.25) flags.push('Private student loans cannot exceed 25% of total enrolled debt for Level.');
+      if (stateCode === 'CA' && privateStudentDebt > 0) flags.push('Private student loans are not accepted for California residents through Level.');
+      if (medicalBackRentDebt > 0 && totalDebt > 0 && medicalBackRentDebt / totalDebt >= 0.50) flags.push('Medical and back rent must be less than 50% of total enrolled debt for Level.');
+      if (privateStudentDebt > 0 && !state.privateStudentLoanProof) flags.push('Private student loan proof is required for Level.');
+      if (privateStudentDebt > 0 && !state.notEnrolledInSchool) flags.push('Client must no longer be enrolled in school for private student loan enrollment.');
+
+      rows.forEach(function (row) {
+        const amount = numberOrZero(row.amount);
+        if (!amount) return;
+        const name = getCreditorDisplayName(row);
+        if (LEVEL_REJECTED_TYPES.indexOf(row.debtType) >= 0) flags.push(row.debtType + ' is not accepted by Level.');
+        if (amount < 200 && !row.inCollections) flags.push((name || row.debtType) + ' must be at least $200 unless in collections or charged off.');
+        if (!row.paymentMade) flags.push((name || row.debtType) + ' must have at least one payment made before Level enrollment.');
+        if (row.inLitigation && !state.litigationApproved) flags.push((name || row.debtType) + ' is in litigation and requires approval.');
+        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) flags.push(name + ' is on the Level rejected creditor list.');
+        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) flags.push(name + ' is secured. Level only allows this if the client agrees to lose the collateral.');
+        if (row.debtType === 'Back Rent' && !row.inCollections) flags.push('Back rent is only accepted when in collections for Level.');
+        if (row.debtType === 'Business Debt' && !row.businessUnprofitable) flags.push('Business debt is accepted only when the business is closed or explicitly not profitable.');
+        if (row.debtType === 'Private Student Loan' && normalizeCreditorName(name).indexOf('DISCOVER') >= 0) flags.push('Discover private student loans are not accepted.');
+        if (row.debtType === 'Private Student Loan' && row.hasCosigner && !state.cosignerAlsoEnrolled) flags.push('If a private student loan has a co-signer, the co-signer must also be enrolled.');
+      });
+      return Array.from(new Set(flags));
+    }
+
+    function getRoute(totalDebt, stateCode, csFlags) {
+      if (!stateCode) return { route:'', reason:'Select a state to calculate routing.' };
+      if (totalDebt > 0 && totalDebt < 7000) {
+        const blocked = csFlags.some(function (f) {
+          return f.indexOf('not accepted') >= 0 || f.indexOf('does not service') >= 0 || f.indexOf('red or non-sell') >= 0 || f.indexOf('requires at least') >= 0;
+        });
+        if (blocked) return { route:'NO OPTION', reason:'Consumer Shield would normally handle debts below $7,000, but this deal does not currently meet Consumer Shield guidelines.' };
+        return { route:'CONSUMER SHIELD', reason:'Debt below $7,000 routes to Consumer Shield when state and account types qualify.' };
+      }
+      if (NO_DS_STATES.indexOf(stateCode) >= 0) return { route:'NO OPTION', reason:'No current debt settlement coverage in this state for Level or Verify.' };
+      if (VERIFY_ONLY_STATES.indexOf(stateCode) >= 0) return { route:'VERIFY', reason:'Level is unavailable in this state, so Verify is the fallback.' };
+      return { route:'LEVEL', reason:'Level is prioritized whenever available due to stronger economics.' };
+    }
+
+    function compute() {
+      const populated = state.rows.filter(function (r) { return numberOrZero(r.amount) > 0; });
+      const totalDebt = populated.reduce(function (s, r) { return s + numberOrZero(r.amount); }, 0);
+      const consumerShieldFlags = getConsumerShieldFlags(populated, totalDebt, state.selectedState);
+      const levelFlags = getLevelFlags(populated, totalDebt, state.selectedState);
+      const routeInfo = getRoute(totalDebt, state.selectedState, consumerShieldFlags);
+      const stateTier = state.selectedState ? getStateTier(state.selectedState) : 'GREEN';
+      const feeRate = routeInfo.route === 'LEVEL' ? (stateTier === 'GREEN' ? 0.25 : 0.27) : routeInfo.route === 'VERIFY' ? (stateTier === 'GREEN' ? 0.25 : 0.30) : 0;
+      const verifyAdjustedDebt = populated.reduce(function (s, r) {
+        const manual = r.creditorName === 'Other / Manual Entry' || !!r.manualName;
+        return s + getVerifyPayableBalance(numberOrZero(r.amount), r.debtType, manual);
+      }, 0);
+      const grossCommissionRate = routeInfo.route === 'LEVEL' ? 0.08 : routeInfo.route === 'VERIFY' ? 0.06 : 0;
+      const repCommissionRate = grossCommissionRate > 0 ? 0.01 : 0;
+      const commissionBase = routeInfo.route === 'VERIFY' ? verifyAdjustedDebt : totalDebt;
+      const grossCommission = commissionBase * grossCommissionRate;
+      const repCommission = commissionBase * repCommissionRate;
+      const fundingTierProfit = commissionBase * Math.max(0, grossCommissionRate - repCommissionRate);
+      const rejectedForLevel = populated.filter(function (r) { return creditorMatches(getCreditorDisplayName(r), LEVEL_REJECTED_CREDITORS); });
+      const rejectedForVerify = populated.filter(function (r) { return creditorMatches(getCreditorDisplayName(r), VERIFY_REJECTED_CREDITORS); });
+      const doNothing = calcDoNothing(totalDebt, 0.24);
+      let shortest = null;
+      let recommended = null;
+
+      if (routeInfo.route === 'LEVEL') {
+        const totalCost = totalDebt * LEVEL_SETTLEMENT_RATE + totalDebt * feeRate;
+        shortest = { term:12, totalCost:totalCost, monthlyPayment:totalCost / 12 };
+        recommended = { term:getLevelMaxTerm(totalDebt), totalCost:totalCost, monthlyPayment:totalCost / getLevelMaxTerm(totalDebt) };
+      } else if (routeInfo.route === 'VERIFY') {
+        const maxTerm = getVerifyMaxTerm(totalDebt);
+        if (maxTerm) {
+          const totalCost = totalDebt * 0.53 + totalDebt * feeRate + 250;
+          const shortTerm = Math.max(12, Math.round(maxTerm * 0.72));
+          shortest = { term:shortTerm, totalCost:totalCost, monthlyPayment:(totalCost / shortTerm) + 50 };
+          recommended = { term:maxTerm, totalCost:totalCost, monthlyPayment:(totalCost / maxTerm) + 50 };
+        }
+      } else if (routeInfo.route === 'CONSUMER SHIELD') {
+        const term = totalDebt > 8800 ? 36 : 24;
+        const monthlyPayment = Math.max(220, totalDebt / term);
+        const totalCost = monthlyPayment * term;
+        shortest = { term:term, totalCost:totalCost, monthlyPayment:monthlyPayment };
+        recommended = { term:term, totalCost:totalCost, monthlyPayment:monthlyPayment };
+      }
+
+      const flags = [];
+      if (routeInfo.route === 'LEVEL') flags.push.apply(flags, levelFlags);
+      if (routeInfo.route === 'VERIFY') {
+        if (rejectedForVerify.length) flags.push('Verify rejected creditor detected.');
+        if (populated.some(function (r) { return r.creditorName === 'Other / Manual Entry' || !!r.manualName; })) flags.push('Manual creditor present. Verify chargeback policy may apply if creditor is removed.');
+        if (populated.some(function (r) { return ['Medical Bill','Credit Union Loan','Auto Repo Deficiency','Judgment'].indexOf(r.debtType) >= 0; })) flags.push('Verify compensation may be reduced based on debt-type caps.');
+      }
+      if (routeInfo.route === 'CONSUMER SHIELD') {
+        flags.push.apply(flags, consumerShieldFlags);
+        flags.push('Consumer Shield support is Monday through Friday, 9am to 7pm EST.');
+        flags.push('Consumer Shield will not send communications after 8pm in the contact local time unless already a client.');
+        flags.push('Consumer Shield uses Equifax for credit pull.');
+      }
+      if (routeInfo.route === 'NO OPTION') flags.push(routeInfo.reason);
+
+      return {
+        populated:populated,
+        totalDebt:totalDebt,
+        verifyAdjustedDebt:verifyAdjustedDebt,
+        routeInfo:routeInfo,
+        stateTier:stateTier,
+        feeRate:feeRate,
+        grossCommissionRate:grossCommissionRate,
+        repCommissionRate:repCommissionRate,
+        grossCommission:grossCommission,
+        repCommission:repCommission,
+        fundingTierProfit:fundingTierProfit,
+        rejectedForLevel:rejectedForLevel,
+        doNothing:doNothing,
+        shortest:shortest,
+        recommended:recommended,
+        flags:Array.from(new Set(flags))
+      };
     }
 
     function rowAlerts(row, route) {
@@ -153,132 +421,106 @@
       const isManual = row.creditorName === 'Other / Manual Entry' || !!row.manualName;
       if (route === 'LEVEL') {
         if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) alerts.push({ label:'Not accepted by Level', tone:'red' });
-        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS)) alerts.push({ label:'Check secured status', tone:'amber' });
+        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) alerts.push({ label:'Secured or collateral risk', tone:'amber' });
+        if (LEVEL_REJECTED_TYPES.indexOf(row.debtType) >= 0) alerts.push({ label:'Debt type not accepted', tone:'red' });
       }
       if (route === 'VERIFY') {
         if (creditorMatches(name, VERIFY_REJECTED_CREDITORS)) alerts.push({ label:'Not accepted by Verify', tone:'red' });
         if (isManual) alerts.push({ label:'Manual creditor', tone:'amber' });
-        if (['Medical','Credit Union','Auto Repo','Legal'].includes(row.debtType)) alerts.push({ label:'Verify cap applied', tone:'blue' });
+        if (['Medical Bill','Credit Union Loan','Auto Repo Deficiency','Judgment'].indexOf(row.debtType) >= 0) alerts.push({ label:'Verify cap applied', tone:'blue' });
+      }
+      if (route === 'CONSUMER SHIELD') {
+        if (CONSUMER_SHIELD_REJECTED_TYPES.indexOf(row.debtType) >= 0) alerts.push({ label:'Not accepted by Consumer Shield', tone:'red' });
+        if (CONSUMER_SHIELD_CONDITIONAL_TYPES.indexOf(row.debtType) >= 0) alerts.push({ label:'Conditional or docs needed', tone:'amber' });
       }
       return alerts;
     }
 
-    function cardRow(label, value, cls='') {
-      return `<div class="flex items-center justify-between border-b border-slate-100 py-2 text-sm ${cls}"><span class="text-slate-500">${label}</span><span class="font-semibold text-slate-900">${value}</span></div>`;
-    }
-
-    function compute() {
-      const populated = state.rows.filter(r => numberOrZero(r.amount) > 0);
-      const totalDebt = populated.reduce((s,r)=>s+numberOrZero(r.amount),0);
-      const verifyAdjustedDebt = populated.reduce((s,r)=>{ const manual = r.creditorName === 'Other / Manual Entry' || !!r.manualName; return s + getVerifyPayableBalance(numberOrZero(r.amount), r.debtType, manual); },0);
-      const routeInfo = getRoute(totalDebt, state.selectedState);
-      const stateTier = state.selectedState ? getStateTier(state.selectedState) : 'GREEN';
-      const feeRate = routeInfo.route === 'LEVEL' ? (stateTier === 'GREEN' ? 0.25 : 0.27) : routeInfo.route === 'VERIFY' ? (stateTier === 'GREEN' ? 0.25 : 0.30) : 0;
-      const grossCommissionRate = routeInfo.route === 'LEVEL' ? 0.08 : routeInfo.route === 'VERIFY' ? 0.06 : 0;
-      const repCommissionRate = grossCommissionRate > 0 ? 0.01 : 0;
-      const fundingTierProfitRate = Math.max(0, grossCommissionRate - repCommissionRate);
-      const commissionBase = routeInfo.route === 'VERIFY' ? verifyAdjustedDebt : totalDebt;
-      const grossCommission = commissionBase * grossCommissionRate;
-      const repCommission = commissionBase * repCommissionRate;
-      const fundingTierProfit = commissionBase * fundingTierProfitRate;
-      const rejectedForLevel = populated.filter(r => creditorMatches(getCreditorDisplayName(r), LEVEL_REJECTED_CREDITORS));
-      const rejectedForVerify = populated.filter(r => creditorMatches(getCreditorDisplayName(r), VERIFY_REJECTED_CREDITORS));
-      const conditionalForLevel = populated.filter(r => creditorMatches(getCreditorDisplayName(r), LEVEL_CONDITIONAL_CREDITORS));
-      const doNothing = calcDoNothing(totalDebt);
-      let shortest = null, recommended = null;
-      if (routeInfo.route === 'LEVEL') {
-        const totalCost = totalDebt * LEVEL_SETTLEMENT_RATE + totalDebt * feeRate;
-        shortest = { term:12, totalCost, monthlyPayment: totalCost/12 };
-        recommended = { term:getLevelMaxTerm(totalDebt), totalCost, monthlyPayment: totalCost / getLevelMaxTerm(totalDebt) };
-      } else if (routeInfo.route === 'VERIFY') {
-        const maxTerm = getVerifyMaxTerm(totalDebt);
-        if (maxTerm) {
-          const totalCost = totalDebt * 0.53 + totalDebt * feeRate + 250;
-          const shortTerm = Math.max(12, Math.round(maxTerm * 0.72));
-          shortest = { term:shortTerm, totalCost, monthlyPayment:(totalCost/shortTerm)+50 };
-          recommended = { term:maxTerm, totalCost, monthlyPayment:(totalCost/maxTerm)+50 };
-        }
-      }
-      const flags = [];
-      if (routeInfo.route === 'LEVEL' && rejectedForLevel.length) flags.push('Level Debt rejected creditor detected.');
-      if (routeInfo.route === 'LEVEL' && conditionalForLevel.length) flags.push('Level conditional creditor detected. Secured accounts are not allowed for some creditors.');
-      if (routeInfo.route === 'VERIFY' && rejectedForVerify.length) flags.push('Verify rejected creditor detected.');
-      if (routeInfo.route === 'VERIFY' && populated.some(r => r.creditorName === 'Other / Manual Entry' || !!r.manualName)) flags.push('Manual creditor present. Verify chargeback policy may apply if creditor is removed.');
-      if (routeInfo.route === 'VERIFY' && populated.some(r => ['Medical','Credit Union','Auto Repo','Legal'].includes(r.debtType))) flags.push('Verify compensation may be reduced based on debt-type caps.');
-      if (routeInfo.route === 'NO OPTION') flags.push('This state is not currently supported for Level Debt or Verify.');
-      if (routeInfo.route === 'CONSUMER SHIELD') flags.push('Consumer Shield state and creditor restrictions still need to be finalized.');
-      return { populated, totalDebt, verifyAdjustedDebt, routeInfo, stateTier, feeRate, grossCommissionRate, repCommissionRate, fundingTierProfitRate, grossCommission, repCommission, fundingTierProfit, rejectedForLevel, doNothing, shortest, recommended, flags };
-    }
-
     function renderRows(route) {
-      el('rows').innerHTML = state.rows.map((row, index) => {
+      el('rows').innerHTML = state.rows.map(function (row, index) {
         const alerts = rowAlerts(row, route);
-        const bg = alerts.some(a=>a.tone==='red') ? 'border-red-300 bg-red-50' : alerts.some(a=>a.tone==='amber') ? 'border-amber-300 bg-amber-50' : alerts.some(a=>a.tone==='blue') ? 'border-sky-300 bg-sky-50' : 'border-slate-100 bg-white';
-        return `
-          <div class="grid grid-cols-3 gap-3 rounded-2xl border p-3 ${bg}">
-            <div class="space-y-2">
-              <select data-index="${index}" data-key="creditorName">${CREDITOR_OPTIONS.map(o=>`<option ${row.creditorName===o?'selected':''} value="${o}">${o || 'Select creditor'}</option>`).join('')}</select>
-              ${row.creditorName === 'Other / Manual Entry' ? `<input class="input" data-index="${index}" data-key="manualName" placeholder="Type creditor name" value="${row.manualName || ''}" />` : ''}
-              ${alerts.length ? `<div class="flex flex-wrap gap-2 pt-1">${alerts.map(a=>`<span class="rounded-full border px-2 py-1 text-[11px] font-medium ${a.tone==='red'?'bg-red-100 text-red-700 border-red-200':a.tone==='amber'?'bg-amber-100 text-amber-800 border-amber-200':'bg-sky-100 text-sky-700 border-sky-200'}">${a.label}</span>`).join('')}</div>` : ''}
-            </div>
-            <input class="input" data-index="${index}" data-key="amount" placeholder="$0" value="${row.amount || ''}" />
-            <select data-index="${index}" data-key="debtType">${DEBT_TYPES.map(t=>`<option ${row.debtType===t?'selected':''} value="${t}">${t}</option>`).join('')}</select>
-          </div>`;
+        const bg = alerts.some(function (a) { return a.tone === 'red'; }) ? 'border-red-300 bg-red-50' : alerts.some(function (a) { return a.tone === 'amber'; }) ? 'border-amber-300 bg-amber-50' : alerts.some(function (a) { return a.tone === 'blue'; }) ? 'border-sky-300 bg-sky-50' : 'border-slate-100 bg-white';
+        return '<div class="grid grid-cols-[1.1fr,0.55fr,0.95fr,1.2fr] gap-3 rounded-2xl border p-3 ' + bg + '">' +
+          '<div class="space-y-2">' +
+            '<select data-index="' + index + '" data-key="creditorName">' + CREDITOR_OPTIONS.map(function (o) { return '<option ' + (row.creditorName === o ? 'selected' : '') + ' value="' + o + '">' + (o || 'Select creditor') + '</option>'; }).join('') + '</select>' +
+            (row.creditorName === 'Other / Manual Entry' ? '<input class="input" data-index="' + index + '" data-key="manualName" placeholder="Type creditor name" value="' + (row.manualName || '') + '" />' : '') +
+            (alerts.length ? '<div class="flex flex-wrap gap-2 pt-1">' + alerts.map(function (a) { var cls = a.tone === 'red' ? 'bg-red-100 text-red-700 border-red-200' : a.tone === 'amber' ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-sky-100 text-sky-700 border-sky-200'; return '<span class="rounded-full border px-2 py-1 text-[11px] font-medium ' + cls + '">' + a.label + '</span>'; }).join('') + '</div>' : '') +
+          '</div>' +
+          '<input class="input" data-index="' + index + '" data-key="amount" placeholder="$0" value="' + (row.amount || '') + '" />' +
+          '<select data-index="' + index + '" data-key="debtType">' + DEBT_TYPES.map(function (t) { return '<option ' + (row.debtType === t ? 'selected' : '') + ' value="' + t + '">' + t + '</option>'; }).join('') + '</select>' +
+          '<div class="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-white p-2 text-xs">' +
+            '<label class="flex items-center gap-1"><input class="tiny-check" type="checkbox" data-index="' + index + '" data-key="inCollections" ' + (row.inCollections ? 'checked' : '') + ' /> Collections</label>' +
+            '<label class="flex items-center gap-1"><input class="tiny-check" type="checkbox" data-index="' + index + '" data-key="inLitigation" ' + (row.inLitigation ? 'checked' : '') + ' /> Litigation</label>' +
+            '<label class="flex items-center gap-1"><input class="tiny-check" type="checkbox" data-index="' + index + '" data-key="isSecured" ' + (row.isSecured ? 'checked' : '') + ' /> Secured</label>' +
+            '<label class="flex items-center gap-1"><input class="tiny-check" type="checkbox" data-index="' + index + '" data-key="paymentMade" ' + (row.paymentMade ? 'checked' : '') + ' /> Payment made</label>' +
+            '<label class="flex items-center gap-1"><input class="tiny-check" type="checkbox" data-index="' + index + '" data-key="hasCosigner" ' + (row.hasCosigner ? 'checked' : '') + ' /> Co-signer</label>' +
+            '<label class="flex items-center gap-1"><input class="tiny-check" type="checkbox" data-index="' + index + '" data-key="businessUnprofitable" ' + (row.businessUnprofitable ? 'checked' : '') + ' /> Business closed or unprofitable</label>' +
+          '</div>' +
+        '</div>';
       }).join('');
 
-      document.querySelectorAll('#rows [data-index]').forEach(node => {
+      document.querySelectorAll('#rows [data-index]').forEach(function (node) {
         node.addEventListener('input', onFieldChange);
         node.addEventListener('change', onFieldChange);
       });
     }
 
+    function renderComparison(c) {
+      const rows = [
+        ['Monthly Payments', currency(c.doNothing.monthlyPayment), c.shortest ? currency(c.shortest.monthlyPayment) : '—', c.recommended ? currency(c.recommended.monthlyPayment) : '—'],
+        ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.totalDebt) : '—'],
+        ['Months to Payoff', c.doNothing.monthsToPayoff + ' months', c.shortest ? c.shortest.term + ' months' : '—', c.recommended ? c.recommended.term + ' months' : '—'],
+        ['Estimated Int Rate', Math.round(c.doNothing.apr * 100) + '% APR', c.shortest ? '0%' : '—', c.recommended ? '0%' : '—'],
+        ['Estimated Total Payback*', currency(c.doNothing.totalPayback), c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
+        ['Estimated Savings', '—', c.shortest ? '<span class="hyper-green">' + currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost)) + '</span>' : '—', c.recommended ? '<span class="hyper-green">' + currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost)) + '</span>' : '—']
+      ];
+      el('comparisonTable').innerHTML = rows.map(function (r, idx) {
+        return '<tr class="' + (idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50') + '">' +
+          '<td class="border-b px-4 py-4 text-sm font-medium text-slate-600">' + r[0] + '</td>' +
+          '<td class="border-b px-4 py-4 text-sm font-semibold text-slate-900">' + r[1] + '</td>' +
+          '<td class="border-b px-4 py-4 text-sm font-semibold text-slate-900">' + r[2] + '</td>' +
+          '<td class="border-b px-4 py-4 text-sm font-semibold text-slate-900">' + r[3] + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
     function render() {
+      state.creditorScore = el('creditorScore').value;
+      state.budgetSurplus = el('budgetSurplus').value;
+      state.monthlyDraft = el('monthlyDraft').value;
+      state.biWeeklyDraft = el('biWeeklyDraft').value;
+      state.privateStudentLoanProof = el('privateStudentLoanProof').checked;
+      state.notEnrolledInSchool = el('notEnrolledInSchool').checked;
+      state.cosignerAlsoEnrolled = el('cosignerAlsoEnrolled').checked;
+      state.litigationApproved = el('litigationApproved').checked;
+
       const c = compute();
       el('totalDebt').textContent = currency(c.totalDebt);
       renderRows(c.routeInfo.route);
+      renderComparison(c);
+
       const stateFull = state.selectedState ? STATE_NAMES[state.selectedState] : 'No state selected';
       const tierColor = c.stateTier === 'RED' ? '#DC2626' : '#16A34A';
       const tierBg = c.stateTier === 'RED' ? '#FEF2F2' : '#ECFDF5';
-      el('topBadges').innerHTML = `
-        <span class="rounded-full px-4 py-2 text-sm text-white" style="background:${c.routeInfo.route==='LEVEL'?'#009688':c.routeInfo.route==='VERIFY'?'#2563EB':c.routeInfo.route==='CONSUMER SHIELD'?'#7C3AED':c.routeInfo.route==='NO OPTION'?'#DC2626':'#5B5E6D'}">${c.routeInfo.route || 'Pending'}</span>
-        <span class="rounded-full px-4 py-2 text-sm border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">${c.stateTier} State Tier</span>
-        <span class="rounded-full px-4 py-2 text-sm border border-slate-300">State: ${stateFull}</span>`;
+      const routeColor = c.routeInfo.route === 'LEVEL' ? '#009688' : c.routeInfo.route === 'VERIFY' ? '#2563EB' : c.routeInfo.route === 'CONSUMER SHIELD' ? '#7C3AED' : c.routeInfo.route === 'NO OPTION' ? '#DC2626' : '#5B5E6D';
+
+      el('topBadges').innerHTML = '<span class="rounded-full px-4 py-2 text-sm text-white" style="background:' + routeColor + '">' + (c.routeInfo.route || 'Pending') + '</span>' +
+        '<span class="rounded-full px-4 py-2 text-sm border" style="border-color:' + tierColor + '; color:' + tierColor + '; background:' + tierBg + '">' + c.stateTier + ' State Tier</span>' +
+        '<span class="rounded-full px-4 py-2 text-sm border border-slate-300">State: ' + stateFull + '</span>';
+
       el('routeReason').textContent = c.routeInfo.reason;
-      el('metricsGrid').innerHTML = `
-        <div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Current Route</div><div class="mt-1 text-lg font-semibold">${c.routeInfo.route || 'Pending'}</div></div>
-        <div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Fee Rate</div><div class="mt-1 text-lg font-semibold">${(c.feeRate*100).toFixed(0)}%</div></div>
-        <div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Gross Commission</div><div class="mt-1 text-lg font-semibold">${(c.grossCommissionRate*100).toFixed(0)}% • ${currency(c.grossCommission)}</div></div>
-        <div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Rep Commission</div><div class="mt-1 text-lg font-semibold">${(c.repCommissionRate*100).toFixed(0)}% • ${currency(c.repCommission)}</div></div>
-        <div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Funding Tier Profit</div><div class="mt-1 text-lg font-semibold">${currency(c.fundingTierProfit)}</div></div>
-        <div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Level Rejected Creditors</div><div class="mt-1 text-lg font-semibold">${c.routeInfo.route==='LEVEL'?c.rejectedForLevel.length:0}</div></div>
-        ${c.routeInfo.route==='VERIFY' ? `<div class="rounded-2xl bg-slate-50 p-4 md:col-span-2 xl:col-span-3"><div class="text-xs uppercase tracking-wide text-slate-500">Adjusted Verify Debt</div><div class="mt-1 text-lg font-semibold">${currency(c.verifyAdjustedDebt)}</div></div>` : ''}`;
-      el('flags').innerHTML = c.flags.map(flag=>`<div class="flex items-start gap-2 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">⚠️ <span>${flag}</span></div>`).join('');
+      el('metricsGrid').innerHTML =
+        '<div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Current Route</div><div class="mt-1 text-lg font-semibold">' + (c.routeInfo.route || 'Pending') + '</div></div>' +
+        '<div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Fee Rate</div><div class="mt-1 text-lg font-semibold">' + Math.round(c.feeRate * 100) + '%</div></div>' +
+        '<div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Gross Commission</div><div class="mt-1 text-lg font-semibold">' + Math.round(c.grossCommissionRate * 100) + '% • ' + currency(c.grossCommission) + '</div></div>' +
+        '<div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Rep Commission</div><div class="mt-1 text-lg font-semibold">' + Math.round(c.repCommissionRate * 100) + '% • ' + currency(c.repCommission) + '</div></div>' +
+        '<div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Funding Tier Profit</div><div class="mt-1 text-lg font-semibold">' + currency(c.fundingTierProfit) + '</div></div>' +
+        '<div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Level Rejected Creditors</div><div class="mt-1 text-lg font-semibold">' + (c.routeInfo.route === 'LEVEL' ? c.rejectedForLevel.length : 0) + '</div></div>' +
+        (c.routeInfo.route === 'VERIFY' ? '<div class="rounded-2xl bg-slate-50 p-4 md:col-span-2"><div class="text-xs uppercase tracking-wide text-slate-500">Adjusted Verify Debt</div><div class="mt-1 text-lg font-semibold">' + currency(c.verifyAdjustedDebt) + '</div></div>' : '');
 
-      el('doNothingCard').innerHTML = [
-        cardRow('Monthly Payments', currency(c.doNothing.monthlyPayment)),
-        cardRow('Total Estimated Debt', currency(c.doNothing.totalDebt)),
-        cardRow('Months to Payoff', `${c.doNothing.monthsToPayoff} months`),
-        cardRow('Estimated Int Rate', `${(c.doNothing.apr*100).toFixed(0)}% APR`),
-        cardRow('Estimated Total Payback*', currency(c.doNothing.totalPayback))
-      ].join('');
-
-      el('shortestCard').innerHTML = c.shortest ? [
-        cardRow('Monthly Payments', currency(c.shortest.monthlyPayment)),
-        cardRow('Total Estimated Debt', currency(c.totalDebt)),
-        cardRow('Months to Payoff', `${c.shortest.term} months`),
-        cardRow('Estimated Int Rate', '0%'),
-        cardRow('Estimated Total Payback*', currency(c.shortest.totalCost)),
-        cardRow('Estimated Savings', `<span class="hyper-green">${currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost))}</span>`)
-      ].join('') : '<div class="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">Enter state and creditor balances to generate a shortest-payoff option.</div>';
-
-      el('maxCard').innerHTML = c.recommended ? [
-        cardRow('Monthly Payments', currency(c.recommended.monthlyPayment)),
-        cardRow('Total Estimated Debt', currency(c.totalDebt)),
-        cardRow('Months to Payoff', `${c.recommended.term} months`),
-        cardRow('Estimated Int Rate', '0%'),
-        cardRow('Estimated Total Payback*', currency(c.recommended.totalCost)),
-        cardRow('Estimated Savings', `<span class="hyper-green">${currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost))}</span>`)
-      ].join('') : '<div class="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">Enter state and creditor balances to generate a recommended program option.</div>';
+      el('flags').innerHTML = c.flags.map(function (flag) {
+        return '<div class="flex items-start gap-2 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">⚠️ <span>' + flag + '</span></div>';
+      }).join('');
 
       const pdfBtn = el('pdfBtn');
       pdfBtn.disabled = !(c.recommended && state.selectedState && c.totalDebt > 0);
@@ -290,65 +532,70 @@
     function onFieldChange(e) {
       const index = Number(e.target.dataset.index);
       const key = e.target.dataset.key;
-      state.rows[index][key] = e.target.value;
+      if (Number.isInteger(index) && state.rows[index]) {
+        if (e.target.type === 'checkbox') state.rows[index][key] = e.target.checked;
+        else state.rows[index][key] = e.target.value;
+      }
       render();
     }
 
     function buildPdf() {
       const c = compute();
       if (!(c.recommended && state.selectedState && c.totalDebt > 0)) return;
-      const { jsPDF } = window.jspdf;
+      const jsPDF = window.jspdf.jsPDF;
       const doc = new jsPDF();
       let y = 18;
       const lineGap = 7;
       const pageWidth = doc.internal.pageSize.getWidth();
-      const addLine = (text, size=11, color=[0,0,0], x=14) => {
-        doc.setFontSize(size); doc.setTextColor(color[0], color[1], color[2]);
-        const lines = doc.splitTextToSize(String(text), pageWidth - 28); doc.text(lines, x, y); y += lines.length * lineGap;
-      };
-      doc.setFillColor(0,150,136); doc.rect(0,0,pageWidth,24,'F'); doc.setTextColor(255,255,255); doc.setFontSize(18); doc.text('Funding Tier Debt Relief Comparison',14,15); y=34;
-      addLine(`State: ${STATE_NAMES[state.selectedState]}`,11,[91,94,109]);
-      addLine(`Recommended Route: ${c.routeInfo.route}`,11,[91,94,109]);
-      addLine(`Routing Reason: ${c.routeInfo.reason}`,11,[91,94,109]); y += 2;
-      addLine('Deal Summary',14,[0,150,136]);
-      addLine(`Total Enrolled Debt: ${currency(c.totalDebt)}`);
-      addLine(`Gross Commission: ${(c.grossCommissionRate*100).toFixed(0)}% • ${currency(c.grossCommission)}`);
-      addLine(`Rep Commission: ${(c.repCommissionRate*100).toFixed(0)}% • ${currency(c.repCommission)}`);
-      addLine(`Funding Tier Profit: ${currency(c.fundingTierProfit)}`);
-      if (c.routeInfo.route === 'VERIFY') addLine(`Adjusted Verify Compensation Debt: ${currency(c.verifyAdjustedDebt)}`);
-      y += 2;
-      addLine('Do Nothing Scenario',14,[220,38,38]);
-      addLine(`Monthly Payments: ${currency(c.doNothing.monthlyPayment)}`);
-      addLine(`Total Estimated Debt: ${currency(c.doNothing.totalDebt)}`);
-      addLine(`Months to Payoff: ${c.doNothing.monthsToPayoff} months`);
-      addLine(`Estimated Int Rate: ${(c.doNothing.apr*100).toFixed(0)}% APR`);
-      addLine(`Estimated Total Payback*: ${currency(c.doNothing.totalPayback)}`); y += 2;
-      if (c.shortest) {
-        addLine('Shortest Payoff',14,[91,94,109]);
-        addLine(`Monthly Payments: ${currency(c.shortest.monthlyPayment)}`);
-        addLine(`Total Estimated Debt: ${currency(c.totalDebt)}`);
-        addLine(`Months to Payoff: ${c.shortest.term} months`);
-        addLine('Estimated Int Rate: 0%');
-        addLine(`Estimated Total Payback*: ${currency(c.shortest.totalCost)}`);
-        addLine(`Estimated Savings: ${currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost))}`); y += 2;
+      function addLine(text, size, color) {
+        doc.setFontSize(size || 11);
+        const rgb = color || [0,0,0];
+        doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+        const lines = doc.splitTextToSize(String(text), pageWidth - 28);
+        doc.text(lines, 14, y);
+        y += lines.length * lineGap;
       }
-      addLine('Best Option / Recommended',14,[0,150,136]);
-      addLine(`Monthly Payments: ${currency(c.recommended.monthlyPayment)}`);
-      addLine(`Total Estimated Debt: ${currency(c.totalDebt)}`);
-      addLine(`Months to Payoff: ${c.recommended.term} months`);
-      addLine('Estimated Int Rate: 0%');
-      addLine(`Estimated Total Payback*: ${currency(c.recommended.totalCost)}`);
-      addLine(`Estimated Savings: ${currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost))}`); y += 4;
-      if (y > 245) { doc.addPage(); y = 20; }
-      addLine('Creditor Details',14,[0,150,136]);
-      c.populated.forEach((row,idx)=> addLine(`${idx+1}. ${getCreditorDisplayName(row)} — ${currency(numberOrZero(row.amount))} — ${row.debtType}`, 10));
-      y += 4; addLine('*Estimates are based on average credit card interest and minimum payment assumptions. Actual results may vary.',9,[91,94,109]);
-      doc.save('funding-tier-debt-comparison.pdf');
+      doc.setFillColor(0,150,136);
+      doc.rect(0,0,pageWidth,24,'F');
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(18);
+      doc.text('Funding Tier AI - Deal Router', 14, 15);
+      y = 34;
+      addLine('State: ' + STATE_NAMES[state.selectedState], 11, [91,94,109]);
+      addLine('Recommended Route: ' + c.routeInfo.route, 11, [91,94,109]);
+      addLine('Routing Reason: ' + c.routeInfo.reason, 11, [91,94,109]);
+      y += 2;
+      addLine('Deal Summary', 14, [0,150,136]);
+      addLine('Total Enrolled Debt: ' + currency(c.totalDebt));
+      addLine('Gross Commission: ' + Math.round(c.grossCommissionRate * 100) + '% • ' + currency(c.grossCommission));
+      addLine('Rep Commission: ' + Math.round(c.repCommissionRate * 100) + '% • ' + currency(c.repCommission));
+      addLine('Funding Tier Profit: ' + currency(c.fundingTierProfit));
+      if (c.routeInfo.route === 'VERIFY') addLine('Adjusted Verify Compensation Debt: ' + currency(c.verifyAdjustedDebt));
+      y += 2;
+      addLine('Comparison Summary', 14, [0,150,136]);
+      addLine('Do Nothing: ' + currency(c.doNothing.monthlyPayment) + ' / ' + c.doNothing.monthsToPayoff + ' months / ' + currency(c.doNothing.totalPayback));
+      if (c.shortest) addLine('Shortest Payoff: ' + currency(c.shortest.monthlyPayment) + ' / ' + c.shortest.term + ' months / ' + currency(c.shortest.totalCost) + ' / Savings ' + currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost)));
+      if (c.recommended) addLine('Max Term: ' + currency(c.recommended.monthlyPayment) + ' / ' + c.recommended.term + ' months / ' + currency(c.recommended.totalCost) + ' / Savings ' + currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost)));
+      y += 2;
+      addLine('Creditor Details', 14, [0,150,136]);
+      c.populated.forEach(function (row, idx) {
+        addLine((idx + 1) + '. ' + getCreditorDisplayName(row) + ' — ' + currency(numberOrZero(row.amount)) + ' — ' + row.debtType, 10);
+      });
+      if (c.flags.length) {
+        y += 2;
+        addLine('Guideline Notes', 14, [220,38,38]);
+        c.flags.slice(0, 10).forEach(function (flag) { addLine('• ' + flag, 10); });
+      }
+      y += 4;
+      addLine('*Estimates are based on average credit card interest and minimum payment assumptions. Actual results may vary.', 9, [91,94,109]);
+      doc.save('funding-tier-ai-deal-router.pdf');
     }
 
     function init() {
-      el('state').innerHTML = `<option value="">Select state</option>` + STATES.map(([abbr,name])=>`<option value="${abbr}">${name}</option>`).join('');
-      el('state').addEventListener('change', e => { state.selectedState = e.target.value; render(); });
+      el('state').innerHTML = '<option value="">Select state</option>' + STATES.map(function (entry) { return '<option value="' + entry[0] + '">' + entry[1] + '</option>'; }).join('');
+      el('state').addEventListener('change', function (e) { state.selectedState = e.target.value; render(); });
+      ['creditorScore','budgetSurplus','monthlyDraft','biWeeklyDraft'].forEach(function (id) { el(id).addEventListener('input', render); });
+      ['privateStudentLoanProof','notEnrolledInSchool','cosignerAlsoEnrolled','litigationApproved'].forEach(function (id) { el(id).addEventListener('change', render); });
       el('pdfBtn').addEventListener('click', buildPdf);
       render();
     }
