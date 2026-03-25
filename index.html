@@ -79,11 +79,23 @@
       display: inline-block;
       vertical-align: middle;
     }
+    .pricing-logo {
+      max-width: 80px;
+      max-height: 35px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
     .plan-card {
       border-radius: 18px;
       border: 1px solid #d7eeeb;
       padding: 18px;
       background: linear-gradient(180deg, #ffffff 0%, #f5fbfa 100%);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .plan-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
     }
     .plan-chip {
       display: inline-block;
@@ -103,11 +115,7 @@
       font-weight: 800;
       line-height: 1.1;
     }
-    .mini-list {
-      margin-top: 12px;
-      display: grid;
-      gap: 8px;
-    }
+    .mini-list { margin-top: 12px; display: grid; gap: 8px; }
     .mini-list div { font-size: 14px; color: #334155; }
     .diff-box {
       border: 1px solid #bfe3dd;
@@ -139,6 +147,12 @@
       font-weight: 700;
       font-size: 14px;
       line-height: 1.45;
+    }
+    .proposal-header {
+      background: linear-gradient(90deg, rgba(0,150,136,0.08), rgba(255,255,255,1));
+    }
+    .savings-glow {
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 0 24px rgba(0,150,136,0.10);
     }
   </style>
 </head>
@@ -196,7 +210,10 @@
         </div>
 
         <div class="card bg-white p-4 teal-panel">
-          <h2 class="text-base font-semibold">Actions</h2>
+          <div class="flex items-center justify-between gap-3">
+            <h2 class="text-base font-semibold">Actions</h2>
+            <div class="text-xs text-slate-600">Download the program comparison or email it to your prospect.</div>
+          </div>
           <div class="mt-3 grid gap-3 md:grid-cols-[1.2fr,0.9fr,0.9fr] items-end">
             <div>
               <label class="block mb-2 text-sm font-medium">Prospect Email</label>
@@ -204,9 +221,6 @@
             </div>
             <button id="pdfBtn" class="w-full rounded-xl py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-500">Download PDF</button>
             <button id="sendEmailBtn" class="w-full rounded-xl py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-700 to-teal-600">Send Email</button>
-          </div>
-          <div class="mt-3 rounded-xl bg-white/90 border border-teal-100 p-3 text-xs text-slate-600">
-            Email subject: <strong>Your Estimated Debt Relief Savings Snapshot</strong>. Reply emails go to <strong>success@fundingtier.com</strong> when your backend is configured accordingly.
           </div>
         </div>
       </div>
@@ -220,7 +234,7 @@
     </section>
 
     <section class="card bg-white overflow-hidden">
-      <div class="p-6 pb-0 bg-gradient-to-r from-teal-50 via-white to-white">
+      <div class="p-6 pb-0 proposal-header">
         <h2 class="text-2xl font-semibold">Program Comparrison to Current Financial Situation</h2>
         <p class="mt-1 text-slate-600">This view is designed to make it clear that remaining in the minimum-payment path is not a safe long-term outcome for the prospect.</p>
       </div>
@@ -229,9 +243,9 @@
           <thead>
             <tr>
               <th class="border-b bg-slate-100 px-4 py-4 text-left text-sm font-semibold text-slate-700">Detail</th>
-              <th class="border-b bg-red-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">Do Nothing - Keep paying minimum payments to creditors, interest compounding monthly</th>
+              <th class="border-b bg-red-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">CURRENT SITUATION | Interest Compounding, Debt Accumulating</th>
               <th class="border-b bg-white px-4 py-4 text-left text-sm font-semibold text-slate-900">Shortest Payoff<div class="mt-1 text-xs font-medium text-slate-500">Fastest available term</div></th>
-              <th class="border-b bg-emerald-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">Max Term / Recommended<div class="mt-1 inline-flex rounded-full bg-teal-600 px-2 py-1 text-[11px] font-medium text-white">Best Option</div></th>
+              <th class="border-b bg-emerald-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">DEBT RELIEF PROGRAM<div class="mt-1 inline-flex rounded-full bg-teal-600 px-2 py-1 text-[11px] font-medium text-white">Best Option</div></th>
             </tr>
           </thead>
           <tbody id="comparisonTable"></tbody>
@@ -693,19 +707,21 @@
     }
 
     function renderComparison(c) {
+      const totalPaybackRed = `<span style="color:#DC2626;font-weight:800;">${currency(c.doNothing.totalPayback)}</span>`;
+
       const rows = [
         ['Monthly Payments', currency(c.doNothing.monthlyPayment), c.shortest ? currency(c.shortest.monthlyPayment) : '—', c.recommended ? currency(c.recommended.monthlyPayment) : '—'],
         ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.totalDebt) : '—'],
         ['Months to Payoff', `${c.doNothing.monthsToPayoff} months`, c.shortest ? `${c.shortest.term} months` : '—', c.recommended ? `${c.recommended.term} months` : '—'],
         ['Estimated Int Rate', `${(c.doNothing.apr * 100).toFixed(0)}% APR`, c.shortest ? '0%' : '—', c.recommended ? '0%' : '—'],
-        ['Estimated Total Payback*', currency(c.doNothing.totalPayback), c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
+        ['Estimated Total Payback*', totalPaybackRed, c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
         ['Estimated Savings', '—', c.shortest ? `<span class="font-extrabold text-white">${currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost))}</span>` : '—', c.recommended ? `<span class="text-white font-black text-[20px]">${currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost))}</span>` : '—']
       ];
 
       el('comparisonTable').innerHTML = rows.map((r, idx) => {
         const savingsRow = idx === 5;
         return `
-          <tr class="${savingsRow ? 'bg-teal-600' : (idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50')}">
+          <tr class="${savingsRow ? 'bg-teal-600 savings-glow' : (idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50')}">
             <td class="border-b px-4 py-4 text-sm font-medium ${savingsRow ? 'text-white' : 'text-slate-600'}">${r[0]}</td>
             <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[1]}</td>
             <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[2]}</td>
@@ -722,7 +738,7 @@
         cards.push(`
           <div class="plan-card">
             <div class="flex items-center justify-between gap-3">
-              <img src="${ROUTE_LOGOS['CONSUMER SHIELD']}" class="pricing-logo" alt="Consumer Shield logo" />
+              <div>${ROUTE_LOGOS['CONSUMER SHIELD'] ? `<img src="${ROUTE_LOGOS['CONSUMER SHIELD']}" class="pricing-logo" alt="Consumer Shield logo" />` : ''}</div>
               <span class="plan-chip" style="background:rgba(15,118,110,0.10); color:#0f766e;">Consumer Shield</span>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-4">
@@ -738,7 +754,7 @@
         cards.push(`
           <div class="plan-card">
             <div class="flex items-center justify-between gap-3">
-              <img src="${ROUTE_LOGOS['LEVEL']}" class="pricing-logo" alt="Level logo" />
+              <div>${ROUTE_LOGOS['LEVEL'] ? `<img src="${ROUTE_LOGOS['LEVEL']}" class="pricing-logo" alt="Level logo" />` : ''}</div>
               <span class="plan-chip" style="background:rgba(0,150,136,0.10); color:#009688;">Level Debt</span>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-4">
@@ -754,7 +770,7 @@
         cards.push(`
           <div class="plan-card">
             <div class="flex items-center justify-between gap-3">
-              <img src="${ROUTE_LOGOS['VERIFY']}" class="pricing-logo" alt="Verify logo" />
+              <div>${ROUTE_LOGOS['VERIFY'] ? `<img src="${ROUTE_LOGOS['VERIFY']}" class="pricing-logo" alt="Verify logo" />` : ''}</div>
               <span class="plan-chip" style="background:rgba(14,116,144,0.10); color:#0f766e;">Verify</span>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-4">
@@ -778,9 +794,9 @@
               <thead>
                 <tr class="bg-slate-100">
                   <th>Program Features</th>
-                  <th><div class="flex items-center gap-2"><img class="tiny-logo" src="${ROUTE_LOGOS['CONSUMER SHIELD']}" alt="Consumer Shield logo" /><span>Consumer Shield</span></div></th>
-                  <th><div class="flex items-center gap-2"><img class="tiny-logo" src="${ROUTE_LOGOS['LEVEL']}" alt="Level logo" /><span>Level Debt</span></div></th>
-                  <th><div class="flex items-center gap-2"><img class="tiny-logo" src="${ROUTE_LOGOS['VERIFY']}" alt="Verify logo" /><span>Verify</span></div></th>
+                  <th><div class="flex items-center gap-2">${ROUTE_LOGOS['CONSUMER SHIELD'] ? `<img class="tiny-logo" src="${ROUTE_LOGOS['CONSUMER SHIELD']}" alt="Consumer Shield logo" />` : ''}<span>Consumer Shield</span></div></th>
+                  <th><div class="flex items-center gap-2">${ROUTE_LOGOS['LEVEL'] ? `<img class="tiny-logo" src="${ROUTE_LOGOS['LEVEL']}" alt="Level logo" />` : ''}<span>Level Debt</span></div></th>
+                  <th><div class="flex items-center gap-2">${ROUTE_LOGOS['VERIFY'] ? `<img class="tiny-logo" src="${ROUTE_LOGOS['VERIFY']}" alt="Verify logo" />` : ''}<span>Verify</span></div></th>
                 </tr>
               </thead>
               <tbody>
@@ -996,9 +1012,9 @@
       doc.setTextColor(91, 94, 109);
       const introBullets = [
         'This summary compares three payoff scenarios for your enrolled debt.',
-        'The Do Nothing scenario is not a recommended path. It illustrates what may happen if minimum payments continue while interest compounds month after month.',
+        'The current situation is not a recommended path. It illustrates what may happen if minimum payments continue while interest compounds month after month.',
         'Shortest Payoff shows the fastest available program structure based on the current routing.',
-        'Max Term / Recommended shows the longest structured program option, typically designed to reduce the monthly payment while still creating estimated savings versus doing nothing.'
+        'Debt Relief Program shows the structured program option designed to reduce monthly burden while still creating estimated savings versus the current situation.'
       ];
 
       introBullets.forEach((line) => {
@@ -1015,9 +1031,9 @@
 
       const headers = [
         'Detail',
-        'Do Nothing - Keep paying minimum payments to creditors, interest compounding monthly',
+        'CURRENT SITUATION | Interest Compounding, Debt Accumulating',
         'Shortest Payoff',
-        'Max Term / Recommended'
+        'DEBT RELIEF PROGRAM'
       ];
 
       const tableRows = [
@@ -1058,6 +1074,9 @@
           if (isSavingsRow) {
             doc.setTextColor(255, 255, 255);
             doc.setFont(undefined, 'bold');
+          } else if (idx === 4 && i === 1) {
+            doc.setTextColor(220, 38, 38);
+            doc.setFont(undefined, 'bold');
           } else {
             doc.setTextColor(15, 23, 42);
             doc.setFont(undefined, 'normal');
@@ -1073,9 +1092,9 @@
       doc.setFontSize(9);
       doc.setTextColor(91, 94, 109);
       const footerBullets = [
-        'Do Nothing means continuing to make minimum payments while interest compounds monthly, which can keep the debt active for a very long time.',
+        'Current Situation means continuing to make minimum payments while interest compounds monthly, which can keep the debt active for a very long time.',
         'Shortest Payoff means the fastest currently available program term based on the selected servicing route.',
-        'Max Term / Recommended means the longest available structured term, often intended to lower the monthly payment while still showing estimated savings versus the minimum-payment path.',
+        'Debt Relief Program means the structured program option intended to lower the monthly payment burden while still showing estimated savings versus the current path.',
         'Estimates are illustrative and final program terms may vary.'
       ];
 
@@ -1101,76 +1120,77 @@
       URL.revokeObjectURL(url);
     }
 
-async function sendProspectEmail() {
-  const email = el('prospectEmail').value.trim();
-  if (!email) {
-    alert('Enter a prospect email first.');
-    return;
-  }
+    async function sendProspectEmail() {
+      const email = el('prospectEmail').value.trim();
+      if (!email) {
+        alert('Enter a prospect email first.');
+        return;
+      }
 
-  const blob = await generatePdfBlob();
-  if (!blob) {
-    alert('Complete the scenario first.');
-    return;
-  }
+      const blob = await generatePdfBlob();
+      if (!blob) {
+        alert('Complete the scenario first.');
+        return;
+      }
 
-  const arrayBuffer = await blob.arrayBuffer();
-  const bytes = new Uint8Array(arrayBuffer);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i += 1) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  const pdfBase64 = btoa(binary);
+      const arrayBuffer = await blob.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i += 1) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const pdfBase64 = btoa(binary);
 
-  const btn = el('sendEmailBtn');
-  const originalText = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
+      const btn = el('sendEmailBtn');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
 
-  try {
-    const res = await fetch(EMAIL_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to: email,
-        subject: EMAIL_SUBJECT,
-        text: EMAIL_BODY,
-        filename: 'DEBT SETTLEMENT - SAVINGS SCENARIO.pdf',
-        pdfBase64
-      })
-    });
+      try {
+        const res = await fetch(EMAIL_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: email,
+            subject: EMAIL_SUBJECT,
+            text: EMAIL_BODY,
+            filename: 'DEBT SETTLEMENT - SAVINGS SCENARIO.pdf',
+            pdfBase64
+          })
+        });
 
-    const raw = await res.text();
+        const raw = await res.text();
 
-    let data;
-    try {
-      data = JSON.parse(raw);
-    } catch {
-      throw new Error(raw || 'Server returned a non-JSON response.');
+        let data;
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          throw new Error(raw || 'Server returned a non-JSON response.');
+        }
+
+        if (!res.ok) {
+          const errorMessage =
+            typeof data?.error === 'string'
+              ? data.error
+              : data?.error?.message || data?.details || JSON.stringify(data);
+          throw new Error(errorMessage);
+        }
+
+        alert('Email sent successfully.');
+      } catch (err) {
+        alert(err.message || 'Failed to send email.');
+        console.error('Send email error:', err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
     }
-
-    if (!res.ok) {
-      const errorMessage =
-        typeof data?.error === 'string'
-          ? data.error
-          : data?.error?.message || data?.details || JSON.stringify(data);
-      throw new Error(errorMessage);
-    }
-
-    alert('Email sent successfully.');
-  } catch (err) {
-    alert(err.message || 'Failed to send email.');
-    console.error('Send email error:', err);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = originalText;
-  }
-}
 
     function initStateSelect() {
       el('state').innerHTML =
         '<option value="">Select state</option>' +
         STATES.map(([abbr, name]) => `<option value="${abbr}" title="${name}">${abbr}</option>`).join('');
+
       el('state').addEventListener('change', (e) => {
         state.selectedState = e.target.value;
         render();
