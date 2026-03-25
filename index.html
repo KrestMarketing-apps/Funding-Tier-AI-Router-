@@ -549,7 +549,7 @@
         ['Months to Payoff', `${c.doNothing.monthsToPayoff} months`, c.shortest ? `${c.shortest.term} months` : '—', c.recommended ? `${c.recommended.term} months` : '—'],
         ['Estimated Int Rate', `${(c.doNothing.apr*100).toFixed(0)}% APR`, c.shortest ? '0%' : '—', c.recommended ? '0%' : '—'],
         ['Estimated Total Payback*', currency(c.doNothing.totalPayback), c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
-        ['Estimated Savings', '—', c.shortest ? `<span class="brand-teal font-extrabold">${currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost))}</span>` : '—', c.recommended ? `<span class="savings-emphasis">${currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost))}</span>` : '—']
+        ['Estimated Savings', '—', c.shortest ? `<span class="font-extrabold text-white">${currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost))}</span>` : '—', c.recommended ? `<span class="text-white font-black text-[20px]">${currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost))}</span>` : '—']
       ];
 
       el('comparisonTable').innerHTML = rows.map((r, idx)=>{
