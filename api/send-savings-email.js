@@ -27,7 +27,8 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Funding Tier <success@fundingtier.com>',
+        from: 'Funding Tier <success@emailservice.fundingtier.com>',
+reply_to: 'success@fundingtier.com',
         to: [to],
         subject: subject || 'Your Estimated Debt Relief Savings Snapshot',
         text:
