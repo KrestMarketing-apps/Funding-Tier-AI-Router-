@@ -128,6 +128,7 @@
         <div class="space-y-4">
           <div class="flex flex-wrap gap-3" id="topBadges"></div>
           <div id="routeReason" class="rounded-xl bg-slate-50 p-3 text-sm text-slate-700"></div>
+          <div id="providerAvailability" class="grid gap-3 md:grid-cols-2 xl:grid-cols-3"></div>
           <div id="metricsGrid" class="grid gap-3 md:grid-cols-3 xl:grid-cols-6"></div>
         </div>
       </div>
@@ -217,16 +218,20 @@
     const EMAIL_BODY = 'Hello, please view the attachment to better understand how you can save through a debt settlement program.';
     const EMAIL_ENDPOINT = '/api/send-savings-email';
 
-    const VERIFY_ONLY_STATES = ['GU','HI','ME','MT','PR','SC','SD','UT','WI','IL'];
-    const NO_DS_STATES = ['AK','RI','VT','WV','OR'];
-
     const STATE_NAMES = {
       AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',GU:'Guam',PR:'Puerto Rico'
     };
     const STATES = Object.entries(STATE_NAMES);
-    const GREEN_STATES = new Set(['AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','IA','ID','IN','KS','KY','LA','MA','MD','MI','MN','MO','MS','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','PA','TN','TX','VA','WA','WY']);
-    const CONSUMER_SHIELD_SERVICE_STATES = new Set(['AL','AK','AZ','AR','CA','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NH','NM','NV','NY','ND','OH','OK','RI','SC','SD','TN','TX','UT','VA','VT','WA','WV','WI','WY']);
-    const CONSUMER_SHIELD_RED_STATES = new Set(['CO','PA','NJ','OR','NC','PR','TX','WA']);
+
+    const LEVEL_RED_STATES = new Set(['CT','GA','LA','MN','NV','NH','NJ','ND','OH','PA','TN','WA','WY']);
+    const LEVEL_GREEN_STATES = new Set(['AL','AZ','AR','CA','DC','FL','ID','IN','IA','KY','MD','MA','MI','MS','MO','NE','NM','NY','OK','TX','VA']);
+    const LEVEL_BLACKOUT_STATES = new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
+
+    const VERIFY_RED_STATES = new Set(['CO','CT','DE','GA','HI','IA','ID','IL','KS','KY','LA','MA','ME','MN','MS','MT','NC','ND','NH','NJ','NV','OH','PA','SC','TN','TX','UT','VA','WA','WI','WY']);
+    const VERIFY_GREEN_STATES = new Set(['AL','AZ','AR','CA','DC','FL','IN','MD','MO','NE','NM','NY','OK','SD']);
+    const VERIFY_BLACKOUT_STATES = new Set(['AK','RI','VT','WV','OR']);
+
+    const CONSUMER_SHIELD_BLACKOUT_STATES = new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
 
     const CREDITOR_OPTIONS = ['', 'American Express','Bank of America','Capital One','Chase','Citi','Discover','Wells Fargo','Synchrony','Upstart','LendingClub','OneMain Financial','SoFi','Avant','Best Egg','Klarna','Goodleap','Sunbit','RBC Bank','USAA','Republic Finance','Mariner Finance','Regional Finance','Lendmark','Navient','Other / Manual Entry'];
     const DEBT_TYPES = ['Unsecured Credit Card','Unsecured Personal Loan','Payday Loan','Tribal Loan','Medical Bill','Back Rent','Private Student Loan','Business Debt','Repossession Deficiency','Apartment Back Rent (Collections)','Unsecured Line of Credit','Cell Phone Bill','Utility Bill','USAA','Deficiency','Auto Repo Deficiency','Peer-to-Peer Loan','Timeshare','Mortgage','Federal Student Loan','Navient Student Loan','Judgment','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','SBA Loan','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Other'];
@@ -240,6 +245,7 @@
 
     const LEVEL_CONDITIONAL_CREDITORS = ['Lendmark','Mariner Finance','OneMain','Regional Finance','Republic Finance'];
     const LEVEL_REJECTED_TYPES = ['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt'];
+
     const LEVEL_SETTLEMENT_RATE = 0.50;
 
     const state = {
@@ -275,9 +281,43 @@
       });
     };
     const getCreditorDisplayName = row => row.creditorName === 'Other / Manual Entry' ? (row.manualName || 'Manual Creditor') : (row.creditorName || '');
-    const getStateTier = code => GREEN_STATES.has(code) ? 'GREEN' : 'RED';
+
+    function getLevelStateStatus(stateCode) {
+      if (!stateCode) return { status: 'UNKNOWN', label: 'Unknown' };
+      if (LEVEL_BLACKOUT_STATES.has(stateCode)) return { status: 'BLACKOUT', label: 'Black Out' };
+      if (LEVEL_RED_STATES.has(stateCode)) return { status: 'RED', label: 'Attorney Model' };
+      if (LEVEL_GREEN_STATES.has(stateCode)) return { status: 'GREEN', label: 'Standard Model' };
+      return { status: 'BLACKOUT', label: 'Black Out' };
+    }
+
+    function getVerifyStateStatus(stateCode) {
+      if (!stateCode) return { status: 'UNKNOWN', label: 'Unknown' };
+      if (VERIFY_BLACKOUT_STATES.has(stateCode)) return { status: 'BLACKOUT', label: 'Black Out' };
+      if (VERIFY_RED_STATES.has(stateCode)) return { status: 'RED', label: 'Attorney Model' };
+      if (VERIFY_GREEN_STATES.has(stateCode)) return { status: 'GREEN', label: 'Standard Model' };
+      return { status: 'BLACKOUT', label: 'Black Out' };
+    }
+
+    function getConsumerShieldStateStatus(stateCode) {
+      if (!stateCode) return { status: 'UNKNOWN', label: 'Unknown' };
+      if (CONSUMER_SHIELD_BLACKOUT_STATES.has(stateCode)) return { status: 'BLACKOUT', label: 'Black Out' };
+      return { status: 'GREEN', label: 'Serviceable' };
+    }
+
+    function getLevelRouteLabel(stateCode) {
+      const s = getLevelStateStatus(stateCode);
+      if (s.status === 'RED') return 'LEVEL DEBT: ATTORNEY MODEL_PINNACLE LEGAL';
+      return 'LEVEL DEBT';
+    }
+
+    function getVerifyRouteLabel(stateCode) {
+      const s = getVerifyStateStatus(stateCode);
+      if (s.status === 'RED') return 'VERIFY DEBT SOLUTIONS: ATTORNEY MODEL';
+      return 'VERIFY DEBT SOLUTIONS';
+    }
+
     const getLevelMaxTerm = debt => debt < 10000 ? 24 : debt < 12500 ? 30 : debt < 15000 ? 36 : debt < 25000 ? 42 : debt < 35000 ? 48 : debt < 50000 ? 54 : 60;
-    const getVerifyMaxTerm = debt => debt > 35000 ? 56 : debt > 30000 ? 54 : debt > 25000 ? 52 : debt > 24000 ? 50 : debt > 23000 ? 49 : debt > 22000 ? 48 : debt > 20000 ? 47 : debt > 19000 ? 46 : debt > 18000 ? 45 : debt > 17000 ? 44 : debt > 16000 ? 43 : debt > 15000 ? 42 : debt > 14000 ? 41 : debt > 13000 ? 40 : debt > 12000 ? 39 : debt > 11000 ? 37 : debt > 10000 ? 35 : null;
+    const getVerifyMaxTerm = debt => debt >= 7000 && debt <= 10000 ? 35 : debt > 35000 ? 56 : debt > 30000 ? 54 : debt > 25000 ? 52 : debt > 24000 ? 50 : debt > 23000 ? 49 : debt > 22000 ? 48 : debt > 20000 ? 47 : debt > 19000 ? 46 : debt > 18000 ? 45 : debt > 17000 ? 44 : debt > 16000 ? 43 : debt > 15000 ? 42 : debt > 14000 ? 41 : debt > 13000 ? 40 : debt > 12000 ? 39 : debt > 11000 ? 37 : debt > 10000 ? 35 : null;
     const getVerifyPayableBalance = (amount, debtType, isManual) =>
       debtType === 'Medical Bill' ? Math.min(amount,5000) :
       ['Credit Union Loan','Auto Repo Deficiency','Judgment'].includes(debtType) ? Math.min(amount,10000) :
@@ -317,8 +357,7 @@
       const flags = [];
       if (totalDebt > 0 && totalDebt < 4000) flags.push('Consumer Shield requires at least $4,000 total enrolled debt.');
       if (totalDebt >= 4000 && totalDebt < 5500) flags.push('For $4,000 to $5,499, Consumer Shield still uses a $220 payment floor.');
-      if (stateCode && !CONSUMER_SHIELD_SERVICE_STATES.has(stateCode)) flags.push('Consumer Shield does not service this state.');
-      if (stateCode && CONSUMER_SHIELD_RED_STATES.has(stateCode)) flags.push('Consumer Shield marks this state as red or non-sell.');
+      if (stateCode && getConsumerShieldStateStatus(stateCode).status === 'BLACKOUT') flags.push('Consumer Shield does not service this state.');
       rows.forEach(row => {
         const amount = numberOrZero(row.amount);
         if (!amount) return;
@@ -361,18 +400,59 @@
     }
 
     function getRoute(totalDebt, stateCode, flags) {
-      if (!stateCode) return { route:'', reason:'Select a state to calculate routing.' };
-
-      if (totalDebt > 0 && totalDebt < 7000) {
-        if (flags.consumerShield.some(f => f.includes('not accepted') || f.includes('does not service') || f.includes('red or non-sell') || f.includes('requires at least'))) {
-          return { route:'NO OPTION', reason:'Consumer Shield would normally handle debts below $7,000, but this deal does not currently meet Consumer Shield guidelines.' };
-        }
-        return { route:'CONSUMER SHIELD', reason:'Debt below $7,000 routes to Consumer Shield when state and account types qualify.' };
+      if (!stateCode) {
+        return { route:'', reason:'Select a state to calculate routing.' };
       }
 
-      if (NO_DS_STATES.includes(stateCode)) return { route:'NO OPTION', reason:'No current debt settlement coverage in this state for Level Debt or Verify.' };
-      if (VERIFY_ONLY_STATES.includes(stateCode)) return { route:'VERIFY', reason:'Level Debt is unavailable in this state, so Verify is the fallback.' };
-      return { route:'LEVEL', reason:'Level Debt is prioritized whenever available due to stronger economics.' };
+      const csStatus = getConsumerShieldStateStatus(stateCode);
+      const levelStatus = getLevelStateStatus(stateCode);
+      const verifyStatus = getVerifyStateStatus(stateCode);
+
+      const consumerShieldEligible =
+        csStatus.status !== 'BLACKOUT' &&
+        !flags.consumerShield.some(f =>
+          f.includes('not accepted') ||
+          f.includes('requires at least')
+        );
+
+      const levelEligible = levelStatus.status !== 'BLACKOUT';
+      const verifyEligible = verifyStatus.status !== 'BLACKOUT';
+
+      if (totalDebt > 0 && totalDebt < 7000) {
+        if (consumerShieldEligible) {
+          return {
+            route: 'CONSUMER SHIELD',
+            reason: 'Debt below $7,000 routes to Consumer Shield when the state and account profile are serviceable.'
+          };
+        }
+        return {
+          route: 'NO OPTION',
+          reason: 'Debt is below $7,000 and Consumer Shield is not serviceable or eligible for this deal.'
+        };
+      }
+
+      if (levelEligible) {
+        return {
+          route: 'LEVEL',
+          reason: levelStatus.status === 'RED'
+            ? 'Best option is Level Debt under the attorney model in this state.'
+            : 'Best option is Level Debt in this serviceable non-attorney state.'
+        };
+      }
+
+      if (verifyEligible) {
+        return {
+          route: 'VERIFY',
+          reason: verifyStatus.status === 'RED'
+            ? 'Level is not serviceable here, so the deal routes to Verify under the attorney model.'
+            : 'Level is not serviceable here, so the deal routes to Verify in this serviceable non-attorney state.'
+        };
+      }
+
+      return {
+        route: 'NO OPTION',
+        reason: 'No available backend is serviceable in this state.'
+      };
     }
 
     function compute() {
@@ -381,12 +461,30 @@
       const consumerShieldFlags = getConsumerShieldFlags(populated, totalDebt, state.selectedState);
       const levelFlags = getLevelFlags(populated, totalDebt, state.selectedState, state);
       const routeInfo = getRoute(totalDebt, state.selectedState, { consumerShield: consumerShieldFlags, level: levelFlags });
-      const stateTier = state.selectedState ? getStateTier(state.selectedState) : 'GREEN';
-      const feeRate = routeInfo.route === 'LEVEL' ? (stateTier === 'GREEN' ? 0.25 : 0.27) : routeInfo.route === 'VERIFY' ? (stateTier === 'GREEN' ? 0.25 : 0.30) : 0;
+
+      const levelStateStatus = getLevelStateStatus(state.selectedState);
+      const verifyStateStatus = getVerifyStateStatus(state.selectedState);
+      const consumerShieldStateStatus = getConsumerShieldStateStatus(state.selectedState);
+
+      const stateTier =
+        routeInfo.route === 'LEVEL'
+          ? levelStateStatus.status
+          : routeInfo.route === 'VERIFY'
+            ? verifyStateStatus.status
+            : 'GREEN';
+
+      const feeRate =
+        routeInfo.route === 'LEVEL'
+          ? (levelStateStatus.status === 'RED' ? 0.27 : 0.25)
+          : routeInfo.route === 'VERIFY'
+            ? (verifyStateStatus.status === 'RED' ? 0.30 : 0.25)
+            : 0;
+
       const verifyAdjustedDebt = populated.reduce((s,r)=> {
         const manual = r.creditorName === 'Other / Manual Entry' || !!r.manualName;
         return s + getVerifyPayableBalance(numberOrZero(r.amount), r.debtType, manual);
       },0);
+
       const grossCommissionRate = routeInfo.route === 'LEVEL' ? 0.08 : routeInfo.route === 'VERIFY' ? 0.06 : 0;
       const repCommissionRate = grossCommissionRate > 0 ? 0.01 : 0;
       const commissionBase = routeInfo.route === 'VERIFY' ? verifyAdjustedDebt : totalDebt;
@@ -432,7 +530,7 @@
       };
 
       const levelComparisonTerm = totalDebt > 0 ? getLevelMaxTerm(totalDebt) : 0;
-      const levelComparisonFeeRate = stateTier === 'GREEN' ? 0.25 : 0.27;
+      const levelComparisonFeeRate = levelStateStatus.status === 'RED' ? 0.27 : 0.25;
       const levelComparisonTotalCost = totalDebt > 0 ? (totalDebt * LEVEL_SETTLEMENT_RATE + totalDebt * levelComparisonFeeRate) : 0;
       const levelComparison = {
         term: levelComparisonTerm,
@@ -478,7 +576,10 @@
         recommended,
         consumerShieldComparison,
         levelComparison,
-        flags: Array.from(new Set(flags))
+        flags: Array.from(new Set(flags)),
+        levelStateStatus,
+        verifyStateStatus,
+        consumerShieldStateStatus
       };
     }
 
@@ -583,19 +684,14 @@
       const csUnavailable = [];
       const ldUnavailable = [];
 
-      if (state.selectedState && !CONSUMER_SHIELD_SERVICE_STATES.has(state.selectedState)) {
-        csUnavailable.push('X - State is not available for service');
-      }
-      if (totalDebt > 0 && totalDebt < 4000) {
-        csUnavailable.push('X - Debt amount too low');
-      }
+      const csState = getConsumerShieldStateStatus(state.selectedState);
+      const levelState = getLevelStateStatus(state.selectedState);
 
-      if (state.selectedState && (NO_DS_STATES.includes(state.selectedState) || VERIFY_ONLY_STATES.includes(state.selectedState))) {
-        ldUnavailable.push('X - State is not available for service');
-      }
-      if (totalDebt > 0 && totalDebt < 7000) {
-        ldUnavailable.push('X - Debt amount too low');
-      }
+      if (csState.status === 'BLACKOUT') csUnavailable.push('X - State is not available for service');
+      if (totalDebt > 0 && totalDebt < 4000) csUnavailable.push('X - Debt amount too low');
+
+      if (levelState.status === 'BLACKOUT') ldUnavailable.push('X - State is not available for service');
+      if (totalDebt > 0 && totalDebt < 7000) ldUnavailable.push('X - Debt amount too low');
 
       el('pricingComparison').innerHTML =
         '<div class="plan-card">' +
@@ -641,12 +737,85 @@
     }
 
     function renderProviderLogo(route) {
-      const src = ROUTE_LOGOS[route];
-      if (!src) {
+      let src = '';
+      let alt = '';
+      let title = '';
+
+      if (route === 'LEVEL') {
+        src = ROUTE_LOGOS['LEVEL'];
+        title = getLevelRouteLabel(state.selectedState);
+        alt = title;
+      } else if (route === 'VERIFY') {
+        src = ROUTE_LOGOS['VERIFY'];
+        title = getVerifyRouteLabel(state.selectedState);
+        alt = title;
+      } else if (route === 'CONSUMER SHIELD') {
+        src = ROUTE_LOGOS['CONSUMER SHIELD'];
+        title = 'CONSUMER SHIELD';
+        alt = title;
+      } else {
         el('providerLogoBox').innerHTML = '';
         return;
       }
-      el('providerLogoBox').innerHTML = `<div class="provider-logo-wrap"><img class="provider-logo" src="${src}" alt="${route} logo" /></div>`;
+
+      el('providerLogoBox').innerHTML = `
+        <div class="provider-logo-wrap flex-col gap-3">
+          <img class="provider-logo" src="${src}" alt="${alt}" />
+          <div class="text-center text-sm font-semibold text-slate-700">${title}</div>
+        </div>
+      `;
+    }
+
+    function buildProviderAvailability(c) {
+      const levelStatus = c.levelStateStatus;
+      const verifyStatus = c.verifyStateStatus;
+      const csStatus = c.consumerShieldStateStatus;
+
+      const providers = [
+        {
+          key: 'LEVEL',
+          name: levelStatus.status === 'RED' ? 'LEVEL DEBT: ATTORNEY MODEL_PINNACLE LEGAL' : 'LEVEL DEBT',
+          status: levelStatus.status,
+          best: c.routeInfo.route === 'LEVEL'
+        },
+        {
+          key: 'VERIFY',
+          name: verifyStatus.status === 'RED' ? 'VERIFY DEBT SOLUTIONS: ATTORNEY MODEL' : 'VERIFY DEBT SOLUTIONS',
+          status: verifyStatus.status,
+          best: c.routeInfo.route === 'VERIFY'
+        },
+        {
+          key: 'CONSUMER SHIELD',
+          name: 'CONSUMER SHIELD',
+          status: csStatus.status,
+          best: c.routeInfo.route === 'CONSUMER SHIELD'
+        }
+      ];
+
+      return providers.map(p => {
+        const icon = p.status === 'BLACKOUT' ? '✖' : '✔';
+        const border =
+          p.best ? 'border-green-500 bg-green-50' :
+          p.status === 'BLACKOUT' ? 'border-black bg-black text-white' :
+          'border-green-400 bg-white';
+
+        const sublabel =
+          p.status === 'RED' ? 'Attorney Model' :
+          p.status === 'GREEN' ? 'Serviceable' :
+          p.status === 'BLACKOUT' ? 'Not Serviceable' :
+          'Unknown';
+
+        return `
+          <div class="rounded-xl border p-3 ${border}">
+            <div class="flex items-center gap-2 text-sm font-semibold">
+              <span>${icon}</span>
+              <span>${p.name}</span>
+              ${p.best ? '<span class="ml-auto rounded-full bg-green-600 px-2 py-1 text-[10px] font-bold text-white">BEST OPTION</span>' : ''}
+            </div>
+            <div class="mt-1 text-xs ${p.status === 'BLACKOUT' ? 'text-white/80' : 'text-slate-600'}">${sublabel}</div>
+          </div>
+        `;
+      }).join('');
     }
 
     function render() {
@@ -663,10 +832,15 @@
       const tierBg = c.stateTier === 'RED' ? '#FEF2F2' : '#ECFDF5';
 
       el('topBadges').innerHTML =
-        (c.routeInfo.route === 'CONSUMER SHIELD' ? '' : `<span class="rounded-full px-4 py-2 text-sm border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">${c.stateTier} State Tier</span>`) +
-        `<span class="rounded-full px-4 py-2 text-sm border border-slate-300">State: ${stateFull}</span>`;
+        `<span class="rounded-full px-4 py-2 text-sm border border-slate-300">State: ${stateFull}</span>` +
+        (c.routeInfo.route === 'LEVEL'
+          ? `<span class="rounded-full px-4 py-2 text-sm border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">Level: ${c.levelStateStatus.label}</span>`
+          : c.routeInfo.route === 'VERIFY'
+            ? `<span class="rounded-full px-4 py-2 text-sm border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">Verify: ${c.verifyStateStatus.label}</span>`
+            : `<span class="rounded-full px-4 py-2 text-sm border border-teal-300 bg-teal-50 text-teal-700">Consumer Shield: ${c.consumerShieldStateStatus.label}</span>`);
 
       el('routeReason').textContent = c.routeInfo.reason;
+      el('providerAvailability').innerHTML = buildProviderAvailability(c);
 
       el('metricsGrid').innerHTML = `
         <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs uppercase tracking-wide text-slate-500">Current Route</div><div class="mt-1 text-base font-semibold">${c.routeInfo.route || 'Pending'}</div></div>
