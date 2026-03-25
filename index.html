@@ -72,6 +72,23 @@
       padding: 18px;
       background: #f8fafc;
     }
+    .provider-logo-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 120px;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      background: #ffffff;
+    }
+    .provider-logo {
+      max-width: 275px;
+      max-height: 150px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-teal-50 via-white to-slate-50 p-4 md:p-8 text-slate-900">
@@ -79,9 +96,7 @@
     <div class="card bg-white p-6 md:p-8">
       <div class="inline-flex items-center gap-2 rounded-full px-4 py-1 text-sm font-medium" style="background: rgba(0,150,136,0.08); color:#009688;">Funding Tier Calculator</div>
       <h1 class="mt-3 text-3xl md:text-5xl font-semibold tracking-tight">Funding Tier AI - Deal Router</h1>
-      <p class="mt-3 max-w-3xl leading-7 text-slate-600">
-        Compare the cost of doing nothing against structured debt relief options, route the deal instantly, compare Consumer Shield vs Level Debt program pricing, and generate/send a branded PDF summary for the prospect.
-      </p>
+      <p class="mt-3 max-w-3xl leading-7 text-slate-600">Compare the cost of doing nothing against structured debt relief options, route the deal instantly, compare Consumer Shield vs Level Debt program pricing, and generate or send a branded PDF summary for the prospect.</p>
     </div>
 
     <div class="grid gap-8 xl:grid-cols-[1.35fr,0.65fr]">
@@ -118,6 +133,7 @@
       <div class="space-y-6">
         <div class="card bg-white p-6">
           <h2 class="text-2xl font-semibold">Routing & Internal Metrics</h2>
+          <div id="providerLogoBox" class="mt-4"></div>
           <div class="mt-4 flex flex-wrap gap-3" id="topBadges"></div>
           <div id="routeReason" class="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-700"></div>
           <div id="metricsGrid" class="mt-4 grid gap-3 rounded-xl border border-slate-200 p-4 md:grid-cols-2"></div>
@@ -132,9 +148,7 @@
             <input id="prospectEmail" class="input" type="email" placeholder="prospect@email.com" />
           </div>
           <button id="sendEmailBtn" class="mt-3 w-full rounded-xl py-4 text-base font-semibold text-white" style="background:#0f766e;">Send Prospect Email</button>
-          <div class="mt-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
-            Sends a PDF attachment with subject line <strong>Your Estimated Debt Relief Savings Snapshot</strong>.
-          </div>
+          <div class="mt-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">Sends a PDF attachment with subject line <strong>Your Estimated Debt Relief Savings Snapshot</strong>. Reply emails go to <strong>success@fundingtier.com</strong> when your backend is configured accordingly.</div>
         </div>
       </div>
     </div>
@@ -148,26 +162,17 @@
 
     <div class="card bg-white overflow-hidden">
       <div class="p-6 pb-0">
-        <h2 class="text-2xl font-semibold">Program Comparison</h2>
-        <p class="mt-1 text-slate-600">Scenarios run left to right. The details stay aligned in vertical rows.</p>
+        <h2 class="text-2xl font-semibold">How Does This Save Time and Money for Our Client</h2>
+        <p class="mt-1 text-slate-600">Understanding the difference from NOT ENROLLING VS ENROLLING IN A PROGRAM</p>
       </div>
       <div class="overflow-x-auto p-6">
         <table class="w-full min-w-[920px] border-collapse">
           <thead>
             <tr>
               <th class="border-b bg-slate-100 px-4 py-4 text-left text-sm font-semibold text-slate-700">Detail</th>
-              <th class="border-b bg-red-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">
-                Do Nothing
-                <div class="mt-1 text-xs font-medium text-red-600">Minimum payment path</div>
-              </th>
-              <th class="border-b bg-white px-4 py-4 text-left text-sm font-semibold text-slate-900">
-                Shortest Payoff
-                <div class="mt-1 text-xs font-medium text-slate-500">Fastest available term</div>
-              </th>
-              <th class="border-b bg-emerald-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">
-                Max Term / Recommended
-                <div class="mt-1 inline-flex rounded-full bg-teal-600 px-2 py-1 text-[11px] font-medium text-white">Best Option</div>
-              </th>
+              <th class="border-b bg-red-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">Do Nothing<div class="mt-1 text-xs font-medium text-red-600">Minimum payment path</div></th>
+              <th class="border-b bg-white px-4 py-4 text-left text-sm font-semibold text-slate-900">Shortest Payoff<div class="mt-1 text-xs font-medium text-slate-500">Fastest available term</div></th>
+              <th class="border-b bg-emerald-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">Max Term / Recommended<div class="mt-1 inline-flex rounded-full bg-teal-600 px-2 py-1 text-[11px] font-medium text-white">Best Option</div></th>
             </tr>
           </thead>
           <tbody id="comparisonTable"></tbody>
@@ -178,6 +183,11 @@
 
   <script>
     const LOGO_URL = 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf8e8df54a8b29097c4.png';
+    const ROUTE_LOGOS = {
+      'CONSUMER SHIELD': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png',
+      'LEVEL': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp',
+      'VERIFY': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c03ff7b858d1d4d04.webp'
+    };
     const EMAIL_SUBJECT = 'Your Estimated Debt Relief Savings Snapshot';
     const EMAIL_BODY = 'Hello, please view the attachment to better understand how you can save through a debt settlement program.';
     const EMAIL_ENDPOINT = '/api/send-savings-email';
@@ -260,6 +270,26 @@
       ['Credit Union Loan','Auto Repo Deficiency','Judgment'].includes(debtType) ? Math.min(amount,10000) :
       isManual ? Math.min(amount,10000) : amount;
 
+    function getConsumerShieldProgramLength(totalDebt) {
+      if (totalDebt >= 4000 && totalDebt <= 4999) return 18;
+      if (totalDebt >= 5000 && totalDebt <= 8800) return 24;
+      if (totalDebt > 8800) return 36;
+      return 0;
+    }
+
+    function getConsumerShieldProgramPayment(totalDebt) {
+      if (totalDebt >= 50000) return 620;
+      if (totalDebt >= 30000) return 520;
+      if (totalDebt >= 25000) return 420;
+      if (totalDebt >= 20000) return 370;
+      if (totalDebt >= 15000) return 320;
+      if (totalDebt >= 10000) return 270;
+      if (totalDebt >= 5500) return 220;
+      if (totalDebt >= 5000) return 220;
+      if (totalDebt >= 4000) return 220;
+      return 0;
+    }
+
     function calcDoNothing(totalDebt, apr=0.24) {
       const monthlyPayment = totalDebt * 0.025;
       const monthlyRate = apr / 12;
@@ -273,9 +303,9 @@
     function getConsumerShieldFlags(rows, totalDebt, stateCode) {
       const flags = [];
       if (totalDebt > 0 && totalDebt < 4000) flags.push('Consumer Shield requires at least $4,000 total enrolled debt.');
-      if (totalDebt >= 4000 && totalDebt < 5500) flags.push('For $4,000–$5,500, Gabe Germino may need to manually add the $220 payment.');
+      if (totalDebt >= 4000 && totalDebt < 5500) flags.push('For $4,000 to $5,499, Consumer Shield still uses a $220 payment floor.');
       if (stateCode && !CONSUMER_SHIELD_SERVICE_STATES.has(stateCode)) flags.push('Consumer Shield does not service this state.');
-      if (stateCode && CONSUMER_SHIELD_RED_STATES.has(stateCode)) flags.push('Consumer Shield marks this state as red / non-sell.');
+      if (stateCode && CONSUMER_SHIELD_RED_STATES.has(stateCode)) flags.push('Consumer Shield marks this state as red or non-sell.');
       rows.forEach(row => {
         const amount = numberOrZero(row.amount);
         if (!amount) return;
@@ -321,7 +351,7 @@
       if (!stateCode) return { route:'', reason:'Select a state to calculate routing.' };
 
       if (totalDebt > 0 && totalDebt < 7000) {
-        if (flags.consumerShield.some(f => f.includes('not accepted') || f.includes('does not service') || f.includes('red / non-sell') || f.includes('requires at least'))) {
+        if (flags.consumerShield.some(f => f.includes('not accepted') || f.includes('does not service') || f.includes('red or non-sell') || f.includes('requires at least'))) {
           return { route:'NO OPTION', reason:'Consumer Shield would normally handle debts below $7,000, but this deal does not currently meet Consumer Shield guidelines.' };
         }
         return { route:'CONSUMER SHIELD', reason:'Debt below $7,000 routes to Consumer Shield when state and account types qualify.' };
@@ -370,23 +400,23 @@
           recommended = { term:maxTerm, totalCost, monthlyPayment:(totalCost/maxTerm)+50 };
         }
       } else if (routeInfo.route === 'CONSUMER SHIELD') {
-        const term = totalDebt > 8800 ? 36 : 24;
-        const monthlyPayment = Math.max(220, totalDebt / term);
+        const term = getConsumerShieldProgramLength(totalDebt);
+        const monthlyPayment = getConsumerShieldProgramPayment(totalDebt);
         const totalCost = monthlyPayment * term;
         shortest = { term, totalCost, monthlyPayment };
         recommended = { term, totalCost, monthlyPayment };
       }
 
-      const consumerShieldTerm = totalDebt > 8800 ? 36 : 24;
-      const consumerShieldMonthly = totalDebt > 0 ? Math.max(220, totalDebt / consumerShieldTerm) : 0;
+      const consumerShieldTerm = getConsumerShieldProgramLength(totalDebt);
+      const consumerShieldMonthly = getConsumerShieldProgramPayment(totalDebt);
       const consumerShieldComparison = {
-        term: totalDebt > 0 ? consumerShieldTerm : 0,
+        term: consumerShieldTerm,
         monthlyPayment: consumerShieldMonthly,
         benefits: [
-          '4-prong support model',
-          'Credit report violation monitoring',
-          'Credit builder support',
-          'Resolve law firm membership'
+          'Lower stress through a structured monthly plan',
+          'Support that may help monitor credit report issues',
+          'Additional tools that may help rebuild credit',
+          'Extra legal-support style resources built into the program'
         ]
       };
 
@@ -397,10 +427,10 @@
         term: levelComparisonTerm,
         monthlyPayment: levelComparisonTerm > 0 ? levelComparisonTotalCost / levelComparisonTerm : 0,
         benefits: [
-          'Longer term flexibility',
-          'Higher rep/gross commission economics',
-          'Structured debt settlement pacing',
-          'Priority routing when available'
+          'Longer terms can create lower monthly payments',
+          'Flexible structure based on total enrolled debt',
+          'Designed to reduce the payoff burden versus minimum payments',
+          'Can create more breathing room in the monthly budget'
         ]
       };
 
@@ -413,8 +443,8 @@
       }
       if (routeInfo.route === 'CONSUMER SHIELD') {
         flags.push(...consumerShieldFlags);
-        flags.push('Consumer Shield support is Monday–Friday, 9am–7pm EST.');
-        flags.push('Consumer Shield will not send communications after 8pm in the contact’s local time unless already a client.');
+        flags.push('Consumer Shield support is Monday through Friday, 9am to 7pm EST.');
+        flags.push('Consumer Shield will not send communications after 8pm in the contact local time unless already a client.');
         flags.push('Consumer Shield uses Equifax for credit pull.');
       }
       if (routeInfo.route === 'NO OPTION') flags.push(routeInfo.reason);
@@ -522,14 +552,16 @@
         ['Estimated Savings', '—', c.shortest ? `<span class="brand-teal font-extrabold">${currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost))}</span>` : '—', c.recommended ? `<span class="savings-emphasis">${currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost))}</span>` : '—']
       ];
 
-      el('comparisonTable').innerHTML = rows.map((r, idx)=>`
-        <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}">
-          <td class="border-b px-4 py-4 text-sm font-medium text-slate-600">${r[0]}</td>
-          <td class="border-b px-4 py-4 text-sm font-semibold text-slate-900">${r[1]}</td>
-          <td class="border-b px-4 py-4 text-sm font-semibold text-slate-900">${r[2]}</td>
-          <td class="border-b px-4 py-4 text-sm font-semibold text-slate-900">${r[3]}</td>
-        </tr>
-      `).join('');
+      el('comparisonTable').innerHTML = rows.map((r, idx)=>{
+        const savingsRow = idx === 5;
+        return `
+        <tr class="${savingsRow ? 'bg-teal-600' : (idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50')}">
+          <td class="border-b px-4 py-4 text-sm font-medium ${savingsRow ? 'text-white' : 'text-slate-600'}">${r[0]}</td>
+          <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[1]}</td>
+          <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[2]}</td>
+          <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[3]}</td>
+        </tr>`;
+      }).join('');
     }
 
     function renderPricingComparison(c) {
@@ -558,33 +590,36 @@
         '<div class="diff-box">' +
           '<h3 class="text-lg font-semibold">How the Two Options Differ</h3>' +
           '<div class="mt-3 grid gap-3 md:grid-cols-3 text-sm text-slate-700">' +
-            '<div><strong>Term Structure:</strong> Consumer Shield uses a shorter fixed-style program length, while Level Debt can extend longer based on enrolled debt.</div>' +
-            '<div><strong>Payment Shape:</strong> Consumer Shield may show a higher required floor payment, while Level Debt often spreads cost across a longer term to reduce the monthly payment.</div>' +
-            '<div><strong>Value Proposition:</strong> Consumer Shield emphasizes bundled support tools, while Level Debt emphasizes flexible term design and preferred routing when eligible.</div>' +
+            '<div><strong>Monthly Comfort:</strong> Level Debt may create a lower monthly payment when a longer term is available, while Consumer Shield follows a more fixed payment ladder.</div>' +
+            '<div><strong>Program Style:</strong> Consumer Shield adds bundled support resources, while Level Debt is designed around flexible term ranges tied to total debt.</div>' +
+            '<div><strong>Client Experience:</strong> Both options aim to reduce the burden versus staying on minimum payments, but the payment feel and program pace can look different depending on total debt.</div>' +
           '</div>' +
         '</div>';
     }
 
+    function renderProviderLogo(route) {
+      const src = ROUTE_LOGOS[route];
+      if (!src) {
+        el('providerLogoBox').innerHTML = '';
+        return;
+      }
+      el('providerLogoBox').innerHTML = `<div class="provider-logo-wrap"><img class="provider-logo" src="${src}" alt="${route} logo" /></div>`;
+    }
+
     function render() {
       state.creditorScore = el('creditorScore').value;
-
       const c = compute();
       el('totalDebt').textContent = currency(c.totalDebt);
       refreshRowVisuals();
       renderComparison(c);
       renderPricingComparison(c);
+      renderProviderLogo(c.routeInfo.route);
 
       const stateFull = state.selectedState ? STATE_NAMES[state.selectedState] : 'No state selected';
       const tierColor = c.stateTier === 'RED' ? '#DC2626' : '#16A34A';
       const tierBg = c.stateTier === 'RED' ? '#FEF2F2' : '#ECFDF5';
-      const routeColor =
-        c.routeInfo.route==='LEVEL' ? '#009688' :
-        c.routeInfo.route==='VERIFY' ? '#2563EB' :
-        c.routeInfo.route==='CONSUMER SHIELD' ? '#7C3AED' :
-        c.routeInfo.route==='NO OPTION' ? '#DC2626' : '#5B5E6D';
 
       el('topBadges').innerHTML =
-        `<span class="rounded-full px-4 py-2 text-sm text-white" style="background:${routeColor}">${c.routeInfo.route || 'Pending'}</span>` +
         (c.routeInfo.route === 'CONSUMER SHIELD' ? '' : `<span class="rounded-full px-4 py-2 text-sm border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">${c.stateTier} State Tier</span>`) +
         `<span class="rounded-full px-4 py-2 text-sm border border-slate-300">State: ${stateFull}</span>`;
 
@@ -688,12 +723,18 @@
 
       doc.setFontSize(10);
       doc.setTextColor(91, 94, 109);
-      const intro = doc.splitTextToSize(
-        'This summary compares three payoff scenarios for your enrolled debt. The Do Nothing scenario estimates what could happen if you continue making minimum monthly payments at a typical high credit card APR. Shortest Payoff shows the fastest available program structure based on the current routing. Max Term / Recommended shows the longest structured program option, typically designed to reduce the monthly payment while still creating estimated savings versus doing nothing.',
-        pageWidth - 28
-      );
-      doc.text(intro, 14, y);
-      y += intro.length * 5 + 6;
+      const introBullets = [
+        'This summary compares three payoff scenarios for your enrolled debt.',
+        'The Do Nothing scenario estimates what could happen if you continue making minimum monthly payments at a typical high credit card APR.',
+        'Shortest Payoff shows the fastest available program structure based on the current routing.',
+        'Max Term / Recommended shows the longest structured program option, typically designed to reduce the monthly payment while still creating estimated savings versus doing nothing.'
+      ];
+      introBullets.forEach(line => {
+        const lines = doc.splitTextToSize('• ' + line, pageWidth - 28);
+        doc.text(lines, 14, y);
+        y += lines.length * 5 + 1;
+      });
+      y += 4;
 
       doc.setFontSize(11);
       doc.setTextColor(0,0,0);
@@ -712,7 +753,6 @@
 
       const colX = [14, 62, 110, 158];
       const rowH = 10;
-
       doc.setFillColor(241, 245, 249);
       doc.rect(14, y, 182, rowH, 'F');
       doc.setFontSize(9);
@@ -721,13 +761,22 @@
       y += rowH;
 
       tableRows.forEach((row, idx) => {
-        if (idx % 2 === 1) {
+        const isSavingsRow = idx === 5;
+        if (isSavingsRow) {
+          doc.setFillColor(0,150,136);
+          doc.rect(14, y, 182, rowH, 'F');
+        } else if (idx % 2 === 1) {
           doc.setFillColor(248, 250, 252);
           doc.rect(14, y, 182, rowH, 'F');
         }
         row.forEach((cell, i) => {
-          if (idx === 5 && i > 1 && cell !== '—') doc.setTextColor(0, 150, 136);
-          else doc.setTextColor(15, 23, 42);
+          if (isSavingsRow) {
+            doc.setTextColor(255,255,255);
+            doc.setFont(undefined, 'bold');
+          } else {
+            doc.setTextColor(15,23,42);
+            doc.setFont(undefined, 'normal');
+          }
           doc.text(String(cell), colX[i] + 2, y + 6);
         });
         y += rowH;
@@ -736,11 +785,17 @@
       y += 8;
       doc.setFontSize(9);
       doc.setTextColor(91,94,109);
-      const notes = doc.splitTextToSize(
-        'Do Nothing means staying on the minimum payment path. Shortest Payoff means the fastest currently available program term based on the selected servicing route. Max Term / Recommended means the longest available structured term, often intended to lower the monthly payment while still showing estimated savings versus the minimum-payment path. Estimates are illustrative and final program terms may vary.',
-        pageWidth - 28
-      );
-      doc.text(notes, 14, y);
+      const footerBullets = [
+        'Do Nothing means staying on the minimum payment path.',
+        'Shortest Payoff means the fastest currently available program term based on the selected servicing route.',
+        'Max Term / Recommended means the longest available structured term, often intended to lower the monthly payment while still showing estimated savings versus the minimum-payment path.',
+        'Estimates are illustrative and final program terms may vary.'
+      ];
+      footerBullets.forEach(line => {
+        const lines = doc.splitTextToSize('• ' + line, pageWidth - 28);
+        doc.text(lines, 14, y);
+        y += lines.length * 5 + 1;
+      });
 
       return doc.output('blob');
     }
@@ -800,12 +855,17 @@
         const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data?.error || 'Failed to send email.');
+          const errorMessage =
+            typeof data?.error === 'string'
+              ? data.error
+              : data?.error?.message || data?.error?.name || data?.details || JSON.stringify(data);
+          throw new Error(errorMessage);
         }
 
         alert('Email sent successfully.');
       } catch (err) {
         alert(err.message || 'Failed to send email.');
+        console.error('Send email error:', err);
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;
