@@ -56,7 +56,7 @@
       line-height: 1.1;
     }
     .mini-list {
-      margin-top: 10px;
+      margin-top: 12px;
       display: grid;
       gap: 8px;
     }
@@ -74,10 +74,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 120px;
-      padding: 12px;
+      min-height: 110px;
+      padding: 10px;
       border: 1px solid #e2e8f0;
-      border-radius: 18px;
+      border-radius: 16px;
       background: #ffffff;
     }
     .provider-logo {
@@ -96,9 +96,10 @@
       padding: 12px 14px;
       font-weight: 700;
       font-size: 14px;
+      line-height: 1.45;
     }
     .pricing-logo {
-      max-width: 180px;
+      max-width: 170px;
       max-height: 56px;
       width: auto;
       height: auto;
@@ -122,60 +123,58 @@
 
     <div class="card bg-white p-6">
       <h2 class="text-2xl font-semibold">Routing & Internal Metrics</h2>
-      <div class="mt-4 grid gap-4 xl:grid-cols-[280px,1fr] items-start">
+      <div class="mt-4 grid gap-4 xl:grid-cols-[290px,1fr] items-start">
         <div id="providerLogoBox"></div>
         <div class="space-y-4">
           <div class="flex flex-wrap gap-3" id="topBadges"></div>
-          <div id="routeReason" class="rounded-xl bg-slate-50 p-4 text-sm text-slate-700"></div>
-          <div id="metricsGrid" class="grid gap-3 rounded-xl border border-slate-200 p-4 md:grid-cols-3 xl:grid-cols-6"></div>
+          <div id="routeReason" class="rounded-xl bg-slate-50 p-3 text-sm text-slate-700"></div>
+          <div id="metricsGrid" class="grid gap-3 md:grid-cols-3 xl:grid-cols-6"></div>
         </div>
       </div>
       <div id="flags" class="mt-4 space-y-2"></div>
     </div>
 
-    <div class="grid gap-8">
-      <div class="card bg-white p-6">
-        <h2 class="text-2xl font-semibold">Deal Inputs</h2>
-        <p class="mt-1 text-slate-600">Enter state, creditor score, and up to 5 creditors. Routing and comparison update automatically.</p>
+    <div class="card bg-white p-6">
+      <h2 class="text-2xl font-semibold">Deal Inputs</h2>
+      <p class="mt-1 text-slate-600">Enter state, creditor score, and up to 5 creditors. Routing and comparison update automatically.</p>
 
-        <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <div>
-            <label class="block mb-2 text-sm font-medium">State</label>
-            <select id="state"></select>
-          </div>
-          <div>
-            <label class="block mb-2 text-sm font-medium">Creditor Score</label>
-            <input id="creditorScore" class="input" value="650" />
-          </div>
-          <div>
-            <label class="block mb-2 text-sm font-medium">Total Enrolled Debt</label>
-            <div id="totalDebt" class="rounded-xl border bg-slate-50 px-4 py-3 text-lg font-semibold">$0</div>
-          </div>
+      <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div>
+          <label class="block mb-2 text-sm font-medium">State</label>
+          <select id="state"></select>
         </div>
-
-        <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200">
-          <div class="grid grid-cols-[1.2fr,0.7fr,1fr,0.8fr] gap-3 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
-            <div>Creditor Name</div>
-            <div>Debt Amount</div>
-            <div>Debt Type</div>
-            <div>Conditions</div>
-          </div>
-          <div id="rows" class="space-y-2 p-3"></div>
+        <div>
+          <label class="block mb-2 text-sm font-medium">Creditor Score</label>
+          <input id="creditorScore" class="input" value="650" />
+        </div>
+        <div>
+          <label class="block mb-2 text-sm font-medium">Total Enrolled Debt</label>
+          <div id="totalDebt" class="rounded-xl border bg-slate-50 px-4 py-3 text-lg font-semibold">$0</div>
         </div>
       </div>
 
-      <div class="card bg-white p-6">
-        <h2 class="text-2xl font-semibold">Actions</h2>
-        <div class="grid gap-4 lg:grid-cols-[1fr,1fr,1.2fr] items-end">
-          <button id="pdfBtn" class="w-full rounded-xl py-4 text-base font-semibold text-white" style="background:#009688;">Download Prospect PDF</button>
-          <button id="sendEmailBtn" class="w-full rounded-xl py-4 text-base font-semibold text-white" style="background:#0f766e;">Send Prospect Email</button>
-          <div>
-            <label class="block mb-2 text-sm font-medium">Prospect Email</label>
-            <input id="prospectEmail" class="input" type="email" placeholder="prospect@email.com" />
-          </div>
+      <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200">
+        <div class="grid grid-cols-[1.2fr,0.7fr,1fr,0.8fr] gap-3 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
+          <div>Creditor Name</div>
+          <div>Debt Amount</div>
+          <div>Debt Type</div>
+          <div>Conditions</div>
         </div>
-        <div class="mt-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">Sends a PDF attachment with subject line <strong>Your Estimated Debt Relief Savings Snapshot</strong>. Reply emails go to <strong>success@fundingtier.com</strong> when your backend is configured accordingly.</div>
+        <div id="rows" class="space-y-2 p-3"></div>
       </div>
+    </div>
+
+    <div class="card bg-white p-6">
+      <h2 class="text-2xl font-semibold">Actions</h2>
+      <div class="grid gap-4 lg:grid-cols-[1fr,1fr,1.2fr] items-end">
+        <button id="pdfBtn" class="w-full rounded-xl py-4 text-base font-semibold text-white" style="background:#009688;">Download Prospect PDF</button>
+        <button id="sendEmailBtn" class="w-full rounded-xl py-4 text-base font-semibold text-white" style="background:#0f766e;">Send Prospect Email</button>
+        <div>
+          <label class="block mb-2 text-sm font-medium">Prospect Email</label>
+          <input id="prospectEmail" class="input" type="email" placeholder="prospect@email.com" />
+        </div>
+      </div>
+      <div class="mt-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">Sends a PDF attachment with subject line <strong>Your Estimated Debt Relief Savings Snapshot</strong>. Reply emails go to <strong>success@fundingtier.com</strong> when your backend is configured accordingly.</div>
     </div>
 
     <div class="card bg-white p-6">
@@ -225,23 +224,12 @@
       AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',GU:'Guam',PR:'Puerto Rico'
     };
     const STATES = Object.entries(STATE_NAMES);
-
     const GREEN_STATES = new Set(['AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','IA','ID','IN','KS','KY','LA','MA','MD','MI','MN','MO','MS','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','PA','TN','TX','VA','WA','WY']);
     const CONSUMER_SHIELD_SERVICE_STATES = new Set(['AL','AK','AZ','AR','CA','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NH','NM','NV','NY','ND','OH','OK','RI','SC','SD','TN','TX','UT','VA','VT','WA','WV','WI','WY']);
     const CONSUMER_SHIELD_RED_STATES = new Set(['CO','PA','NJ','OR','NC','PR','TX','WA']);
 
     const CREDITOR_OPTIONS = ['', 'American Express','Bank of America','Capital One','Chase','Citi','Discover','Wells Fargo','Synchrony','Upstart','LendingClub','OneMain Financial','SoFi','Avant','Best Egg','Klarna','Goodleap','Sunbit','RBC Bank','USAA','Republic Finance','Mariner Finance','Regional Finance','Lendmark','Navient','Other / Manual Entry'];
-
-    const DEBT_TYPES = [
-      'Unsecured Credit Card','Unsecured Personal Loan','Payday Loan','Tribal Loan','Medical Bill','Back Rent',
-      'Private Student Loan','Business Debt','Repossession Deficiency','Apartment Back Rent (Collections)',
-      'Unsecured Line of Credit','Cell Phone Bill','Utility Bill','USAA','Deficiency','Auto Repo Deficiency',
-      'Peer-to-Peer Loan','Timeshare','Mortgage','Federal Student Loan','Navient Student Loan','Judgment',
-      'IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual',
-      'Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account',
-      'AFES Account','SBA Loan','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account',
-      'Employer Debt','Other'
-    ];
+    const DEBT_TYPES = ['Unsecured Credit Card','Unsecured Personal Loan','Payday Loan','Tribal Loan','Medical Bill','Back Rent','Private Student Loan','Business Debt','Repossession Deficiency','Apartment Back Rent (Collections)','Unsecured Line of Credit','Cell Phone Bill','Utility Bill','USAA','Deficiency','Auto Repo Deficiency','Peer-to-Peer Loan','Timeshare','Mortgage','Federal Student Loan','Navient Student Loan','Judgment','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','SBA Loan','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Other'];
 
     const CONSUMER_SHIELD_REJECTED_TYPES = ['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account'];
     const CONSUMER_SHIELD_CONDITIONAL_TYPES = ['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt'];
@@ -432,16 +420,14 @@
         recommended = { term, totalCost, monthlyPayment };
       }
 
-      const consumerShieldTerm = getConsumerShieldProgramLength(totalDebt);
-      const consumerShieldMonthly = getConsumerShieldProgramPayment(totalDebt);
       const consumerShieldComparison = {
-        term: consumerShieldTerm,
-        monthlyPayment: consumerShieldMonthly,
+        term: getConsumerShieldProgramLength(totalDebt),
+        monthlyPayment: getConsumerShieldProgramPayment(totalDebt),
         benefits: [
-          'Lower stress through a structured monthly plan',
-          'Support that may help monitor credit report issues',
-          'Additional tools that may help rebuild credit',
-          'Extra legal-support style resources built into the program'
+          'Simple payment structure that is easy to follow',
+          'Built-in support resources that can add peace of mind',
+          'Extra tools that may help improve financial stability during the program',
+          'A more guided experience for clients who want structure'
         ]
       };
 
@@ -452,10 +438,10 @@
         term: levelComparisonTerm,
         monthlyPayment: levelComparisonTerm > 0 ? levelComparisonTotalCost / levelComparisonTerm : 0,
         benefits: [
-          'Longer terms can create lower monthly payments',
-          'Flexible structure based on total enrolled debt',
-          'Designed to reduce the payoff burden versus minimum payments',
-          'Can create more breathing room in the monthly budget'
+          'Longer terms can reduce the monthly payment burden',
+          'Flexible term ranges based on the amount of debt enrolled',
+          'Designed to create breathing room in the household budget',
+          'Can be appealing for clients focused on affordability month to month'
         ]
       };
 
@@ -646,8 +632,8 @@
               '<tbody>' +
                 '<tr><td class="font-semibold">Monthly payment style</td><td>Uses a structured payment ladder based on enrolled debt tiers.</td><td>Can spread cost across longer terms, which may reduce the monthly payment.</td></tr>' +
                 '<tr><td class="font-semibold">Program length</td><td>Typically follows shorter defined term buckets.</td><td>Uses broader term ranges tied to the size of the enrolled debt.</td></tr>' +
-                '<tr><td class="font-semibold">Support experience</td><td>Emphasizes bundled support features and added client resources.</td><td>Emphasizes flexible term design and payment relief through structure.</td></tr>' +
-                '<tr><td class="font-semibold">Who may prefer it</td><td>Clients who want a more fixed monthly structure and bundled support tools.</td><td>Clients who want maximum flexibility and the possibility of a lower monthly obligation.</td></tr>' +
+                '<tr><td class="font-semibold">Support experience</td><td>Built around a more guided structure with bundled support features.</td><td>Built around term flexibility and affordability through longer range options.</td></tr>' +
+                '<tr><td class="font-semibold">Best fit</td><td>May fit clients who want a more fixed and structured plan design.</td><td>May fit clients who want the possibility of a lower monthly obligation.</td></tr>' +
               '</tbody>' +
             '</table>' +
           '</div>' +
@@ -666,7 +652,6 @@
     function render() {
       state.creditorScore = el('creditorScore').value;
       const c = compute();
-
       el('totalDebt').textContent = currency(c.totalDebt);
       refreshRowVisuals();
       renderComparison(c);
@@ -887,9 +872,7 @@
       const arrayBuffer = await blob.arrayBuffer();
       const bytes = new Uint8Array(arrayBuffer);
       let binary = '';
-      for (let i = 0; i < bytes.length; i += 1) {
-        binary += String.fromCharCode(bytes[i]);
-      }
+      for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
       const pdfBase64 = btoa(binary);
 
       const btn = el('sendEmailBtn');
