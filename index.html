@@ -1101,62 +1101,71 @@
       URL.revokeObjectURL(url);
     }
 
-    async function sendProspectEmail() {
-      const email = el('prospectEmail').value.trim();
-      if (!email) {
-        alert('Enter a prospect email first.');
-        return;
-      }
+async function sendProspectEmail() {
+  const email = el('prospectEmail').value.trim();
+  if (!email) {
+    alert('Enter a prospect email first.');
+    return;
+  }
 
-      const blob = await generatePdfBlob();
-      if (!blob) {
-        alert('Complete the scenario first.');
-        return;
-      }
+  const blob = await generatePdfBlob();
+  if (!blob) {
+    alert('Complete the scenario first.');
+    return;
+  }
 
-      const arrayBuffer = await blob.arrayBuffer();
-      const bytes = new Uint8Array(arrayBuffer);
-      let binary = '';
-      for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
-      const pdfBase64 = btoa(binary);
+  const arrayBuffer = await blob.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 1) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const pdfBase64 = btoa(binary);
 
-      const btn = el('sendEmailBtn');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Sending...';
+  const btn = el('sendEmailBtn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
 
-      try {
-        const res = await fetch(EMAIL_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: email,
-            subject: EMAIL_SUBJECT,
-            text: EMAIL_BODY,
-            filename: 'DEBT SETTLEMENT - SAVINGS SCENARIO.pdf',
-            pdfBase64
-          })
-        });
+  try {
+    const res = await fetch(EMAIL_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: email,
+        subject: EMAIL_SUBJECT,
+        text: EMAIL_BODY,
+        filename: 'DEBT SETTLEMENT - SAVINGS SCENARIO.pdf',
+        pdfBase64
+      })
+    });
 
-        const data = await res.json();
+    const raw = await res.text();
 
-        if (!res.ok) {
-          const errorMessage =
-            typeof data?.error === 'string'
-              ? data.error
-              : data?.error?.message || data?.details || JSON.stringify(data);
-          throw new Error(errorMessage);
-        }
-
-        alert('Email sent successfully.');
-      } catch (err) {
-        alert(err.message || 'Failed to send email.');
-        console.error('Send email error:', err);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      throw new Error(raw || 'Server returned a non-JSON response.');
     }
+
+    if (!res.ok) {
+      const errorMessage =
+        typeof data?.error === 'string'
+          ? data.error
+          : data?.error?.message || data?.details || JSON.stringify(data);
+      throw new Error(errorMessage);
+    }
+
+    alert('Email sent successfully.');
+  } catch (err) {
+    alert(err.message || 'Failed to send email.');
+    console.error('Send email error:', err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
 
     function initStateSelect() {
       el('state').innerHTML =
