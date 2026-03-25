@@ -22,8 +22,6 @@
       border-color: #009688;
       box-shadow: 0 0 0 3px rgba(0,150,136,0.12);
     }
-    .brand-teal { color: #009688; }
-    .savings-emphasis { color: #009688; font-weight: 900; font-size: 20px; }
     .conditions-select {
       min-height: 88px;
       font-size: 12px;
@@ -89,6 +87,29 @@
       height: auto;
       object-fit: contain;
     }
+    .unavailable-box {
+      margin-top: 16px;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #b91c1c;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .pricing-logo {
+      max-width: 180px;
+      max-height: 56px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    .pricing-compare-table td,
+    .pricing-compare-table th {
+      border: 1px solid #cbd5e1;
+      padding: 12px;
+      vertical-align: top;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-teal-50 via-white to-slate-50 p-4 md:p-8 text-slate-900">
@@ -99,7 +120,20 @@
       <p class="mt-3 max-w-3xl leading-7 text-slate-600">Compare the cost of doing nothing against structured debt relief options, route the deal instantly, compare Consumer Shield vs Level Debt program pricing, and generate or send a branded PDF summary for the prospect.</p>
     </div>
 
-    <div class="grid gap-8 xl:grid-cols-[1.35fr,0.65fr]">
+    <div class="card bg-white p-6">
+      <h2 class="text-2xl font-semibold">Routing & Internal Metrics</h2>
+      <div class="mt-4 grid gap-4 xl:grid-cols-[280px,1fr] items-start">
+        <div id="providerLogoBox"></div>
+        <div class="space-y-4">
+          <div class="flex flex-wrap gap-3" id="topBadges"></div>
+          <div id="routeReason" class="rounded-xl bg-slate-50 p-4 text-sm text-slate-700"></div>
+          <div id="metricsGrid" class="grid gap-3 rounded-xl border border-slate-200 p-4 md:grid-cols-3 xl:grid-cols-6"></div>
+        </div>
+      </div>
+      <div id="flags" class="mt-4 space-y-2"></div>
+    </div>
+
+    <div class="grid gap-8">
       <div class="card bg-white p-6">
         <h2 class="text-2xl font-semibold">Deal Inputs</h2>
         <p class="mt-1 text-slate-600">Enter state, creditor score, and up to 5 creditors. Routing and comparison update automatically.</p>
@@ -130,26 +164,17 @@
         </div>
       </div>
 
-      <div class="space-y-6">
-        <div class="card bg-white p-6">
-          <h2 class="text-2xl font-semibold">Routing & Internal Metrics</h2>
-          <div id="providerLogoBox" class="mt-4"></div>
-          <div class="mt-4 flex flex-wrap gap-3" id="topBadges"></div>
-          <div id="routeReason" class="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-700"></div>
-          <div id="metricsGrid" class="mt-4 grid gap-3 rounded-xl border border-slate-200 p-4 md:grid-cols-2"></div>
-          <div id="flags" class="mt-4 space-y-2"></div>
-        </div>
-
-        <div class="card bg-white p-6">
-          <h2 class="text-2xl font-semibold">Actions</h2>
-          <button id="pdfBtn" class="mt-4 w-full rounded-xl py-4 text-base font-semibold text-white" style="background:#009688;">Download Prospect PDF</button>
-          <div class="mt-4">
+      <div class="card bg-white p-6">
+        <h2 class="text-2xl font-semibold">Actions</h2>
+        <div class="grid gap-4 lg:grid-cols-[1fr,1fr,1.2fr] items-end">
+          <button id="pdfBtn" class="w-full rounded-xl py-4 text-base font-semibold text-white" style="background:#009688;">Download Prospect PDF</button>
+          <button id="sendEmailBtn" class="w-full rounded-xl py-4 text-base font-semibold text-white" style="background:#0f766e;">Send Prospect Email</button>
+          <div>
             <label class="block mb-2 text-sm font-medium">Prospect Email</label>
             <input id="prospectEmail" class="input" type="email" placeholder="prospect@email.com" />
           </div>
-          <button id="sendEmailBtn" class="mt-3 w-full rounded-xl py-4 text-base font-semibold text-white" style="background:#0f766e;">Send Prospect Email</button>
-          <div class="mt-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">Sends a PDF attachment with subject line <strong>Your Estimated Debt Relief Savings Snapshot</strong>. Reply emails go to <strong>success@fundingtier.com</strong> when your backend is configured accordingly.</div>
         </div>
+        <div class="mt-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">Sends a PDF attachment with subject line <strong>Your Estimated Debt Relief Savings Snapshot</strong>. Reply emails go to <strong>success@fundingtier.com</strong> when your backend is configured accordingly.</div>
       </div>
     </div>
 
@@ -188,6 +213,7 @@
       'LEVEL': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp',
       'VERIFY': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c03ff7b858d1d4d04.webp'
     };
+
     const EMAIL_SUBJECT = 'Your Estimated Debt Relief Savings Snapshot';
     const EMAIL_BODY = 'Hello, please view the attachment to better understand how you can save through a debt settlement program.';
     const EMAIL_ENDPOINT = '/api/send-savings-email';
@@ -201,7 +227,6 @@
     const STATES = Object.entries(STATE_NAMES);
 
     const GREEN_STATES = new Set(['AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','IA','ID','IN','KS','KY','LA','MA','MD','MI','MN','MO','MS','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','PA','TN','TX','VA','WA','WY']);
-
     const CONSUMER_SHIELD_SERVICE_STATES = new Set(['AL','AK','AZ','AR','CA','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NH','NM','NV','NY','ND','OH','OK','RI','SC','SD','TN','TX','UT','VA','VT','WA','WV','WI','WY']);
     const CONSUMER_SHIELD_RED_STATES = new Set(['CO','PA','NJ','OR','NC','PR','TX','WA']);
 
@@ -567,32 +592,64 @@
     function renderPricingComparison(c) {
       const cs = c.consumerShieldComparison;
       const ld = c.levelComparison;
+      const totalDebt = c.totalDebt;
+
+      const csUnavailable = [];
+      const ldUnavailable = [];
+
+      if (state.selectedState && !CONSUMER_SHIELD_SERVICE_STATES.has(state.selectedState)) {
+        csUnavailable.push('X - State is not available for service');
+      }
+      if (totalDebt > 0 && totalDebt < 4000) {
+        csUnavailable.push('X - Debt amount too low');
+      }
+
+      if (state.selectedState && (NO_DS_STATES.includes(state.selectedState) || VERIFY_ONLY_STATES.includes(state.selectedState))) {
+        ldUnavailable.push('X - State is not available for service');
+      }
+      if (totalDebt > 0 && totalDebt < 7000) {
+        ldUnavailable.push('X - Debt amount too low');
+      }
 
       el('pricingComparison').innerHTML =
         '<div class="plan-card">' +
-          '<span class="plan-chip" style="background:rgba(15,118,110,0.10); color:#0f766e;">Consumer Shield</span>' +
+          '<div class="flex items-start justify-between gap-3">' +
+            '<img class="pricing-logo" src="' + ROUTE_LOGOS['CONSUMER SHIELD'] + '" alt="Consumer Shield logo" />' +
+            '<span class="plan-chip" style="background:rgba(15,118,110,0.10); color:#1e3a8a;">Consumer Shield</span>' +
+          '</div>' +
           '<div class="mt-4 grid grid-cols-2 gap-4">' +
             '<div><div class="plan-label">Program Length</div><div class="plan-value">' + (cs.term ? cs.term + ' mo' : '—') + '</div></div>' +
             '<div><div class="plan-label">Monthly Payment</div><div class="plan-value">' + (cs.monthlyPayment ? currency(cs.monthlyPayment) : '—') + '</div></div>' +
           '</div>' +
+          (csUnavailable.length ? '<div class="unavailable-box">' + csUnavailable.join('<br>') + '</div>' : '') +
           '<div class="mini-list">' + cs.benefits.map(function (b) { return '<div>• ' + b + '</div>'; }).join('') + '</div>' +
         '</div>' +
         '<div class="plan-card">' +
-          '<span class="plan-chip" style="background:rgba(0,150,136,0.10); color:#009688;">Level Debt</span>' +
+          '<div class="flex items-start justify-between gap-3">' +
+            '<img class="pricing-logo" src="' + ROUTE_LOGOS['LEVEL'] + '" alt="Level Debt logo" />' +
+            '<span class="plan-chip" style="background:rgba(0,150,136,0.10); color:#1e3a8a;">Level Debt</span>' +
+          '</div>' +
           '<div class="mt-4 grid grid-cols-2 gap-4">' +
             '<div><div class="plan-label">Program Length</div><div class="plan-value">' + (ld.term ? ld.term + ' mo' : '—') + '</div></div>' +
             '<div><div class="plan-label">Monthly Payment</div><div class="plan-value">' + (ld.monthlyPayment ? currency(ld.monthlyPayment) : '—') + '</div></div>' +
           '</div>' +
+          (ldUnavailable.length ? '<div class="unavailable-box">' + ldUnavailable.join('<br>') + '</div>' : '') +
           '<div class="mini-list">' + ld.benefits.map(function (b) { return '<div>• ' + b + '</div>'; }).join('') + '</div>' +
         '</div>';
 
       el('pricingDifferences').innerHTML =
         '<div class="diff-box">' +
-          '<h3 class="text-lg font-semibold">How the Two Options Differ</h3>' +
-          '<div class="mt-3 grid gap-3 md:grid-cols-3 text-sm text-slate-700">' +
-            '<div><strong>Monthly Comfort:</strong> Level Debt may create a lower monthly payment when a longer term is available, while Consumer Shield follows a more fixed payment ladder.</div>' +
-            '<div><strong>Program Style:</strong> Consumer Shield adds bundled support resources, while Level Debt is designed around flexible term ranges tied to total debt.</div>' +
-            '<div><strong>Client Experience:</strong> Both options aim to reduce the burden versus staying on minimum payments, but the payment feel and program pace can look different depending on total debt.</div>' +
+          '<h3 class="text-lg font-semibold mb-3">How the Two Options Differ</h3>' +
+          '<div class="overflow-x-auto">' +
+            '<table class="w-full pricing-compare-table text-sm text-slate-700 bg-white">' +
+              '<thead><tr class="bg-slate-100"><th>Comparison Point</th><th>Consumer Shield</th><th>Level Debt</th></tr></thead>' +
+              '<tbody>' +
+                '<tr><td class="font-semibold">Monthly payment style</td><td>Uses a structured payment ladder based on enrolled debt tiers.</td><td>Can spread cost across longer terms, which may reduce the monthly payment.</td></tr>' +
+                '<tr><td class="font-semibold">Program length</td><td>Typically follows shorter defined term buckets.</td><td>Uses broader term ranges tied to the size of the enrolled debt.</td></tr>' +
+                '<tr><td class="font-semibold">Support experience</td><td>Emphasizes bundled support features and added client resources.</td><td>Emphasizes flexible term design and payment relief through structure.</td></tr>' +
+                '<tr><td class="font-semibold">Who may prefer it</td><td>Clients who want a more fixed monthly structure and bundled support tools.</td><td>Clients who want maximum flexibility and the possibility of a lower monthly obligation.</td></tr>' +
+              '</tbody>' +
+            '</table>' +
           '</div>' +
         '</div>';
     }
@@ -609,6 +666,7 @@
     function render() {
       state.creditorScore = el('creditorScore').value;
       const c = compute();
+
       el('totalDebt').textContent = currency(c.totalDebt);
       refreshRowVisuals();
       renderComparison(c);
@@ -626,13 +684,12 @@
       el('routeReason').textContent = c.routeInfo.reason;
 
       el('metricsGrid').innerHTML = `
-        <div class="rounded-xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Current Route</div><div class="mt-1 text-lg font-semibold">${c.routeInfo.route || 'Pending'}</div></div>
-        <div class="rounded-xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Fee Rate</div><div class="mt-1 text-lg font-semibold">${(c.feeRate*100).toFixed(0)}%</div></div>
-        <div class="rounded-xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Gross Commission</div><div class="mt-1 text-lg font-semibold">${(c.grossCommissionRate*100).toFixed(0)}% • ${currency(c.grossCommission)}</div></div>
-        <div class="rounded-xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Rep Commission</div><div class="mt-1 text-lg font-semibold">${(c.repCommissionRate*100).toFixed(0)}% • ${currency(c.repCommission)}</div></div>
-        <div class="rounded-xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Funding Tier Profit</div><div class="mt-1 text-lg font-semibold">${currency(c.fundingTierProfit)}</div></div>
-        <div class="rounded-xl bg-slate-50 p-4"><div class="text-xs uppercase tracking-wide text-slate-500">Level Rejected Creditors</div><div class="mt-1 text-lg font-semibold">${c.routeInfo.route==='LEVEL'?c.rejectedForLevel.length:0}</div></div>
-        ${c.routeInfo.route==='VERIFY' ? `<div class="rounded-xl bg-slate-50 p-4 md:col-span-2"><div class="text-xs uppercase tracking-wide text-slate-500">Adjusted Verify Debt</div><div class="mt-1 text-lg font-semibold">${currency(c.verifyAdjustedDebt)}</div></div>` : ''}
+        <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs uppercase tracking-wide text-slate-500">Current Route</div><div class="mt-1 text-base font-semibold">${c.routeInfo.route || 'Pending'}</div></div>
+        <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs uppercase tracking-wide text-slate-500">Fee Rate</div><div class="mt-1 text-base font-semibold">${(c.feeRate*100).toFixed(0)}%</div></div>
+        <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs uppercase tracking-wide text-slate-500">Gross Commission</div><div class="mt-1 text-base font-semibold">${(c.grossCommissionRate*100).toFixed(0)}% • ${currency(c.grossCommission)}</div></div>
+        <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs uppercase tracking-wide text-slate-500">Rep Commission</div><div class="mt-1 text-base font-semibold">${(c.repCommissionRate*100).toFixed(0)}% • ${currency(c.repCommission)}</div></div>
+        <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs uppercase tracking-wide text-slate-500">Funding Tier Profit</div><div class="mt-1 text-base font-semibold">${currency(c.fundingTierProfit)}</div></div>
+        <div class="rounded-xl bg-slate-50 p-3"><div class="text-xs uppercase tracking-wide text-slate-500">Level Rejected Creditors</div><div class="mt-1 text-base font-semibold">${c.routeInfo.route==='LEVEL' ? c.rejectedForLevel.length : 0}</div></div>
       `;
 
       el('flags').innerHTML = c.flags.map(flag=>`<div class="flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">⚠️ <span>${flag}</span></div>`).join('');
@@ -753,6 +810,7 @@
 
       const colX = [14, 62, 110, 158];
       const rowH = 10;
+
       doc.setFillColor(241, 245, 249);
       doc.rect(14, y, 182, rowH, 'F');
       doc.setFontSize(9);
