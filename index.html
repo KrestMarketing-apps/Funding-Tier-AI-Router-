@@ -148,6 +148,71 @@
     .savings-glow {
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 0 24px rgba(0,150,136,0.10);
     }
+    .creditor-search-wrap {
+      position: relative;
+    }
+    .creditor-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .creditor-option {
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #0f172a;
+      border-bottom: 1px solid #eef2f7;
+      background: #fff;
+    }
+    .creditor-option:hover {
+      background: #ecfdf5;
+    }
+    .creditor-option:last-child {
+      border-bottom: none;
+    }
+    .pitch-card {
+      border-radius: 18px;
+      border: 1px solid #bfe3dd;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff 0%, #f0fbf9 100%);
+    }
+    .pitch-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .pitch-sub {
+      margin-top: 4px;
+      font-size: 13px;
+      color: #475569;
+    }
+    .pitch-list {
+      margin-top: 14px;
+      display: grid;
+      gap: 8px;
+    }
+    .pitch-list div {
+      font-size: 14px;
+      color: #1e293b;
+    }
+    .pitch-urgency {
+      margin-top: 14px;
+      border-radius: 12px;
+      background: #fef2f2;
+      color: #b91c1c;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-teal-100 via-white to-slate-100 text-slate-900">
@@ -227,6 +292,12 @@
       <div id="pricingDifferences" class="mt-6"></div>
     </section>
 
+    <section class="card bg-white p-6 teal-panel">
+      <h2 class="text-2xl font-semibold">Program Pitch / Quick Sizzle</h2>
+      <p class="mt-1 text-slate-600">Fast talking points your team can use to explain the strongest benefits of each available option with urgency.</p>
+      <div id="programPitchSection" class="mt-6 grid gap-6 lg:grid-cols-2"></div>
+    </section>
+
     <section class="card bg-white overflow-hidden">
       <div class="p-6 pb-0 proposal-header">
         <h2 class="text-2xl font-semibold">Program Comparrison to Current Financial Situation</h2>
@@ -303,7 +374,7 @@ www.fundingtier.com
       'Utility Bill': 'Utility Bill',
       'Rent': 'Back Rent',
       'Collection Account': 'Other',
-      'Judgment Debt': 'Judgment Debt',
+      'Judgment Debt': 'Judgment',
       'Consumer Debt in Litigation': 'Judgment',
       'Tax Debt': 'IRS Tax Debt',
       'Property Tax': 'IRS Tax Debt',
@@ -530,6 +601,7 @@ www.fundingtier.com
 
     function applyCreditorSelection(index, rec) {
       if (!state.rows[index]) return;
+
       state.rows[index].creditorName = rec.display_name || '';
       state.rows[index].creditorMeta = rec;
       state.rows[index].debtType = getDebtTypeFromMeta(rec, state.rows[index].debtType);
@@ -664,11 +736,17 @@ www.fundingtier.com
 
       const csEligible =
         csStatus.status !== 'BLACKOUT' &&
-        !flags.consumerShield.some((f) => f.toLowerCase().includes('not accepted') || f.toLowerCase().includes('not eligible'));
+        !flags.consumerShield.some((f) => {
+          const t = String(f).toLowerCase();
+          return t.includes('not accepted') || t.includes('not eligible');
+        });
 
       const levelEligible =
         levelStatus.status !== 'BLACKOUT' &&
-        !flags.level.some((f) => f.toLowerCase().includes('not accepted') || f.toLowerCase().includes('not eligible'));
+        !flags.level.some((f) => {
+          const t = String(f).toLowerCase();
+          return t.includes('not accepted') || t.includes('not eligible');
+        });
 
       if (levelEligible && totalDebt >= 7000) {
         return {
@@ -794,19 +872,25 @@ www.fundingtier.com
       const meta = row.creditorMeta;
 
       if (meta) {
-        if (String(meta.eligible_for_enrollment || '').toLowerCase() === 'no') {
+        const eligible = String(meta.eligible_for_enrollment || '').toLowerCase();
+        const review = String(meta.needs_supervisor_review || '').toLowerCase();
+        const collateral = String(meta.collateral_flag || '').toLowerCase();
+        const litigation = String(meta.litigation_flag || '').toLowerCase();
+        const inheritsType = String(meta.underlying_debt_inherits_original_type || '').toLowerCase();
+
+        if (eligible === 'no') {
           alerts.push({ label: 'Not eligible for enrollment', tone: 'red' });
         }
-        if (String(meta.needs_supervisor_review || '').toLowerCase() === 'yes' || String(meta.needs_supervisor_review || '').toLowerCase() === 'maybe') {
+        if (review === 'yes' || review === 'maybe') {
           alerts.push({ label: 'Supervisor review', tone: 'amber' });
         }
-        if (String(meta.collateral_flag || '').toLowerCase() === 'yes' || String(meta.collateral_flag || '').toLowerCase() === 'maybe') {
+        if (collateral === 'yes' || collateral === 'maybe') {
           alerts.push({ label: 'Collateral risk', tone: 'amber' });
         }
-        if (String(meta.litigation_flag || '').toLowerCase() === 'yes' || String(meta.litigation_flag || '').toLowerCase() === 'maybe') {
+        if (litigation === 'yes' || litigation === 'maybe') {
           alerts.push({ label: 'Litigation check', tone: 'amber' });
         }
-        if (String(meta.underlying_debt_inherits_original_type || '').toLowerCase() === 'yes') {
+        if (inheritsType === 'yes') {
           alerts.push({ label: 'Verify original debt type', tone: 'amber' });
         }
       }
@@ -837,16 +921,19 @@ www.fundingtier.com
 
     function renderCreditorSuggestions(query, index) {
       const matches = getCreditorMatches(query);
-      if (!matches.length) return '';
+      if (!matches.length || !query.trim()) return '';
+
       return `
-        <div class="mt-2 flex flex-wrap gap-2">
+        <div class="creditor-dropdown">
           ${matches.map((rec) => `
             <button
               type="button"
-              class="creditor-suggestion rounded-full border border-teal-200 bg-teal-50 px-2 py-1 text-[11px] font-medium text-teal-700 hover:bg-teal-100"
+              class="creditor-option"
               data-index="${index}"
               data-display="${String(rec.display_name || '').replace(/"/g, '&quot;')}"
-            >${rec.display_name}</button>
+            >
+              ${rec.display_name}
+            </button>
           `).join('')}
         </div>
       `;
@@ -858,15 +945,17 @@ www.fundingtier.com
         return `
           <div class="row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 border-slate-100 bg-white" data-row="${index}">
             <div class="space-y-2">
-              <input
-                class="input"
-                data-index="${index}"
-                data-key="creditorName"
-                placeholder="${state.creditorLookupReady ? 'Search or type creditor name' : 'Type creditor name'}"
-                value="${row.creditorName || ''}"
-                autocomplete="off"
-              />
-              ${renderCreditorSuggestions(row.creditorName || '', index)}
+              <div class="creditor-search-wrap">
+                <input
+                  class="input creditor-input"
+                  data-index="${index}"
+                  data-key="creditorName"
+                  placeholder="${state.creditorLookupReady ? 'Search or type creditor name' : 'Type creditor name'}"
+                  value="${row.creditorName || ''}"
+                  autocomplete="off"
+                />
+                <div class="creditor-suggestions-container" id="creditorSuggestions-${index}"></div>
+              </div>
               ${notes.length ? `<div class="flex flex-wrap gap-2">${notes.map((n) => `<span class="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-600">${n}</span>`).join('')}</div>` : ''}
               <div class="alert-wrap flex flex-wrap gap-2 pt-1"></div>
             </div>
@@ -886,43 +975,98 @@ www.fundingtier.com
       }).join('');
 
       document.querySelectorAll('#rows [data-index]').forEach((node) => {
-        node.addEventListener('input', onFieldChange);
-        node.addEventListener('change', onFieldChange);
+        if (!node.classList.contains('creditor-input')) {
+          node.addEventListener('input', onFieldChange);
+          node.addEventListener('change', onFieldChange);
+        }
       });
 
-      document.querySelectorAll('.creditor-suggestion').forEach((btn) => {
-        btn.addEventListener('click', (e) => {
-          const index = Number(e.currentTarget.dataset.index);
-          const display = e.currentTarget.dataset.display || '';
-          const rec = state.creditorDb.find((r) => String(r.display_name) === display);
-          if (!rec || !Number.isInteger(index) || !state.rows[index]) return;
-          applyCreditorSelection(index, rec);
-        });
-      });
-
+      wireCreditorSearch();
       refreshRowVisuals();
     }
 
-    function refreshRowVisuals() {
-      const route = computeScenarioData().routeInfo.route;
-      state.rows.forEach((row, index) => {
-        const card = document.querySelector(`[data-row="${index}"]`);
-        if (!card) return;
-        const alerts = rowAlerts(row, route);
-        const wrap = card.querySelector('.alert-wrap');
-        const bg =
-          alerts.some((a) => a.tone === 'red') ? 'border-red-300 bg-red-50' :
-          alerts.some((a) => a.tone === 'amber') ? 'border-amber-300 bg-amber-50' :
-          'border-slate-100 bg-white';
+    function wireCreditorSearch() {
+      document.querySelectorAll('.creditor-input').forEach((input) => {
+        input.addEventListener('input', (e) => {
+          const index = Number(e.target.dataset.index);
+          const value = e.target.value || '';
+          if (!Number.isInteger(index) || !state.rows[index]) return;
 
-        card.className = `row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 ${bg}`;
-        wrap.innerHTML = alerts.map((a) =>
-          `<span class="rounded-full border px-2 py-1 text-[11px] font-medium ${
-            a.tone === 'red'
-              ? 'bg-red-100 text-red-700 border-red-200'
-              : 'bg-amber-100 text-amber-800 border-amber-200'
-          }">${a.label}</span>`
-        ).join('');
+          state.rows[index].creditorName = value;
+          state.rows[index].creditorMeta = null;
+
+          const exact = state.creditorDb.find(
+            (r) => normalizeCreditorName(r.display_name) === normalizeCreditorName(value)
+          );
+
+          if (exact) {
+            state.rows[index].creditorMeta = exact;
+            state.rows[index].debtType = getDebtTypeFromMeta(exact, state.rows[index].debtType);
+          }
+
+          const container = document.getElementById(`creditorSuggestions-${index}`);
+          if (container) {
+            container.innerHTML = renderCreditorSuggestions(value, index);
+          }
+
+          refreshRowVisuals();
+          renderComparison(computeScenarioData());
+          renderPricingComparison(computeScenarioData());
+          renderProgramPitchSection(computeScenarioData());
+          renderProviderLogo(computeScenarioData().routeInfo.route);
+          renderBadges(computeScenarioData());
+          renderMetrics(computeScenarioData());
+          renderFlags(computeScenarioData());
+          el('routeReason').textContent = computeScenarioData().routeInfo.reason;
+          el('providerAvailability').innerHTML = buildProviderAvailability(computeScenarioData());
+          el('totalDebt').textContent = currency(computeScenarioData().totalDebt);
+
+          input.focus();
+          input.setSelectionRange(value.length, value.length);
+
+          document.querySelectorAll(`#creditorSuggestions-${index} .creditor-option`).forEach((btn) => {
+            btn.addEventListener('mousedown', (evt) => {
+              evt.preventDefault();
+            });
+
+            btn.addEventListener('click', (evt) => {
+              const display = evt.currentTarget.dataset.display || '';
+              const rec = state.creditorDb.find((r) => String(r.display_name) === display);
+              if (!rec) return;
+              applyCreditorSelection(index, rec);
+            });
+          });
+        });
+
+        input.addEventListener('focus', (e) => {
+          const index = Number(e.target.dataset.index);
+          const value = e.target.value || '';
+          const container = document.getElementById(`creditorSuggestions-${index}`);
+          if (container) {
+            container.innerHTML = renderCreditorSuggestions(value, index);
+          }
+
+          document.querySelectorAll(`#creditorSuggestions-${index} .creditor-option`).forEach((btn) => {
+            btn.addEventListener('mousedown', (evt) => {
+              evt.preventDefault();
+            });
+
+            btn.addEventListener('click', (evt) => {
+              const display = evt.currentTarget.dataset.display || '';
+              const rec = state.creditorDb.find((r) => String(r.display_name) === display);
+              if (!rec) return;
+              applyCreditorSelection(index, rec);
+            });
+          });
+        });
+
+        input.addEventListener('blur', (e) => {
+          const index = Number(e.target.dataset.index);
+          setTimeout(() => {
+            const container = document.getElementById(`creditorSuggestions-${index}`);
+            if (container) container.innerHTML = '';
+          }, 150);
+        });
       });
     }
 
@@ -1028,6 +1172,48 @@ www.fundingtier.com
       `;
     }
 
+    function renderProgramPitchSection(c) {
+      const cards = [];
+
+      if (c.programs.level.available) {
+        cards.push(`
+          <div class="pitch-card">
+            <div class="pitch-title">Level Debt</div>
+            <div class="pitch-sub">Primary debt-settlement option when the state and deal structure qualify.</div>
+            <div class="pitch-list">
+              <div>• Creates a structured path to resolve debt instead of staying trapped in minimum payments.</div>
+              <div>• Can reduce total payoff compared with years of compounding interest.</div>
+              <div>• Often allows longer terms to lower the monthly burden.</div>
+              <div>• Gives the client one clear strategy instead of juggling multiple creditors.</div>
+              <div>• Strongest primary fit when the state and debt profile support enrollment.</div>
+            </div>
+            <div class="pitch-urgency">Urgency: every month a client stays in the current payment cycle, interest keeps compounding and the balance typically becomes more expensive to resolve.</div>
+          </div>
+        `);
+      }
+
+      if (c.programs.consumerShield.available) {
+        cards.push(`
+          <div class="pitch-card">
+            <div class="pitch-title">Consumer Shield</div>
+            <div class="pitch-sub">Fallback option when Level is unavailable and Consumer Shield remains serviceable.</div>
+            <div class="pitch-list">
+              <div>• Provides an alternative path when a standard settlement route is blocked.</div>
+              <div>• Uses a more fixed, structured payment model for easier explanation.</div>
+              <div>• Can still create momentum for clients who need action now, not delay.</div>
+              <div>• Supports clients who fall outside standard Level eligibility or state availability.</div>
+              <div>• Helps preserve an actionable option instead of leaving the prospect with no path forward.</div>
+            </div>
+            <div class="pitch-urgency">Urgency: when a client qualifies for a serviceable fallback option, delaying can mean more fees, more stress, and fewer workable solutions later.</div>
+          </div>
+        `);
+      }
+
+      el('programPitchSection').innerHTML = cards.length
+        ? cards.join('')
+        : '<div class="unavailable-box lg:col-span-2">NO PROGRAM PITCH AVAILABLE / NO SERVICEABLE OPTIONS MATCH THIS SCENARIO</div>';
+    }
+
     function renderProviderLogo(route) {
       const src = ROUTE_LOGOS[route];
       if (!src) {
@@ -1107,6 +1293,7 @@ www.fundingtier.com
       refreshRowVisuals();
       renderComparison(c);
       renderPricingComparison(c);
+      renderProgramPitchSection(c);
       renderProviderLogo(c.routeInfo.route);
       renderBadges(c);
       renderMetrics(c);
@@ -1132,18 +1319,6 @@ www.fundingtier.com
         state.rows[index].isSecured = values.includes('isSecured');
         state.rows[index].paymentMade = values.includes('paymentMade');
         state.rows[index].businessUnprofitable = values.includes('businessUnprofitable');
-        render();
-        return;
-      }
-
-      if (key === 'creditorName') {
-        state.rows[index].creditorName = e.target.value;
-        const exact = state.creditorDb.find((r) => normalizeCreditorName(r.display_name) === normalizeCreditorName(e.target.value));
-        state.rows[index].creditorMeta = exact || null;
-        if (exact) {
-          state.rows[index].debtType = getDebtTypeFromMeta(exact, state.rows[index].debtType);
-        }
-        renderRows();
         render();
         return;
       }
