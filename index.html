@@ -223,7 +223,7 @@
     <section class="card bg-white p-6 teal-panel">
       <h2 class="text-2xl font-semibold">Program Pricing Comparison</h2>
       <p class="mt-1 text-slate-600">Only programs that are actually available for the current state and debt amount are shown.</p>
-      <div id="pricingComparison" class="mt-6 grid gap-6 lg:grid-cols-3"></div>
+      <div id="pricingComparison" class="mt-6 grid gap-6 lg:grid-cols-2"></div>
       <div id="pricingDifferences" class="mt-6"></div>
     </section>
 
@@ -252,8 +252,7 @@
     const LOGO_URL = 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf8e8df54a8b29097c4.png';
     const ROUTE_LOGOS = {
       'CONSUMER SHIELD': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png',
-      'LEVEL': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp',
-      'VERIFY': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c03ff7b858d1d4d04.webp'
+      'LEVEL': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp'
     };
 
     const EMAIL_SUBJECT = 'Your Estimated Debt Relief Savings Snapshot';
@@ -265,6 +264,7 @@ www.fundingtier.com
 
 *This email and any attachments are intended solely for the use of the intended recipient(s) and may contain confidential, privileged, or legally protected information. If you are not the intended recipient, you are hereby notified that any review, use, disclosure, distribution, or copying of this communication is strictly prohibited. If you have received this email in error, please notify the sender immediately and delete this email and all copies from your system.`;
     const EMAIL_ENDPOINT = '/api/send-savings-email';
+    const CREDITOR_CSV_PATH = '/internal_creditor_classification_searchable_v2.csv';
 
     const STATE_NAMES = {
       AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',GU:'Guam',PR:'Puerto Rico'
@@ -275,13 +275,8 @@ www.fundingtier.com
     const LEVEL_GREEN_STATES = new Set(['AL','AZ','AR','CA','DC','FL','ID','IN','IA','KY','MD','MA','MI','MS','MO','NE','NM','NY','OK','TX','VA']);
     const LEVEL_BLACKOUT_STATES = new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
 
-    const VERIFY_RED_STATES = new Set(['CO','CT','DE','GA','HI','IA','ID','IL','KS','KY','LA','MA','ME','MN','MS','MT','NC','ND','NH','NJ','NV','OH','PA','SC','TN','TX','UT','VA','WA','WI','WY']);
-    const VERIFY_GREEN_STATES = new Set(['AL','AZ','AR','CA','DC','FL','IN','MD','MO','NE','NM','NY','OK','SD']);
-    const VERIFY_BLACKOUT_STATES = new Set(['AK','RI','VT','WV','OR']);
-
     const CONSUMER_SHIELD_BLACKOUT_STATES = new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
 
-    const CREDITOR_OPTIONS = ['', 'American Express','Bank of America','Capital One','Chase','Citi','Discover','Wells Fargo','Synchrony','Upstart','LendingClub','OneMain Financial','SoFi','Avant','Best Egg','Klarna','Goodleap','Sunbit','RBC Bank','USAA','Republic Finance','Mariner Finance','Regional Finance','Lendmark','Navient','Other / Manual Entry'];
     const DEBT_TYPES = ['Unsecured Credit Card','Unsecured Personal Loan','Payday Loan','Tribal Loan','Medical Bill','Back Rent','Private Student Loan','Business Debt','Repossession Deficiency','Apartment Back Rent (Collections)','Unsecured Line of Credit','Cell Phone Bill','Utility Bill','USAA','Deficiency','Auto Repo Deficiency','Peer-to-Peer Loan','Timeshare','Mortgage','Federal Student Loan','Navient Student Loan','Judgment','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','SBA Loan','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Other'];
 
     const CONSUMER_SHIELD_REJECTED_TYPES = new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
@@ -289,21 +284,59 @@ www.fundingtier.com
     const LEVEL_REJECTED_TYPES = new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt']);
     const LEVEL_CONDITIONAL_CREDITORS = ['Lendmark','Mariner Finance','OneMain','Regional Finance','Republic Finance'];
     const LEVEL_REJECTED_CREDITORS = ['ALLEVIATE TAX LLC','Acceptance Now','ACIMA','Advance Financial','AGCO FINANCE','STATE EMPLOYEE CREDIT UNION','STATEEMP','Aqua Finance','Bell Finance','BHG Financial','BHG Money','Bobs Discount Furniture','Bobs Finance','Bobs Furniture','Cornerstone Financial','CreditCentral','EMPOWER FCU','Enerbank','ESL Credit Union','Farmers Furniture','FRMRS FURN','Fort Worth Credit Union','Forth Worth CU','Fortera Credit Union','Garden Federal Credit Union','Golden One Credit Union','Goldman Sachs','GoodLeap','Hawaii CU','HC ROYA','HYCITE','Royal Prestige','Heights Financial','Island Finance','ISPC','Kabbage Loans','KIKOFF','Koalafi','Loan Pal','Local Government Federal Credit Union','Matco Tools Financing','Matco Fin','Military Star','Nebraska Furniture','Omni Loans','Opensky','PINNACLE FINANCIAL GROUP','Pioneer Loans','Popular Bank','Banco Popular','PowerPay','Preferred Loans','Quick Help Loans','Red River Credit','REDRIVERCR','REDSTONE Credit Union','RENT-A CENTER','RFFC FINANCIAL','Robinhood','Security Finance','STATE EMPLOYEES C U','Service Finance Company','SVCFIN','SRVFINCO','Snap On Credit','SOLAR MOSAIC','Southern Finance','Sunset Financial','Toledo Finance','Tower Loans','Unacceptable Creditors','West Creek Financial','WSECU','Yendo'];
-    const VERIFY_REJECTED_CREDITORS = ['Bank of Guam','Goodleap','HSERVCOM','Klarna','Military Star/Army and Air Force Exchange Service (AAFES)','Pioneer Military/Pioneer Financial','RBC BANK','Rapid Finance','Sunbit','ENERB','Les Schwab','Omni Credit Company'];
+
+    const PRODUCT_TYPE_TO_DEBT_TYPE = {
+      'Credit Card': 'Unsecured Credit Card',
+      'Credit / Charge Card': 'Unsecured Credit Card',
+      'Retail Credit Card': 'Unsecured Credit Card',
+      'Medical Credit Card': 'Unsecured Credit Card',
+      'Store / Credit Card': 'Unsecured Credit Card',
+      'Revolving Credit': 'Unsecured Credit Card',
+      'Secured Card': 'Unsecured Credit Card',
+      'Personal Loan': 'Unsecured Personal Loan',
+      'Personal Loan / Line': 'Unsecured Personal Loan',
+      'Installment Loan': 'Unsecured Personal Loan',
+      'Installment / Line': 'Unsecured Line of Credit',
+      'Line of Credit': 'Unsecured Line of Credit',
+      'Medical Bill': 'Medical Bill',
+      'Telecom Bill': 'Cell Phone Bill',
+      'Utility Bill': 'Utility Bill',
+      'Rent': 'Back Rent',
+      'Collection Account': 'Other',
+      'Judgment Debt': 'Judgment Debt',
+      'Consumer Debt in Litigation': 'Judgment',
+      'Tax Debt': 'IRS Tax Debt',
+      'Property Tax': 'IRS Tax Debt',
+      'Mortgage': 'Mortgage',
+      'Mortgage / HELOC': 'Mortgage',
+      'Auto Loan': 'Auto Repo Deficiency',
+      'Auto Loan / Lease': 'Auto Repo Deficiency',
+      'Vehicle Title Loan': 'Auto Repo Deficiency',
+      'Deficiency Balance': 'Deficiency',
+      'POS Installment': 'Unsecured Personal Loan',
+      'Installment Financing': 'Unsecured Personal Loan',
+      'Home Improvement Loan': 'Unsecured Personal Loan',
+      'Business MCA': 'Business Debt',
+      'Business Loan': 'Business Debt',
+      'Student Loan': 'Private Student Loan',
+      'Payday / Installment': 'Payday Loan'
+    };
 
     const state = {
       selectedState: '',
+      creditorDb: [],
+      creditorLookupReady: false,
       rows: Array.from({ length: 5 }, (_, i) => ({
         id: i + 1,
         creditorName: '',
-        manualName: '',
         amount: '',
         debtType: 'Unsecured Credit Card',
         inCollections: false,
         inLitigation: false,
         isSecured: false,
         paymentMade: true,
-        businessUnprofitable: false
+        businessUnprofitable: false,
+        creditorMeta: null
       }))
     };
 
@@ -334,22 +367,13 @@ www.fundingtier.com
       });
     };
 
-    const getCreditorDisplayName = (row) =>
-      row.creditorName === 'Other / Manual Entry' ? (row.manualName || 'Manual Creditor') : (row.creditorName || '');
+    const getCreditorDisplayName = (row) => row.creditorName || '';
 
     function getLevelStateStatus(code) {
       if (!code) return { status: 'UNKNOWN', label: 'Unknown' };
       if (LEVEL_BLACKOUT_STATES.has(code)) return { status: 'BLACKOUT', label: 'Black Out' };
       if (LEVEL_RED_STATES.has(code)) return { status: 'RED', label: 'Attorney Model' };
       if (LEVEL_GREEN_STATES.has(code)) return { status: 'GREEN', label: 'Standard Model' };
-      return { status: 'BLACKOUT', label: 'Black Out' };
-    }
-
-    function getVerifyStateStatus(code) {
-      if (!code) return { status: 'UNKNOWN', label: 'Unknown' };
-      if (VERIFY_BLACKOUT_STATES.has(code)) return { status: 'BLACKOUT', label: 'Black Out' };
-      if (VERIFY_RED_STATES.has(code)) return { status: 'RED', label: 'Attorney Model' };
-      if (VERIFY_GREEN_STATES.has(code)) return { status: 'GREEN', label: 'Standard Model' };
       return { status: 'BLACKOUT', label: 'Black Out' };
     }
 
@@ -367,35 +391,6 @@ www.fundingtier.com
       if (debt < 35000) return 48;
       if (debt < 50000) return 54;
       return 60;
-    }
-
-    function getVerifyMaxTerm(debt) {
-      if (debt >= 7000 && debt <= 10000) return 35;
-      if (debt > 35000) return 56;
-      if (debt > 30000) return 54;
-      if (debt > 25000) return 52;
-      if (debt > 24000) return 50;
-      if (debt > 23000) return 49;
-      if (debt > 22000) return 48;
-      if (debt > 20000) return 47;
-      if (debt > 19000) return 46;
-      if (debt > 18000) return 45;
-      if (debt > 17000) return 44;
-      if (debt > 16000) return 43;
-      if (debt > 15000) return 42;
-      if (debt > 14000) return 41;
-      if (debt > 13000) return 40;
-      if (debt > 12000) return 39;
-      if (debt > 11000) return 37;
-      if (debt > 10000) return 35;
-      return null;
-    }
-
-    function getVerifyPayableBalance(amount, debtType, isManual) {
-      if (debtType === 'Medical Bill') return Math.min(amount, 5000);
-      if (['Credit Union Loan', 'Auto Repo Deficiency', 'Judgment'].includes(debtType)) return Math.min(amount, 10000);
-      if (isManual) return Math.min(amount, 10000);
-      return amount;
     }
 
     function getConsumerShieldProgramLength(totalDebt) {
@@ -430,79 +425,275 @@ www.fundingtier.com
       return { monthlyPayment, totalDebt, monthsToPayoff: months, apr, totalPayback: monthlyPayment * months };
     }
 
+    function parseCsvLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i += 1) {
+        const char = line[i];
+        const next = line[i + 1];
+
+        if (char === '"' && inQuotes && next === '"') {
+          current += '"';
+          i += 1;
+        } else if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current);
+      return result.map((v) => String(v).trim());
+    }
+
+    async function loadCreditorDatabase() {
+      try {
+        const res = await fetch(CREDITOR_CSV_PATH, { cache: 'no-store' });
+        if (!res.ok) throw new Error('CSV not found');
+        const text = await res.text();
+        const lines = text.split(/\r?\n/).filter(Boolean);
+        if (lines.length < 2) throw new Error('CSV empty');
+
+        const headers = parseCsvLine(lines[0]);
+        const data = [];
+
+        for (let i = 1; i < lines.length; i += 1) {
+          const values = parseCsvLine(lines[i]);
+          if (!values.length || values.every((v) => !v)) continue;
+          const row = {};
+          headers.forEach((h, idx) => {
+            row[h] = values[idx] ?? '';
+          });
+
+          row._normalizedIndex = normalizeCreditorName(row.search_index || '');
+          row._normalizedAliases = normalizeCreditorName((row.search_aliases || '').replace(/\|/g, ' '));
+          row._normalizedTokens = normalizeCreditorName((row.search_tokens || '').replace(/,/g, ' '));
+          row._normalizedDisplay = normalizeCreditorName(row.display_name || '');
+          data.push(row);
+        }
+
+        state.creditorDb = data;
+        state.creditorLookupReady = true;
+      } catch (err) {
+        console.error('Creditor CSV failed to load:', err);
+        state.creditorDb = [];
+        state.creditorLookupReady = false;
+      }
+    }
+
+    function scoreCreditorRecord(query, rec) {
+      const q = normalizeCreditorName(query);
+      if (!q) return 0;
+
+      let score = 0;
+      if (rec._normalizedDisplay === q) score += 120;
+      if (rec._normalizedDisplay.startsWith(q)) score += 95;
+      if (rec._normalizedIndex.includes(q)) score += 80;
+      if (rec._normalizedAliases.includes(q)) score += 70;
+      if (rec._normalizedTokens.includes(q)) score += 60;
+
+      const words = q.split(' ').filter(Boolean);
+      for (const w of words) {
+        if (rec._normalizedDisplay.includes(w)) score += 14;
+        if (rec._normalizedIndex.includes(w)) score += 10;
+        if (rec._normalizedAliases.includes(w)) score += 8;
+        if (rec._normalizedTokens.includes(w)) score += 6;
+      }
+      return score;
+    }
+
+    function getCreditorMatches(query, limit = 6) {
+      if (!state.creditorLookupReady || !query.trim()) return [];
+      return state.creditorDb
+        .map((rec) => ({ rec, score: scoreCreditorRecord(query, rec) }))
+        .filter((x) => x.score > 0)
+        .sort((a, b) => b.score - a.score || String(a.rec.display_name).localeCompare(String(b.rec.display_name)))
+        .slice(0, limit)
+        .map((x) => x.rec);
+    }
+
+    function getDebtTypeFromMeta(meta, currentDebtType) {
+      const mapped = PRODUCT_TYPE_TO_DEBT_TYPE[meta?.product_type];
+      return mapped || currentDebtType || 'Other';
+    }
+
+    function yesNoMaybeToFlag(v) {
+      const n = String(v || '').trim().toLowerCase();
+      if (n === 'yes') return true;
+      if (n === 'maybe') return 'maybe';
+      return false;
+    }
+
+    function applyCreditorSelection(index, rec) {
+      if (!state.rows[index]) return;
+      state.rows[index].creditorName = rec.display_name || '';
+      state.rows[index].creditorMeta = rec;
+      state.rows[index].debtType = getDebtTypeFromMeta(rec, state.rows[index].debtType);
+
+      const collateralFlag = yesNoMaybeToFlag(rec.collateral_flag);
+      const litigationFlag = yesNoMaybeToFlag(rec.litigation_flag);
+
+      if (collateralFlag === true) state.rows[index].isSecured = true;
+      if (litigationFlag === true) state.rows[index].inLitigation = true;
+
+      renderRows();
+      render();
+    }
+
+    function getMetadataNotes(meta) {
+      if (!meta) return [];
+      const notes = [];
+      if (meta.routing_category) notes.push(`Routing: ${meta.routing_category}`);
+      if (meta.classification) notes.push(`Classification: ${meta.classification}`);
+      if (meta.product_type) notes.push(`Product: ${meta.product_type}`);
+      return notes;
+    }
+
     function collectFlags(rows, totalDebt, stateCode) {
       const consumerShieldFlags = [];
       const levelFlags = [];
-      const verifyFlags = [];
 
-      if (totalDebt > 0 && totalDebt < 4000) consumerShieldFlags.push('Consumer Shield requires at least $4,000 total enrolled debt.');
-      if (stateCode && getConsumerShieldStateStatus(stateCode).status === 'BLACKOUT') consumerShieldFlags.push('Consumer Shield does not service this state.');
-      if (totalDebt > 0 && totalDebt < 7000) levelFlags.push('Level Debt requires at least $7,000 total enrolled debt.');
-      if (totalDebt > 0 && totalDebt < 7000) verifyFlags.push('Verify generally requires at least $7,000 total enrolled debt.');
+      if (totalDebt > 0 && totalDebt < 4000) {
+        consumerShieldFlags.push('Consumer Shield requires at least $4,000 total enrolled debt.');
+      }
+
+      if (stateCode && getConsumerShieldStateStatus(stateCode).status === 'BLACKOUT') {
+        consumerShieldFlags.push('Consumer Shield does not service this state.');
+      }
+
+      if (totalDebt > 0 && totalDebt < 7000) {
+        levelFlags.push('Level Debt requires at least $7,000 total enrolled debt.');
+      }
 
       rows.forEach((row) => {
         const amount = numberOrZero(row.amount);
         if (!amount) return;
+
         const name = getCreditorDisplayName(row);
+        const meta = row.creditorMeta;
 
-        if (amount < 100) consumerShieldFlags.push((name || row.debtType) + ' is below Consumer Shield minimum $100 per account.');
-        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) consumerShieldFlags.push(row.debtType + ' is not accepted by Consumer Shield.');
-        if (row.debtType === 'Apartment Back Rent (Collections)' && !row.inCollections) consumerShieldFlags.push('Apartment back rent is only accepted if in collections.');
-        if (row.debtType === 'USAA' && row.isSecured) consumerShieldFlags.push('USAA is only accepted when there is no other secured debt.');
+        if (meta) {
+          const eligible = String(meta.eligible_for_enrollment || '').toLowerCase();
+          const review = String(meta.needs_supervisor_review || '').toLowerCase();
+          const collateralFlag = String(meta.collateral_flag || '').toLowerCase();
+          const litigationFlag = String(meta.litigation_flag || '').toLowerCase();
+          const inheritsType = String(meta.underlying_debt_inherits_original_type || '').toLowerCase();
 
-        if (LEVEL_REJECTED_TYPES.has(row.debtType)) levelFlags.push(row.debtType + ' is not accepted by Level Debt.');
-        if (amount < 200 && !row.inCollections) levelFlags.push((name || row.debtType) + ' must be at least $200 unless already in collections or charged off.');
-        if (!row.paymentMade) levelFlags.push((name || row.debtType) + ' must have at least one payment made before Level enrollment.');
-        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) levelFlags.push(name + ' is on the Level rejected creditor list.');
-        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) levelFlags.push(name + ' is secured. Level only allows this if the client agrees to lose the collateral.');
+          if (eligible === 'no') {
+            const reason = meta.exclude_reason || `${meta.display_name} is marked not eligible for enrollment.`;
+            consumerShieldFlags.push(reason);
+            levelFlags.push(reason);
+          }
 
-        if (creditorMatches(name, VERIFY_REJECTED_CREDITORS)) verifyFlags.push(name + ' is not accepted by Verify.');
+          if (review === 'yes' || review === 'maybe') {
+            const reviewNote = `${meta.display_name} requires supervisor review.`;
+            consumerShieldFlags.push(reviewNote);
+            levelFlags.push(reviewNote);
+          }
+
+          if (collateralFlag === 'yes' || collateralFlag === 'maybe') {
+            levelFlags.push(`${meta.display_name} may involve collateral and needs secured-debt review.`);
+            consumerShieldFlags.push(`${meta.display_name} may involve collateral and needs secured-debt review.`);
+          }
+
+          if (litigationFlag === 'yes' || litigationFlag === 'maybe' || row.inLitigation) {
+            levelFlags.push(`${meta.display_name} may involve litigation or legal posture review.`);
+            consumerShieldFlags.push(`${meta.display_name} may involve litigation or legal posture review.`);
+          }
+
+          if (inheritsType === 'yes') {
+            levelFlags.push(`${meta.display_name} inherits the original underlying debt type and must be verified.`);
+            consumerShieldFlags.push(`${meta.display_name} inherits the original underlying debt type and must be verified.`);
+          }
+        }
+
+        if (amount < 100) {
+          consumerShieldFlags.push((name || row.debtType) + ' is below Consumer Shield minimum $100 per account.');
+        }
+
+        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) {
+          consumerShieldFlags.push(row.debtType + ' is not accepted by Consumer Shield.');
+        }
+
+        if (row.debtType === 'Apartment Back Rent (Collections)' && !row.inCollections) {
+          consumerShieldFlags.push('Apartment back rent is only accepted if in collections.');
+        }
+
+        if (row.debtType === 'USAA' && row.isSecured) {
+          consumerShieldFlags.push('USAA is only accepted when there is no other secured debt.');
+        }
+
+        if (LEVEL_REJECTED_TYPES.has(row.debtType)) {
+          levelFlags.push(row.debtType + ' is not accepted by Level Debt.');
+        }
+
+        if (amount < 200 && !row.inCollections) {
+          levelFlags.push((name || row.debtType) + ' must be at least $200 unless already in collections or charged off.');
+        }
+
+        if (!row.paymentMade) {
+          levelFlags.push((name || row.debtType) + ' must have at least one payment made before Level enrollment.');
+        }
+
+        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) {
+          levelFlags.push(name + ' is on the Level rejected creditor list.');
+        }
+
+        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) {
+          levelFlags.push(name + ' is secured. Level only allows this if the client agrees to lose the collateral.');
+        }
       });
 
       return {
         consumerShield: Array.from(new Set(consumerShieldFlags)),
-        level: Array.from(new Set(levelFlags)),
-        verify: Array.from(new Set(verifyFlags))
+        level: Array.from(new Set(levelFlags))
       };
     }
 
     function chooseRoute(totalDebt, stateCode, flags) {
-      if (!stateCode) return { route: '', reason: 'Select a state to calculate routing.' };
+      if (!stateCode) {
+        return { route: '', reason: 'Select a state to calculate routing.' };
+      }
 
       const csStatus = getConsumerShieldStateStatus(stateCode);
       const levelStatus = getLevelStateStatus(stateCode);
-      const verifyStatus = getVerifyStateStatus(stateCode);
 
-      const csEligible = csStatus.status !== 'BLACKOUT' && !flags.consumerShield.some((f) => f.includes('not accepted') || f.includes('requires at least'));
-      const levelEligible = levelStatus.status !== 'BLACKOUT' && !flags.level.some((f) => f.includes('not accepted'));
-      const verifyEligible = verifyStatus.status !== 'BLACKOUT' && !flags.verify.some((f) => f.includes('not accepted'));
+      const csEligible =
+        csStatus.status !== 'BLACKOUT' &&
+        !flags.consumerShield.some((f) => f.toLowerCase().includes('not accepted') || f.toLowerCase().includes('not eligible'));
 
-      if (totalDebt > 0 && totalDebt < 7000) {
-        if (csEligible) {
-          return { route: 'CONSUMER SHIELD', reason: 'Debt below $7,000 routes to Consumer Shield when the state and account profile are serviceable.' };
-        }
-        return { route: 'NO OPTION', reason: 'Debt is below $7,000 and Consumer Shield is not serviceable or eligible for this deal.' };
-      }
+      const levelEligible =
+        levelStatus.status !== 'BLACKOUT' &&
+        !flags.level.some((f) => f.toLowerCase().includes('not accepted') || f.toLowerCase().includes('not eligible'));
 
-      if (levelEligible) {
+      if (levelEligible && totalDebt >= 7000) {
         return {
           route: 'LEVEL',
-          reason: levelStatus.status === 'RED'
-            ? 'Best option is Level Debt under the attorney model in this state.'
-            : 'Best option is Level Debt in this serviceable non-attorney state.'
+          reason:
+            levelStatus.status === 'RED'
+              ? 'Best option is Level Debt under the attorney model in this state.'
+              : 'Best option is Level Debt in this serviceable non-attorney state.'
         };
       }
 
-      if (verifyEligible) {
+      if (csEligible && totalDebt >= 4000) {
         return {
-          route: 'VERIFY',
-          reason: verifyStatus.status === 'RED'
-            ? 'Level is not serviceable here, so the deal routes to Verify under the attorney model.'
-            : 'Level is not serviceable here, so the deal routes to Verify in this serviceable non-attorney state.'
+          route: 'CONSUMER SHIELD',
+          reason:
+            totalDebt < 7000
+              ? 'Debt below $7,000 routes to Consumer Shield when the state and account profile are serviceable.'
+              : 'Level Debt is not available for this deal, so the deal routes to Consumer Shield where serviceable.'
         };
       }
 
-      return { route: 'NO OPTION', reason: 'No available backend is serviceable in this state.' };
+      return {
+        route: 'NO OPTION',
+        reason: 'No available backend is serviceable for this state and debt scenario.'
+      };
     }
 
     function computeScenarioData() {
@@ -512,21 +703,15 @@ www.fundingtier.com
       const routeInfo = chooseRoute(totalDebt, state.selectedState, flags);
 
       const levelState = getLevelStateStatus(state.selectedState);
-      const verifyState = getVerifyStateStatus(state.selectedState);
       const csState = getConsumerShieldStateStatus(state.selectedState);
 
       const feeRate =
-        routeInfo.route === 'LEVEL' ? (levelState.status === 'RED' ? 0.27 : 0.25) :
-        routeInfo.route === 'VERIFY' ? (verifyState.status === 'RED' ? 0.30 : 0.25) :
-        0;
+        routeInfo.route === 'LEVEL'
+          ? (levelState.status === 'RED' ? 0.27 : 0.25)
+          : 0;
 
-      const verifyAdjustedDebt = rows.reduce((sum, row) => {
-        const manual = row.creditorName === 'Other / Manual Entry' || !!row.manualName;
-        return sum + getVerifyPayableBalance(numberOrZero(row.amount), row.debtType, manual);
-      }, 0);
-
-      const repCommissionRate = (routeInfo.route === 'LEVEL' || routeInfo.route === 'VERIFY') ? 0.01 : 0;
-      const repCommission = (routeInfo.route === 'VERIFY' ? verifyAdjustedDebt : totalDebt) * repCommissionRate;
+      const repCommissionRate = routeInfo.route === 'LEVEL' ? 0.01 : 0;
+      const repCommission = totalDebt * repCommissionRate;
 
       const doNothing = calcDoNothing(totalDebt);
 
@@ -538,14 +723,6 @@ www.fundingtier.com
         shortest = { term: 12, totalCost, monthlyPayment: totalCost / 12 };
         const maxTerm = getLevelMaxTerm(totalDebt);
         recommended = { term: maxTerm, totalCost, monthlyPayment: totalCost / maxTerm };
-      } else if (routeInfo.route === 'VERIFY') {
-        const maxTerm = getVerifyMaxTerm(totalDebt);
-        if (maxTerm) {
-          const totalCost = totalDebt * 0.53 + totalDebt * feeRate + 250;
-          const shortTerm = Math.max(12, Math.round(maxTerm * 0.72));
-          shortest = { term: shortTerm, totalCost, monthlyPayment: (totalCost / shortTerm) + 50 };
-          recommended = { term: maxTerm, totalCost, monthlyPayment: (totalCost / maxTerm) + 50 };
-        }
       } else if (routeInfo.route === 'CONSUMER SHIELD') {
         const term = getConsumerShieldProgramLength(totalDebt);
         const monthlyPayment = getConsumerShieldProgramPayment(totalDebt);
@@ -580,26 +757,11 @@ www.fundingtier.com
             'Lower monthly burden potential',
             'Budget breathing room'
           ]
-        },
-        verify: {
-          name: 'Verify',
-          available: verifyState.status !== 'BLACKOUT' && totalDebt >= 7000 && !!getVerifyMaxTerm(totalDebt),
-          term: getVerifyMaxTerm(totalDebt) || 0,
-          monthlyPayment: totalDebt > 0 && getVerifyMaxTerm(totalDebt)
-            ? (((totalDebt * 0.53) + (totalDebt * (verifyState.status === 'RED' ? 0.30 : 0.25)) + 250) / getVerifyMaxTerm(totalDebt)) + 50
-            : 0,
-          benefits: [
-            'Attorney-model availability in more states',
-            'Alternative backend when Level is unavailable',
-            'Structured program terms',
-            'Useful fallback option for blocked states'
-          ]
         }
       };
 
       const activeFlags = [];
       if (routeInfo.route === 'LEVEL') activeFlags.push(...flags.level);
-      if (routeInfo.route === 'VERIFY') activeFlags.push(...flags.verify);
       if (routeInfo.route === 'CONSUMER SHIELD') activeFlags.push(...flags.consumerShield);
       if (routeInfo.route === 'NO OPTION') activeFlags.push(routeInfo.reason);
 
@@ -620,7 +782,6 @@ www.fundingtier.com
         repCommissionRate,
         repCommission,
         levelState,
-        verifyState,
         csState,
         programs,
         flags: Array.from(new Set(activeFlags))
@@ -630,54 +791,113 @@ www.fundingtier.com
     function rowAlerts(row, route) {
       const alerts = [];
       const name = getCreditorDisplayName(row);
-      const isManual = row.creditorName === 'Other / Manual Entry' || !!row.manualName;
+      const meta = row.creditorMeta;
 
-      if (route === 'LEVEL') {
-        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) alerts.push({ label: 'Not accepted by Level', tone: 'red' });
-        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) alerts.push({ label: 'Secured / collateral risk', tone: 'amber' });
-        if (LEVEL_REJECTED_TYPES.has(row.debtType)) alerts.push({ label: 'Debt type not accepted', tone: 'red' });
+      if (meta) {
+        if (String(meta.eligible_for_enrollment || '').toLowerCase() === 'no') {
+          alerts.push({ label: 'Not eligible for enrollment', tone: 'red' });
+        }
+        if (String(meta.needs_supervisor_review || '').toLowerCase() === 'yes' || String(meta.needs_supervisor_review || '').toLowerCase() === 'maybe') {
+          alerts.push({ label: 'Supervisor review', tone: 'amber' });
+        }
+        if (String(meta.collateral_flag || '').toLowerCase() === 'yes' || String(meta.collateral_flag || '').toLowerCase() === 'maybe') {
+          alerts.push({ label: 'Collateral risk', tone: 'amber' });
+        }
+        if (String(meta.litigation_flag || '').toLowerCase() === 'yes' || String(meta.litigation_flag || '').toLowerCase() === 'maybe') {
+          alerts.push({ label: 'Litigation check', tone: 'amber' });
+        }
+        if (String(meta.underlying_debt_inherits_original_type || '').toLowerCase() === 'yes') {
+          alerts.push({ label: 'Verify original debt type', tone: 'amber' });
+        }
       }
 
-      if (route === 'VERIFY') {
-        if (creditorMatches(name, VERIFY_REJECTED_CREDITORS)) alerts.push({ label: 'Not accepted by Verify', tone: 'red' });
-        if (isManual) alerts.push({ label: 'Manual creditor', tone: 'amber' });
+      if (route === 'LEVEL') {
+        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) {
+          alerts.push({ label: 'Not accepted by Level', tone: 'red' });
+        }
+        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) {
+          alerts.push({ label: 'Secured / collateral risk', tone: 'amber' });
+        }
+        if (LEVEL_REJECTED_TYPES.has(row.debtType)) {
+          alerts.push({ label: 'Debt type not accepted', tone: 'red' });
+        }
       }
 
       if (route === 'CONSUMER SHIELD') {
-        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) alerts.push({ label: 'Not accepted by Consumer Shield', tone: 'red' });
-        if (CONSUMER_SHIELD_CONDITIONAL_TYPES.has(row.debtType)) alerts.push({ label: 'Conditional / docs needed', tone: 'amber' });
+        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) {
+          alerts.push({ label: 'Not accepted by Consumer Shield', tone: 'red' });
+        }
+        if (CONSUMER_SHIELD_CONDITIONAL_TYPES.has(row.debtType)) {
+          alerts.push({ label: 'Conditional / docs needed', tone: 'amber' });
+        }
       }
 
       return alerts;
     }
 
-    function renderRows() {
-      el('rows').innerHTML = state.rows.map((row, index) => `
-        <div class="row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 border-slate-100 bg-white" data-row="${index}">
-          <div class="space-y-2">
-            <select data-index="${index}" data-key="creditorName">
-              ${CREDITOR_OPTIONS.map((o) => `<option ${row.creditorName === o ? 'selected' : ''} value="${o}">${o || 'Select creditor'}</option>`).join('')}
-            </select>
-            ${row.creditorName === 'Other / Manual Entry' ? `<input class="input" data-index="${index}" data-key="manualName" placeholder="Type creditor name" value="${row.manualName || ''}" />` : ''}
-            <div class="alert-wrap flex flex-wrap gap-2 pt-1"></div>
-          </div>
-          <input class="input" data-index="${index}" data-key="amount" placeholder="$0" value="${row.amount || ''}" />
-          <select data-index="${index}" data-key="debtType">
-            ${DEBT_TYPES.map((t) => `<option ${row.debtType === t ? 'selected' : ''} value="${t}">${t}</option>`).join('')}
-          </select>
-          <select multiple class="conditions-select" data-index="${index}" data-key="conditions" size="1">
-            <option value="inCollections" ${row.inCollections ? 'selected' : ''}>Collections</option>
-            <option value="inLitigation" ${row.inLitigation ? 'selected' : ''}>Litigation</option>
-            <option value="isSecured" ${row.isSecured ? 'selected' : ''}>Secured</option>
-            <option value="paymentMade" ${row.paymentMade ? 'selected' : ''}>Payment made</option>
-            <option value="businessUnprofitable" ${row.businessUnprofitable ? 'selected' : ''}>Business closed / unprofitable</option>
-          </select>
+    function renderCreditorSuggestions(query, index) {
+      const matches = getCreditorMatches(query);
+      if (!matches.length) return '';
+      return `
+        <div class="mt-2 flex flex-wrap gap-2">
+          ${matches.map((rec) => `
+            <button
+              type="button"
+              class="creditor-suggestion rounded-full border border-teal-200 bg-teal-50 px-2 py-1 text-[11px] font-medium text-teal-700 hover:bg-teal-100"
+              data-index="${index}"
+              data-display="${String(rec.display_name || '').replace(/"/g, '&quot;')}"
+            >${rec.display_name}</button>
+          `).join('')}
         </div>
-      `).join('');
+      `;
+    }
+
+    function renderRows() {
+      el('rows').innerHTML = state.rows.map((row, index) => {
+        const notes = getMetadataNotes(row.creditorMeta);
+        return `
+          <div class="row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 border-slate-100 bg-white" data-row="${index}">
+            <div class="space-y-2">
+              <input
+                class="input"
+                data-index="${index}"
+                data-key="creditorName"
+                placeholder="${state.creditorLookupReady ? 'Search or type creditor name' : 'Type creditor name'}"
+                value="${row.creditorName || ''}"
+                autocomplete="off"
+              />
+              ${renderCreditorSuggestions(row.creditorName || '', index)}
+              ${notes.length ? `<div class="flex flex-wrap gap-2">${notes.map((n) => `<span class="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-600">${n}</span>`).join('')}</div>` : ''}
+              <div class="alert-wrap flex flex-wrap gap-2 pt-1"></div>
+            </div>
+            <input class="input" data-index="${index}" data-key="amount" placeholder="$0" value="${row.amount || ''}" />
+            <select data-index="${index}" data-key="debtType">
+              ${DEBT_TYPES.map((t) => `<option ${row.debtType === t ? 'selected' : ''} value="${t}">${t}</option>`).join('')}
+            </select>
+            <select multiple class="conditions-select" data-index="${index}" data-key="conditions" size="1">
+              <option value="inCollections" ${row.inCollections ? 'selected' : ''}>Collections</option>
+              <option value="inLitigation" ${row.inLitigation ? 'selected' : ''}>Litigation</option>
+              <option value="isSecured" ${row.isSecured ? 'selected' : ''}>Secured</option>
+              <option value="paymentMade" ${row.paymentMade ? 'selected' : ''}>On-Time Payments / Current</option>
+              <option value="businessUnprofitable" ${row.businessUnprofitable ? 'selected' : ''}>Business closed / unprofitable</option>
+            </select>
+          </div>
+        `;
+      }).join('');
 
       document.querySelectorAll('#rows [data-index]').forEach((node) => {
         node.addEventListener('input', onFieldChange);
         node.addEventListener('change', onFieldChange);
+      });
+
+      document.querySelectorAll('.creditor-suggestion').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          const index = Number(e.currentTarget.dataset.index);
+          const display = e.currentTarget.dataset.display || '';
+          const rec = state.creditorDb.find((r) => String(r.display_name) === display);
+          if (!rec || !Number.isInteger(index) || !state.rows[index]) return;
+          applyCreditorSelection(index, rec);
+        });
       });
 
       refreshRowVisuals();
@@ -764,28 +984,13 @@ www.fundingtier.com
         `);
       }
 
-      if (c.programs.verify.available) {
-        cards.push(`
-          <div class="plan-card">
-            <div class="flex items-center justify-between gap-3">
-              <span class="plan-chip" style="background:rgba(14,116,144,0.10); color:#0f766e;">Verify</span>
-            </div>
-            <div class="mt-4 grid grid-cols-2 gap-4">
-              <div><div class="plan-label">Program Length</div><div class="plan-value">${c.programs.verify.term ? c.programs.verify.term + ' mo' : '—'}</div></div>
-              <div><div class="plan-label">Monthly Payment</div><div class="plan-value">${c.programs.verify.monthlyPayment ? currency(c.programs.verify.monthlyPayment) : '—'}</div></div>
-            </div>
-            <div class="mini-list">${c.programs.verify.benefits.map((b) => `<div>• ${b}</div>`).join('')}</div>
-          </div>
-        `);
-      }
-
       el('pricingComparison').innerHTML = cards.length
         ? cards.join('')
-        : '<div class="unavailable-box lg:col-span-3">SERVICE NOT AVAILABLE / NO PROGRAM OPTIONS MATCH THIS STATE AND DEBT SCENARIO</div>';
+        : '<div class="unavailable-box lg:col-span-2">SERVICE NOT AVAILABLE / NO PROGRAM OPTIONS MATCH THIS STATE AND DEBT SCENARIO</div>';
 
       el('pricingDifferences').innerHTML = `
         <div class="diff-box">
-          <h3 class="text-lg font-semibold mb-3">How the Three Options Differ</h3>
+          <h3 class="text-lg font-semibold mb-3">AVAILABLE OPTIONS EXPLAINED</h3>
           <div class="overflow-x-auto">
             <table class="w-full pricing-compare-table text-sm text-slate-700 bg-white">
               <thead>
@@ -793,33 +998,28 @@ www.fundingtier.com
                   <th>Program Features</th>
                   <th><div class="flex items-center gap-2">${ROUTE_LOGOS['CONSUMER SHIELD'] ? `<img class="tiny-logo" src="${ROUTE_LOGOS['CONSUMER SHIELD']}" alt="Consumer Shield logo" />` : ''}<span>Consumer Shield</span></div></th>
                   <th><div class="flex items-center gap-2">${ROUTE_LOGOS['LEVEL'] ? `<img class="tiny-logo" src="${ROUTE_LOGOS['LEVEL']}" alt="Level logo" />` : ''}<span>Level Debt</span></div></th>
-                  <th><div class="flex items-center gap-2">${ROUTE_LOGOS['VERIFY'] ? `<img class="tiny-logo" src="${ROUTE_LOGOS['VERIFY']}" alt="Verify logo" />` : ''}<span>Verify</span></div></th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td class="font-semibold">Primary fit</td>
-                  <td>Often used when debt is below $7,000 and the state is serviceable.</td>
-                  <td>Primary recommended backend when serviceable and debt qualifies.</td>
-                  <td>Fallback backend when Level is blocked but Verify remains serviceable.</td>
+                  <td>Often used when Level is unavailable or when debt falls below standard settlement thresholds and Consumer Shield remains serviceable.</td>
+                  <td>Primary recommended backend when the state is serviceable and the debt qualifies.</td>
+                </tr>
+                <tr>
+                  <td class="font-semibold">Program style</td>
+                  <td>Debt validation-oriented structure.</td>
+                  <td>Traditional debt settlement structure.</td>
                 </tr>
                 <tr>
                   <td class="font-semibold">Monthly payment feel</td>
                   <td>Tier-based and more fixed.</td>
                   <td>Often more flexible with longer term options.</td>
-                  <td>Structured alternative with attorney-model reach in more states.</td>
-                </tr>
-                <tr>
-                  <td class="font-semibold">Program reach</td>
-                  <td>Debt validation style coverage in eligible states.</td>
-                  <td>Strong fit for qualifying standard and attorney-model Level states.</td>
-                  <td>Helps preserve a program option in states where Level is unavailable.</td>
                 </tr>
                 <tr>
                   <td class="font-semibold">Typical advantage</td>
-                  <td>Useful option for smaller debt amounts.</td>
-                  <td>Usually the strongest affordability and economics combination.</td>
-                  <td>Keeps a viable path open when other routing is limited.</td>
+                  <td>Useful fallback when Level cannot take the deal and Consumer Shield is serviceable.</td>
+                  <td>Usually the strongest primary debt-settlement fit when available.</td>
                 </tr>
               </tbody>
             </table>
@@ -840,7 +1040,6 @@ www.fundingtier.com
     function buildProviderAvailability(c) {
       const providers = [
         { name: 'LEVEL DEBT', available: c.programs.level.available, best: c.routeInfo.route === 'LEVEL' },
-        { name: 'VERIFY DEBT SOLUTIONS', available: c.programs.verify.available, best: c.routeInfo.route === 'VERIFY' },
         { name: 'CONSUMER SHIELD', available: c.programs.consumerShield.available, best: c.routeInfo.route === 'CONSUMER SHIELD' }
       ];
 
@@ -878,11 +1077,7 @@ www.fundingtier.com
     function renderBadges(c) {
       const stateCode = state.selectedState || '—';
       const stateFull = state.selectedState ? STATE_NAMES[state.selectedState] : 'No state selected';
-      const isRed = c.routeInfo.route === 'LEVEL'
-        ? c.levelState.status === 'RED'
-        : c.routeInfo.route === 'VERIFY'
-          ? c.verifyState.status === 'RED'
-          : false;
+      const isRed = c.routeInfo.route === 'LEVEL' ? c.levelState.status === 'RED' : false;
 
       const tierColor = isRed ? '#DC2626' : '#16A34A';
       const tierBg = isRed ? '#FEF2F2' : '#ECFDF5';
@@ -892,8 +1087,6 @@ www.fundingtier.com
         second = `<span class="pill border border-teal-300 bg-teal-50 text-teal-700">Consumer Shield: ${c.csState.label}</span>`;
       } else if (c.routeInfo.route === 'LEVEL') {
         second = `<span class="pill border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">Level: ${c.levelState.label}</span>`;
-      } else if (c.routeInfo.route === 'VERIFY') {
-        second = `<span class="pill border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">Verify: ${c.verifyState.label}</span>`;
       }
 
       el('topBadges').innerHTML = `
@@ -943,25 +1136,19 @@ www.fundingtier.com
         return;
       }
 
-      state.rows[index][key] = e.target.value;
-
       if (key === 'creditorName') {
-        const rowEl = document.querySelector(`[data-row="${index}"]`);
-        const existing = rowEl ? rowEl.querySelector('[data-key="manualName"]') : null;
-
-        if (state.rows[index].creditorName === 'Other / Manual Entry' && !existing) {
-          renderRows();
-          render();
-          return;
+        state.rows[index].creditorName = e.target.value;
+        const exact = state.creditorDb.find((r) => normalizeCreditorName(r.display_name) === normalizeCreditorName(e.target.value));
+        state.rows[index].creditorMeta = exact || null;
+        if (exact) {
+          state.rows[index].debtType = getDebtTypeFromMeta(exact, state.rows[index].debtType);
         }
-        if (state.rows[index].creditorName !== 'Other / Manual Entry' && existing) {
-          state.rows[index].manualName = '';
-          renderRows();
-          render();
-          return;
-        }
+        renderRows();
+        render();
+        return;
       }
 
+      state.rows[index][key] = e.target.value;
       render();
     }
 
@@ -1199,7 +1386,8 @@ www.fundingtier.com
       el('sendEmailBtn').addEventListener('click', sendProspectEmail);
     }
 
-    function init() {
+    async function init() {
+      await loadCreditorDatabase();
       initStateSelect();
       initActionButtons();
       renderRows();
