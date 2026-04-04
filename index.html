@@ -213,6 +213,17 @@
       font-size: 13px;
       font-weight: 700;
     }
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #475569;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-teal-100 via-white to-slate-100 text-slate-900">
@@ -334,8 +345,8 @@ Funding Tier
 www.fundingtier.com
 
 *This email and any attachments are intended solely for the use of the intended recipient(s) and may contain confidential, privileged, or legally protected information. If you are not the intended recipient, you are hereby notified that any review, use, disclosure, distribution, or copying of this communication is strictly prohibited. If you have received this email in error, please notify the sender immediately and delete this email and all copies from your system.`;
+
     const EMAIL_ENDPOINT = '/api/send-savings-email';
-    const CREDITOR_CSV_PATH = '/internal_creditor_classification_searchable_v2.csv';
 
     const STATE_NAMES = {
       AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',GU:'Guam',PR:'Puerto Rico'
@@ -370,9 +381,11 @@ www.fundingtier.com
       'Installment / Line': 'Unsecured Line of Credit',
       'Line of Credit': 'Unsecured Line of Credit',
       'Medical Bill': 'Medical Bill',
+      'Medical Financing': 'Medical Bill',
       'Telecom Bill': 'Cell Phone Bill',
       'Utility Bill': 'Utility Bill',
       'Rent': 'Back Rent',
+      'HOA Assessments': 'Back Rent',
       'Collection Account': 'Other',
       'Judgment Debt': 'Judgment',
       'Consumer Debt in Litigation': 'Judgment',
@@ -383,6 +396,7 @@ www.fundingtier.com
       'Auto Loan': 'Auto Repo Deficiency',
       'Auto Loan / Lease': 'Auto Repo Deficiency',
       'Vehicle Title Loan': 'Auto Repo Deficiency',
+      'Title Loan': 'Auto Repo Deficiency',
       'Deficiency Balance': 'Deficiency',
       'POS Installment': 'Unsecured Personal Loan',
       'Installment Financing': 'Unsecured Personal Loan',
@@ -392,6 +406,97 @@ www.fundingtier.com
       'Student Loan': 'Private Student Loan',
       'Payday / Installment': 'Payday Loan'
     };
+
+    const EMBEDDED_CREDITOR_TSV = String.raw`creditor_group	display_name	search_aliases	search_tokens	search_index	product_type	classification	routing_category	eligible_for_enrollment	needs_supervisor_review	collateral_flag	litigation_flag	underlying_debt_inherits_original_type	exclude_reason	routing_notes	backend_notes
+Chase	Chase Credit Card	chase|jp morgan chase|jpmorgan chase|amazon rewards visa|freedom|sapphire|slate	amazon rewards visa, chase, freedom, jp morgan chase, jpmorgan chase, sapphire, slate	chase credit card | chase | amazon rewards visa, chase, freedom, jp morgan chase, jpmorgan chase, sapphire, slate	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+Chase	Chase Personal Loan	chase personal loan|jpmcb installment	chase personal loan, jpmcb installment	chase personal loan | chase | chase personal loan, jpmcb installment	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify no collateral or pledge.	Route using current backend rules only: Level Debt or Consumer Shield.
+Chase	Chase Auto Loan	chase auto|jpmorgan auto	chase auto, jpmorgan auto	chase auto loan | chase | chase auto, jpmorgan auto	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Capital One	Capital One Credit Card	capital one|cap one|quicksilver|venture|savor|kohls card	cap one, capital one, kohls card, quicksilver, savor, venture	capital one credit card | capital one | cap one, capital one, kohls card, quicksilver, savor, venture	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+Capital One	Capital One Auto Finance	capital one auto|auto navigator	auto navigator, capital one auto	capital one auto finance | capital one | auto navigator, capital one auto	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Discover	Discover Credit Card	discover|discover card	discover, discover card	discover credit card | discover | discover, discover card	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt; apply backend caps if used internally.	Route using current backend rules only: Level Debt or Consumer Shield.
+Discover	Discover Personal Loan	discover personal loan	discover personal loan	discover personal loan | discover | discover personal loan	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Unsecured installment debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+American Express	American Express Card	american express|amex|amex card|amex charge card	american express, amex, amex card, amex charge card	american express card | american express | american express, amex, amex card, amex charge card	Credit / Charge Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Charge cards are operationally treated as unsecured.	Route using current backend rules only: Level Debt or Consumer Shield.
+Citibank	Citibank Credit Card	citibank|citi|citi card|best buy card	best buy card, citi, citi card, citibank	citibank credit card | citibank | best buy card, citi, citi card, citibank	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+Bank of America	Bank of America Credit Card	bank of america|bofa|boa credit card	bank of america, boa credit card, bofa	bank of america credit card | bank of america | bank of america, boa credit card, bofa	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+Bank of America	Bank of America Auto Loan	bank of america auto|bofa auto	bank of america auto, bofa auto	bank of america auto loan | bank of america | bank of america auto, bofa auto	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Wells Fargo	Wells Fargo Credit Card	wells fargo|wf credit card	wells fargo, wf credit card	wells fargo credit card | wells fargo | wells fargo, wf credit card	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+Wells Fargo	Wells Fargo Auto Loan	wells fargo auto|wf auto	wells fargo auto, wf auto	wells fargo auto loan | wells fargo | wells fargo auto, wf auto	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Barclays	Barclays Credit Card	barclays|barclaycard|aviator	aviator, barclaycard, barclays	barclays credit card | barclays | aviator, barclaycard, barclays	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Common co-branded card issuer.	Route using current backend rules only: Level Debt or Consumer Shield.
+Synchrony	Synchrony Credit / Store Card	synchrony|syncb|carecredit|amazon store card|lowes card|sams club	amazon store card, carecredit, lowes card, sams club, syncb, synchrony	synchrony credit / store card | synchrony | amazon store card, carecredit, lowes card, sams club, syncb, synchrony	Store / Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Most store cards and CareCredit are unsecured.	Route using current backend rules only: Level Debt or Consumer Shield.
+Comenity / Bread	Comenity / Bread Retail Card	comenity|bread financial|victoria secret card	bread financial, comenity, victoria secret card	comenity / bread retail card | comenity / bread | bread financial, comenity, victoria secret card	Retail Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Store-branded retail credit.	Route using current backend rules only: Level Debt or Consumer Shield.
+Navy Federal	Navy Federal Credit Card	navy federal|nfcu credit card	navy federal, nfcu credit card	navy federal credit card | navy federal | navy federal, nfcu credit card	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Check that it is not a secured-card variant.	Route using current backend rules only: Level Debt or Consumer Shield.
+Navy Federal	Navy Federal Share-Secured Loan	navy federal pledge loan|share secured	navy federal pledge loan, share secured	navy federal share-secured loan | navy federal | navy federal pledge loan, share secured	Share-Secured Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Deposit collateral	Savings/share balance pledged.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Credit Union	Credit Union Signature Loan	signature loan|personal signature loan|credit union personal loan	credit union personal loan, personal signature loan, signature loan	credit union signature loan | credit union | credit union personal loan, personal signature loan, signature loan	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Most signature loans are unsecured.	Route using current backend rules only: Level Debt or Consumer Shield.
+Credit Union	Credit Union Auto Loan	credit union auto loan	credit union auto loan	credit union auto loan | credit union | credit union auto loan	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+SoFi	SoFi Personal Loan	sofi	sofi	sofi personal loan | sofi | sofi	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Marketplace/fintech unsecured loan.	Route using current backend rules only: Level Debt or Consumer Shield.
+Upstart	Upstart Personal Loan	upstart	upstart	upstart personal loan | upstart | upstart	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Marketplace/partner-bank unsecured installment.	Route using current backend rules only: Level Debt or Consumer Shield.
+Upgrade	Upgrade Personal Loan / Line	upgrade	upgrade	upgrade personal loan / line | upgrade | upgrade	Personal Loan / Line	Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify no secured variant.	Route using current backend rules only: Level Debt or Consumer Shield.
+Avant	Avant Personal Loan	avant	avant	avant personal loan | avant | avant	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Common unsecured installment debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+LendingClub	LendingClub Personal Loan	lendingclub	lendingclub	lendingclub personal loan | lendingclub | lendingclub	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Common unsecured installment debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+Best Egg	Best Egg Personal Loan	best egg	best egg	best egg personal loan | best egg | best egg	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Common unsecured installment debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+Prosper	Prosper Personal Loan	prosper	prosper	prosper personal loan | prosper | prosper	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Common unsecured installment debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+Achieve	Achieve / FreedomPlus Personal Loan	achieve|freedomplus	achieve, freedomplus	achieve / freedomplus personal loan | achieve | achieve, freedomplus	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify current branding on tradeline.	Route using current backend rules only: Level Debt or Consumer Shield.
+OneMain Financial	OneMain Personal Loan	onemain|one main	one main, onemain	onemain personal loan | onemain financial | one main, onemain	Personal Loan	Can Be Unsecured or Secured	Conditional	Maybe	Yes	Maybe	No	No		Must verify agreement because OneMain offers both secured and unsecured products.	Route using current backend rules only: Level Debt or Consumer Shield.
+OppLoans	OppLoans Installment Loan	opploans	opploans	opploans installment loan | opploans | opploans	Installment Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		High APR unsecured installment.	Route using current backend rules only: Level Debt or Consumer Shield.
+NetCredit	NetCredit Installment / Line	netcredit	netcredit	netcredit installment / line | netcredit | netcredit	Installment / Line	Usually Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify state and exact product.	Route using current backend rules only: Level Debt or Consumer Shield.
+Elastic	Elastic Line of Credit	elastic	elastic	elastic line of credit | elastic | elastic	Line of Credit	Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify tradeline wording.	Route using current backend rules only: Level Debt or Consumer Shield.
+Rise	Rise Installment Loan	rise	rise	rise installment loan | rise | rise	Installment Loan	Usually Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify state and exact product.	Route using current backend rules only: Level Debt or Consumer Shield.
+CashNetUSA	CashNetUSA Payday / Installment	cashnetusa	cashnetusa	cashnetusa payday / installment | cashnetusa | cashnetusa	Payday / Installment	Unsecured	Conditional	Maybe	Yes	No	No	No		Unsecured but compliance-sensitive.	Route using current backend rules only: Level Debt or Consumer Shield.
+Speedy Cash	Speedy Cash Payday / Installment	speedy cash	speedy cash	speedy cash payday / installment | speedy cash | speedy cash	Payday / Installment	Unsecured	Conditional	Maybe	Yes	No	No	No		Verify exact structure.	Route using current backend rules only: Level Debt or Consumer Shield.
+ACE Cash Express	ACE Cash Express Payday / Installment	ace cash express|ace cash	ace cash, ace cash express	ace cash express payday / installment | ace cash express | ace cash, ace cash express	Payday / Installment	Unsecured	Conditional	Maybe	Yes	No	No	No		Verify exact structure.	Route using current backend rules only: Level Debt or Consumer Shield.
+Affirm	Affirm POS Installment	affirm	affirm	affirm pos installment | affirm | affirm	POS Installment	Usually Unsecured	Conditional	Maybe	Yes	No	No	No		Review account terms.	Route using current backend rules only: Level Debt or Consumer Shield.
+Klarna	Klarna POS Installment	klarna	klarna	klarna pos installment | klarna | klarna	POS Installment	Usually Unsecured	Conditional	Maybe	Yes	No	No	No		Review account terms.	Route using current backend rules only: Level Debt or Consumer Shield.
+Afterpay	Afterpay / Clearpay POS Installment	afterpay|clearpay	afterpay, clearpay	afterpay / clearpay pos installment | afterpay | afterpay, clearpay	POS Installment	Usually Unsecured	Conditional	Maybe	Yes	No	No	No		Review account terms.	Route using current backend rules only: Level Debt or Consumer Shield.
+Zip	Zip / Quadpay POS Installment	zip|quadpay	quadpay, zip	zip / quadpay pos installment | zip | quadpay, zip	POS Installment	Usually Unsecured	Conditional	Maybe	Yes	No	No	No		Review account terms.	Route using current backend rules only: Level Debt or Consumer Shield.
+PayPal	PayPal Credit	paypal credit|paypal syncb	paypal credit, paypal syncb	paypal credit | paypal | paypal credit, paypal syncb	Revolving Credit	Unsecured	Commonly Eligible	Yes	No	No	No	No		Often issued by Synchrony.	Route using current backend rules only: Level Debt or Consumer Shield.
+Apple Card	Apple Card	apple card|goldman sachs card	apple card, goldman sachs card	apple card | apple card | apple card, goldman sachs card	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+CareCredit	CareCredit	carecredit	carecredit	carecredit | carecredit | carecredit	Medical Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Medical financing card issued by Synchrony.	Route using current backend rules only: Level Debt or Consumer Shield.
+PatientFi	PatientFi Medical Financing	patientfi	patientfi	patientfi medical financing | patientfi | patientfi	Medical Financing	Usually Unsecured	Conditional	Maybe	Yes	No	No	No		Verify agreement.	Route using current backend rules only: Level Debt or Consumer Shield.
+Ally	Ally Auto Loan	ally auto|ally financial	ally auto, ally financial	ally auto loan | ally | ally auto, ally financial	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Santander Consumer	Santander Consumer Auto Loan	santander consumer|roadloans|santander auto	roadloans, santander auto, santander consumer	santander consumer auto loan | santander consumer | roadloans, santander auto, santander consumer	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Toyota Financial	Toyota Financial Auto Loan / Lease	toyota financial|toyota motor credit	toyota financial, toyota motor credit	toyota financial auto loan / lease | toyota financial | toyota financial, toyota motor credit	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Honda Financial	Honda Financial Auto Loan / Lease	honda financial|ahfc	ahfc, honda financial	honda financial auto loan / lease | honda financial | ahfc, honda financial	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Ford Credit	Ford Credit Auto Loan / Lease	ford credit|ford motor credit	ford credit, ford motor credit	ford credit auto loan / lease | ford credit | ford credit, ford motor credit	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+GM Financial	GM Financial Auto Loan / Lease	gm financial|gmac	gm financial, gmac	gm financial auto loan / lease | gm financial | gm financial, gmac	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Hyundai Motor Finance	Hyundai Motor Finance Auto Loan / Lease	hyundai motor finance	hyundai motor finance	hyundai motor finance auto loan / lease | hyundai motor finance | hyundai motor finance	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Kia Finance	Kia Finance Auto Loan / Lease	kia finance|kia motor finance	kia finance, kia motor finance	kia finance auto loan / lease | kia finance | kia finance, kia motor finance	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+BMW Financial	BMW Financial Auto Loan / Lease	bmw financial	bmw financial	bmw financial auto loan / lease | bmw financial | bmw financial	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Mercedes-Benz Financial	Mercedes-Benz Financial Auto Loan / Lease	mercedes benz financial|mbfs	mbfs, mercedes benz financial	mercedes-benz financial auto loan / lease | mercedes-benz financial | mbfs, mercedes benz financial	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Credit Acceptance	Credit Acceptance Auto Loan	credit acceptance	credit acceptance	credit acceptance auto loan | credit acceptance | credit acceptance	Auto Loan	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Westlake Financial	Westlake Financial Auto Loan	westlake financial	westlake financial	westlake financial auto loan | westlake financial | westlake financial	Auto Loan	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Rocket Mortgage	Rocket Mortgage	rocket mortgage|quicken loans	quicken loans, rocket mortgage	rocket mortgage | rocket mortgage | quicken loans, rocket mortgage	Mortgage	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Home collateral	Treat as secured real-estate debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Pennymac	Pennymac Mortgage	pennymac	pennymac	pennymac mortgage | pennymac | pennymac	Mortgage	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Home collateral	Treat as secured real-estate debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Mr. Cooper	Mr. Cooper Mortgage	mr cooper|nationstar	mr cooper, nationstar	mr. cooper mortgage | mr. cooper | mr cooper, nationstar	Mortgage	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Home collateral	Treat as secured real-estate debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Local Bank / Credit Union	Mortgage / HELOC	mortgage|heloc|home equity	heloc, home equity, mortgage	mortgage / heloc | local bank / credit union | heloc, home equity, mortgage	Mortgage / HELOC	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Home collateral	Treat as secured real-estate debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+IRS	Federal Tax Debt	irs|internal revenue service|federal tax	federal tax, internal revenue service, irs	federal tax debt | irs | federal tax, internal revenue service, irs	Tax Debt	Priority / Can Become Lien-Based	Excluded / Special Handling	No	Yes	Maybe	No	No	Tax debt / lien risk	Not standard unsecured settlement debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+State Tax Agency	State Tax Debt	ftb|franchise tax board|state tax|state revenue	franchise tax board, ftb, state revenue, state tax	state tax debt | state tax agency | franchise tax board, ftb, state revenue, state tax	Tax Debt	Priority / Can Become Lien-Based	Excluded / Special Handling	No	Yes	Maybe	No	No	Tax debt / lien risk	Not standard unsecured settlement debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+County Tax Collector	Property Tax	property tax|county tax collector	county tax collector, property tax	property tax | county tax collector | county tax collector, property tax	Property Tax	Lien-Based / Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Property tax lien	Tied to property.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Federal Student Aid	Federal Student Loan	federal student aid|department of education|edfinancial|mohela	department of education, edfinancial, federal student aid, mohela	federal student loan | federal student aid | department of education, edfinancial, federal student aid, mohela	Student Loan	Usually Unsecured but Special Category	Excluded / Special Handling	No	Yes	No	No	No	Student loan	Not typical unsecured settlement fit.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Navient / Aidvantage / Nelnet	Student Loan Servicer	navient|aidvantage|nelnet|sallie mae	aidvantage, navient, nelnet, sallie mae	student loan servicer | navient / aidvantage / nelnet | aidvantage, navient, nelnet, sallie mae	Student Loan	Usually Unsecured but Special Category	Excluded / Special Handling	No	Yes	No	No	No	Student loan	Operationally separate from normal unsecured consumer debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Medical	Hospital / Medical Group Bill	hospital|medical group|surgery center|er bill|doctor bill	doctor bill, er bill, hospital, medical group, surgery center	hospital / medical group bill | medical | doctor bill, er bill, hospital, medical group, surgery center	Medical Bill	Unsecured	Commonly Eligible	Yes	No	No	No	No		No collateral.	Route using current backend rules only: Level Debt or Consumer Shield.
+Utility	Utility Bill	utility|electric bill|gas bill|water bill	electric bill, gas bill, utility, water bill	utility bill | utility | electric bill, gas bill, utility, water bill	Utility Bill	Unsecured	Conditional	Maybe	Yes	No	No	No		Usually unsecured service debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+Telecom	Cell / Internet Bill	cell phone bill|internet bill|verizon|att|tmobile|comcast	att, cell phone bill, comcast, internet bill, tmobile, verizon	cell / internet bill | telecom | att, cell phone bill, comcast, internet bill, tmobile, verizon	Telecom Bill	Unsecured	Conditional	Maybe	Yes	No	No	No		Usually unsecured service debt.	Route using current backend rules only: Level Debt or Consumer Shield.
+Rent	Back Rent	back rent|rent due|landlord|property manager	back rent, landlord, property manager, rent due	back rent | rent | back rent, landlord, property manager, rent due	Rent	Unsecured	Conditional	Maybe	Yes	No	No	No		Operational rules vary.	Route using current backend rules only: Level Debt or Consumer Shield.
+HOA	HOA / Condo Assessments	hoa|homeowners association|condo association	condo association, hoa, homeowners association	hoa / condo assessments | hoa | condo association, hoa, homeowners association	HOA Assessments	Usually Unsecured / Lien Risk	Conditional	Maybe	Yes	Maybe	No	No	HOA lien risk	Can become lien-related.	Route using current backend rules only: Level Debt or Consumer Shield.
+Collection Agency	Collection Account	collection|midland|portfolio recovery|lvnv|resurgent|jefferson capital|cavalry	cavalry, collection, jefferson capital, lvnv, midland, portfolio recovery, resurgent	collection account | collection agency | cavalry, collection, jefferson capital, lvnv, midland, portfolio recovery, resurgent	Collection Account	Follows Underlying Debt Type	Conditional	Maybe	Yes	No	Maybe	Yes		Must identify original creditor and original debt type.	Route using current backend rules only: Level Debt or Consumer Shield.
+Midland Credit Management	Midland Collection Account	midland|mcm	mcm, midland	midland collection account | midland credit management | mcm, midland	Collection Account	Follows Underlying Debt Type	Conditional	Maybe	Yes	No	Maybe	Yes		Often former credit-card debt; confirm original account.	Route using current backend rules only: Level Debt or Consumer Shield.
+Portfolio Recovery	Portfolio Recovery Collection Account	portfolio recovery|pra	portfolio recovery, pra	portfolio recovery collection account | portfolio recovery | portfolio recovery, pra	Collection Account	Follows Underlying Debt Type	Conditional	Maybe	Yes	No	Maybe	Yes		Often former credit-card debt; confirm original account.	Route using current backend rules only: Level Debt or Consumer Shield.
+LVNV Funding	LVNV Funding Collection Account	lvnv|resurgent	lvnv, resurgent	lvnv funding collection account | lvnv funding | lvnv, resurgent	Collection Account	Follows Underlying Debt Type	Conditional	Maybe	Yes	No	Maybe	Yes		Confirm original account type.	Route using current backend rules only: Level Debt or Consumer Shield.
+Jefferson Capital	Jefferson Capital Collection Account	jefferson capital	jefferson capital	jefferson capital collection account | jefferson capital | jefferson capital	Collection Account	Follows Underlying Debt Type	Conditional	Maybe	Yes	No	Maybe	Yes		Confirm original account type.	Route using current backend rules only: Level Debt or Consumer Shield.
+Law Firm Collection	Debt in Litigation	summons|complaint|law firm collection|attorney collection	attorney collection, complaint, law firm collection, summons	debt in litigation | law firm collection | attorney collection, complaint, law firm collection, summons	Consumer Debt in Litigation	Follows Underlying Debt Type	Conditional / Special Handling	Maybe	Yes	No	Yes	Yes	Litigation	Lawsuit status may change backend eligibility.	Route using current backend rules only: Level Debt or Consumer Shield.
+Secured Card	Secured Credit Card	secured card|deposit secured card	deposit secured card, secured card	secured credit card | secured card | deposit secured card, secured card	Secured Card	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Deposit collateral	Do not treat as normal unsecured card.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Repo Deficiency	Repossession Deficiency Balance	repo deficiency|deficiency balance|post repo	deficiency balance, post repo, repo deficiency	repossession deficiency balance | repo deficiency | deficiency balance, post repo, repo deficiency	Deficiency Balance	Usually Treated Operationally as Unsecured Deficiency	Conditional / Special Handling	Maybe	Yes	No	Maybe	No	Prior secured debt / deficiency	Need repo status and backend rules.	Route using current backend rules only: Level Debt or Consumer Shield.
+Foreclosure Deficiency	Foreclosure Deficiency	foreclosure deficiency	foreclosure deficiency	foreclosure deficiency | foreclosure deficiency | foreclosure deficiency	Deficiency Balance	Conditional / State-Specific	Conditional / Special Handling	Maybe	Yes	Maybe	Maybe	No	Legal / state-specific	Legal review may be required.	Route using current backend rules only: Level Debt or Consumer Shield.
+Judgment Debt	Judgment Debt	judgment|court judgment	court judgment, judgment	judgment debt | judgment debt | court judgment, judgment	Judgment Debt	Conditional / Lien Risk	Conditional / Special Handling	Maybe	Yes	Maybe	Yes	No	Judgment / lien risk	Review whether lien attached.	Route using current backend rules only: Level Debt or Consumer Shield.
+Pawn Loan	Pawn Loan	pawn loan|pawn shop	pawn loan, pawn shop	pawn loan | pawn loan | pawn loan, pawn shop	Pawn Loan	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Item pledged	Item is collateral.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Title Loan	Vehicle Title Loan	title loan|car title loan	car title loan, title loan	vehicle title loan | title loan | car title loan, title loan	Title Loan	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle title collateral	Vehicle title is collateral.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Furniture Financing	Furniture Financing	furniture financing|rooms to go|ashley financing	ashley financing, furniture financing, rooms to go	furniture financing | furniture financing | ashley financing, furniture financing, rooms to go	Installment Financing	Can Be Secured or Unsecured	Conditional	Maybe	Yes	Maybe	No	No		Must verify agreement.	Route using current backend rules only: Level Debt or Consumer Shield.
+Jewelry Financing	Jewelry Financing	jewelry financing|kay jewelers financing	jewelry financing, kay jewelers financing	jewelry financing | jewelry financing | jewelry financing, kay jewelers financing	Installment Financing	Can Be Secured or Unsecured	Conditional	Maybe	Yes	Maybe	No	No		Must verify agreement.	Route using current backend rules only: Level Debt or Consumer Shield.
+Solar Loan	Solar / Home Improvement Loan	solar loan|home improvement loan	home improvement loan, solar loan	solar / home improvement loan | solar loan | home improvement loan, solar loan	Home Improvement Loan	Can Be Secured or Unsecured	Conditional / Special Handling	Maybe	Yes	Maybe	No	No		Check contract, UCC, and fixture terms.	Route using current backend rules only: Level Debt or Consumer Shield.
+Business MCA	Merchant Cash Advance	mca|merchant cash advance	mca, merchant cash advance	merchant cash advance | business mca | mca, merchant cash advance	Business MCA	Not Standard Consumer Unsecured Debt	Excluded / Special Handling	No	Yes	No	No	No	Business debt	Business-only product.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Business Term Loan	Business Term Loan	business term loan|business loan	business loan, business term loan	business term loan | business term loan | business loan, business term loan	Business Loan	Can Be Secured or Unsecured	Conditional	Maybe	Yes	Maybe	No	No		Check personal guarantee and UCC.	Route using current backend rules only: Level Debt or Consumer Shield.
+SBA Loan	SBA Loan	sba loan|small business administration loan	sba loan, small business administration loan	sba loan | sba loan | sba loan, small business administration loan	Business Loan	Often Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Business secured debt	Check collateral and UCC.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
+Lease Deficiency	Lease Deficiency	lease deficiency|broken lease auto|equipment lease deficiency	broken lease auto, equipment lease deficiency, lease deficiency	lease deficiency | lease deficiency | broken lease auto, equipment lease deficiency, lease deficiency	Deficiency Balance	Conditional	Conditional / Special Handling	Maybe	Yes	Maybe	Maybe	No		Need contract and deficiency details.	Route using current backend rules only: Level Debt or Consumer Shield.`;
 
     const state = {
       selectedState: '',
@@ -412,6 +517,15 @@ www.fundingtier.com
     };
 
     const el = (id) => document.getElementById(id);
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
     const currency = (value) =>
       new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
@@ -496,45 +610,22 @@ www.fundingtier.com
       return { monthlyPayment, totalDebt, monthsToPayoff: months, apr, totalPayback: monthlyPayment * months };
     }
 
-    function parseCsvLine(line) {
-      const result = [];
-      let current = '';
-      let inQuotes = false;
-
-      for (let i = 0; i < line.length; i += 1) {
-        const char = line[i];
-        const next = line[i + 1];
-
-        if (char === '"' && inQuotes && next === '"') {
-          current += '"';
-          i += 1;
-        } else if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          result.push(current);
-          current = '';
-        } else {
-          current += char;
-        }
-      }
-      result.push(current);
-      return result.map((v) => String(v).trim());
+    function parseTsvLine(line) {
+      return line.split('\t').map((v) => String(v).trim());
     }
 
     async function loadCreditorDatabase() {
       try {
-        const res = await fetch(CREDITOR_CSV_PATH, { cache: 'no-store' });
-        if (!res.ok) throw new Error('CSV not found');
-        const text = await res.text();
-        const lines = text.split(/\r?\n/).filter(Boolean);
-        if (lines.length < 2) throw new Error('CSV empty');
+        const lines = EMBEDDED_CREDITOR_TSV.split(/\r?\n/).filter(Boolean);
+        if (lines.length < 2) throw new Error('Embedded creditor data is empty.');
 
-        const headers = parseCsvLine(lines[0]);
+        const headers = parseTsvLine(lines[0]);
         const data = [];
 
         for (let i = 1; i < lines.length; i += 1) {
-          const values = parseCsvLine(lines[i]);
+          const values = parseTsvLine(lines[i]);
           if (!values.length || values.every((v) => !v)) continue;
+
           const row = {};
           headers.forEach((h, idx) => {
             row[h] = values[idx] ?? '';
@@ -550,7 +641,7 @@ www.fundingtier.com
         state.creditorDb = data;
         state.creditorLookupReady = true;
       } catch (err) {
-        console.error('Creditor CSV failed to load:', err);
+        console.error('Embedded creditor data failed to load:', err);
         state.creditorDb = [];
         state.creditorLookupReady = false;
       }
@@ -930,9 +1021,9 @@ www.fundingtier.com
               type="button"
               class="creditor-option"
               data-index="${index}"
-              data-display="${String(rec.display_name || '').replace(/"/g, '&quot;')}"
+              data-display="${escapeHtml(rec.display_name || '')}"
             >
-              ${rec.display_name}
+              ${escapeHtml(rec.display_name || '')}
             </button>
           `).join('')}
         </div>
@@ -951,17 +1042,17 @@ www.fundingtier.com
                   data-index="${index}"
                   data-key="creditorName"
                   placeholder="${state.creditorLookupReady ? 'Search or type creditor name' : 'Type creditor name'}"
-                  value="${row.creditorName || ''}"
+                  value="${escapeHtml(row.creditorName || '')}"
                   autocomplete="off"
                 />
                 <div class="creditor-suggestions-container" id="creditorSuggestions-${index}"></div>
               </div>
-              ${notes.length ? `<div class="flex flex-wrap gap-2">${notes.map((n) => `<span class="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-600">${n}</span>`).join('')}</div>` : ''}
+              ${notes.length ? `<div class="flex flex-wrap gap-2">${notes.map((n) => `<span class="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-600">${escapeHtml(n)}</span>`).join('')}</div>` : ''}
               <div class="alert-wrap flex flex-wrap gap-2 pt-1"></div>
             </div>
-            <input class="input" data-index="${index}" data-key="amount" placeholder="$0" value="${row.amount || ''}" />
+            <input class="input" data-index="${index}" data-key="amount" placeholder="$0" value="${escapeHtml(row.amount || '')}" />
             <select data-index="${index}" data-key="debtType">
-              ${DEBT_TYPES.map((t) => `<option ${row.debtType === t ? 'selected' : ''} value="${t}">${t}</option>`).join('')}
+              ${DEBT_TYPES.map((t) => `<option ${row.debtType === t ? 'selected' : ''} value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('')}
             </select>
             <select multiple class="conditions-select" data-index="${index}" data-key="conditions" size="1">
               <option value="inCollections" ${row.inCollections ? 'selected' : ''}>Collections</option>
@@ -1009,17 +1100,18 @@ www.fundingtier.com
             container.innerHTML = renderCreditorSuggestions(value, index);
           }
 
+          const c = computeScenarioData();
           refreshRowVisuals();
-          renderComparison(computeScenarioData());
-          renderPricingComparison(computeScenarioData());
-          renderProgramPitchSection(computeScenarioData());
-          renderProviderLogo(computeScenarioData().routeInfo.route);
-          renderBadges(computeScenarioData());
-          renderMetrics(computeScenarioData());
-          renderFlags(computeScenarioData());
-          el('routeReason').textContent = computeScenarioData().routeInfo.reason;
-          el('providerAvailability').innerHTML = buildProviderAvailability(computeScenarioData());
-          el('totalDebt').textContent = currency(computeScenarioData().totalDebt);
+          renderComparison(c);
+          renderPricingComparison(c);
+          renderProgramPitchSection(c);
+          renderProviderLogo(c.routeInfo.route);
+          renderBadges(c);
+          renderMetrics(c);
+          renderFlags(c);
+          el('routeReason').textContent = c.routeInfo.reason;
+          el('providerAvailability').innerHTML = buildProviderAvailability(c);
+          el('totalDebt').textContent = currency(c.totalDebt);
 
           input.focus();
           input.setSelectionRange(value.length, value.length);
@@ -1070,6 +1162,29 @@ www.fundingtier.com
       });
     }
 
+    function refreshRowVisuals() {
+      const route = computeScenarioData().routeInfo.route;
+      state.rows.forEach((row, index) => {
+        const card = document.querySelector(`.row-card[data-row="${index}"]`);
+        if (!card) return;
+        const alerts = rowAlerts(row, route);
+        const wrap = card.querySelector('.alert-wrap');
+        const bg =
+          alerts.some((a) => a.tone === 'red') ? 'border-red-300 bg-red-50' :
+          alerts.some((a) => a.tone === 'amber') ? 'border-amber-300 bg-amber-50' :
+          'border-slate-100 bg-white';
+
+        card.className = `row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 ${bg}`;
+        wrap.innerHTML = alerts.map((a) =>
+          `<span class="rounded-full border px-2 py-1 text-[11px] font-medium ${
+            a.tone === 'red'
+              ? 'bg-red-100 text-red-700 border-red-200'
+              : 'bg-amber-100 text-amber-800 border-amber-200'
+          }">${escapeHtml(a.label)}</span>`
+        ).join('');
+      });
+    }
+
     function renderComparison(c) {
       const totalPaybackRed = `<span style="color:#DC2626;font-weight:800;">${currency(c.doNothing.totalPayback)}</span>`;
 
@@ -1108,7 +1223,7 @@ www.fundingtier.com
               <div><div class="plan-label">Program Length</div><div class="plan-value">${c.programs.consumerShield.term ? c.programs.consumerShield.term + ' mo' : '—'}</div></div>
               <div><div class="plan-label">Monthly Payment</div><div class="plan-value">${c.programs.consumerShield.monthlyPayment ? currency(c.programs.consumerShield.monthlyPayment) : '—'}</div></div>
             </div>
-            <div class="mini-list">${c.programs.consumerShield.benefits.map((b) => `<div>• ${b}</div>`).join('')}</div>
+            <div class="mini-list">${c.programs.consumerShield.benefits.map((b) => `<div>• ${escapeHtml(b)}</div>`).join('')}</div>
           </div>
         `);
       }
@@ -1123,7 +1238,7 @@ www.fundingtier.com
               <div><div class="plan-label">Program Length</div><div class="plan-value">${c.programs.level.term ? c.programs.level.term + ' mo' : '—'}</div></div>
               <div><div class="plan-label">Monthly Payment</div><div class="plan-value">${c.programs.level.monthlyPayment ? currency(c.programs.level.monthlyPayment) : '—'}</div></div>
             </div>
-            <div class="mini-list">${c.programs.level.benefits.map((b) => `<div>• ${b}</div>`).join('')}</div>
+            <div class="mini-list">${c.programs.level.benefits.map((b) => `<div>• ${escapeHtml(b)}</div>`).join('')}</div>
           </div>
         `);
       }
@@ -1276,14 +1391,14 @@ www.fundingtier.com
       }
 
       el('topBadges').innerHTML = `
-        <span title="${stateFull}" class="pill border border-slate-300 bg-white cursor-help">State: ${stateCode}</span>
+        <span title="${escapeHtml(stateFull)}" class="pill border border-slate-300 bg-white cursor-help">State: ${escapeHtml(stateCode)}</span>
         ${second}
       `;
     }
 
     function renderFlags(c) {
       el('flags').innerHTML = c.flags.map((flag) => `
-        <div class="flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">⚠️ <span>${flag}</span></div>
+        <div class="flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">⚠️ <span>${escapeHtml(flag)}</span></div>
       `).join('');
     }
 
@@ -1548,7 +1663,7 @@ www.fundingtier.com
     function initStateSelect() {
       el('state').innerHTML =
         '<option value="">Select state</option>' +
-        STATES.map(([abbr, name]) => `<option value="${abbr}" title="${name}">${abbr}</option>`).join('');
+        STATES.map(([abbr, name]) => `<option value="${escapeHtml(abbr)}" title="${escapeHtml(name)}">${escapeHtml(abbr)}</option>`).join('');
 
       el('state').addEventListener('change', (e) => {
         state.selectedState = e.target.value;
