@@ -7,1684 +7,757 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body { font-family: Arial, Helvetica, sans-serif; }
+    body { font-family: Arial, Helvetica, sans-serif; background: #f8fafc; }
     .card { border-radius: 18px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08); }
-    .input, select {
+    .input, select, textarea {
       width: 100%;
       border: 1px solid #d1d5db;
       border-radius: 12px;
-      background: #fff;
-      padding: 10px 12px;
-      font-size: 14px;
-      outline: none;
-    }
-    .input:focus, select:focus, .conditions-select:focus {
-      border-color: #009688;
-      box-shadow: 0 0 0 3px rgba(0,150,136,0.12);
-    }
-    .conditions-select {
-      height: 38px;
-      min-height: 38px;
-      max-height: 38px;
-      overflow-y: auto;
-      font-size: 12px;
-      padding: 6px 8px;
-      border-radius: 12px;
-      border: 1px solid #d1d5db;
-      background: #fff;
-      width: 100%;
-    }
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 80;
-      backdrop-filter: blur(14px);
-      background: linear-gradient(90deg, rgba(255,255,255,0.97) 0%, rgba(239,250,248,0.97) 45%, rgba(255,255,255,0.97) 100%);
-      border-bottom: 1px solid rgba(0,150,136,0.14);
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-    }
-    .brand-logo {
-      max-width: 170px;
-      max-height: 64px;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-    }
-    .sticky-stack { position: sticky; top: 94px; }
-    .teal-panel {
-      background: linear-gradient(135deg, rgba(0,150,136,0.11) 0%, rgba(0,150,136,0.04) 48%, rgba(255,255,255,1) 100%);
-    }
-    .provider-logo-wrap {
-      width: 80px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid #d7eeeb;
-      border-radius: 10px;
-      background: #fff;
-      padding: 3px;
-      flex: 0 0 auto;
-    }
-    .provider-logo {
-      max-width: 72px;
-      max-height: 22px;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-    }
-    .tiny-logo {
-      width: 42px;
-      height: 16px;
-      object-fit: contain;
-      display: inline-block;
-      vertical-align: middle;
-    }
-    .plan-card {
-      border-radius: 18px;
-      border: 1px solid #d7eeeb;
-      padding: 18px;
-      background: linear-gradient(180deg, #ffffff 0%, #f5fbfa 100%);
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-    .plan-card:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
-    }
-    .plan-chip {
-      display: inline-block;
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .plan-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: #64748b;
-    }
-    .plan-value {
-      font-size: 26px;
-      font-weight: 800;
-      line-height: 1.1;
-    }
-    .mini-list { margin-top: 12px; display: grid; gap: 8px; }
-    .mini-list div { font-size: 14px; color: #334155; }
-    .diff-box {
-      border: 1px solid #bfe3dd;
-      border-radius: 18px;
-      padding: 18px;
-      background: linear-gradient(180deg, #f7fcfb 0%, #eef9f7 100%);
-    }
-    .pricing-compare-table td, .pricing-compare-table th {
-      border: 1px solid #cbd5e1;
-      padding: 12px;
-      vertical-align: top;
-    }
-    .pill {
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .unavailable-box {
-      margin-top: 16px;
-      border: 1px solid #fecaca;
-      background: #fef2f2;
-      color: #b91c1c;
-      border-radius: 14px;
       padding: 12px 14px;
+      outline: none;
+      background: white;
+    }
+    .input:focus, select:focus, textarea:focus {
+      border-color: #0f766e;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    }
+    .btn {
+      border-radius: 12px;
+      padding: 12px 16px;
       font-weight: 700;
-      font-size: 14px;
-      line-height: 1.45;
+      transition: 0.2s ease;
     }
-    .proposal-header {
-      background: linear-gradient(90deg, rgba(0,150,136,0.08), rgba(255,255,255,1));
+    .btn:hover { transform: translateY(-1px); }
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
     }
-    .savings-glow {
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 0 24px rgba(0,150,136,0.10);
-    }
-    .creditor-search-wrap {
-      position: relative;
-    }
-    .creditor-dropdown {
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      right: 0;
-      z-index: 30;
-      background: #fff;
-      border: 1px solid #cbd5e1;
-      border-radius: 14px;
-      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
-      max-height: 220px;
-      overflow-y: auto;
-    }
-    .creditor-option {
-      width: 100%;
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
       text-align: left;
       padding: 10px 12px;
-      font-size: 13px;
-      color: #0f172a;
-      border-bottom: 1px solid #eef2f7;
-      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
     }
-    .creditor-option:hover {
-      background: #ecfdf5;
-    }
-    .creditor-option:last-child {
-      border-bottom: none;
-    }
-    .pitch-card {
-      border-radius: 18px;
-      border: 1px solid #bfe3dd;
-      padding: 18px;
-      background: linear-gradient(180deg, #ffffff 0%, #f0fbf9 100%);
-    }
-    .pitch-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: #0f172a;
-    }
-    .pitch-sub {
-      margin-top: 4px;
-      font-size: 13px;
-      color: #475569;
-    }
-    .pitch-list {
-      margin-top: 14px;
-      display: grid;
-      gap: 8px;
-    }
-    .pitch-list div {
-      font-size: 14px;
-      color: #1e293b;
-    }
-    .pitch-urgency {
-      margin-top: 14px;
-      border-radius: 12px;
-      background: #fef2f2;
-      color: #b91c1c;
-      padding: 10px 12px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .meta-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      color: #475569;
-    }
+    th { background: #f1f5f9; font-size: 13px; }
+    .route-good { background: #dcfce7; color: #166534; }
+    .route-warn { background: #fef3c7; color: #92400e; }
+    .route-bad { background: #fee2e2; color: #991b1b; }
+    .small-label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; display: block; }
+    .section-title { font-size: 20px; font-weight: 800; color: #0f172a; }
+    .subtle { color: #64748b; }
   </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-teal-100 via-white to-slate-100 text-slate-900">
-  <header class="topbar">
-    <div class="mx-auto max-w-7xl px-4 py-4 md:px-6">
-      <div class="flex items-center gap-8 md:gap-[100px]">
-        <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf8e8df54a8b29097c4.png" alt="Funding Tier logo" class="brand-logo" />
-        <div class="text-[17px] font-bold tracking-tight text-black md:text-[22px]">AI DEAL ROUTER / PROGRAM AVAILABILITY</div>
+<body>
+  <div class="max-w-7xl mx-auto p-4 md:p-6">
+    <div class="mb-6">
+      <div class="card bg-gradient-to-r from-teal-700 to-slate-900 text-white p-6">
+        <h1 class="text-3xl font-extrabold">Funding Tier AI - Deal Router</h1>
+        <p class="mt-2 text-slate-200">
+          Internal routing tool for debt settlement intake, creditor classification, eligibility review, backend recommendation, and searchable creditor database.
+        </p>
       </div>
     </div>
-  </header>
 
-  <main class="mx-auto max-w-7xl space-y-8 p-4 md:p-6">
-    <section class="grid gap-6 xl:grid-cols-[70%,30%] items-start">
-      <div class="card bg-white p-6 teal-panel">
-        <h2 class="text-2xl font-semibold">Debts / Creditors</h2>
-        <p class="mt-1 text-slate-600">Enter the state and up to 5 creditors. Routing and comparison update automatically.</p>
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <!-- LEFT COLUMN -->
+      <div class="xl:col-span-2 space-y-6">
+        <div class="card bg-white p-5">
+          <h2 class="section-title mb-4">Client Intake</h2>
 
-        <div class="mt-5 grid gap-4 md:grid-cols-2">
-          <div>
-            <label class="block mb-2 text-sm font-medium">State</label>
-            <select id="state"></select>
-          </div>
-          <div>
-            <label class="block mb-2 text-sm font-medium">Total Enrolled Debt</label>
-            <div id="totalDebt" class="rounded-xl border bg-white/80 px-4 py-3 text-lg font-semibold">$0</div>
-          </div>
-        </div>
-
-        <div class="mt-5 overflow-hidden rounded-2xl border border-teal-100 bg-white/80">
-          <div class="grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 bg-gradient-to-r from-teal-50 to-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
-            <div>Creditor Name</div>
-            <div>Debt Amount</div>
-            <div>Debt Type</div>
-            <div>Conditions</div>
-          </div>
-          <div id="rows" class="space-y-2 p-3"></div>
-        </div>
-      </div>
-
-      <div class="sticky-stack space-y-4">
-        <div class="card bg-white p-5 teal-panel">
-          <h2 class="text-lg font-semibold">Routing & Internal Metrics</h2>
-
-          <div class="mt-3 flex items-center gap-3">
-            <div id="providerLogoBox"></div>
-            <div id="topBadges" class="flex flex-wrap gap-2"></div>
-          </div>
-
-          <div id="routeReason" class="mt-3 w-full rounded-xl bg-white/90 border border-teal-100 p-3 text-xs text-slate-700"></div>
-          <div id="providerAvailability" class="mt-3 grid gap-3"></div>
-          <div id="metricsGrid" class="mt-3 grid gap-2 md:grid-cols-2"></div>
-          <div id="flags" class="mt-3 space-y-2"></div>
-        </div>
-
-        <div class="card bg-white p-4 teal-panel">
-          <div class="flex items-center justify-between gap-3">
-            <h2 class="text-base font-semibold">Actions</h2>
-            <div class="text-xs text-slate-600">Download the program comparison or email it to your prospect.</div>
-          </div>
-          <div class="mt-3 grid gap-3 md:grid-cols-[1.2fr,0.9fr,0.9fr] items-end">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block mb-2 text-sm font-medium">Prospect Email</label>
-              <input id="prospectEmail" class="input" type="email" placeholder="prospect@email.com" />
+              <label class="small-label">First Name</label>
+              <input id="firstName" class="input" type="text" placeholder="John" />
             </div>
-            <button id="pdfBtn" class="w-full rounded-xl py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-500 whitespace-nowrap">Download PDF</button>
-            <button id="sendEmailBtn" class="w-full rounded-xl py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-700 to-teal-600">Send Email</button>
+            <div>
+              <label class="small-label">Last Name</label>
+              <input id="lastName" class="input" type="text" placeholder="Doe" />
+            </div>
+            <div>
+              <label class="small-label">Phone</label>
+              <input id="phone" class="input" type="text" placeholder="(555) 555-5555" />
+            </div>
+            <div>
+              <label class="small-label">Email</label>
+              <input id="email" class="input" type="email" placeholder="example@email.com" />
+            </div>
+            <div>
+              <label class="small-label">State</label>
+              <select id="state"></select>
+            </div>
+            <div>
+              <label class="small-label">Employment / Income Status</label>
+              <select id="incomeStatus">
+                <option value="">Select</option>
+                <option>Employed Full Time</option>
+                <option>Employed Part Time</option>
+                <option>Self-Employed</option>
+                <option>Retired</option>
+                <option>SSI / Disability</option>
+                <option>Other Verifiable Income</option>
+                <option>No Income</option>
+              </select>
+            </div>
+            <div>
+              <label class="small-label">Monthly Gross Income</label>
+              <input id="monthlyIncome" class="input" type="number" min="0" placeholder="0" />
+            </div>
+            <div>
+              <label class="small-label">Estimated Affordable Program Payment</label>
+              <input id="affordablePayment" class="input" type="number" min="0" placeholder="225" />
+            </div>
+            <div>
+              <label class="small-label">Currently Making Payments?</label>
+              <select id="makingPayments">
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label class="small-label">In Bankruptcy?</label>
+              <select id="bankruptcy">
+                <option value="">Select</option>
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+            <div>
+              <label class="small-label">Active Lawsuit?</label>
+              <select id="lawsuit">
+                <option value="">Select</option>
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+            <div>
+              <label class="small-label">Already Enrolled in Debt Relief?</label>
+              <select id="enrolled">
+                <option value="">Select</option>
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mt-5">
+            <label class="small-label">Internal Notes</label>
+            <textarea id="notes" rows="3" placeholder="Agent notes, call summary, objections, special flags, etc."></textarea>
           </div>
         </div>
-      </div>
-    </section>
 
-    <section class="card bg-white p-6 teal-panel">
-      <h2 class="text-2xl font-semibold">Program Pricing Comparison</h2>
-      <p class="mt-1 text-slate-600">Only programs that are actually available for the current state and debt amount are shown.</p>
-      <div id="pricingComparison" class="mt-6 grid gap-6 lg:grid-cols-2"></div>
-      <div id="pricingDifferences" class="mt-6"></div>
-    </section>
-
-    <section class="card bg-white p-6 teal-panel">
-      <h2 class="text-2xl font-semibold">Program Pitch / Quick Sizzle</h2>
-      <p class="mt-1 text-slate-600">Fast talking points your team can use to explain the strongest benefits of each available option with urgency.</p>
-      <div id="programPitchSection" class="mt-6 grid gap-6 lg:grid-cols-2"></div>
-    </section>
-
-    <section class="card bg-white overflow-hidden">
-      <div class="p-6 pb-0 proposal-header">
-        <h2 class="text-2xl font-semibold">Program Comparrison to Current Financial Situation</h2>
-        <p class="mt-1 text-slate-600">This view is designed to make it clear that remaining in the minimum-payment path is not a safe long-term outcome for the prospect.</p>
-      </div>
-      <div class="overflow-x-auto p-6">
-        <table class="w-full min-w-[1120px] border-collapse">
-          <thead>
-            <tr>
-              <th class="border-b bg-slate-100 px-4 py-4 text-left text-sm font-semibold text-slate-700">Detail</th>
-              <th class="border-b bg-red-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">Current Financial Situation</th>
-              <th class="border-b bg-white px-4 py-4 text-left text-sm font-semibold text-slate-900">Shortest Payoff<div class="mt-1 text-xs font-medium text-slate-500">Fastest available term</div></th>
-              <th class="border-b bg-emerald-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">DEBT RELIEF PROGRAM<div class="mt-1 inline-flex rounded-full bg-teal-600 px-2 py-1 text-[11px] font-medium text-white">Best Option</div></th>
-            </tr>
-          </thead>
-          <tbody id="comparisonTable"></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    const LOGO_URL = 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf8e8df54a8b29097c4.png';
-    const ROUTE_LOGOS = {
-      'CONSUMER SHIELD': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png',
-      'LEVEL': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp'
-    };
-
-    const EMAIL_SUBJECT = 'Your Estimated Debt Relief Savings Snapshot';
-    const EMAIL_BODY = `Hello, please view the attachment to better understand how you can save through a debt settlement program.
-
-Funding Tier
-(833) 716-3863
-www.fundingtier.com
-
-*This email and any attachments are intended solely for the use of the intended recipient(s) and may contain confidential, privileged, or legally protected information. If you are not the intended recipient, you are hereby notified that any review, use, disclosure, distribution, or copying of this communication is strictly prohibited. If you have received this email in error, please notify the sender immediately and delete this email and all copies from your system.`;
-
-    const EMAIL_ENDPOINT = '/api/send-savings-email';
-
-    const STATE_NAMES = {
-      AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',GU:'Guam',PR:'Puerto Rico'
-    };
-    const STATES = Object.entries(STATE_NAMES);
-
-    const LEVEL_RED_STATES = new Set(['CT','GA','LA','MN','NV','NH','NJ','ND','OH','PA','TN','WA','WY']);
-    const LEVEL_GREEN_STATES = new Set(['AL','AZ','AR','CA','DC','FL','ID','IN','IA','KY','MD','MA','MI','MS','MO','NE','NM','NY','OK','TX','VA']);
-    const LEVEL_BLACKOUT_STATES = new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
-
-    const CONSUMER_SHIELD_BLACKOUT_STATES = new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
-
-    const DEBT_TYPES = ['Unsecured Credit Card','Unsecured Personal Loan','Payday Loan','Tribal Loan','Medical Bill','Back Rent','Private Student Loan','Business Debt','Repossession Deficiency','Apartment Back Rent (Collections)','Unsecured Line of Credit','Cell Phone Bill','Utility Bill','USAA','Deficiency','Auto Repo Deficiency','Peer-to-Peer Loan','Timeshare','Mortgage','Federal Student Loan','Navient Student Loan','Judgment','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','SBA Loan','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Other'];
-
-    const CONSUMER_SHIELD_REJECTED_TYPES = new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
-    const CONSUMER_SHIELD_CONDITIONAL_TYPES = new Set(['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt']);
-    const LEVEL_REJECTED_TYPES = new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt']);
-    const LEVEL_CONDITIONAL_CREDITORS = ['Lendmark','Mariner Finance','OneMain','Regional Finance','Republic Finance'];
-    const LEVEL_REJECTED_CREDITORS = ['ALLEVIATE TAX LLC','Acceptance Now','ACIMA','Advance Financial','AGCO FINANCE','STATE EMPLOYEE CREDIT UNION','STATEEMP','Aqua Finance','Bell Finance','BHG Financial','BHG Money','Bobs Discount Furniture','Bobs Finance','Bobs Furniture','Cornerstone Financial','CreditCentral','EMPOWER FCU','Enerbank','ESL Credit Union','Farmers Furniture','FRMRS FURN','Fort Worth Credit Union','Forth Worth CU','Fortera Credit Union','Garden Federal Credit Union','Golden One Credit Union','Goldman Sachs','GoodLeap','Hawaii CU','HC ROYA','HYCITE','Royal Prestige','Heights Financial','Island Finance','ISPC','Kabbage Loans','KIKOFF','Koalafi','Loan Pal','Local Government Federal Credit Union','Matco Tools Financing','Matco Fin','Military Star','Nebraska Furniture','Omni Loans','Opensky','PINNACLE FINANCIAL GROUP','Pioneer Loans','Popular Bank','Banco Popular','PowerPay','Preferred Loans','Quick Help Loans','Red River Credit','REDRIVERCR','REDSTONE Credit Union','RENT-A CENTER','RFFC FINANCIAL','Robinhood','Security Finance','STATE EMPLOYEES C U','Service Finance Company','SVCFIN','SRVFINCO','Snap On Credit','SOLAR MOSAIC','Southern Finance','Sunset Financial','Toledo Finance','Tower Loans','Unacceptable Creditors','West Creek Financial','WSECU','Yendo'];
-
-    const PRODUCT_TYPE_TO_DEBT_TYPE = {
-      'Credit Card': 'Unsecured Credit Card',
-      'Credit / Charge Card': 'Unsecured Credit Card',
-      'Retail Credit Card': 'Unsecured Credit Card',
-      'Medical Credit Card': 'Unsecured Credit Card',
-      'Store / Credit Card': 'Unsecured Credit Card',
-      'Revolving Credit': 'Unsecured Credit Card',
-      'Secured Card': 'Unsecured Credit Card',
-      'Personal Loan': 'Unsecured Personal Loan',
-      'Personal Loan / Line': 'Unsecured Personal Loan',
-      'Installment Loan': 'Unsecured Personal Loan',
-      'Installment / Line': 'Unsecured Line of Credit',
-      'Line of Credit': 'Unsecured Line of Credit',
-      'Medical Bill': 'Medical Bill',
-      'Medical Financing': 'Medical Bill',
-      'Telecom Bill': 'Cell Phone Bill',
-      'Utility Bill': 'Utility Bill',
-      'Rent': 'Back Rent',
-      'HOA Assessments': 'Back Rent',
-      'Collection Account': 'Other',
-      'Judgment Debt': 'Judgment',
-      'Consumer Debt in Litigation': 'Judgment',
-      'Tax Debt': 'IRS Tax Debt',
-      'Property Tax': 'IRS Tax Debt',
-      'Mortgage': 'Mortgage',
-      'Mortgage / HELOC': 'Mortgage',
-      'Auto Loan': 'Auto Repo Deficiency',
-      'Auto Loan / Lease': 'Auto Repo Deficiency',
-      'Vehicle Title Loan': 'Auto Repo Deficiency',
-      'Title Loan': 'Auto Repo Deficiency',
-      'Deficiency Balance': 'Deficiency',
-      'POS Installment': 'Unsecured Personal Loan',
-      'Installment Financing': 'Unsecured Personal Loan',
-      'Home Improvement Loan': 'Unsecured Personal Loan',
-      'Business MCA': 'Business Debt',
-      'Business Loan': 'Business Debt',
-      'Student Loan': 'Private Student Loan',
-      'Payday / Installment': 'Payday Loan'
-    };
-
-    const EMBEDDED_CREDITOR_TSV = String.raw`creditor_group	display_name	search_aliases	search_tokens	search_index	product_type	classification	routing_category	eligible_for_enrollment	needs_supervisor_review	collateral_flag	litigation_flag	underlying_debt_inherits_original_type	exclude_reason	routing_notes	backend_notes
-Chase	Chase Credit Card	chase|jp morgan chase|jpmorgan chase|amazon rewards visa|freedom|sapphire|slate	amazon rewards visa, chase, freedom, jp morgan chase, jpmorgan chase, sapphire, slate	chase credit card | chase | amazon rewards visa, chase, freedom, jp morgan chase, jpmorgan chase, sapphire, slate	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-Chase	Chase Personal Loan	chase personal loan|jpmcb installment	chase personal loan, jpmcb installment	chase personal loan | chase | chase personal loan, jpmcb installment	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify no collateral or pledge.	Route using current backend rules only: Level Debt or Consumer Shield.
-Chase	Chase Auto Loan	chase auto|jpmorgan auto	chase auto, jpmorgan auto	chase auto loan | chase | chase auto, jpmorgan auto	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Capital One	Capital One Credit Card	capital one|cap one|quicksilver|venture|savor|kohls card	cap one, capital one, kohls card, quicksilver, savor, venture	capital one credit card | capital one | cap one, capital one, kohls card, quicksilver, savor, venture	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-Capital One	Capital One Auto Finance	capital one auto|auto navigator	auto navigator, capital one auto	capital one auto finance | capital one | auto navigator, capital one auto	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Discover	Discover Credit Card	discover|discover card	discover, discover card	discover credit card | discover | discover, discover card	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt; apply backend caps if used internally.	Route using current backend rules only: Level Debt or Consumer Shield.
-Discover	Discover Personal Loan	discover personal loan	discover personal loan	discover personal loan | discover | discover personal loan	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Unsecured installment debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-American Express	American Express Card	american express|amex|amex card|amex charge card	american express, amex, amex card, amex charge card	american express card | american express | american express, amex, amex card, amex charge card	Credit / Charge Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Charge cards are operationally treated as unsecured.	Route using current backend rules only: Level Debt or Consumer Shield.
-Citibank	Citibank Credit Card	citibank|citi|citi card|best buy card	best buy card, citi, citi card, citibank	citibank credit card | citibank | best buy card, citi, citi card, citibank	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-Bank of America	Bank of America Credit Card	bank of america|bofa|boa credit card	bank of america, boa credit card, bofa	bank of america credit card | bank of america | bank of america, boa credit card, bofa	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-Bank of America	Bank of America Auto Loan	bank of america auto|bofa auto	bank of america auto, bofa auto	bank of america auto loan | bank of america | bank of america auto, bofa auto	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Wells Fargo	Wells Fargo Credit Card	wells fargo|wf credit card	wells fargo, wf credit card	wells fargo credit card | wells fargo | wells fargo, wf credit card	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-Wells Fargo	Wells Fargo Auto Loan	wells fargo auto|wf auto	wells fargo auto, wf auto	wells fargo auto loan | wells fargo | wells fargo auto, wf auto	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Barclays	Barclays Credit Card	barclays|barclaycard|aviator	aviator, barclaycard, barclays	barclays credit card | barclays | aviator, barclaycard, barclays	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Common co-branded card issuer.	Route using current backend rules only: Level Debt or Consumer Shield.
-Synchrony	Synchrony Credit / Store Card	synchrony|syncb|carecredit|amazon store card|lowes card|sams club	amazon store card, carecredit, lowes card, sams club, syncb, synchrony	synchrony credit / store card | synchrony | amazon store card, carecredit, lowes card, sams club, syncb, synchrony	Store / Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Most store cards and CareCredit are unsecured.	Route using current backend rules only: Level Debt or Consumer Shield.
-Comenity / Bread	Comenity / Bread Retail Card	comenity|bread financial|victoria secret card	bread financial, comenity, victoria secret card	comenity / bread retail card | comenity / bread | bread financial, comenity, victoria secret card	Retail Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Store-branded retail credit.	Route using current backend rules only: Level Debt or Consumer Shield.
-Navy Federal	Navy Federal Credit Card	navy federal|nfcu credit card	navy federal, nfcu credit card	navy federal credit card | navy federal | navy federal, nfcu credit card	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Check that it is not a secured-card variant.	Route using current backend rules only: Level Debt or Consumer Shield.
-Navy Federal	Navy Federal Share-Secured Loan	navy federal pledge loan|share secured	navy federal pledge loan, share secured	navy federal share-secured loan | navy federal | navy federal pledge loan, share secured	Share-Secured Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Deposit collateral	Savings/share balance pledged.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Credit Union	Credit Union Signature Loan	signature loan|personal signature loan|credit union personal loan	credit union personal loan, personal signature loan, signature loan	credit union signature loan | credit union | credit union personal loan, personal signature loan, signature loan	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Most signature loans are unsecured.	Route using current backend rules only: Level Debt or Consumer Shield.
-Credit Union	Credit Union Auto Loan	credit union auto loan	credit union auto loan	credit union auto loan | credit union | credit union auto loan	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-SoFi	SoFi Personal Loan	sofi	sofi	sofi personal loan | sofi | sofi	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Marketplace/fintech unsecured loan.	Route using current backend rules only: Level Debt or Consumer Shield.
-Upstart	Upstart Personal Loan	upstart	upstart	upstart personal loan | upstart | upstart	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Marketplace/partner-bank unsecured installment.	Route using current backend rules only: Level Debt or Consumer Shield.
-Upgrade	Upgrade Personal Loan / Line	upgrade	upgrade	upgrade personal loan / line | upgrade | upgrade	Personal Loan / Line	Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify no secured variant.	Route using current backend rules only: Level Debt or Consumer Shield.
-Avant	Avant Personal Loan	avant	avant	avant personal loan | avant | avant	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Common unsecured installment debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-LendingClub	LendingClub Personal Loan	lendingclub	lendingclub	lendingclub personal loan | lendingclub | lendingclub	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Common unsecured installment debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-Best Egg	Best Egg Personal Loan	best egg	best egg	best egg personal loan | best egg | best egg	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Common unsecured installment debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-Prosper	Prosper Personal Loan	prosper	prosper	prosper personal loan | prosper | prosper	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Common unsecured installment debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-Achieve	Achieve / FreedomPlus Personal Loan	achieve|freedomplus	achieve, freedomplus	achieve / freedomplus personal loan | achieve | achieve, freedomplus	Personal Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify current branding on tradeline.	Route using current backend rules only: Level Debt or Consumer Shield.
-OneMain Financial	OneMain Personal Loan	onemain|one main	one main, onemain	onemain personal loan | onemain financial | one main, onemain	Personal Loan	Can Be Unsecured or Secured	Conditional	Maybe	Yes	Maybe	No	No		Must verify agreement because OneMain offers both secured and unsecured products.	Route using current backend rules only: Level Debt or Consumer Shield.
-OppLoans	OppLoans Installment Loan	opploans	opploans	opploans installment loan | opploans | opploans	Installment Loan	Unsecured	Commonly Eligible	Yes	No	No	No	No		High APR unsecured installment.	Route using current backend rules only: Level Debt or Consumer Shield.
-NetCredit	NetCredit Installment / Line	netcredit	netcredit	netcredit installment / line | netcredit | netcredit	Installment / Line	Usually Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify state and exact product.	Route using current backend rules only: Level Debt or Consumer Shield.
-Elastic	Elastic Line of Credit	elastic	elastic	elastic line of credit | elastic | elastic	Line of Credit	Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify tradeline wording.	Route using current backend rules only: Level Debt or Consumer Shield.
-Rise	Rise Installment Loan	rise	rise	rise installment loan | rise | rise	Installment Loan	Usually Unsecured	Commonly Eligible	Yes	No	No	No	No		Verify state and exact product.	Route using current backend rules only: Level Debt or Consumer Shield.
-CashNetUSA	CashNetUSA Payday / Installment	cashnetusa	cashnetusa	cashnetusa payday / installment | cashnetusa | cashnetusa	Payday / Installment	Unsecured	Conditional	Maybe	Yes	No	No	No		Unsecured but compliance-sensitive.	Route using current backend rules only: Level Debt or Consumer Shield.
-Speedy Cash	Speedy Cash Payday / Installment	speedy cash	speedy cash	speedy cash payday / installment | speedy cash | speedy cash	Payday / Installment	Unsecured	Conditional	Maybe	Yes	No	No	No		Verify exact structure.	Route using current backend rules only: Level Debt or Consumer Shield.
-ACE Cash Express	ACE Cash Express Payday / Installment	ace cash express|ace cash	ace cash, ace cash express	ace cash express payday / installment | ace cash express | ace cash, ace cash express	Payday / Installment	Unsecured	Conditional	Maybe	Yes	No	No	No		Verify exact structure.	Route using current backend rules only: Level Debt or Consumer Shield.
-Affirm	Affirm POS Installment	affirm	affirm	affirm pos installment | affirm | affirm	POS Installment	Usually Unsecured	Conditional	Maybe	Yes	No	No	No		Review account terms.	Route using current backend rules only: Level Debt or Consumer Shield.
-Klarna	Klarna POS Installment	klarna	klarna	klarna pos installment | klarna | klarna	POS Installment	Usually Unsecured	Conditional	Maybe	Yes	No	No	No		Review account terms.	Route using current backend rules only: Level Debt or Consumer Shield.
-Afterpay	Afterpay / Clearpay POS Installment	afterpay|clearpay	afterpay, clearpay	afterpay / clearpay pos installment | afterpay | afterpay, clearpay	POS Installment	Usually Unsecured	Conditional	Maybe	Yes	No	No	No		Review account terms.	Route using current backend rules only: Level Debt or Consumer Shield.
-Zip	Zip / Quadpay POS Installment	zip|quadpay	quadpay, zip	zip / quadpay pos installment | zip | quadpay, zip	POS Installment	Usually Unsecured	Conditional	Maybe	Yes	No	No	No		Review account terms.	Route using current backend rules only: Level Debt or Consumer Shield.
-PayPal	PayPal Credit	paypal credit|paypal syncb	paypal credit, paypal syncb	paypal credit | paypal | paypal credit, paypal syncb	Revolving Credit	Unsecured	Commonly Eligible	Yes	No	No	No	No		Often issued by Synchrony.	Route using current backend rules only: Level Debt or Consumer Shield.
-Apple Card	Apple Card	apple card|goldman sachs card	apple card, goldman sachs card	apple card | apple card | apple card, goldman sachs card	Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Standard unsecured revolving debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-CareCredit	CareCredit	carecredit	carecredit	carecredit | carecredit | carecredit	Medical Credit Card	Unsecured	Commonly Eligible	Yes	No	No	No	No		Medical financing card issued by Synchrony.	Route using current backend rules only: Level Debt or Consumer Shield.
-PatientFi	PatientFi Medical Financing	patientfi	patientfi	patientfi medical financing | patientfi | patientfi	Medical Financing	Usually Unsecured	Conditional	Maybe	Yes	No	No	No		Verify agreement.	Route using current backend rules only: Level Debt or Consumer Shield.
-Ally	Ally Auto Loan	ally auto|ally financial	ally auto, ally financial	ally auto loan | ally | ally auto, ally financial	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Santander Consumer	Santander Consumer Auto Loan	santander consumer|roadloans|santander auto	roadloans, santander auto, santander consumer	santander consumer auto loan | santander consumer | roadloans, santander auto, santander consumer	Auto Loan	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Toyota Financial	Toyota Financial Auto Loan / Lease	toyota financial|toyota motor credit	toyota financial, toyota motor credit	toyota financial auto loan / lease | toyota financial | toyota financial, toyota motor credit	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Honda Financial	Honda Financial Auto Loan / Lease	honda financial|ahfc	ahfc, honda financial	honda financial auto loan / lease | honda financial | ahfc, honda financial	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Ford Credit	Ford Credit Auto Loan / Lease	ford credit|ford motor credit	ford credit, ford motor credit	ford credit auto loan / lease | ford credit | ford credit, ford motor credit	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-GM Financial	GM Financial Auto Loan / Lease	gm financial|gmac	gm financial, gmac	gm financial auto loan / lease | gm financial | gm financial, gmac	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Hyundai Motor Finance	Hyundai Motor Finance Auto Loan / Lease	hyundai motor finance	hyundai motor finance	hyundai motor finance auto loan / lease | hyundai motor finance | hyundai motor finance	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Kia Finance	Kia Finance Auto Loan / Lease	kia finance|kia motor finance	kia finance, kia motor finance	kia finance auto loan / lease | kia finance | kia finance, kia motor finance	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-BMW Financial	BMW Financial Auto Loan / Lease	bmw financial	bmw financial	bmw financial auto loan / lease | bmw financial | bmw financial	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Mercedes-Benz Financial	Mercedes-Benz Financial Auto Loan / Lease	mercedes benz financial|mbfs	mbfs, mercedes benz financial	mercedes-benz financial auto loan / lease | mercedes-benz financial | mbfs, mercedes benz financial	Auto Loan / Lease	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Credit Acceptance	Credit Acceptance Auto Loan	credit acceptance	credit acceptance	credit acceptance auto loan | credit acceptance | credit acceptance	Auto Loan	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Westlake Financial	Westlake Financial Auto Loan	westlake financial	westlake financial	westlake financial auto loan | westlake financial | westlake financial	Auto Loan	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle collateral	Treat as secured vehicle debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Rocket Mortgage	Rocket Mortgage	rocket mortgage|quicken loans	quicken loans, rocket mortgage	rocket mortgage | rocket mortgage | quicken loans, rocket mortgage	Mortgage	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Home collateral	Treat as secured real-estate debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Pennymac	Pennymac Mortgage	pennymac	pennymac	pennymac mortgage | pennymac | pennymac	Mortgage	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Home collateral	Treat as secured real-estate debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Mr. Cooper	Mr. Cooper Mortgage	mr cooper|nationstar	mr cooper, nationstar	mr. cooper mortgage | mr. cooper | mr cooper, nationstar	Mortgage	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Home collateral	Treat as secured real-estate debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Local Bank / Credit Union	Mortgage / HELOC	mortgage|heloc|home equity	heloc, home equity, mortgage	mortgage / heloc | local bank / credit union | heloc, home equity, mortgage	Mortgage / HELOC	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Home collateral	Treat as secured real-estate debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-IRS	Federal Tax Debt	irs|internal revenue service|federal tax	federal tax, internal revenue service, irs	federal tax debt | irs | federal tax, internal revenue service, irs	Tax Debt	Priority / Can Become Lien-Based	Excluded / Special Handling	No	Yes	Maybe	No	No	Tax debt / lien risk	Not standard unsecured settlement debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-State Tax Agency	State Tax Debt	ftb|franchise tax board|state tax|state revenue	franchise tax board, ftb, state revenue, state tax	state tax debt | state tax agency | franchise tax board, ftb, state revenue, state tax	Tax Debt	Priority / Can Become Lien-Based	Excluded / Special Handling	No	Yes	Maybe	No	No	Tax debt / lien risk	Not standard unsecured settlement debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-County Tax Collector	Property Tax	property tax|county tax collector	county tax collector, property tax	property tax | county tax collector | county tax collector, property tax	Property Tax	Lien-Based / Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Property tax lien	Tied to property.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Federal Student Aid	Federal Student Loan	federal student aid|department of education|edfinancial|mohela	department of education, edfinancial, federal student aid, mohela	federal student loan | federal student aid | department of education, edfinancial, federal student aid, mohela	Student Loan	Usually Unsecured but Special Category	Excluded / Special Handling	No	Yes	No	No	No	Student loan	Not typical unsecured settlement fit.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Navient / Aidvantage / Nelnet	Student Loan Servicer	navient|aidvantage|nelnet|sallie mae	aidvantage, navient, nelnet, sallie mae	student loan servicer | navient / aidvantage / nelnet | aidvantage, navient, nelnet, sallie mae	Student Loan	Usually Unsecured but Special Category	Excluded / Special Handling	No	Yes	No	No	No	Student loan	Operationally separate from normal unsecured consumer debt.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Medical	Hospital / Medical Group Bill	hospital|medical group|surgery center|er bill|doctor bill	doctor bill, er bill, hospital, medical group, surgery center	hospital / medical group bill | medical | doctor bill, er bill, hospital, medical group, surgery center	Medical Bill	Unsecured	Commonly Eligible	Yes	No	No	No	No		No collateral.	Route using current backend rules only: Level Debt or Consumer Shield.
-Utility	Utility Bill	utility|electric bill|gas bill|water bill	electric bill, gas bill, utility, water bill	utility bill | utility | electric bill, gas bill, utility, water bill	Utility Bill	Unsecured	Conditional	Maybe	Yes	No	No	No		Usually unsecured service debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-Telecom	Cell / Internet Bill	cell phone bill|internet bill|verizon|att|tmobile|comcast	att, cell phone bill, comcast, internet bill, tmobile, verizon	cell / internet bill | telecom | att, cell phone bill, comcast, internet bill, tmobile, verizon	Telecom Bill	Unsecured	Conditional	Maybe	Yes	No	No	No		Usually unsecured service debt.	Route using current backend rules only: Level Debt or Consumer Shield.
-Rent	Back Rent	back rent|rent due|landlord|property manager	back rent, landlord, property manager, rent due	back rent | rent | back rent, landlord, property manager, rent due	Rent	Unsecured	Conditional	Maybe	Yes	No	No	No		Operational rules vary.	Route using current backend rules only: Level Debt or Consumer Shield.
-HOA	HOA / Condo Assessments	hoa|homeowners association|condo association	condo association, hoa, homeowners association	hoa / condo assessments | hoa | condo association, hoa, homeowners association	HOA Assessments	Usually Unsecured / Lien Risk	Conditional	Maybe	Yes	Maybe	No	No	HOA lien risk	Can become lien-related.	Route using current backend rules only: Level Debt or Consumer Shield.
-Collection Agency	Collection Account	collection|midland|portfolio recovery|lvnv|resurgent|jefferson capital|cavalry	cavalry, collection, jefferson capital, lvnv, midland, portfolio recovery, resurgent	collection account | collection agency | cavalry, collection, jefferson capital, lvnv, midland, portfolio recovery, resurgent	Collection Account	Follows Underlying Debt Type	Conditional	Maybe	Yes	No	Maybe	Yes		Must identify original creditor and original debt type.	Route using current backend rules only: Level Debt or Consumer Shield.
-Midland Credit Management	Midland Collection Account	midland|mcm	mcm, midland	midland collection account | midland credit management | mcm, midland	Collection Account	Follows Underlying Debt Type	Conditional	Maybe	Yes	No	Maybe	Yes		Often former credit-card debt; confirm original account.	Route using current backend rules only: Level Debt or Consumer Shield.
-Portfolio Recovery	Portfolio Recovery Collection Account	portfolio recovery|pra	portfolio recovery, pra	portfolio recovery collection account | portfolio recovery | portfolio recovery, pra	Collection Account	Follows Underlying Debt Type	Conditional	Maybe	Yes	No	Maybe	Yes		Often former credit-card debt; confirm original account.	Route using current backend rules only: Level Debt or Consumer Shield.
-LVNV Funding	LVNV Funding Collection Account	lvnv|resurgent	lvnv, resurgent	lvnv funding collection account | lvnv funding | lvnv, resurgent	Collection Account	Follows Underlying Debt Type	Conditional	Maybe	Yes	No	Maybe	Yes		Confirm original account type.	Route using current backend rules only: Level Debt or Consumer Shield.
-Jefferson Capital	Jefferson Capital Collection Account	jefferson capital	jefferson capital	jefferson capital collection account | jefferson capital | jefferson capital	Collection Account	Follows Underlying Debt Type	Conditional	Maybe	Yes	No	Maybe	Yes		Confirm original account type.	Route using current backend rules only: Level Debt or Consumer Shield.
-Law Firm Collection	Debt in Litigation	summons|complaint|law firm collection|attorney collection	attorney collection, complaint, law firm collection, summons	debt in litigation | law firm collection | attorney collection, complaint, law firm collection, summons	Consumer Debt in Litigation	Follows Underlying Debt Type	Conditional / Special Handling	Maybe	Yes	No	Yes	Yes	Litigation	Lawsuit status may change backend eligibility.	Route using current backend rules only: Level Debt or Consumer Shield.
-Secured Card	Secured Credit Card	secured card|deposit secured card	deposit secured card, secured card	secured credit card | secured card | deposit secured card, secured card	Secured Card	Secured	Usually Excluded / Special Handling	No	Yes	Yes	No	No	Deposit collateral	Do not treat as normal unsecured card.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Repo Deficiency	Repossession Deficiency Balance	repo deficiency|deficiency balance|post repo	deficiency balance, post repo, repo deficiency	repossession deficiency balance | repo deficiency | deficiency balance, post repo, repo deficiency	Deficiency Balance	Usually Treated Operationally as Unsecured Deficiency	Conditional / Special Handling	Maybe	Yes	No	Maybe	No	Prior secured debt / deficiency	Need repo status and backend rules.	Route using current backend rules only: Level Debt or Consumer Shield.
-Foreclosure Deficiency	Foreclosure Deficiency	foreclosure deficiency	foreclosure deficiency	foreclosure deficiency | foreclosure deficiency | foreclosure deficiency	Deficiency Balance	Conditional / State-Specific	Conditional / Special Handling	Maybe	Yes	Maybe	Maybe	No	Legal / state-specific	Legal review may be required.	Route using current backend rules only: Level Debt or Consumer Shield.
-Judgment Debt	Judgment Debt	judgment|court judgment	court judgment, judgment	judgment debt | judgment debt | court judgment, judgment	Judgment Debt	Conditional / Lien Risk	Conditional / Special Handling	Maybe	Yes	Maybe	Yes	No	Judgment / lien risk	Review whether lien attached.	Route using current backend rules only: Level Debt or Consumer Shield.
-Pawn Loan	Pawn Loan	pawn loan|pawn shop	pawn loan, pawn shop	pawn loan | pawn loan | pawn loan, pawn shop	Pawn Loan	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Item pledged	Item is collateral.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Title Loan	Vehicle Title Loan	title loan|car title loan	car title loan, title loan	vehicle title loan | title loan | car title loan, title loan	Title Loan	Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Vehicle title collateral	Vehicle title is collateral.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Furniture Financing	Furniture Financing	furniture financing|rooms to go|ashley financing	ashley financing, furniture financing, rooms to go	furniture financing | furniture financing | ashley financing, furniture financing, rooms to go	Installment Financing	Can Be Secured or Unsecured	Conditional	Maybe	Yes	Maybe	No	No		Must verify agreement.	Route using current backend rules only: Level Debt or Consumer Shield.
-Jewelry Financing	Jewelry Financing	jewelry financing|kay jewelers financing	jewelry financing, kay jewelers financing	jewelry financing | jewelry financing | jewelry financing, kay jewelers financing	Installment Financing	Can Be Secured or Unsecured	Conditional	Maybe	Yes	Maybe	No	No		Must verify agreement.	Route using current backend rules only: Level Debt or Consumer Shield.
-Solar Loan	Solar / Home Improvement Loan	solar loan|home improvement loan	home improvement loan, solar loan	solar / home improvement loan | solar loan | home improvement loan, solar loan	Home Improvement Loan	Can Be Secured or Unsecured	Conditional / Special Handling	Maybe	Yes	Maybe	No	No		Check contract, UCC, and fixture terms.	Route using current backend rules only: Level Debt or Consumer Shield.
-Business MCA	Merchant Cash Advance	mca|merchant cash advance	mca, merchant cash advance	merchant cash advance | business mca | mca, merchant cash advance	Business MCA	Not Standard Consumer Unsecured Debt	Excluded / Special Handling	No	Yes	No	No	No	Business debt	Business-only product.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Business Term Loan	Business Term Loan	business term loan|business loan	business loan, business term loan	business term loan | business term loan | business loan, business term loan	Business Loan	Can Be Secured or Unsecured	Conditional	Maybe	Yes	Maybe	No	No		Check personal guarantee and UCC.	Route using current backend rules only: Level Debt or Consumer Shield.
-SBA Loan	SBA Loan	sba loan|small business administration loan	sba loan, small business administration loan	sba loan | sba loan | sba loan, small business administration loan	Business Loan	Often Secured	Excluded / Special Handling	No	Yes	Yes	No	No	Business secured debt	Check collateral and UCC.	Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.
-Lease Deficiency	Lease Deficiency	lease deficiency|broken lease auto|equipment lease deficiency	broken lease auto, equipment lease deficiency, lease deficiency	lease deficiency | lease deficiency | broken lease auto, equipment lease deficiency, lease deficiency	Deficiency Balance	Conditional	Conditional / Special Handling	Maybe	Yes	Maybe	Maybe	No		Need contract and deficiency details.	Route using current backend rules only: Level Debt or Consumer Shield.`;
-
-    const state = {
-      selectedState: '',
-      creditorDb: [],
-      creditorLookupReady: false,
-      rows: Array.from({ length: 5 }, (_, i) => ({
-        id: i + 1,
-        creditorName: '',
-        amount: '',
-        debtType: 'Unsecured Credit Card',
-        inCollections: false,
-        inLitigation: false,
-        isSecured: false,
-        paymentMade: true,
-        businessUnprofitable: false,
-        creditorMeta: null
-      }))
-    };
-
-    const el = (id) => document.getElementById(id);
-
-    function escapeHtml(value) {
-      return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    const currency = (value) =>
-      new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
-
-    const numberOrZero = (value) => {
-      const n = parseFloat(String(value).replace(/[^0-9.]/g, ''));
-      return Number.isFinite(n) ? n : 0;
-    };
-
-    const normalizeCreditorName = (value) =>
-      String(value || '')
-        .toUpperCase()
-        .replace(/&/g, ' AND ')
-        .replace(/[^A-Z0-9 ]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-    const creditorMatches = (input, patterns) => {
-      const a = normalizeCreditorName(input);
-      if (!a) return false;
-      return patterns.some((p) => {
-        const b = normalizeCreditorName(p);
-        return a === b || a.includes(b) || b.includes(a);
-      });
-    };
-
-    const getCreditorDisplayName = (row) => row.creditorName || '';
-
-    function getLevelStateStatus(code) {
-      if (!code) return { status: 'UNKNOWN', label: 'Unknown' };
-      if (LEVEL_BLACKOUT_STATES.has(code)) return { status: 'BLACKOUT', label: 'Black Out' };
-      if (LEVEL_RED_STATES.has(code)) return { status: 'RED', label: 'Attorney Model' };
-      if (LEVEL_GREEN_STATES.has(code)) return { status: 'GREEN', label: 'Standard Model' };
-      return { status: 'BLACKOUT', label: 'Black Out' };
-    }
-
-    function getConsumerShieldStateStatus(code) {
-      if (!code) return { status: 'UNKNOWN', label: 'Unknown' };
-      if (CONSUMER_SHIELD_BLACKOUT_STATES.has(code)) return { status: 'BLACKOUT', label: 'Black Out' };
-      return { status: 'GREEN', label: 'Serviceable' };
-    }
-
-    function getLevelMaxTerm(debt) {
-      if (debt < 10000) return 24;
-      if (debt < 12500) return 30;
-      if (debt < 15000) return 36;
-      if (debt < 25000) return 42;
-      if (debt < 35000) return 48;
-      if (debt < 50000) return 54;
-      return 60;
-    }
-
-    function getConsumerShieldProgramLength(totalDebt) {
-      if (totalDebt >= 4000 && totalDebt <= 4999) return 18;
-      if (totalDebt >= 5000 && totalDebt <= 8800) return 24;
-      if (totalDebt > 8800) return 36;
-      return 0;
-    }
-
-    function getConsumerShieldProgramPayment(totalDebt) {
-      if (totalDebt >= 50000) return 620;
-      if (totalDebt >= 30000) return 520;
-      if (totalDebt >= 25000) return 420;
-      if (totalDebt >= 20000) return 370;
-      if (totalDebt >= 15000) return 320;
-      if (totalDebt >= 10000) return 270;
-      if (totalDebt >= 5500) return 220;
-      if (totalDebt >= 4000) return 220;
-      return 0;
-    }
-
-    function calcDoNothing(totalDebt, apr = 0.24) {
-      const monthlyPayment = totalDebt * 0.025;
-      const monthlyRate = apr / 12;
-      if (totalDebt <= 0 || monthlyPayment <= totalDebt * monthlyRate) {
-        return { monthlyPayment: 0, totalDebt, monthsToPayoff: 0, apr, totalPayback: 0 };
-      }
-      const months = Math.max(
-        1,
-        Math.round(Math.log(monthlyPayment / (monthlyPayment - totalDebt * monthlyRate)) / Math.log(1 + monthlyRate))
-      );
-      return { monthlyPayment, totalDebt, monthsToPayoff: months, apr, totalPayback: monthlyPayment * months };
-    }
-
-    function parseTsvLine(line) {
-      return line.split('\t').map((v) => String(v).trim());
-    }
-
-    async function loadCreditorDatabase() {
-      try {
-        const lines = EMBEDDED_CREDITOR_TSV.split(/\r?\n/).filter(Boolean);
-        if (lines.length < 2) throw new Error('Embedded creditor data is empty.');
-
-        const headers = parseTsvLine(lines[0]);
-        const data = [];
-
-        for (let i = 1; i < lines.length; i += 1) {
-          const values = parseTsvLine(lines[i]);
-          if (!values.length || values.every((v) => !v)) continue;
-
-          const row = {};
-          headers.forEach((h, idx) => {
-            row[h] = values[idx] ?? '';
-          });
-
-          row._normalizedIndex = normalizeCreditorName(row.search_index || '');
-          row._normalizedAliases = normalizeCreditorName((row.search_aliases || '').replace(/\|/g, ' '));
-          row._normalizedTokens = normalizeCreditorName((row.search_tokens || '').replace(/,/g, ' '));
-          row._normalizedDisplay = normalizeCreditorName(row.display_name || '');
-          data.push(row);
-        }
-
-        state.creditorDb = data;
-        state.creditorLookupReady = true;
-      } catch (err) {
-        console.error('Embedded creditor data failed to load:', err);
-        state.creditorDb = [];
-        state.creditorLookupReady = false;
-      }
-    }
-
-    function scoreCreditorRecord(query, rec) {
-      const q = normalizeCreditorName(query);
-      if (!q) return 0;
-
-      let score = 0;
-      if (rec._normalizedDisplay === q) score += 120;
-      if (rec._normalizedDisplay.startsWith(q)) score += 95;
-      if (rec._normalizedIndex.includes(q)) score += 80;
-      if (rec._normalizedAliases.includes(q)) score += 70;
-      if (rec._normalizedTokens.includes(q)) score += 60;
-
-      const words = q.split(' ').filter(Boolean);
-      for (const w of words) {
-        if (rec._normalizedDisplay.includes(w)) score += 14;
-        if (rec._normalizedIndex.includes(w)) score += 10;
-        if (rec._normalizedAliases.includes(w)) score += 8;
-        if (rec._normalizedTokens.includes(w)) score += 6;
-      }
-      return score;
-    }
-
-    function getCreditorMatches(query, limit = 6) {
-      if (!state.creditorLookupReady || !query.trim()) return [];
-      return state.creditorDb
-        .map((rec) => ({ rec, score: scoreCreditorRecord(query, rec) }))
-        .filter((x) => x.score > 0)
-        .sort((a, b) => b.score - a.score || String(a.rec.display_name).localeCompare(String(b.rec.display_name)))
-        .slice(0, limit)
-        .map((x) => x.rec);
-    }
-
-    function getDebtTypeFromMeta(meta, currentDebtType) {
-      const mapped = PRODUCT_TYPE_TO_DEBT_TYPE[meta?.product_type];
-      return mapped || currentDebtType || 'Other';
-    }
-
-    function yesNoMaybeToFlag(v) {
-      const n = String(v || '').trim().toLowerCase();
-      if (n === 'yes') return true;
-      if (n === 'maybe') return 'maybe';
-      return false;
-    }
-
-    function applyCreditorSelection(index, rec) {
-      if (!state.rows[index]) return;
-
-      state.rows[index].creditorName = rec.display_name || '';
-      state.rows[index].creditorMeta = rec;
-      state.rows[index].debtType = getDebtTypeFromMeta(rec, state.rows[index].debtType);
-
-      const collateralFlag = yesNoMaybeToFlag(rec.collateral_flag);
-      const litigationFlag = yesNoMaybeToFlag(rec.litigation_flag);
-
-      if (collateralFlag === true) state.rows[index].isSecured = true;
-      if (litigationFlag === true) state.rows[index].inLitigation = true;
-
-      renderRows();
-      render();
-    }
-
-    function getMetadataNotes(meta) {
-      if (!meta) return [];
-      const notes = [];
-      if (meta.routing_category) notes.push(`Routing: ${meta.routing_category}`);
-      if (meta.classification) notes.push(`Classification: ${meta.classification}`);
-      if (meta.product_type) notes.push(`Product: ${meta.product_type}`);
-      return notes;
-    }
-
-    function collectFlags(rows, totalDebt, stateCode) {
-      const consumerShieldFlags = [];
-      const levelFlags = [];
-
-      if (totalDebt > 0 && totalDebt < 4000) {
-        consumerShieldFlags.push('Consumer Shield requires at least $4,000 total enrolled debt.');
-      }
-
-      if (stateCode && getConsumerShieldStateStatus(stateCode).status === 'BLACKOUT') {
-        consumerShieldFlags.push('Consumer Shield does not service this state.');
-      }
-
-      if (totalDebt > 0 && totalDebt < 7000) {
-        levelFlags.push('Level Debt requires at least $7,000 total enrolled debt.');
-      }
-
-      rows.forEach((row) => {
-        const amount = numberOrZero(row.amount);
-        if (!amount) return;
-
-        const name = getCreditorDisplayName(row);
-        const meta = row.creditorMeta;
-
-        if (meta) {
-          const eligible = String(meta.eligible_for_enrollment || '').toLowerCase();
-          const review = String(meta.needs_supervisor_review || '').toLowerCase();
-          const collateralFlag = String(meta.collateral_flag || '').toLowerCase();
-          const litigationFlag = String(meta.litigation_flag || '').toLowerCase();
-          const inheritsType = String(meta.underlying_debt_inherits_original_type || '').toLowerCase();
-
-          if (eligible === 'no') {
-            const reason = meta.exclude_reason || `${meta.display_name} is marked not eligible for enrollment.`;
-            consumerShieldFlags.push(reason);
-            levelFlags.push(reason);
-          }
-
-          if (review === 'yes' || review === 'maybe') {
-            const reviewNote = `${meta.display_name} requires supervisor review.`;
-            consumerShieldFlags.push(reviewNote);
-            levelFlags.push(reviewNote);
-          }
-
-          if (collateralFlag === 'yes' || collateralFlag === 'maybe') {
-            levelFlags.push(`${meta.display_name} may involve collateral and needs secured-debt review.`);
-            consumerShieldFlags.push(`${meta.display_name} may involve collateral and needs secured-debt review.`);
-          }
-
-          if (litigationFlag === 'yes' || litigationFlag === 'maybe' || row.inLitigation) {
-            levelFlags.push(`${meta.display_name} may involve litigation or legal posture review.`);
-            consumerShieldFlags.push(`${meta.display_name} may involve litigation or legal posture review.`);
-          }
-
-          if (inheritsType === 'yes') {
-            levelFlags.push(`${meta.display_name} inherits the original underlying debt type and must be verified.`);
-            consumerShieldFlags.push(`${meta.display_name} inherits the original underlying debt type and must be verified.`);
-          }
-        }
-
-        if (amount < 100) {
-          consumerShieldFlags.push((name || row.debtType) + ' is below Consumer Shield minimum $100 per account.');
-        }
-
-        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) {
-          consumerShieldFlags.push(row.debtType + ' is not accepted by Consumer Shield.');
-        }
-
-        if (row.debtType === 'Apartment Back Rent (Collections)' && !row.inCollections) {
-          consumerShieldFlags.push('Apartment back rent is only accepted if in collections.');
-        }
-
-        if (row.debtType === 'USAA' && row.isSecured) {
-          consumerShieldFlags.push('USAA is only accepted when there is no other secured debt.');
-        }
-
-        if (LEVEL_REJECTED_TYPES.has(row.debtType)) {
-          levelFlags.push(row.debtType + ' is not accepted by Level Debt.');
-        }
-
-        if (amount < 200 && !row.inCollections) {
-          levelFlags.push((name || row.debtType) + ' must be at least $200 unless already in collections or charged off.');
-        }
-
-        if (!row.paymentMade) {
-          levelFlags.push((name || row.debtType) + ' must have at least one payment made before Level enrollment.');
-        }
-
-        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) {
-          levelFlags.push(name + ' is on the Level rejected creditor list.');
-        }
-
-        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) {
-          levelFlags.push(name + ' is secured. Level only allows this if the client agrees to lose the collateral.');
-        }
-      });
-
-      return {
-        consumerShield: Array.from(new Set(consumerShieldFlags)),
-        level: Array.from(new Set(levelFlags))
-      };
-    }
-
-    function chooseRoute(totalDebt, stateCode, flags) {
-      if (!stateCode) {
-        return { route: '', reason: 'Select a state to calculate routing.' };
-      }
-
-      const csStatus = getConsumerShieldStateStatus(stateCode);
-      const levelStatus = getLevelStateStatus(stateCode);
-
-      const csEligible =
-        csStatus.status !== 'BLACKOUT' &&
-        !flags.consumerShield.some((f) => {
-          const t = String(f).toLowerCase();
-          return t.includes('not accepted') || t.includes('not eligible');
-        });
-
-      const levelEligible =
-        levelStatus.status !== 'BLACKOUT' &&
-        !flags.level.some((f) => {
-          const t = String(f).toLowerCase();
-          return t.includes('not accepted') || t.includes('not eligible');
-        });
-
-      if (levelEligible && totalDebt >= 7000) {
-        return {
-          route: 'LEVEL',
-          reason:
-            levelStatus.status === 'RED'
-              ? 'Best option is Level Debt under the attorney model in this state.'
-              : 'Best option is Level Debt in this serviceable non-attorney state.'
-        };
-      }
-
-      if (csEligible && totalDebt >= 4000) {
-        return {
-          route: 'CONSUMER SHIELD',
-          reason:
-            totalDebt < 7000
-              ? 'Debt below $7,000 routes to Consumer Shield when the state and account profile are serviceable.'
-              : 'Level Debt is not available for this deal, so the deal routes to Consumer Shield where serviceable.'
-        };
-      }
-
-      return {
-        route: 'NO OPTION',
-        reason: 'No available backend is serviceable for this state and debt scenario.'
-      };
-    }
-
-    function computeScenarioData() {
-      const rows = state.rows.filter((r) => numberOrZero(r.amount) > 0);
-      const totalDebt = rows.reduce((sum, row) => sum + numberOrZero(row.amount), 0);
-      const flags = collectFlags(rows, totalDebt, state.selectedState);
-      const routeInfo = chooseRoute(totalDebt, state.selectedState, flags);
-
-      const levelState = getLevelStateStatus(state.selectedState);
-      const csState = getConsumerShieldStateStatus(state.selectedState);
-
-      const feeRate =
-        routeInfo.route === 'LEVEL'
-          ? (levelState.status === 'RED' ? 0.27 : 0.25)
-          : 0;
-
-      const repCommissionRate = routeInfo.route === 'LEVEL' ? 0.01 : 0;
-      const repCommission = totalDebt * repCommissionRate;
-
-      const doNothing = calcDoNothing(totalDebt);
-
-      let shortest = null;
-      let recommended = null;
-
-      if (routeInfo.route === 'LEVEL') {
-        const totalCost = totalDebt * 0.50 + totalDebt * feeRate;
-        shortest = { term: 12, totalCost, monthlyPayment: totalCost / 12 };
-        const maxTerm = getLevelMaxTerm(totalDebt);
-        recommended = { term: maxTerm, totalCost, monthlyPayment: totalCost / maxTerm };
-      } else if (routeInfo.route === 'CONSUMER SHIELD') {
-        const term = getConsumerShieldProgramLength(totalDebt);
-        const monthlyPayment = getConsumerShieldProgramPayment(totalDebt);
-        const totalCost = term * monthlyPayment;
-        shortest = { term, totalCost, monthlyPayment };
-        recommended = { term, totalCost, monthlyPayment };
-      }
-
-      const programs = {
-        consumerShield: {
-          name: 'Consumer Shield',
-          available: csState.status !== 'BLACKOUT' && totalDebt >= 4000,
-          term: getConsumerShieldProgramLength(totalDebt),
-          monthlyPayment: getConsumerShieldProgramPayment(totalDebt),
-          benefits: [
-            'Structured monthly plan',
-            'Credit monitoring support',
-            'Credit-building support tools',
-            'Additional client protection resources'
-          ]
-        },
-        level: {
-          name: 'Level Debt',
-          available: levelState.status !== 'BLACKOUT' && totalDebt >= 7000,
-          term: totalDebt > 0 ? getLevelMaxTerm(totalDebt) : 0,
-          monthlyPayment: totalDebt > 0
-            ? ((totalDebt * 0.50) + (totalDebt * (levelState.status === 'RED' ? 0.27 : 0.25))) / getLevelMaxTerm(totalDebt)
-            : 0,
-          benefits: [
-            'Longer-term payment flexibility',
-            'Affordability-focused structure',
-            'Lower monthly burden potential',
-            'Budget breathing room'
-          ]
-        }
-      };
-
-      const activeFlags = [];
-      if (routeInfo.route === 'LEVEL') activeFlags.push(...flags.level);
-      if (routeInfo.route === 'CONSUMER SHIELD') activeFlags.push(...flags.consumerShield);
-      if (routeInfo.route === 'NO OPTION') activeFlags.push(routeInfo.reason);
-
-      if (routeInfo.route === 'CONSUMER SHIELD') {
-        activeFlags.push('Consumer Shield support is Monday through Friday, 9am to 7pm EST.');
-        activeFlags.push('Consumer Shield will not send communications after 8pm in the contact local time unless already a client.');
-        activeFlags.push('Consumer Shield uses Equifax for credit pull.');
-      }
-
-      return {
-        rows,
-        totalDebt,
-        routeInfo,
-        doNothing,
-        shortest,
-        recommended,
-        feeRate,
-        repCommissionRate,
-        repCommission,
-        levelState,
-        csState,
-        programs,
-        flags: Array.from(new Set(activeFlags))
-      };
-    }
-
-    function rowAlerts(row, route) {
-      const alerts = [];
-      const name = getCreditorDisplayName(row);
-      const meta = row.creditorMeta;
-
-      if (meta) {
-        const eligible = String(meta.eligible_for_enrollment || '').toLowerCase();
-        const review = String(meta.needs_supervisor_review || '').toLowerCase();
-        const collateral = String(meta.collateral_flag || '').toLowerCase();
-        const litigation = String(meta.litigation_flag || '').toLowerCase();
-        const inheritsType = String(meta.underlying_debt_inherits_original_type || '').toLowerCase();
-
-        if (eligible === 'no') {
-          alerts.push({ label: 'Not eligible for enrollment', tone: 'red' });
-        }
-        if (review === 'yes' || review === 'maybe') {
-          alerts.push({ label: 'Supervisor review', tone: 'amber' });
-        }
-        if (collateral === 'yes' || collateral === 'maybe') {
-          alerts.push({ label: 'Collateral risk', tone: 'amber' });
-        }
-        if (litigation === 'yes' || litigation === 'maybe') {
-          alerts.push({ label: 'Litigation check', tone: 'amber' });
-        }
-        if (inheritsType === 'yes') {
-          alerts.push({ label: 'Verify original debt type', tone: 'amber' });
-        }
-      }
-
-      if (route === 'LEVEL') {
-        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) {
-          alerts.push({ label: 'Not accepted by Level', tone: 'red' });
-        }
-        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) {
-          alerts.push({ label: 'Secured / collateral risk', tone: 'amber' });
-        }
-        if (LEVEL_REJECTED_TYPES.has(row.debtType)) {
-          alerts.push({ label: 'Debt type not accepted', tone: 'red' });
-        }
-      }
-
-      if (route === 'CONSUMER SHIELD') {
-        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) {
-          alerts.push({ label: 'Not accepted by Consumer Shield', tone: 'red' });
-        }
-        if (CONSUMER_SHIELD_CONDITIONAL_TYPES.has(row.debtType)) {
-          alerts.push({ label: 'Conditional / docs needed', tone: 'amber' });
-        }
-      }
-
-      return alerts;
-    }
-
-    function renderCreditorSuggestions(query, index) {
-      const matches = getCreditorMatches(query);
-      if (!matches.length || !query.trim()) return '';
-
-      return `
-        <div class="creditor-dropdown">
-          ${matches.map((rec) => `
-            <button
-              type="button"
-              class="creditor-option"
-              data-index="${index}"
-              data-display="${escapeHtml(rec.display_name || '')}"
-            >
-              ${escapeHtml(rec.display_name || '')}
-            </button>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    function renderRows() {
-      el('rows').innerHTML = state.rows.map((row, index) => {
-        const notes = getMetadataNotes(row.creditorMeta);
-        return `
-          <div class="row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 border-slate-100 bg-white" data-row="${index}">
-            <div class="space-y-2">
-              <div class="creditor-search-wrap">
-                <input
-                  class="input creditor-input"
-                  data-index="${index}"
-                  data-key="creditorName"
-                  placeholder="${state.creditorLookupReady ? 'Search or type creditor name' : 'Type creditor name'}"
-                  value="${escapeHtml(row.creditorName || '')}"
-                  autocomplete="off"
-                />
-                <div class="creditor-suggestions-container" id="creditorSuggestions-${index}"></div>
-              </div>
-              ${notes.length ? `<div class="flex flex-wrap gap-2">${notes.map((n) => `<span class="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-600">${escapeHtml(n)}</span>`).join('')}</div>` : ''}
-              <div class="alert-wrap flex flex-wrap gap-2 pt-1"></div>
+        <div class="card bg-white p-5">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+            <h2 class="section-title">Creditor Entries</h2>
+            <div class="flex flex-wrap gap-2">
+              <button class="btn bg-slate-800 text-white" onclick="addCreditorRow()">+ Add Creditor</button>
+              <button class="btn bg-blue-600 text-white" onclick="importSampleCreditors()">Load Sample Set</button>
+              <button class="btn bg-emerald-600 text-white" onclick="exportCreditorsCSV()">Export Creditors CSV</button>
             </div>
-            <input class="input" data-index="${index}" data-key="amount" placeholder="$0" value="${escapeHtml(row.amount || '')}" />
-            <select data-index="${index}" data-key="debtType">
-              ${DEBT_TYPES.map((t) => `<option ${row.debtType === t ? 'selected' : ''} value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('')}
-            </select>
-            <select multiple class="conditions-select" data-index="${index}" data-key="conditions" size="1">
-              <option value="inCollections" ${row.inCollections ? 'selected' : ''}>Collections</option>
-              <option value="inLitigation" ${row.inLitigation ? 'selected' : ''}>Litigation</option>
-              <option value="isSecured" ${row.isSecured ? 'selected' : ''}>Secured</option>
-              <option value="paymentMade" ${row.paymentMade ? 'selected' : ''}>On-Time Payments / Current</option>
-              <option value="businessUnprofitable" ${row.businessUnprofitable ? 'selected' : ''}>Business closed / unprofitable</option>
-            </select>
           </div>
-        `;
-      }).join('');
 
-      document.querySelectorAll('#rows [data-index]').forEach((node) => {
-        if (!node.classList.contains('creditor-input')) {
-          node.addEventListener('input', onFieldChange);
-          node.addEventListener('change', onFieldChange);
-        }
-      });
-
-      wireCreditorSearch();
-      refreshRowVisuals();
-    }
-
-    function wireCreditorSearch() {
-      document.querySelectorAll('.creditor-input').forEach((input) => {
-        input.addEventListener('input', (e) => {
-          const index = Number(e.target.dataset.index);
-          const value = e.target.value || '';
-          if (!Number.isInteger(index) || !state.rows[index]) return;
-
-          state.rows[index].creditorName = value;
-          state.rows[index].creditorMeta = null;
-
-          const exact = state.creditorDb.find(
-            (r) => normalizeCreditorName(r.display_name) === normalizeCreditorName(value)
-          );
-
-          if (exact) {
-            state.rows[index].creditorMeta = exact;
-            state.rows[index].debtType = getDebtTypeFromMeta(exact, state.rows[index].debtType);
-          }
-
-          const container = document.getElementById(`creditorSuggestions-${index}`);
-          if (container) {
-            container.innerHTML = renderCreditorSuggestions(value, index);
-          }
-
-          const c = computeScenarioData();
-          refreshRowVisuals();
-          renderComparison(c);
-          renderPricingComparison(c);
-          renderProgramPitchSection(c);
-          renderProviderLogo(c.routeInfo.route);
-          renderBadges(c);
-          renderMetrics(c);
-          renderFlags(c);
-          el('routeReason').textContent = c.routeInfo.reason;
-          el('providerAvailability').innerHTML = buildProviderAvailability(c);
-          el('totalDebt').textContent = currency(c.totalDebt);
-
-          input.focus();
-          input.setSelectionRange(value.length, value.length);
-
-          document.querySelectorAll(`#creditorSuggestions-${index} .creditor-option`).forEach((btn) => {
-            btn.addEventListener('mousedown', (evt) => {
-              evt.preventDefault();
-            });
-
-            btn.addEventListener('click', (evt) => {
-              const display = evt.currentTarget.dataset.display || '';
-              const rec = state.creditorDb.find((r) => String(r.display_name) === display);
-              if (!rec) return;
-              applyCreditorSelection(index, rec);
-            });
-          });
-        });
-
-        input.addEventListener('focus', (e) => {
-          const index = Number(e.target.dataset.index);
-          const value = e.target.value || '';
-          const container = document.getElementById(`creditorSuggestions-${index}`);
-          if (container) {
-            container.innerHTML = renderCreditorSuggestions(value, index);
-          }
-
-          document.querySelectorAll(`#creditorSuggestions-${index} .creditor-option`).forEach((btn) => {
-            btn.addEventListener('mousedown', (evt) => {
-              evt.preventDefault();
-            });
-
-            btn.addEventListener('click', (evt) => {
-              const display = evt.currentTarget.dataset.display || '';
-              const rec = state.creditorDb.find((r) => String(r.display_name) === display);
-              if (!rec) return;
-              applyCreditorSelection(index, rec);
-            });
-          });
-        });
-
-        input.addEventListener('blur', (e) => {
-          const index = Number(e.target.dataset.index);
-          setTimeout(() => {
-            const container = document.getElementById(`creditorSuggestions-${index}`);
-            if (container) container.innerHTML = '';
-          }, 150);
-        });
-      });
-    }
-
-    function refreshRowVisuals() {
-      const route = computeScenarioData().routeInfo.route;
-      state.rows.forEach((row, index) => {
-        const card = document.querySelector(`.row-card[data-row="${index}"]`);
-        if (!card) return;
-        const alerts = rowAlerts(row, route);
-        const wrap = card.querySelector('.alert-wrap');
-        const bg =
-          alerts.some((a) => a.tone === 'red') ? 'border-red-300 bg-red-50' :
-          alerts.some((a) => a.tone === 'amber') ? 'border-amber-300 bg-amber-50' :
-          'border-slate-100 bg-white';
-
-        card.className = `row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 ${bg}`;
-        wrap.innerHTML = alerts.map((a) =>
-          `<span class="rounded-full border px-2 py-1 text-[11px] font-medium ${
-            a.tone === 'red'
-              ? 'bg-red-100 text-red-700 border-red-200'
-              : 'bg-amber-100 text-amber-800 border-amber-200'
-          }">${escapeHtml(a.label)}</span>`
-        ).join('');
-      });
-    }
-
-    function renderComparison(c) {
-      const totalPaybackRed = `<span style="color:#DC2626;font-weight:800;">${currency(c.doNothing.totalPayback)}</span>`;
-
-      const rows = [
-        ['Monthly Payments', currency(c.doNothing.monthlyPayment), c.shortest ? currency(c.shortest.monthlyPayment) : '—', c.recommended ? currency(c.recommended.monthlyPayment) : '—'],
-        ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.totalDebt) : '—'],
-        ['Months to Payoff', `${c.doNothing.monthsToPayoff} months`, c.shortest ? `${c.shortest.term} months` : '—', c.recommended ? `${c.recommended.term} months` : '—'],
-        ['Estimated Int Rate', `${(c.doNothing.apr * 100).toFixed(0)}% APR`, c.shortest ? '0%' : '—', c.recommended ? '0%' : '—'],
-        ['Estimated Total Payback*', totalPaybackRed, c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
-        ['Estimated Savings', '—', c.shortest ? `<span class="font-extrabold text-white">${currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost))}</span>` : '—', c.recommended ? `<span class="text-white font-black text-[20px]">${currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost))}</span>` : '—']
-      ];
-
-      el('comparisonTable').innerHTML = rows.map((r, idx) => {
-        const savingsRow = idx === 5;
-        return `
-          <tr class="${savingsRow ? 'bg-teal-600 savings-glow' : (idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50')}">
-            <td class="border-b px-4 py-4 text-sm font-medium ${savingsRow ? 'text-white' : 'text-slate-600'}">${r[0]}</td>
-            <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[1]}</td>
-            <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[2]}</td>
-            <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[3]}</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function renderPricingComparison(c) {
-      const cards = [];
-
-      if (c.programs.consumerShield.available) {
-        cards.push(`
-          <div class="plan-card">
-            <div class="flex items-center justify-between gap-3">
-              <span class="plan-chip" style="background:rgba(15,118,110,0.10); color:#0f766e;">Consumer Shield</span>
-            </div>
-            <div class="mt-4 grid grid-cols-2 gap-4">
-              <div><div class="plan-label">Program Length</div><div class="plan-value">${c.programs.consumerShield.term ? c.programs.consumerShield.term + ' mo' : '—'}</div></div>
-              <div><div class="plan-label">Monthly Payment</div><div class="plan-value">${c.programs.consumerShield.monthlyPayment ? currency(c.programs.consumerShield.monthlyPayment) : '—'}</div></div>
-            </div>
-            <div class="mini-list">${c.programs.consumerShield.benefits.map((b) => `<div>• ${escapeHtml(b)}</div>`).join('')}</div>
-          </div>
-        `);
-      }
-
-      if (c.programs.level.available) {
-        cards.push(`
-          <div class="plan-card">
-            <div class="flex items-center justify-between gap-3">
-              <span class="plan-chip" style="background:rgba(0,150,136,0.10); color:#009688;">Level Debt</span>
-            </div>
-            <div class="mt-4 grid grid-cols-2 gap-4">
-              <div><div class="plan-label">Program Length</div><div class="plan-value">${c.programs.level.term ? c.programs.level.term + ' mo' : '—'}</div></div>
-              <div><div class="plan-label">Monthly Payment</div><div class="plan-value">${c.programs.level.monthlyPayment ? currency(c.programs.level.monthlyPayment) : '—'}</div></div>
-            </div>
-            <div class="mini-list">${c.programs.level.benefits.map((b) => `<div>• ${escapeHtml(b)}</div>`).join('')}</div>
-          </div>
-        `);
-      }
-
-      el('pricingComparison').innerHTML = cards.length
-        ? cards.join('')
-        : '<div class="unavailable-box lg:col-span-2">SERVICE NOT AVAILABLE / NO PROGRAM OPTIONS MATCH THIS STATE AND DEBT SCENARIO</div>';
-
-      el('pricingDifferences').innerHTML = `
-        <div class="diff-box">
-          <h3 class="text-lg font-semibold mb-3">AVAILABLE OPTIONS EXPLAINED</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full pricing-compare-table text-sm text-slate-700 bg-white">
+          <div class="table-wrap">
+            <table id="creditorTable">
               <thead>
-                <tr class="bg-slate-100">
-                  <th>Program Features</th>
-                  <th><div class="flex items-center gap-2">${ROUTE_LOGOS['CONSUMER SHIELD'] ? `<img class="tiny-logo" src="${ROUTE_LOGOS['CONSUMER SHIELD']}" alt="Consumer Shield logo" />` : ''}<span>Consumer Shield</span></div></th>
-                  <th><div class="flex items-center gap-2">${ROUTE_LOGOS['LEVEL'] ? `<img class="tiny-logo" src="${ROUTE_LOGOS['LEVEL']}" alt="Level logo" />` : ''}<span>Level Debt</span></div></th>
+                <tr>
+                  <th style="min-width: 220px;">Creditor</th>
+                  <th style="min-width: 140px;">Debt Type</th>
+                  <th style="min-width: 130px;">Amount</th>
+                  <th style="min-width: 130px;">Class</th>
+                  <th style="min-width: 120px;">Status</th>
+                  <th style="min-width: 140px;">Search Match</th>
+                  <th style="min-width: 80px;">Action</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td class="font-semibold">Primary fit</td>
-                  <td>Often used when Level is unavailable or when debt falls below standard settlement thresholds and Consumer Shield remains serviceable.</td>
-                  <td>Primary recommended backend when the state is serviceable and the debt qualifies.</td>
-                </tr>
-                <tr>
-                  <td class="font-semibold">Program style</td>
-                  <td>Debt validation-oriented structure.</td>
-                  <td>Traditional debt settlement structure.</td>
-                </tr>
-                <tr>
-                  <td class="font-semibold">Monthly payment feel</td>
-                  <td>Tier-based and more fixed.</td>
-                  <td>Often more flexible with longer term options.</td>
-                </tr>
-                <tr>
-                  <td class="font-semibold">Typical advantage</td>
-                  <td>Useful fallback when Level cannot take the deal and Consumer Shield is serviceable.</td>
-                  <td>Usually the strongest primary debt-settlement fit when available.</td>
-                </tr>
-              </tbody>
+              <tbody id="creditorTableBody"></tbody>
             </table>
           </div>
         </div>
-      `;
-    }
 
-    function renderProgramPitchSection(c) {
-      const cards = [];
-
-      if (c.programs.level.available) {
-        cards.push(`
-          <div class="pitch-card">
-            <div class="pitch-title">Level Debt</div>
-            <div class="pitch-sub">Primary debt-settlement option when the state and deal structure qualify.</div>
-            <div class="pitch-list">
-              <div>• Creates a structured path to resolve debt instead of staying trapped in minimum payments.</div>
-              <div>• Can reduce total payoff compared with years of compounding interest.</div>
-              <div>• Often allows longer terms to lower the monthly burden.</div>
-              <div>• Gives the client one clear strategy instead of juggling multiple creditors.</div>
-              <div>• Strongest primary fit when the state and debt profile support enrollment.</div>
+        <div class="card bg-white p-5">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+            <h2 class="section-title">Searchable Internal Creditor Database</h2>
+            <div class="flex flex-wrap gap-2">
+              <input id="dbSearch" class="input md:w-96" type="text" placeholder="Search creditor name, category, class..." oninput="renderCreditorDatabaseSearch()" />
+              <button class="btn bg-slate-700 text-white" onclick="downloadFullDatabaseCSV()">Download Full Database CSV</button>
             </div>
-            <div class="pitch-urgency">Urgency: every month a client stays in the current payment cycle, interest keeps compounding and the balance typically becomes more expensive to resolve.</div>
           </div>
-        `);
-      }
 
-      if (c.programs.consumerShield.available) {
-        cards.push(`
-          <div class="pitch-card">
-            <div class="pitch-title">Consumer Shield</div>
-            <div class="pitch-sub">Fallback option when Level is unavailable and Consumer Shield remains serviceable.</div>
-            <div class="pitch-list">
-              <div>• Provides an alternative path when a standard settlement route is blocked.</div>
-              <div>• Uses a more fixed, structured payment model for easier explanation.</div>
-              <div>• Can still create momentum for clients who need action now, not delay.</div>
-              <div>• Supports clients who fall outside standard Level eligibility or state availability.</div>
-              <div>• Helps preserve an actionable option instead of leaving the prospect with no path forward.</div>
-            </div>
-            <div class="pitch-urgency">Urgency: when a client qualifies for a serviceable fallback option, delaying can mean more fees, more stress, and fewer workable solutions later.</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Creditor Name</th>
+                  <th>Category</th>
+                  <th>Class</th>
+                  <th>Program Notes</th>
+                </tr>
+              </thead>
+              <tbody id="dbResults"></tbody>
+            </table>
           </div>
-        `);
-      }
-
-      el('programPitchSection').innerHTML = cards.length
-        ? cards.join('')
-        : '<div class="unavailable-box lg:col-span-2">NO PROGRAM PITCH AVAILABLE / NO SERVICEABLE OPTIONS MATCH THIS SCENARIO</div>';
-    }
-
-    function renderProviderLogo(route) {
-      const src = ROUTE_LOGOS[route];
-      if (!src) {
-        el('providerLogoBox').innerHTML = '';
-        return;
-      }
-      el('providerLogoBox').innerHTML = `<div class="provider-logo-wrap"><img class="provider-logo" src="${src}" alt="${route} logo" /></div>`;
-    }
-
-    function buildProviderAvailability(c) {
-      const providers = [
-        { name: 'LEVEL DEBT', available: c.programs.level.available, best: c.routeInfo.route === 'LEVEL' },
-        { name: 'CONSUMER SHIELD', available: c.programs.consumerShield.available, best: c.routeInfo.route === 'CONSUMER SHIELD' }
-      ];
-
-      return providers.map((p) => {
-        const black = !p.available;
-        const icon = black ? '✖' : '✔';
-        const cls = p.best ? 'border-green-500 bg-green-50' : black ? 'border-black bg-black text-white' : 'border-green-300 bg-white';
-        const sub = p.best ? 'BEST OPTION' : black ? 'Not Serviceable' : 'Additional Option';
-
-        return `
-          <div class="rounded-xl border p-3 ${cls}">
-            <div class="flex items-center gap-2 text-sm font-semibold">
-              <span>${icon}</span>
-              <span>${p.name}</span>
-            </div>
-            <div class="mt-1 text-xs ${black ? 'text-white/80' : 'text-slate-600'}">${sub}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderMetrics(c) {
-      el('metricsGrid').innerHTML = `
-        <div class="rounded-xl bg-white border border-teal-100 p-3">
-          <div class="text-xs uppercase tracking-wide text-slate-500">Fee Rate</div>
-          <div class="mt-1 text-base font-semibold">${(c.feeRate * 100).toFixed(0)}%</div>
         </div>
-        <div class="rounded-xl bg-white border border-teal-100 p-3">
-          <div class="text-xs uppercase tracking-wide text-slate-500">Rep Commission</div>
-          <div class="mt-1 text-base font-semibold">${(c.repCommissionRate * 100).toFixed(0)}% • ${currency(c.repCommission)}</div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="space-y-6">
+        <div class="card bg-white p-5">
+          <h2 class="section-title mb-4">Routing Controls</h2>
+          <div class="space-y-3">
+            <button class="btn w-full bg-teal-700 text-white" onclick="runRouting()">Run Routing Decision</button>
+            <button class="btn w-full bg-slate-800 text-white" onclick="saveCase()">Save Case Locally</button>
+            <button class="btn w-full bg-indigo-600 text-white" onclick="loadCase()">Load Saved Case</button>
+            <button class="btn w-full bg-rose-600 text-white" onclick="clearCase()">Clear Case</button>
+            <button class="btn w-full bg-amber-500 text-slate-900" onclick="downloadPDF()">Download PDF Summary</button>
+          </div>
         </div>
+
+        <div class="card bg-white p-5">
+          <h2 class="section-title mb-4">Case Metrics</h2>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span>Total Debt</span><strong id="metricTotalDebt">$0</strong></div>
+            <div class="flex justify-between"><span>Unsecured Debt</span><strong id="metricUnsecuredDebt">$0</strong></div>
+            <div class="flex justify-between"><span>Secured Debt</span><strong id="metricSecuredDebt">$0</strong></div>
+            <div class="flex justify-between"><span>Unknown Debt</span><strong id="metricUnknownDebt">$0</strong></div>
+            <div class="flex justify-between"><span>Discover % of Enrolled Debt</span><strong id="metricDiscoverPct">0%</strong></div>
+            <div class="flex justify-between"><span>Creditor Count</span><strong id="metricCreditorCount">0</strong></div>
+          </div>
+        </div>
+
+        <div class="card bg-white p-5">
+          <h2 class="section-title mb-4">Routing Result</h2>
+          <div id="routeResult" class="space-y-3 text-sm">
+            <p class="subtle">Run the routing decision to see recommendations.</p>
+          </div>
+        </div>
+
+        <div class="card bg-white p-5">
+          <h2 class="section-title mb-4">Backend Logic</h2>
+          <div class="text-sm text-slate-700 space-y-2">
+            <p><strong>Primary:</strong> Level Debt / Pinnacle model</p>
+            <p><strong>Fallback / exception:</strong> Consumer Shield</p>
+            <p><strong>Verify Debt Solutions:</strong> no longer used</p>
+            <p><strong>Main rules:</strong></p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Must have serviceable state</li>
+              <li>Must not be in bankruptcy</li>
+              <li>Must not already be enrolled</li>
+              <li>Must have qualifying unsecured debt</li>
+              <li>Must have payment ability or income support</li>
+              <li>Discover concentration can force exception routing</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STATES = [
+      "", "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME",
+      "MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN",
+      "TX","UT","VA","VT","WA","WI","WV","WY","DC"
+    ];
+
+    const NON_SERVICEABLE_LEVEL = ["AK","OR","RI","VT","WV"];
+    const CONSUMER_SHIELD_NON_SERVICEABLE = []; // fill later if needed
+    const DEFAULT_MIN_PAYMENT = 225;
+    const DISCOVER_LIMIT_PCT = 60;
+
+    const CREDITOR_DB = [
+      { name: "American Express", category: "Credit Card", class: "Unsecured", notes: "Standard unsecured revolving debt" },
+      { name: "Amex", category: "Credit Card", class: "Unsecured", notes: "Alias of American Express" },
+      { name: "Bank of America", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
+      { name: "Capital One", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
+      { name: "Chase", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
+      { name: "Citi", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
+      { name: "Citibank", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
+      { name: "Discover", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Track concentration; exception if >60%" },
+      { name: "Discover Card", category: "Credit Card", class: "Unsecured", notes: "Track concentration carefully" },
+      { name: "Wells Fargo", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
+      { name: "Barclays", category: "Credit Card", class: "Unsecured", notes: "Standard unsecured" },
+      { name: "Synchrony", category: "Retail Card / Credit Card", class: "Unsecured", notes: "Usually retail or revolving" },
+      { name: "Comenity", category: "Retail Card", class: "Unsecured", notes: "Store card debt" },
+      { name: "Upgrade", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
+      { name: "Upstart", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
+      { name: "LendingClub", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
+      { name: "Prosper", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
+      { name: "Best Egg", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
+      { name: "Avant", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
+      { name: "OneMain Financial", category: "Personal Loan", class: "Unknown", notes: "Can be secured or unsecured; verify structure" },
+      { name: "SoFi", category: "Personal Loan", class: "Unsecured", notes: "Usually unsecured personal loan" },
+      { name: "LightStream", category: "Personal Loan", class: "Unsecured", notes: "Usually unsecured personal loan" },
+      { name: "Navient", category: "Student Loan", class: "Generally Excluded", notes: "Student loans usually not standard debt settlement fit" },
+      { name: "Nelnet", category: "Student Loan", class: "Generally Excluded", notes: "Student loans usually excluded" },
+      { name: "MOHELA", category: "Student Loan", class: "Generally Excluded", notes: "Student loans usually excluded" },
+      { name: "FedLoan", category: "Student Loan", class: "Generally Excluded", notes: "Student loans usually excluded" },
+      { name: "Affirm", category: "Consumer Financing", class: "Unsecured", notes: "Often unsecured consumer financing" },
+      { name: "Klarna", category: "Consumer Financing", class: "Unsecured", notes: "Often unsecured consumer financing" },
+      { name: "Afterpay", category: "Consumer Financing", class: "Unsecured", notes: "Often unsecured consumer financing" },
+      { name: "PayPal Credit", category: "Consumer Financing", class: "Unsecured", notes: "Usually unsecured" },
+      { name: "CareCredit", category: "Medical Financing", class: "Unsecured", notes: "Often unsecured medical financing" },
+      { name: "Medical Bill", category: "Medical", class: "Unsecured", notes: "Can be accepted depending on backend" },
+      { name: "Collection Agency", category: "Collection", class: "Unsecured", notes: "Usually unsecured if tied to unsecured account" },
+      { name: "Portfolio Recovery", category: "Collection", class: "Unsecured", notes: "Collection debt; verify underlying account" },
+      { name: "Midland Credit", category: "Collection", class: "Unsecured", notes: "Collection debt; verify underlying account" },
+      { name: "LVNV Funding", category: "Collection", class: "Unsecured", notes: "Collection debt; verify underlying account" },
+      { name: "Back Rent", category: "Rent", class: "Conditional", notes: "Can be limited share depending on backend rules" },
+      { name: "Repossessed Auto Deficiency", category: "Auto Deficiency", class: "Unsecured", notes: "Post-repo deficiency often unsecured" },
+      { name: "Auto Loan", category: "Vehicle Loan", class: "Secured", notes: "Active vehicle loan is secured" },
+      { name: "Mortgage", category: "Mortgage", class: "Secured", notes: "Secured real estate debt" },
+      { name: "HELOC", category: "Home Equity", class: "Secured", notes: "Secured by home" },
+      { name: "IRS", category: "Tax Debt", class: "Generally Excluded", notes: "Tax debt generally excluded" },
+      { name: "State Tax", category: "Tax Debt", class: "Generally Excluded", notes: "Tax debt generally excluded" },
+      { name: "Title Loan", category: "Title Loan", class: "Secured", notes: "Secured by vehicle title" },
+      { name: "Payday Loan", category: "Short-Term Loan", class: "Unsecured", notes: "Usually unsecured" }
+    ];
+
+    function populateStates() {
+      const stateEl = document.getElementById("state");
+      stateEl.innerHTML = STATES.map(s => `<option value="${s}">${s || "Select"}</option>`).join("");
+    }
+
+    function money(val) {
+      const n = Number(val || 0);
+      return n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "").replace(/[&<>"']/g, s => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[s]));
+    }
+
+    function findCreditorMatch(name) {
+      const n = String(name || "").trim().toLowerCase();
+      if (!n) return null;
+      return CREDITOR_DB.find(c => c.name.toLowerCase() === n) ||
+             CREDITOR_DB.find(c => n.includes(c.name.toLowerCase()) || c.name.toLowerCase().includes(n)) ||
+             null;
+    }
+
+    function classifyDebtType(type, name) {
+      const creditorMatch = findCreditorMatch(name);
+      if (creditorMatch) return creditorMatch.class;
+
+      const t = String(type || "").toLowerCase();
+      const nm = String(name || "").toLowerCase();
+
+      if (t.includes("credit") || t.includes("card") || t.includes("personal loan") || t.includes("collection") || t.includes("medical")) return "Unsecured";
+      if (t.includes("mortgage") || t.includes("heloc") || t.includes("auto") || t.includes("vehicle") || t.includes("title")) return "Secured";
+      if (t.includes("student") || t.includes("tax")) return "Generally Excluded";
+      if (nm.includes("discover")) return "Unsecured";
+      return "Unknown";
+    }
+
+    function addCreditorRow(data = {}) {
+      const tbody = document.getElementById("creditorTableBody");
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td><input class="input creditor-name" type="text" value="${escapeHtml(data.name || "")}" placeholder="Creditor name" oninput="autoClassifyRow(this)" /></td>
+        <td>
+          <select class="input creditor-type" onchange="autoClassifyRow(this)">
+            ${[
+              "", "Credit Card", "Personal Loan", "Collection", "Medical", "Retail Card", "Consumer Financing",
+              "Student Loan", "Tax Debt", "Mortgage", "HELOC", "Auto Loan", "Title Loan", "Repossessed Auto Deficiency", "Back Rent", "Other"
+            ].map(opt => `<option ${data.type === opt ? "selected" : ""}>${opt || "Select"}</option>`).join("")}
+          </select>
+        </td>
+        <td><input class="input creditor-amount" type="number" min="0" value="${escapeHtml(data.amount || "")}" placeholder="0" oninput="updateMetrics()" /></td>
+        <td>
+          <select class="input creditor-class" onchange="updateMetrics()">
+            ${["Unknown","Unsecured","Secured","Conditional","Generally Excluded"].map(opt => `<option ${data.class === opt ? "selected" : ""}>${opt}</option>`).join("")}
+          </select>
+        </td>
+        <td>
+          <select class="input creditor-status">
+            ${["Open","Charged Off","Collections","Closed","Unknown"].map(opt => `<option ${data.status === opt ? "selected" : ""}>${opt}</option>`).join("")}
+          </select>
+        </td>
+        <td class="search-match text-sm subtle">-</td>
+        <td><button class="btn bg-red-100 text-red-700 px-3 py-2" onclick="removeCreditorRow(this)">Remove</button></td>
       `;
+
+      tbody.appendChild(tr);
+      autoClassifyRow(tr.querySelector(".creditor-name"));
+      updateMetrics();
     }
 
-    function renderBadges(c) {
-      const stateCode = state.selectedState || '—';
-      const stateFull = state.selectedState ? STATE_NAMES[state.selectedState] : 'No state selected';
-      const isRed = c.routeInfo.route === 'LEVEL' ? c.levelState.status === 'RED' : false;
-
-      const tierColor = isRed ? '#DC2626' : '#16A34A';
-      const tierBg = isRed ? '#FEF2F2' : '#ECFDF5';
-
-      let second = '';
-      if (c.routeInfo.route === 'CONSUMER SHIELD') {
-        second = `<span class="pill border border-teal-300 bg-teal-50 text-teal-700">Consumer Shield: ${c.csState.label}</span>`;
-      } else if (c.routeInfo.route === 'LEVEL') {
-        second = `<span class="pill border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">Level: ${c.levelState.label}</span>`;
-      }
-
-      el('topBadges').innerHTML = `
-        <span title="${escapeHtml(stateFull)}" class="pill border border-slate-300 bg-white cursor-help">State: ${escapeHtml(stateCode)}</span>
-        ${second}
-      `;
+    function removeCreditorRow(btn) {
+      btn.closest("tr").remove();
+      updateMetrics();
     }
 
-    function renderFlags(c) {
-      el('flags').innerHTML = c.flags.map((flag) => `
-        <div class="flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">⚠️ <span>${escapeHtml(flag)}</span></div>
-      `).join('');
+    function autoClassifyRow(input) {
+      const tr = input.closest("tr");
+      const name = tr.querySelector(".creditor-name").value;
+      const type = tr.querySelector(".creditor-type").value;
+      const match = findCreditorMatch(name);
+      const cls = match ? match.class : classifyDebtType(type, name);
+      tr.querySelector(".creditor-class").value = cls;
+      tr.querySelector(".search-match").innerHTML = match
+        ? `<span class="pill bg-emerald-100 text-emerald-700">${escapeHtml(match.name)}</span>`
+        : `<span class="pill bg-slate-100 text-slate-600">No exact match</span>`;
+      updateMetrics();
     }
 
-    function render() {
-      const c = computeScenarioData();
-      el('totalDebt').textContent = currency(c.totalDebt);
-      refreshRowVisuals();
-      renderComparison(c);
-      renderPricingComparison(c);
-      renderProgramPitchSection(c);
-      renderProviderLogo(c.routeInfo.route);
-      renderBadges(c);
-      renderMetrics(c);
-      renderFlags(c);
-      el('routeReason').textContent = c.routeInfo.reason;
-      el('providerAvailability').innerHTML = buildProviderAvailability(c);
-
-      const pdfBtn = el('pdfBtn');
-      pdfBtn.disabled = !(c.recommended && state.selectedState && c.totalDebt > 0);
-      pdfBtn.style.opacity = pdfBtn.disabled ? 0.55 : 1;
-      pdfBtn.style.cursor = pdfBtn.disabled ? 'not-allowed' : 'pointer';
+    function getCreditorRows() {
+      return [...document.querySelectorAll("#creditorTableBody tr")].map(tr => ({
+        name: tr.querySelector(".creditor-name").value.trim(),
+        type: tr.querySelector(".creditor-type").value,
+        amount: Number(tr.querySelector(".creditor-amount").value || 0),
+        class: tr.querySelector(".creditor-class").value,
+        status: tr.querySelector(".creditor-status").value
+      })).filter(r => r.name || r.amount > 0 || r.type);
     }
 
-    function onFieldChange(e) {
-      const index = Number(e.target.dataset.index);
-      const key = e.target.dataset.key;
-      if (!Number.isInteger(index) || !state.rows[index]) return;
+    function updateMetrics() {
+      const creditors = getCreditorRows();
+      let total = 0, unsecured = 0, secured = 0, unknown = 0, discover = 0;
 
-      if (key === 'conditions') {
-        const values = Array.from(e.target.selectedOptions).map((opt) => opt.value);
-        state.rows[index].inCollections = values.includes('inCollections');
-        state.rows[index].inLitigation = values.includes('inLitigation');
-        state.rows[index].isSecured = values.includes('isSecured');
-        state.rows[index].paymentMade = values.includes('paymentMade');
-        state.rows[index].businessUnprofitable = values.includes('businessUnprofitable');
-        render();
-        return;
-      }
+      creditors.forEach(c => {
+        total += c.amount;
+        if (c.class === "Unsecured") unsecured += c.amount;
+        else if (c.class === "Secured") secured += c.amount;
+        else if (c.class === "Unknown" || c.class === "Conditional" || c.class === "Generally Excluded") unknown += c.amount;
 
-      state.rows[index][key] = e.target.value;
-      render();
-    }
-
-    function loadImageAsDataUrl(url) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'Anonymous';
-        img.onload = () => {
-          try {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            resolve(canvas.toDataURL('image/png'));
-          } catch (err) {
-            reject(err);
-          }
-        };
-        img.onerror = reject;
-        img.src = url;
-      });
-    }
-
-    async function generatePdfBlob() {
-      const c = computeScenarioData();
-      if (!(c.recommended && state.selectedState && c.totalDebt > 0)) return null;
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      let y = 20;
-
-      try {
-        const logoData = await loadImageAsDataUrl(LOGO_URL);
-        doc.addImage(logoData, 'PNG', 14, 10, 36, 14);
-      } catch (e) {}
-
-      doc.setFontSize(18);
-      doc.setTextColor(0, 150, 136);
-      doc.text('Debt Settlement - Savings Scenario', 56, 20);
-      y = 34;
-
-      doc.setFontSize(10);
-      doc.setTextColor(91, 94, 109);
-      const introBullets = [
-        'This summary compares three payoff scenarios for your enrolled debt.',
-        'The current financial situation is not a recommended path. It illustrates what may happen if minimum payments continue while interest compounds month after month.',
-        'Shortest Payoff shows the fastest available program structure based on the current routing.',
-        'Debt Relief Program shows the structured program option designed to reduce monthly burden while still creating estimated savings versus the current financial situation.'
-      ];
-
-      introBullets.forEach((line) => {
-        const lines = doc.splitTextToSize('• ' + line, pageWidth - 28);
-        doc.text(lines, 14, y);
-        y += lines.length * 5 + 1;
+        if (String(c.name).toLowerCase().includes("discover")) discover += c.amount;
       });
 
-      y += 4;
-      doc.setFontSize(11);
-      doc.setTextColor(0, 0, 0);
-      doc.text('Comparison Summary', 14, y);
-      y += 6;
+      const discoverPct = unsecured > 0 ? (discover / unsecured) * 100 : 0;
 
-      const headers = [
-        'Detail',
-        'Current Financial Situation',
-        'Shortest Payoff',
-        'DEBT RELIEF PROGRAM'
-      ];
+      document.getElementById("metricTotalDebt").textContent = money(total);
+      document.getElementById("metricUnsecuredDebt").textContent = money(unsecured);
+      document.getElementById("metricSecuredDebt").textContent = money(secured);
+      document.getElementById("metricUnknownDebt").textContent = money(unknown);
+      document.getElementById("metricDiscoverPct").textContent = `${discoverPct.toFixed(1)}%`;
+      document.getElementById("metricCreditorCount").textContent = creditors.length;
+    }
 
-      const tableRows = [
-        ['Monthly Payments', currency(c.doNothing.monthlyPayment), c.shortest ? currency(c.shortest.monthlyPayment) : '—', c.recommended ? currency(c.recommended.monthlyPayment) : '—'],
-        ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.totalDebt) : '—'],
-        ['Months to Payoff', `${c.doNothing.monthsToPayoff} months`, c.shortest ? `${c.shortest.term} months` : '—', c.recommended ? `${c.recommended.term} months` : '—'],
-        ['Estimated Int Rate', `${(c.doNothing.apr * 100).toFixed(0)}% APR`, c.shortest ? '0%' : '—', c.recommended ? '0%' : '—'],
-        ['Estimated Total Payback*', currency(c.doNothing.totalPayback), c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
-        ['Estimated Savings', '—', c.shortest ? currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost)) : '—', c.recommended ? currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost)) : '—']
-      ];
+    function getCaseData() {
+      return {
+        firstName: document.getElementById("firstName").value.trim(),
+        lastName: document.getElementById("lastName").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        state: document.getElementById("state").value,
+        incomeStatus: document.getElementById("incomeStatus").value,
+        monthlyIncome: Number(document.getElementById("monthlyIncome").value || 0),
+        affordablePayment: Number(document.getElementById("affordablePayment").value || 0),
+        makingPayments: document.getElementById("makingPayments").value,
+        bankruptcy: document.getElementById("bankruptcy").value,
+        lawsuit: document.getElementById("lawsuit").value,
+        enrolled: document.getElementById("enrolled").value,
+        notes: document.getElementById("notes").value.trim(),
+        creditors: getCreditorRows()
+      };
+    }
 
-      const colX = [14, 58, 126, 162];
-      const rowH = 10;
+    function routeDecision(data) {
+      const unsecured = data.creditors.filter(c => c.class === "Unsecured").reduce((sum, c) => sum + c.amount, 0);
+      const discoverDebt = data.creditors
+        .filter(c => String(c.name).toLowerCase().includes("discover"))
+        .reduce((sum, c) => sum + c.amount, 0);
 
-      doc.setFillColor(241, 245, 249);
-      doc.rect(14, y, 182, rowH, 'F');
-      doc.setFontSize(7);
-      doc.setTextColor(51, 65, 85);
+      const discoverPct = unsecured > 0 ? (discoverDebt / unsecured) * 100 : 0;
+      const affordablePayment = Number(data.affordablePayment || 0);
+      const hasIncome = data.incomeStatus && data.incomeStatus !== "No Income";
+      const serviceableLevel = data.state && !NON_SERVICEABLE_LEVEL.includes(data.state);
+      const serviceableConsumerShield = data.state && !CONSUMER_SHIELD_NON_SERVICEABLE.includes(data.state);
 
-      headers.forEach((h, i) => {
-        const wrapped = doc.splitTextToSize(h, i === 1 ? 64 : 34);
-        doc.text(wrapped, colX[i] + 2, y + 4);
-      });
+      const reasons = [];
+      const warnings = [];
+      let recommended = "";
+      let badgeClass = "route-warn";
+      let decisionType = "Manual Review";
 
-      y += 14;
+      if (!data.state) reasons.push("State not selected");
+      if (!data.incomeStatus) reasons.push("Income status not selected");
+      if (!data.makingPayments) reasons.push("Payment status not selected");
+      if (!data.bankruptcy) reasons.push("Bankruptcy status not selected");
+      if (!data.enrolled) reasons.push("Enrollment status not selected");
 
-      tableRows.forEach((row, idx) => {
-        const isSavingsRow = idx === 5;
-        if (isSavingsRow) {
-          doc.setFillColor(0, 150, 136);
-          doc.rect(14, y, 182, rowH, 'F');
-        } else if (idx % 2 === 1) {
-          doc.setFillColor(248, 250, 252);
-          doc.rect(14, y, 182, rowH, 'F');
+      if (data.bankruptcy === "Yes") reasons.push("Client is in bankruptcy");
+      if (data.enrolled === "Yes") reasons.push("Client is already enrolled in a debt relief program");
+      if (unsecured < 4000) reasons.push("Qualifying unsecured debt appears under $4,000");
+      if (!hasIncome && affordablePayment < DEFAULT_MIN_PAYMENT) reasons.push("No income and payment ability below minimum");
+      if (affordablePayment > 0 && affordablePayment < DEFAULT_MIN_PAYMENT) warnings.push(`Affordable payment below preferred threshold of ${money(DEFAULT_MIN_PAYMENT)}`);
+      if (data.lawsuit === "Yes") warnings.push("Active lawsuit present - review manually");
+      if (data.makingPayments === "No") warnings.push("Not currently making payments - still review, but may reduce fit");
+      if (discoverPct > DISCOVER_LIMIT_PCT) warnings.push(`Discover concentration exceeds ${DISCOVER_LIMIT_PCT}% of unsecured debt`);
+
+      if (reasons.length > 0) {
+        recommended = "Not Eligible / Do Not Route Yet";
+        badgeClass = "route-bad";
+        decisionType = "Stop";
+      } else {
+        if (serviceableLevel && discoverPct <= DISCOVER_LIMIT_PCT) {
+          recommended = "Route to Level Debt / Pinnacle";
+          badgeClass = "route-good";
+          decisionType = "Primary Route";
+        } else if (serviceableConsumerShield) {
+          recommended = "Route to Consumer Shield Exception Flow";
+          badgeClass = "route-warn";
+          decisionType = "Fallback Route";
+        } else {
+          recommended = "Manual Escalation Required";
+          badgeClass = "route-bad";
+          decisionType = "Escalation";
         }
+      }
 
-        row.forEach((cell, i) => {
-          if (isSavingsRow) {
-            doc.setTextColor(255, 255, 255);
-            doc.setFont(undefined, 'bold');
-          } else if (idx === 4 && i === 1) {
-            doc.setTextColor(220, 38, 38);
-            doc.setFont(undefined, 'bold');
-          } else {
-            doc.setTextColor(15, 23, 42);
-            doc.setFont(undefined, 'normal');
-          }
-          doc.setFontSize(8);
-          doc.text(String(cell), colX[i] + 2, y + 6);
-        });
-
-        y += rowH;
-      });
-
-      y += 8;
-      doc.setFontSize(9);
-      doc.setTextColor(91, 94, 109);
-      const footerBullets = [
-        'Current Financial Situation means continuing to make minimum payments while interest compounds monthly, which can keep the debt active for a very long time.',
-        'Shortest Payoff means the fastest currently available program term based on the selected servicing route.',
-        'Debt Relief Program means the structured program option intended to lower the monthly payment burden while still showing estimated savings versus the current path.',
-        'Estimates are illustrative and final program terms may vary.'
-      ];
-
-      footerBullets.forEach((line) => {
-        const lines = doc.splitTextToSize('• ' + line, pageWidth - 28);
-        doc.text(lines, 14, y);
-        y += lines.length * 5 + 1;
-      });
-
-      return doc.output('blob');
+      return {
+        totalDebt: data.creditors.reduce((sum, c) => sum + c.amount, 0),
+        unsecured,
+        discoverPct,
+        recommended,
+        badgeClass,
+        decisionType,
+        reasons,
+        warnings,
+        serviceableLevel,
+        serviceableConsumerShield
+      };
     }
 
-    async function buildPdf() {
-      const blob = await generatePdfBlob();
-      if (!blob) return;
+    function runRouting() {
+      const data = getCaseData();
+      const result = routeDecision(data);
+
+      const html = `
+        <div>
+          <span class="pill ${result.badgeClass}">${escapeHtml(result.decisionType)}</span>
+        </div>
+        <div class="text-lg font-extrabold text-slate-900">${escapeHtml(result.recommended)}</div>
+        <div class="text-sm text-slate-700 space-y-1">
+          <div><strong>Total Debt:</strong> ${money(result.totalDebt)}</div>
+          <div><strong>Qualifying Unsecured Debt:</strong> ${money(result.unsecured)}</div>
+          <div><strong>Discover %:</strong> ${result.discoverPct.toFixed(1)}%</div>
+          <div><strong>Level Serviceable:</strong> ${result.serviceableLevel ? "Yes" : "No"}</div>
+          <div><strong>Consumer Shield Serviceable:</strong> ${result.serviceableConsumerShield ? "Yes" : "No"}</div>
+        </div>
+
+        ${result.reasons.length ? `
+          <div class="mt-3">
+            <div class="font-bold text-red-700 mb-1">Blocking Issues</div>
+            <ul class="list-disc pl-5 text-sm text-red-700">
+              ${result.reasons.map(r => `<li>${escapeHtml(r)}</li>`).join("")}
+            </ul>
+          </div>` : ""}
+
+        ${result.warnings.length ? `
+          <div class="mt-3">
+            <div class="font-bold text-amber-700 mb-1">Warnings / Review Items</div>
+            <ul class="list-disc pl-5 text-sm text-amber-700">
+              ${result.warnings.map(w => `<li>${escapeHtml(w)}</li>`).join("")}
+            </ul>
+          </div>` : ""}
+      `;
+
+      document.getElementById("routeResult").innerHTML = html;
+    }
+
+    function saveCase() {
+      const data = getCaseData();
+      localStorage.setItem("fundingTierDealRouterCase", JSON.stringify(data));
+      alert("Case saved locally.");
+    }
+
+    function loadCase() {
+      const raw = localStorage.getItem("fundingTierDealRouterCase");
+      if (!raw) {
+        alert("No saved case found.");
+        return;
+      }
+      const data = JSON.parse(raw);
+
+      document.getElementById("firstName").value = data.firstName || "";
+      document.getElementById("lastName").value = data.lastName || "";
+      document.getElementById("phone").value = data.phone || "";
+      document.getElementById("email").value = data.email || "";
+      document.getElementById("state").value = data.state || "";
+      document.getElementById("incomeStatus").value = data.incomeStatus || "";
+      document.getElementById("monthlyIncome").value = data.monthlyIncome || "";
+      document.getElementById("affordablePayment").value = data.affordablePayment || "";
+      document.getElementById("makingPayments").value = data.makingPayments || "";
+      document.getElementById("bankruptcy").value = data.bankruptcy || "";
+      document.getElementById("lawsuit").value = data.lawsuit || "";
+      document.getElementById("enrolled").value = data.enrolled || "";
+      document.getElementById("notes").value = data.notes || "";
+
+      document.getElementById("creditorTableBody").innerHTML = "";
+      (data.creditors || []).forEach(c => addCreditorRow(c));
+      updateMetrics();
+      runRouting();
+      alert("Saved case loaded.");
+    }
+
+    function clearCase() {
+      if (!confirm("Clear the current case?")) return;
+      document.getElementById("firstName").value = "";
+      document.getElementById("lastName").value = "";
+      document.getElementById("phone").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("state").value = "";
+      document.getElementById("incomeStatus").value = "";
+      document.getElementById("monthlyIncome").value = "";
+      document.getElementById("affordablePayment").value = "";
+      document.getElementById("makingPayments").value = "";
+      document.getElementById("bankruptcy").value = "";
+      document.getElementById("lawsuit").value = "";
+      document.getElementById("enrolled").value = "";
+      document.getElementById("notes").value = "";
+      document.getElementById("creditorTableBody").innerHTML = "";
+      document.getElementById("routeResult").innerHTML = `<p class="subtle">Run the routing decision to see recommendations.</p>`;
+      addCreditorRow();
+      updateMetrics();
+    }
+
+    function importSampleCreditors() {
+      document.getElementById("creditorTableBody").innerHTML = "";
+      [
+        { name: "Discover", type: "Credit Card", amount: 12000, class: "Unsecured", status: "Open" },
+        { name: "Capital One", type: "Credit Card", amount: 6500, class: "Unsecured", status: "Open" },
+        { name: "Upstart", type: "Personal Loan", amount: 8400, class: "Unsecured", status: "Open" }
+      ].forEach(c => addCreditorRow(c));
+      updateMetrics();
+    }
+
+    function buildCSV(rows) {
+      return rows.map(row => row.map(val => {
+        const s = String(val ?? "");
+        return `"${s.replace(/"/g, '""')}"`;
+      }).join(",")).join("\n");
+    }
+
+    function downloadTextFile(filename, content, mime = "text/csv;charset=utf-8;") {
+      const blob = new Blob([content], { type: mime });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = 'DEBT SETTLEMENT - SAVINGS SCENARIO.pdf';
-      document.body.appendChild(a);
+      a.download = filename;
       a.click();
-      a.remove();
       URL.revokeObjectURL(url);
     }
 
-    async function sendProspectEmail() {
-      const email = el('prospectEmail').value.trim();
-      if (!email) {
-        alert('Enter a prospect email first.');
+    function exportCreditorsCSV() {
+      const creditors = getCreditorRows();
+      if (!creditors.length) {
+        alert("No creditor entries to export.");
         return;
       }
-
-      const blob = await generatePdfBlob();
-      if (!blob) {
-        alert('Complete the scenario first.');
-        return;
-      }
-
-      const arrayBuffer = await blob.arrayBuffer();
-      const bytes = new Uint8Array(arrayBuffer);
-      let binary = '';
-      for (let i = 0; i < bytes.length; i += 1) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      const pdfBase64 = btoa(binary);
-
-      const btn = el('sendEmailBtn');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Sending...';
-
-      try {
-        const res = await fetch(EMAIL_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: email,
-            subject: EMAIL_SUBJECT,
-            text: EMAIL_BODY,
-            filename: 'DEBT SETTLEMENT - SAVINGS SCENARIO.pdf',
-            pdfBase64
-          })
-        });
-
-        const raw = await res.text();
-
-        let data;
-        try {
-          data = JSON.parse(raw);
-        } catch {
-          throw new Error(raw || 'Server returned a non-JSON response.');
-        }
-
-        if (!res.ok) {
-          const errorMessage =
-            typeof data?.error === 'string'
-              ? data.error
-              : data?.error?.message || data?.details || JSON.stringify(data);
-          throw new Error(errorMessage);
-        }
-
-        alert('Email sent successfully.');
-      } catch (err) {
-        alert(err.message || 'Failed to send email.');
-        console.error('Send email error:', err);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
+      const rows = [
+        ["Creditor Name", "Debt Type", "Amount", "Class", "Status"]
+      ];
+      creditors.forEach(c => rows.push([c.name, c.type, c.amount, c.class, c.status]));
+      downloadTextFile("creditor-entries.csv", buildCSV(rows));
     }
 
-    function initStateSelect() {
-      el('state').innerHTML =
-        '<option value="">Select state</option>' +
-        STATES.map(([abbr, name]) => `<option value="${escapeHtml(abbr)}" title="${escapeHtml(name)}">${escapeHtml(abbr)}</option>`).join('');
+    function downloadFullDatabaseCSV() {
+      const rows = [["Creditor Name", "Category", "Class", "Program Notes"]];
+      CREDITOR_DB.forEach(c => rows.push([c.name, c.category, c.class, c.notes]));
+      downloadTextFile("internal-creditor-classification-database.csv", buildCSV(rows));
+    }
 
-      el('state').addEventListener('change', (e) => {
-        state.selectedState = e.target.value;
-        render();
+    function renderCreditorDatabaseSearch() {
+      const q = document.getElementById("dbSearch").value.trim().toLowerCase();
+      const results = CREDITOR_DB.filter(c => {
+        const combined = `${c.name} ${c.category} ${c.class} ${c.notes}`.toLowerCase();
+        return !q || combined.includes(q);
       });
+
+      const tbody = document.getElementById("dbResults");
+      tbody.innerHTML = results.map(c => `
+        <tr>
+          <td>${escapeHtml(c.name)}</td>
+          <td>${escapeHtml(c.category)}</td>
+          <td>${escapeHtml(c.class)}</td>
+          <td>${escapeHtml(c.notes)}</td>
+        </tr>
+      `).join("") || `
+        <tr><td colspan="4" class="subtle">No matches found.</td></tr>
+      `;
     }
 
-    function initActionButtons() {
-      el('pdfBtn').addEventListener('click', buildPdf);
-      el('sendEmailBtn').addEventListener('click', sendProspectEmail);
+    async function downloadPDF() {
+      const data = getCaseData();
+      const result = routeDecision(data);
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      let y = 15;
+      const line = (text, size = 11, gap = 7) => {
+        doc.setFontSize(size);
+        const split = doc.splitTextToSize(String(text), 180);
+        doc.text(split, 15, y);
+        y += split.length * gap;
+        if (y > 270) {
+          doc.addPage();
+          y = 15;
+        }
+      };
+
+      doc.setFontSize(18);
+      doc.text("Funding Tier AI - Deal Router Summary", 15, y);
+      y += 10;
+
+      line(`Client: ${data.firstName} ${data.lastName}`, 11);
+      line(`Phone: ${data.phone} | Email: ${data.email}`, 11);
+      line(`State: ${data.state}`, 11);
+      line(`Income Status: ${data.incomeStatus}`, 11);
+      line(`Monthly Income: ${money(data.monthlyIncome)}`, 11);
+      line(`Affordable Payment: ${money(data.affordablePayment)}`, 11);
+      line(`Making Payments: ${data.makingPayments}`, 11);
+      line(`Bankruptcy: ${data.bankruptcy} | Lawsuit: ${data.lawsuit} | Enrolled: ${data.enrolled}`, 11);
+
+      y += 4;
+      line(`Routing Recommendation: ${result.recommended}`, 13);
+      line(`Decision Type: ${result.decisionType}`, 11);
+      line(`Total Debt: ${money(result.totalDebt)}`, 11);
+      line(`Qualifying Unsecured Debt: ${money(result.unsecured)}`, 11);
+      line(`Discover Percentage: ${result.discoverPct.toFixed(1)}%`, 11);
+
+      y += 4;
+      line("Creditor Entries:", 13);
+      data.creditors.forEach((c, idx) => {
+        line(`${idx + 1}. ${c.name} | ${c.type} | ${money(c.amount)} | ${c.class} | ${c.status}`, 10, 6);
+      });
+
+      if (result.reasons.length) {
+        y += 4;
+        line("Blocking Issues:", 13);
+        result.reasons.forEach(r => line(`- ${r}`, 10, 6));
+      }
+
+      if (result.warnings.length) {
+        y += 4;
+        line("Warnings / Review Items:", 13);
+        result.warnings.forEach(w => line(`- ${w}`, 10, 6));
+      }
+
+      if (data.notes) {
+        y += 4;
+        line("Agent Notes:", 13);
+        line(data.notes, 10, 6);
+      }
+
+      doc.save("funding-tier-deal-router-summary.pdf");
     }
 
-    async function init() {
-      await loadCreditorDatabase();
-      initStateSelect();
-      initActionButtons();
-      renderRows();
-      render();
+    function init() {
+      populateStates();
+      addCreditorRow();
+      renderCreditorDatabaseSearch();
+      updateMetrics();
     }
 
-    init();
+    window.addEventListener("DOMContentLoaded", init);
   </script>
 </body>
 </html>
