@@ -50,6 +50,18 @@
     .small-label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; display: block; }
     .section-title { font-size: 20px; font-weight: 800; color: #0f172a; }
     .subtle { color: #64748b; }
+    .code-box {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 14px;
+      padding: 14px;
+      font-family: Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 420px;
+      overflow: auto;
+    }
   </style>
 </head>
 <body>
@@ -58,7 +70,7 @@
       <div class="card bg-gradient-to-r from-teal-700 to-slate-900 text-white p-6">
         <h1 class="text-3xl font-extrabold">Funding Tier AI - Deal Router</h1>
         <p class="mt-2 text-slate-200">
-          Internal routing tool for debt settlement intake, creditor classification, eligibility review, backend recommendation, and searchable creditor database.
+          Internal routing tool for debt settlement intake, creditor classification, eligibility review, backend recommendation, searchable creditor database, webhook test import, and PDF personalization prep.
         </p>
       </div>
     </div>
@@ -71,24 +83,40 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
+              <label class="small-label">Case ID</label>
+              <input id="caseId" class="input" type="text" placeholder="contact_id / opportunity_id / manual id" oninput="refreshPdfPreview()" />
+            </div>
+            <div>
               <label class="small-label">First Name</label>
-              <input id="firstName" class="input" type="text" placeholder="John" />
+              <input id="firstName" class="input" type="text" placeholder="John" oninput="refreshPdfPreview()" />
             </div>
             <div>
               <label class="small-label">Last Name</label>
-              <input id="lastName" class="input" type="text" placeholder="Doe" />
+              <input id="lastName" class="input" type="text" placeholder="Doe" oninput="refreshPdfPreview()" />
             </div>
             <div>
-              <label class="small-label">Phone</label>
-              <input id="phone" class="input" type="text" placeholder="(555) 555-5555" />
+              <label class="small-label">Cell Phone</label>
+              <input id="phone" class="input" type="text" placeholder="(555) 555-5555" oninput="refreshPdfPreview()" />
             </div>
             <div>
-              <label class="small-label">Email</label>
-              <input id="email" class="input" type="email" placeholder="example@email.com" />
+              <label class="small-label">Email Address</label>
+              <input id="email" class="input" type="email" placeholder="example@email.com" oninput="refreshPdfPreview()" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="small-label">Street Address</label>
+              <input id="streetAddress" class="input" type="text" placeholder="123 Main St" oninput="refreshPdfPreview()" />
+            </div>
+            <div>
+              <label class="small-label">City</label>
+              <input id="city" class="input" type="text" placeholder="San Diego" oninput="refreshPdfPreview()" />
             </div>
             <div>
               <label class="small-label">State</label>
-              <select id="state"></select>
+              <select id="state" onchange="refreshPdfPreview()"></select>
+            </div>
+            <div>
+              <label class="small-label">ZIP</label>
+              <input id="zip" class="input" type="text" placeholder="92101" oninput="refreshPdfPreview()" />
             </div>
             <div>
               <label class="small-label">Employment / Income Status</label>
@@ -147,7 +175,7 @@
 
           <div class="mt-5">
             <label class="small-label">Internal Notes</label>
-            <textarea id="notes" rows="3" placeholder="Agent notes, call summary, objections, special flags, etc."></textarea>
+            <textarea id="notes" rows="3" placeholder="Agent notes, call summary, objections, special flags, etc." oninput="refreshPdfPreview()"></textarea>
           </div>
         </div>
 
@@ -202,6 +230,14 @@
             </table>
           </div>
         </div>
+
+        <div class="card bg-white p-5">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <h2 class="section-title">PDF Personalization Preview</h2>
+            <button class="btn bg-amber-500 text-slate-900" onclick="refreshPdfPreview()">Refresh Preview</button>
+          </div>
+          <div id="pdfPreview" class="code-box">Run "Refresh Preview" to generate personalization data.</div>
+        </div>
       </div>
 
       <!-- RIGHT COLUMN -->
@@ -214,6 +250,15 @@
             <button class="btn w-full bg-indigo-600 text-white" onclick="loadCase()">Load Saved Case</button>
             <button class="btn w-full bg-rose-600 text-white" onclick="clearCase()">Clear Case</button>
             <button class="btn w-full bg-amber-500 text-slate-900" onclick="downloadPDF()">Download PDF Summary</button>
+          </div>
+        </div>
+
+        <div class="card bg-white p-5">
+          <h2 class="section-title mb-4">Webhook / GHL JSON Import</h2>
+          <div class="space-y-3">
+            <textarea id="webhookJson" rows="10" class="input" placeholder='Paste webhook JSON here'></textarea>
+            <button class="btn w-full bg-blue-600 text-white" onclick="importWebhookJson()">Import Webhook JSON</button>
+            <div id="webhookStatus" class="text-sm subtle">Paste a payload to test client mapping, creditor population, and PDF data.</div>
           </div>
         </div>
 
@@ -265,7 +310,7 @@
     ];
 
     const NON_SERVICEABLE_LEVEL = ["AK","OR","RI","VT","WV"];
-    const CONSUMER_SHIELD_NON_SERVICEABLE = []; // fill later if needed
+    const CONSUMER_SHIELD_NON_SERVICEABLE = [];
     const DEFAULT_MIN_PAYMENT = 225;
     const DISCOVER_LIMIT_PCT = 60;
 
@@ -333,6 +378,12 @@
       }[s]));
     }
 
+    function toAmount(value) {
+      const cleaned = String(value ?? "").replace(/\$/g, "").replace(/,/g, "").trim();
+      const num = Number(cleaned);
+      return Number.isFinite(num) ? num : 0;
+    }
+
     function findCreditorMatch(name) {
       const n = String(name || "").trim().toLowerCase();
       if (!n) return null;
@@ -369,14 +420,14 @@
             ].map(opt => `<option ${data.type === opt ? "selected" : ""}>${opt || "Select"}</option>`).join("")}
           </select>
         </td>
-        <td><input class="input creditor-amount" type="number" min="0" value="${escapeHtml(data.amount || "")}" placeholder="0" oninput="updateMetrics()" /></td>
+        <td><input class="input creditor-amount" type="number" min="0" value="${escapeHtml(data.amount || "")}" placeholder="0" oninput="updateMetrics(); refreshPdfPreview();" /></td>
         <td>
-          <select class="input creditor-class" onchange="updateMetrics()">
+          <select class="input creditor-class" onchange="updateMetrics(); refreshPdfPreview();">
             ${["Unknown","Unsecured","Secured","Conditional","Generally Excluded"].map(opt => `<option ${data.class === opt ? "selected" : ""}>${opt}</option>`).join("")}
           </select>
         </td>
         <td>
-          <select class="input creditor-status">
+          <select class="input creditor-status" onchange="refreshPdfPreview()">
             ${["Open","Charged Off","Collections","Closed","Unknown"].map(opt => `<option ${data.status === opt ? "selected" : ""}>${opt}</option>`).join("")}
           </select>
         </td>
@@ -387,11 +438,13 @@
       tbody.appendChild(tr);
       autoClassifyRow(tr.querySelector(".creditor-name"));
       updateMetrics();
+      refreshPdfPreview();
     }
 
     function removeCreditorRow(btn) {
       btn.closest("tr").remove();
       updateMetrics();
+      refreshPdfPreview();
     }
 
     function autoClassifyRow(input) {
@@ -405,6 +458,7 @@
         ? `<span class="pill bg-emerald-100 text-emerald-700">${escapeHtml(match.name)}</span>`
         : `<span class="pill bg-slate-100 text-slate-600">No exact match</span>`;
       updateMetrics();
+      refreshPdfPreview();
     }
 
     function getCreditorRows() {
@@ -442,11 +496,15 @@
 
     function getCaseData() {
       return {
+        caseId: document.getElementById("caseId").value.trim(),
         firstName: document.getElementById("firstName").value.trim(),
         lastName: document.getElementById("lastName").value.trim(),
         phone: document.getElementById("phone").value.trim(),
         email: document.getElementById("email").value.trim(),
+        streetAddress: document.getElementById("streetAddress").value.trim(),
+        city: document.getElementById("city").value.trim(),
         state: document.getElementById("state").value,
+        zip: document.getElementById("zip").value.trim(),
         incomeStatus: document.getElementById("incomeStatus").value,
         monthlyIncome: Number(document.getElementById("monthlyIncome").value || 0),
         affordablePayment: Number(document.getElementById("affordablePayment").value || 0),
@@ -457,6 +515,143 @@
         notes: document.getElementById("notes").value.trim(),
         creditors: getCreditorRows()
       };
+    }
+
+    function buildPdfPersonalizationData(data) {
+      const fullName = `${data.firstName || ""} ${data.lastName || ""}`.trim();
+      const fullAddress = [
+        data.streetAddress || "",
+        `${data.city || ""}, ${data.state || ""} ${data.zip || ""}`.trim()
+      ].filter(Boolean).join(", ");
+
+      return {
+        caseId: data.caseId || "",
+        firstName: data.firstName || "",
+        lastName: data.lastName || "",
+        fullName,
+        email: data.email || "",
+        cellPhone: data.phone || "",
+        streetAddress: data.streetAddress || "",
+        city: data.city || "",
+        state: data.state || "",
+        zip: data.zip || "",
+        fullAddress,
+        notes: data.notes || "",
+        totalCreditors: data.creditors.length,
+        creditors: data.creditors.map((c, index) => ({
+          lineNumber: index + 1,
+          creditorName: c.name || "",
+          creditorType: c.type || "",
+          creditorBalance: c.amount || 0,
+          creditorClassification: c.class || "",
+          creditorStatus: c.status || ""
+        }))
+      };
+    }
+
+    function refreshPdfPreview() {
+      const data = getCaseData();
+      const payload = buildPdfPersonalizationData(data);
+      document.getElementById("pdfPreview").textContent = JSON.stringify(payload, null, 2);
+    }
+
+    function parseCreditorsFromPayload(payload) {
+      const creditors = [];
+
+      for (let i = 1; i <= 20; i++) {
+        const name =
+          payload[`creditor_${i}_name`] ||
+          payload[`creditor${i}_name`] ||
+          payload[`creditor_name_${i}`] ||
+          "";
+
+        const type =
+          payload[`creditor_${i}_type`] ||
+          payload[`creditor${i}_type`] ||
+          payload[`creditor_type_${i}`] ||
+          "Other";
+
+        const amount =
+          payload[`creditor_${i}_balance`] ||
+          payload[`creditor_${i}_amount`] ||
+          payload[`creditor${i}_balance`] ||
+          payload[`creditor${i}_amount`] ||
+          payload[`creditor_balance_${i}`] ||
+          payload[`creditor_amount_${i}`] ||
+          0;
+
+        const status =
+          payload[`creditor_${i}_status`] ||
+          payload[`creditor${i}_status`] ||
+          payload[`creditor_status_${i}`] ||
+          "Open";
+
+        if (String(name || "").trim()) {
+          creditors.push({
+            name: String(name).trim(),
+            type: String(type || "Other").trim(),
+            amount: toAmount(amount),
+            class: classifyDebtType(String(type || ""), String(name || "")),
+            status: String(status || "Open").trim()
+          });
+        }
+      }
+
+      if (Array.isArray(payload.creditors)) {
+        payload.creditors.forEach(c => {
+          if (!c || !c.name) return;
+          creditors.push({
+            name: String(c.name || "").trim(),
+            type: String(c.type || "Other").trim(),
+            amount: toAmount(c.amount || c.balance),
+            class: classifyDebtType(String(c.type || ""), String(c.name || "")),
+            status: String(c.status || "Open").trim()
+          });
+        });
+      }
+
+      return creditors;
+    }
+
+    function importWebhookJson() {
+      const raw = document.getElementById("webhookJson").value.trim();
+      const statusEl = document.getElementById("webhookStatus");
+
+      if (!raw) {
+        statusEl.textContent = "Paste a JSON payload first.";
+        return;
+      }
+
+      try {
+        const payload = JSON.parse(raw);
+
+        document.getElementById("caseId").value =
+          payload.case_id ||
+          payload.contact_id ||
+          payload.opportunity_id ||
+          "";
+
+        document.getElementById("firstName").value = payload.first_name || payload.firstName || "";
+        document.getElementById("lastName").value = payload.last_name || payload.lastName || "";
+        document.getElementById("phone").value = payload.phone || payload.cell_phone || payload.mobile_phone || "";
+        document.getElementById("email").value = payload.email || "";
+        document.getElementById("streetAddress").value = payload.address1 || payload.street_address || payload.streetAddress || "";
+        document.getElementById("city").value = payload.city || "";
+        document.getElementById("state").value = payload.state || "";
+        document.getElementById("zip").value = payload.postal_code || payload.zip || payload.zip_code || "";
+        document.getElementById("notes").value = payload.notes || payload.internal_notes || "";
+
+        const creditors = parseCreditorsFromPayload(payload);
+        document.getElementById("creditorTableBody").innerHTML = "";
+        creditors.forEach(c => addCreditorRow(c));
+        if (!creditors.length) addCreditorRow();
+
+        updateMetrics();
+        refreshPdfPreview();
+        statusEl.textContent = `Webhook imported successfully. Loaded ${creditors.length} creditor(s).`;
+      } catch (e) {
+        statusEl.textContent = "Invalid JSON payload. Fix the formatting and try again.";
+      }
     }
 
     function routeDecision(data) {
@@ -536,6 +731,8 @@
         </div>
         <div class="text-lg font-extrabold text-slate-900">${escapeHtml(result.recommended)}</div>
         <div class="text-sm text-slate-700 space-y-1">
+          <div><strong>Case ID:</strong> ${escapeHtml(data.caseId || "-")}</div>
+          <div><strong>Client:</strong> ${escapeHtml(`${data.firstName} ${data.lastName}`.trim() || "-")}</div>
           <div><strong>Total Debt:</strong> ${money(result.totalDebt)}</div>
           <div><strong>Qualifying Unsecured Debt:</strong> ${money(result.unsecured)}</div>
           <div><strong>Discover %:</strong> ${result.discoverPct.toFixed(1)}%</div>
@@ -575,13 +772,18 @@
         alert("No saved case found.");
         return;
       }
+
       const data = JSON.parse(raw);
 
+      document.getElementById("caseId").value = data.caseId || "";
       document.getElementById("firstName").value = data.firstName || "";
       document.getElementById("lastName").value = data.lastName || "";
       document.getElementById("phone").value = data.phone || "";
       document.getElementById("email").value = data.email || "";
+      document.getElementById("streetAddress").value = data.streetAddress || "";
+      document.getElementById("city").value = data.city || "";
       document.getElementById("state").value = data.state || "";
+      document.getElementById("zip").value = data.zip || "";
       document.getElementById("incomeStatus").value = data.incomeStatus || "";
       document.getElementById("monthlyIncome").value = data.monthlyIncome || "";
       document.getElementById("affordablePayment").value = data.affordablePayment || "";
@@ -593,18 +795,26 @@
 
       document.getElementById("creditorTableBody").innerHTML = "";
       (data.creditors || []).forEach(c => addCreditorRow(c));
+      if (!(data.creditors || []).length) addCreditorRow();
+
       updateMetrics();
+      refreshPdfPreview();
       runRouting();
       alert("Saved case loaded.");
     }
 
     function clearCase() {
       if (!confirm("Clear the current case?")) return;
+
+      document.getElementById("caseId").value = "";
       document.getElementById("firstName").value = "";
       document.getElementById("lastName").value = "";
       document.getElementById("phone").value = "";
       document.getElementById("email").value = "";
+      document.getElementById("streetAddress").value = "";
+      document.getElementById("city").value = "";
       document.getElementById("state").value = "";
+      document.getElementById("zip").value = "";
       document.getElementById("incomeStatus").value = "";
       document.getElementById("monthlyIncome").value = "";
       document.getElementById("affordablePayment").value = "";
@@ -613,8 +823,11 @@
       document.getElementById("lawsuit").value = "";
       document.getElementById("enrolled").value = "";
       document.getElementById("notes").value = "";
+      document.getElementById("webhookJson").value = "";
+      document.getElementById("webhookStatus").textContent = "Paste a payload to test client mapping, creditor population, and PDF data.";
       document.getElementById("creditorTableBody").innerHTML = "";
       document.getElementById("routeResult").innerHTML = `<p class="subtle">Run the routing decision to see recommendations.</p>`;
+      document.getElementById("pdfPreview").textContent = 'Run "Refresh Preview" to generate personalization data.';
       addCreditorRow();
       updateMetrics();
     }
@@ -627,6 +840,7 @@
         { name: "Upstart", type: "Personal Loan", amount: 8400, class: "Unsecured", status: "Open" }
       ].forEach(c => addCreditorRow(c));
       updateMetrics();
+      refreshPdfPreview();
     }
 
     function buildCSV(rows) {
@@ -652,9 +866,7 @@
         alert("No creditor entries to export.");
         return;
       }
-      const rows = [
-        ["Creditor Name", "Debt Type", "Amount", "Class", "Status"]
-      ];
+      const rows = [["Creditor Name", "Debt Type", "Amount", "Class", "Status"]];
       creditors.forEach(c => rows.push([c.name, c.type, c.amount, c.class, c.status]));
       downloadTextFile("creditor-entries.csv", buildCSV(rows));
     }
@@ -688,6 +900,7 @@
     async function downloadPDF() {
       const data = getCaseData();
       const result = routeDecision(data);
+      const pdfFields = buildPdfPersonalizationData(data);
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
@@ -707,9 +920,10 @@
       doc.text("Funding Tier AI - Deal Router Summary", 15, y);
       y += 10;
 
-      line(`Client: ${data.firstName} ${data.lastName}`, 11);
+      line(`Case ID: ${data.caseId || "-"}`, 11);
+      line(`Client: ${pdfFields.fullName || "-"}`, 11);
       line(`Phone: ${data.phone} | Email: ${data.email}`, 11);
-      line(`State: ${data.state}`, 11);
+      line(`Address: ${pdfFields.fullAddress || "-"}`, 11);
       line(`Income Status: ${data.incomeStatus}`, 11);
       line(`Monthly Income: ${money(data.monthlyIncome)}`, 11);
       line(`Affordable Payment: ${money(data.affordablePayment)}`, 11);
@@ -755,6 +969,7 @@
       addCreditorRow();
       renderCreditorDatabaseSearch();
       updateMetrics();
+      refreshPdfPreview();
     }
 
     window.addEventListener("DOMContentLoaded", init);
