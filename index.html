@@ -1274,12 +1274,22 @@ function bindCreditorResultClicks() {
       throw new Error(data.error || 'Failed to generate plan.');
     }
 
-    alert(`Success.
+const resultBox = el('planResultBox');
+const planLink = el('planResultLink');
+const pdfLink = el('pdfResultLink');
 
-Plan URL:
-${data.pageUrl}
+if (resultBox && planLink && pdfLink) {
+  planLink.href = data.pageUrl;
+  planLink.textContent = 'Open Personalized Plan';
 
-PDF URL:
+  pdfLink.href = data.pdfUrl;
+  pdfLink.textContent = 'Open PDF';
+
+  resultBox.style.display = 'block';
+  resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+} else {
+  console.warn('planResultBox / links not found in DOM');
+}
 ${data.pdfUrl}`);
   } catch (err) {
     alert(err.message || 'Failed to generate plan.');
