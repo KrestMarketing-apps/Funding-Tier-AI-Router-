@@ -324,6 +324,42 @@
     const getCreditorDisplayName = (row) =>
       row.creditorName === 'Other / Manual Entry' ? (row.manualName || 'Manual Creditor') : (row.creditorName || '');
 
+    function mapCreditorToDebtType(item) {
+  const productType = String(item?.product_type || '').toLowerCase();
+  const classification = String(item?.classification || '').toLowerCase();
+  const group = String(item?.creditor_group || '').toLowerCase();
+  const secured = !!item?.secured;
+
+  if (secured || classification.includes('secured')) return 'Mortgage';
+
+  if (productType.includes('credit card')) return 'Unsecured Credit Card';
+  if (productType.includes('personal loan')) return 'Unsecured Personal Loan';
+  if (productType.includes('line of credit')) return 'Unsecured Line of Credit';
+  if (productType.includes('medical')) return 'Medical Bill';
+  if (productType.includes('student')) return 'Private Student Loan';
+  if (productType.includes('rent')) return 'Back Rent';
+  if (productType.includes('business')) return 'Business Debt';
+  if (group.includes('repo') || productType.includes('deficiency')) return 'Repossession Deficiency';
+
+  return 'Unsecured Credit Card';
+}
+
+function escapeHtml(value = '') {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function hideAllCreditorResults() {
+  document.querySelectorAll('.creditor-results').forEach((box) => {
+    box.innerHTML = '';
+    box.classList.add('hidden');
+  });
+}
+    
     function getLevelStateStatus(code) {
       if (!code) return { status: 'UNKNOWN', label: 'Unknown' };
       if (LEVEL_BLACKOUT_STATES.has(code)) return { status: 'BLACKOUT', label: 'Black Out' };
