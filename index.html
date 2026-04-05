@@ -3,976 +3,1043 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Funding Tier AI - Deal Router</title>
+  <title>Funding Tier AI - Debt Resolution Estimator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body { font-family: Arial, Helvetica, sans-serif; background: #f8fafc; }
-    .card { border-radius: 18px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08); }
-    .input, select, textarea {
+    body { font-family: Arial, Helvetica, sans-serif; }
+    .card { border-radius: 20px; box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08); }
+    .input, select {
       width: 100%;
       border: 1px solid #d1d5db;
-      border-radius: 12px;
-      padding: 12px 14px;
+      border-radius: 14px;
+      background: #fff;
+      padding: 10px 12px;
+      font-size: 14px;
       outline: none;
-      background: white;
     }
-    .input:focus, select:focus, textarea:focus {
-      border-color: #0f766e;
-      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    .input:focus, select:focus, .conditions-select:focus {
+      border-color: #009688;
+      box-shadow: 0 0 0 3px rgba(0,150,136,0.12);
     }
-    .btn {
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-weight: 700;
-      transition: 0.2s ease;
+    .conditions-select {
+      height: 40px;
+      min-height: 40px;
+      max-height: 40px;
+      overflow-y: auto;
+      font-size: 12px;
+      padding: 6px 8px;
+      border-radius: 14px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      width: 100%;
     }
-    .btn:hover { transform: translateY(-1px); }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(90deg, rgba(255,255,255,0.97) 0%, rgba(239,250,248,0.97) 50%, rgba(255,255,255,0.97) 100%);
+      border-bottom: 1px solid rgba(0,150,136,0.14);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+    .brand-logo {
+      max-width: 170px;
+      max-height: 64px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    .sticky-stack { position: sticky; top: 94px; }
+    .teal-panel {
+      background: linear-gradient(135deg, rgba(0,150,136,0.11) 0%, rgba(0,150,136,0.04) 48%, rgba(255,255,255,1) 100%);
+    }
+    .provider-logo-wrap {
+      width: 80px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #d7eeeb;
+      border-radius: 10px;
+      background: #fff;
+      padding: 3px;
+      flex: 0 0 auto;
+    }
+    .provider-logo {
+      max-width: 72px;
+      max-height: 22px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
     .pill {
-      display: inline-block;
-      padding: 6px 10px;
       border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .plan-card {
+      border-radius: 20px;
+      border: 1px solid #d7eeeb;
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff 0%, #f5fbfa 100%);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .plan-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
+    }
+    .plan-chip {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 10px;
       font-size: 12px;
       font-weight: 700;
     }
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td {
-      text-align: left;
-      padding: 10px 12px;
-      border-bottom: 1px solid #e5e7eb;
+    .plan-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #64748b;
+    }
+    .plan-value {
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .mini-list { margin-top: 12px; display: grid; gap: 8px; }
+    .mini-list div { font-size: 14px; color: #334155; }
+    .diff-box {
+      border: 1px solid #bfe3dd;
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, #f7fcfb 0%, #eef9f7 100%);
+    }
+    .pricing-compare-table td, .pricing-compare-table th {
+      border: 1px solid #cbd5e1;
+      padding: 12px;
       vertical-align: top;
     }
-    th { background: #f1f5f9; font-size: 13px; }
-    .route-good { background: #dcfce7; color: #166534; }
-    .route-warn { background: #fef3c7; color: #92400e; }
-    .route-bad { background: #fee2e2; color: #991b1b; }
-    .small-label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; display: block; }
-    .section-title { font-size: 20px; font-weight: 800; color: #0f172a; }
-    .subtle { color: #64748b; }
-    .code-box {
-      background: #0f172a;
-      color: #e2e8f0;
+    .proposal-header {
+      background: linear-gradient(90deg, rgba(0,150,136,0.08), rgba(255,255,255,1));
+    }
+    .savings-glow {
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 0 24px rgba(0,150,136,0.10);
+    }
+    .unavailable-box {
+      margin-top: 16px;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #b91c1c;
       border-radius: 14px;
-      padding: 14px;
-      font-family: Menlo, Monaco, Consolas, monospace;
-      font-size: 12px;
-      white-space: pre-wrap;
-      word-break: break-word;
-      max-height: 420px;
-      overflow: auto;
+      padding: 12px 14px;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.45;
     }
   </style>
 </head>
-<body>
-  <div class="max-w-7xl mx-auto p-4 md:p-6">
-    <div class="mb-6">
-      <div class="card bg-gradient-to-r from-teal-700 to-slate-900 text-white p-6">
-        <h1 class="text-3xl font-extrabold">Funding Tier AI - Deal Router</h1>
-        <p class="mt-2 text-slate-200">
-          Internal routing tool for debt settlement intake, creditor classification, eligibility review, backend recommendation, searchable creditor database, webhook test import, and PDF personalization prep.
-        </p>
+<body class="min-h-screen bg-gradient-to-br from-teal-100 via-white to-slate-100 text-slate-900">
+  <header class="topbar">
+    <div class="mx-auto max-w-7xl px-4 py-4 md:px-6">
+      <div class="flex items-center gap-8 md:gap-[100px]">
+        <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf8e8df54a8b29097c4.png" alt="Funding Tier logo" class="brand-logo" />
+        <div class="text-[17px] font-bold tracking-tight text-black md:text-[22px]">AI DEBT RESOLUTION ESTIMATOR</div>
       </div>
     </div>
+  </header>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      <!-- LEFT COLUMN -->
-      <div class="xl:col-span-2 space-y-6">
-        <div class="card bg-white p-5">
-          <h2 class="section-title mb-4">Client Intake</h2>
+  <main class="mx-auto max-w-7xl space-y-8 p-4 md:p-6">
+    <section class="grid gap-6 xl:grid-cols-[70%,30%] items-start">
+      <div class="card bg-white p-6 teal-panel">
+        <h2 class="text-2xl font-semibold">Debt Scenario Inputs</h2>
+        <p class="mt-1 text-slate-600">Select the state and enter up to 5 debts to estimate program fit and create a prospect-facing comparison summary.</p>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="small-label">Case ID</label>
-              <input id="caseId" class="input" type="text" placeholder="contact_id / opportunity_id / manual id" oninput="refreshPdfPreview()" />
-            </div>
-            <div>
-              <label class="small-label">First Name</label>
-              <input id="firstName" class="input" type="text" placeholder="John" oninput="refreshPdfPreview()" />
-            </div>
-            <div>
-              <label class="small-label">Last Name</label>
-              <input id="lastName" class="input" type="text" placeholder="Doe" oninput="refreshPdfPreview()" />
-            </div>
-            <div>
-              <label class="small-label">Cell Phone</label>
-              <input id="phone" class="input" type="text" placeholder="(555) 555-5555" oninput="refreshPdfPreview()" />
-            </div>
-            <div>
-              <label class="small-label">Email Address</label>
-              <input id="email" class="input" type="email" placeholder="example@email.com" oninput="refreshPdfPreview()" />
-            </div>
-            <div class="md:col-span-2">
-              <label class="small-label">Street Address</label>
-              <input id="streetAddress" class="input" type="text" placeholder="123 Main St" oninput="refreshPdfPreview()" />
-            </div>
-            <div>
-              <label class="small-label">City</label>
-              <input id="city" class="input" type="text" placeholder="San Diego" oninput="refreshPdfPreview()" />
-            </div>
-            <div>
-              <label class="small-label">State</label>
-              <select id="state" onchange="refreshPdfPreview()"></select>
-            </div>
-            <div>
-              <label class="small-label">ZIP</label>
-              <input id="zip" class="input" type="text" placeholder="92101" oninput="refreshPdfPreview()" />
-            </div>
-            <div>
-              <label class="small-label">Employment / Income Status</label>
-              <select id="incomeStatus">
-                <option value="">Select</option>
-                <option>Employed Full Time</option>
-                <option>Employed Part Time</option>
-                <option>Self-Employed</option>
-                <option>Retired</option>
-                <option>SSI / Disability</option>
-                <option>Other Verifiable Income</option>
-                <option>No Income</option>
-              </select>
-            </div>
-            <div>
-              <label class="small-label">Monthly Gross Income</label>
-              <input id="monthlyIncome" class="input" type="number" min="0" placeholder="0" />
-            </div>
-            <div>
-              <label class="small-label">Estimated Affordable Program Payment</label>
-              <input id="affordablePayment" class="input" type="number" min="0" placeholder="225" />
-            </div>
-            <div>
-              <label class="small-label">Currently Making Payments?</label>
-              <select id="makingPayments">
-                <option value="">Select</option>
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-              </select>
-            </div>
-            <div>
-              <label class="small-label">In Bankruptcy?</label>
-              <select id="bankruptcy">
-                <option value="">Select</option>
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
-            <div>
-              <label class="small-label">Active Lawsuit?</label>
-              <select id="lawsuit">
-                <option value="">Select</option>
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
-            <div>
-              <label class="small-label">Already Enrolled in Debt Relief?</label>
-              <select id="enrolled">
-                <option value="">Select</option>
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
+        <div class="mt-5 grid gap-4 md:grid-cols-2">
+          <div>
+            <label class="block mb-2 text-sm font-medium">State</label>
+            <select id="state"></select>
           </div>
-
-          <div class="mt-5">
-            <label class="small-label">Internal Notes</label>
-            <textarea id="notes" rows="3" placeholder="Agent notes, call summary, objections, special flags, etc." oninput="refreshPdfPreview()"></textarea>
+          <div>
+            <label class="block mb-2 text-sm font-medium">Total Enrolled Debt</label>
+            <div id="totalDebt" class="rounded-xl border bg-white/80 px-4 py-3 text-lg font-semibold">$0</div>
           </div>
         </div>
 
-        <div class="card bg-white p-5">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-            <h2 class="section-title">Creditor Entries</h2>
-            <div class="flex flex-wrap gap-2">
-              <button class="btn bg-slate-800 text-white" onclick="addCreditorRow()">+ Add Creditor</button>
-              <button class="btn bg-blue-600 text-white" onclick="importSampleCreditors()">Load Sample Set</button>
-              <button class="btn bg-emerald-600 text-white" onclick="exportCreditorsCSV()">Export Creditors CSV</button>
-            </div>
+        <div class="mt-5 overflow-hidden rounded-2xl border border-teal-100 bg-white/80">
+          <div class="grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 bg-gradient-to-r from-teal-50 to-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
+            <div>Creditor Name</div>
+            <div>Debt Amount</div>
+            <div>Debt Type</div>
+            <div>Conditions</div>
           </div>
-
-          <div class="table-wrap">
-            <table id="creditorTable">
-              <thead>
-                <tr>
-                  <th style="min-width: 220px;">Creditor</th>
-                  <th style="min-width: 140px;">Debt Type</th>
-                  <th style="min-width: 130px;">Amount</th>
-                  <th style="min-width: 130px;">Class</th>
-                  <th style="min-width: 120px;">Status</th>
-                  <th style="min-width: 140px;">Search Match</th>
-                  <th style="min-width: 80px;">Action</th>
-                </tr>
-              </thead>
-              <tbody id="creditorTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card bg-white p-5">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-            <h2 class="section-title">Searchable Internal Creditor Database</h2>
-            <div class="flex flex-wrap gap-2">
-              <input id="dbSearch" class="input md:w-96" type="text" placeholder="Search creditor name, category, class..." oninput="renderCreditorDatabaseSearch()" />
-              <button class="btn bg-slate-700 text-white" onclick="downloadFullDatabaseCSV()">Download Full Database CSV</button>
-            </div>
-          </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Creditor Name</th>
-                  <th>Category</th>
-                  <th>Class</th>
-                  <th>Program Notes</th>
-                </tr>
-              </thead>
-              <tbody id="dbResults"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card bg-white p-5">
-          <div class="flex items-center justify-between gap-3 mb-4">
-            <h2 class="section-title">PDF Personalization Preview</h2>
-            <button class="btn bg-amber-500 text-slate-900" onclick="refreshPdfPreview()">Refresh Preview</button>
-          </div>
-          <div id="pdfPreview" class="code-box">Run "Refresh Preview" to generate personalization data.</div>
+          <div id="rows" class="space-y-2 p-3"></div>
         </div>
       </div>
 
-      <!-- RIGHT COLUMN -->
-      <div class="space-y-6">
-        <div class="card bg-white p-5">
-          <h2 class="section-title mb-4">Routing Controls</h2>
-          <div class="space-y-3">
-            <button class="btn w-full bg-teal-700 text-white" onclick="runRouting()">Run Routing Decision</button>
-            <button class="btn w-full bg-slate-800 text-white" onclick="saveCase()">Save Case Locally</button>
-            <button class="btn w-full bg-indigo-600 text-white" onclick="loadCase()">Load Saved Case</button>
-            <button class="btn w-full bg-rose-600 text-white" onclick="clearCase()">Clear Case</button>
-            <button class="btn w-full bg-amber-500 text-slate-900" onclick="downloadPDF()">Download PDF Summary</button>
+      <div class="sticky-stack space-y-4">
+        <div class="card bg-white p-5 teal-panel">
+          <h2 class="text-lg font-semibold">Recommendation Snapshot</h2>
+
+          <div class="mt-3 flex items-center gap-3">
+            <div id="providerLogoBox"></div>
+            <div id="topBadges" class="flex flex-wrap gap-2"></div>
           </div>
+
+          <div id="routeReason" class="mt-3 w-full rounded-xl bg-white/90 border border-teal-100 p-3 text-xs text-slate-700"></div>
+          <div id="providerAvailability" class="mt-3 grid gap-3"></div>
+          <div id="metricsGrid" class="mt-3 grid gap-2 md:grid-cols-2"></div>
+          <div id="flags" class="mt-3 space-y-2"></div>
         </div>
 
-        <div class="card bg-white p-5">
-          <h2 class="section-title mb-4">Webhook / GHL JSON Import</h2>
-          <div class="space-y-3">
-            <textarea id="webhookJson" rows="10" class="input" placeholder='Paste webhook JSON here'></textarea>
-            <button class="btn w-full bg-blue-600 text-white" onclick="importWebhookJson()">Import Webhook JSON</button>
-            <div id="webhookStatus" class="text-sm subtle">Paste a payload to test client mapping, creditor population, and PDF data.</div>
+        <div class="card bg-white p-4 teal-panel">
+          <div class="flex items-center justify-between gap-3">
+            <h2 class="text-base font-semibold">Prospect Delivery</h2>
+            <div class="text-xs text-slate-600">Send a personalized page link plus a PDF summary.</div>
           </div>
-        </div>
 
-        <div class="card bg-white p-5">
-          <h2 class="section-title mb-4">Case Metrics</h2>
-          <div class="space-y-2 text-sm">
-            <div class="flex justify-between"><span>Total Debt</span><strong id="metricTotalDebt">$0</strong></div>
-            <div class="flex justify-between"><span>Unsecured Debt</span><strong id="metricUnsecuredDebt">$0</strong></div>
-            <div class="flex justify-between"><span>Secured Debt</span><strong id="metricSecuredDebt">$0</strong></div>
-            <div class="flex justify-between"><span>Unknown Debt</span><strong id="metricUnknownDebt">$0</strong></div>
-            <div class="flex justify-between"><span>Discover % of Enrolled Debt</span><strong id="metricDiscoverPct">0%</strong></div>
-            <div class="flex justify-between"><span>Creditor Count</span><strong id="metricCreditorCount">0</strong></div>
+          <div class="mt-3 space-y-3">
+            <div>
+              <label class="block mb-2 text-sm font-medium">Prospect First Name</label>
+              <input id="prospectFirstName" class="input" type="text" placeholder="John" />
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-medium">Prospect Last Name</label>
+              <input id="prospectLastName" class="input" type="text" placeholder="Smith" />
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-medium">Prospect Email</label>
+              <input id="prospectEmail" class="input" type="email" placeholder="prospect@email.com" />
+            </div>
           </div>
-        </div>
 
-        <div class="card bg-white p-5">
-          <h2 class="section-title mb-4">Routing Result</h2>
-          <div id="routeResult" class="space-y-3 text-sm">
-            <p class="subtle">Run the routing decision to see recommendations.</p>
-          </div>
-        </div>
-
-        <div class="card bg-white p-5">
-          <h2 class="section-title mb-4">Backend Logic</h2>
-          <div class="text-sm text-slate-700 space-y-2">
-            <p><strong>Primary:</strong> Level Debt / Pinnacle model</p>
-            <p><strong>Fallback / exception:</strong> Consumer Shield</p>
-            <p><strong>Verify Debt Solutions:</strong> no longer used</p>
-            <p><strong>Main rules:</strong></p>
-            <ul class="list-disc pl-5 space-y-1">
-              <li>Must have serviceable state</li>
-              <li>Must not be in bankruptcy</li>
-              <li>Must not already be enrolled</li>
-              <li>Must have qualifying unsecured debt</li>
-              <li>Must have payment ability or income support</li>
-              <li>Discover concentration can force exception routing</li>
-            </ul>
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
+            <button id="pdfBtn" class="w-full rounded-xl py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-500 whitespace-nowrap">Download PDF</button>
+            <button id="sendEmailBtn" class="w-full rounded-xl py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-teal-700 to-teal-600">Generate + Send</button>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
+
+    <section class="card bg-white p-6 teal-panel">
+      <h2 class="text-2xl font-semibold">Program Comparison</h2>
+      <p class="mt-1 text-slate-600">Only currently available options are shown.</p>
+      <div id="pricingComparison" class="mt-6 grid gap-6 lg:grid-cols-2"></div>
+      <div id="pricingDifferences" class="mt-6"></div>
+    </section>
+
+    <section class="card bg-white overflow-hidden">
+      <div class="p-6 pb-0 proposal-header">
+        <h2 class="text-2xl font-semibold">Program Comparison vs Current Financial Situation</h2>
+        <p class="mt-1 text-slate-600">Designed to clearly show why continuing minimum-payment behavior is usually the most expensive long-term path.</p>
+      </div>
+      <div class="overflow-x-auto p-6">
+        <table class="w-full min-w-[1120px] border-collapse">
+          <thead>
+            <tr>
+              <th class="border-b bg-slate-100 px-4 py-4 text-left text-sm font-semibold text-slate-700">Detail</th>
+              <th class="border-b bg-red-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">Current Financial Situation</th>
+              <th class="border-b bg-white px-4 py-4 text-left text-sm font-semibold text-slate-900">Fastest Available Payoff</th>
+              <th class="border-b bg-emerald-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">Recommended Program<div class="mt-1 inline-flex rounded-full bg-teal-600 px-2 py-1 text-[11px] font-medium text-white">Best Option</div></th>
+            </tr>
+          </thead>
+          <tbody id="comparisonTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 
   <script>
-    const STATES = [
-      "", "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME",
-      "MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN",
-      "TX","UT","VA","VT","WA","WI","WV","WY","DC"
-    ];
+    const LOGO_URL = 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf8e8df54a8b29097c4.png';
+    const ROUTE_LOGOS = {
+      'CONSUMER SHIELD': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png',
+      'LEVEL': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp'
+    };
 
-    const NON_SERVICEABLE_LEVEL = ["AK","OR","RI","VT","WV"];
-    const CONSUMER_SHIELD_NON_SERVICEABLE = [];
-    const DEFAULT_MIN_PAYMENT = 225;
-    const DISCOVER_LIMIT_PCT = 60;
+    const STATE_NAMES = {
+      AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',GU:'Guam',PR:'Puerto Rico'
+    };
+    const STATES = Object.entries(STATE_NAMES);
 
-    const CREDITOR_DB = [
-      { name: "American Express", category: "Credit Card", class: "Unsecured", notes: "Standard unsecured revolving debt" },
-      { name: "Amex", category: "Credit Card", class: "Unsecured", notes: "Alias of American Express" },
-      { name: "Bank of America", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
-      { name: "Capital One", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
-      { name: "Chase", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
-      { name: "Citi", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
-      { name: "Citibank", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
-      { name: "Discover", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Track concentration; exception if >60%" },
-      { name: "Discover Card", category: "Credit Card", class: "Unsecured", notes: "Track concentration carefully" },
-      { name: "Wells Fargo", category: "Credit Card / Personal Loan", class: "Unsecured", notes: "Usually eligible if unsecured" },
-      { name: "Barclays", category: "Credit Card", class: "Unsecured", notes: "Standard unsecured" },
-      { name: "Synchrony", category: "Retail Card / Credit Card", class: "Unsecured", notes: "Usually retail or revolving" },
-      { name: "Comenity", category: "Retail Card", class: "Unsecured", notes: "Store card debt" },
-      { name: "Upgrade", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
-      { name: "Upstart", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
-      { name: "LendingClub", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
-      { name: "Prosper", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
-      { name: "Best Egg", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
-      { name: "Avant", category: "Personal Loan", class: "Unsecured", notes: "Unsecured installment" },
-      { name: "OneMain Financial", category: "Personal Loan", class: "Unknown", notes: "Can be secured or unsecured; verify structure" },
-      { name: "SoFi", category: "Personal Loan", class: "Unsecured", notes: "Usually unsecured personal loan" },
-      { name: "LightStream", category: "Personal Loan", class: "Unsecured", notes: "Usually unsecured personal loan" },
-      { name: "Navient", category: "Student Loan", class: "Generally Excluded", notes: "Student loans usually not standard debt settlement fit" },
-      { name: "Nelnet", category: "Student Loan", class: "Generally Excluded", notes: "Student loans usually excluded" },
-      { name: "MOHELA", category: "Student Loan", class: "Generally Excluded", notes: "Student loans usually excluded" },
-      { name: "FedLoan", category: "Student Loan", class: "Generally Excluded", notes: "Student loans usually excluded" },
-      { name: "Affirm", category: "Consumer Financing", class: "Unsecured", notes: "Often unsecured consumer financing" },
-      { name: "Klarna", category: "Consumer Financing", class: "Unsecured", notes: "Often unsecured consumer financing" },
-      { name: "Afterpay", category: "Consumer Financing", class: "Unsecured", notes: "Often unsecured consumer financing" },
-      { name: "PayPal Credit", category: "Consumer Financing", class: "Unsecured", notes: "Usually unsecured" },
-      { name: "CareCredit", category: "Medical Financing", class: "Unsecured", notes: "Often unsecured medical financing" },
-      { name: "Medical Bill", category: "Medical", class: "Unsecured", notes: "Can be accepted depending on backend" },
-      { name: "Collection Agency", category: "Collection", class: "Unsecured", notes: "Usually unsecured if tied to unsecured account" },
-      { name: "Portfolio Recovery", category: "Collection", class: "Unsecured", notes: "Collection debt; verify underlying account" },
-      { name: "Midland Credit", category: "Collection", class: "Unsecured", notes: "Collection debt; verify underlying account" },
-      { name: "LVNV Funding", category: "Collection", class: "Unsecured", notes: "Collection debt; verify underlying account" },
-      { name: "Back Rent", category: "Rent", class: "Conditional", notes: "Can be limited share depending on backend rules" },
-      { name: "Repossessed Auto Deficiency", category: "Auto Deficiency", class: "Unsecured", notes: "Post-repo deficiency often unsecured" },
-      { name: "Auto Loan", category: "Vehicle Loan", class: "Secured", notes: "Active vehicle loan is secured" },
-      { name: "Mortgage", category: "Mortgage", class: "Secured", notes: "Secured real estate debt" },
-      { name: "HELOC", category: "Home Equity", class: "Secured", notes: "Secured by home" },
-      { name: "IRS", category: "Tax Debt", class: "Generally Excluded", notes: "Tax debt generally excluded" },
-      { name: "State Tax", category: "Tax Debt", class: "Generally Excluded", notes: "Tax debt generally excluded" },
-      { name: "Title Loan", category: "Title Loan", class: "Secured", notes: "Secured by vehicle title" },
-      { name: "Payday Loan", category: "Short-Term Loan", class: "Unsecured", notes: "Usually unsecured" }
-    ];
+    const LEVEL_RED_STATES = new Set(['CT','GA','LA','MN','NV','NH','NJ','ND','OH','PA','TN','WA','WY']);
+    const LEVEL_GREEN_STATES = new Set(['AL','AZ','AR','CA','DC','FL','ID','IN','IA','KY','MD','MA','MI','MS','MO','NE','NM','NY','OK','TX','VA']);
+    const LEVEL_BLACKOUT_STATES = new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
 
-    function populateStates() {
-      const stateEl = document.getElementById("state");
-      stateEl.innerHTML = STATES.map(s => `<option value="${s}">${s || "Select"}</option>`).join("");
+    const CONSUMER_SHIELD_BLACKOUT_STATES = new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
+
+    const CREDITOR_OPTIONS = ['', 'American Express','Bank of America','Capital One','Chase','Citi','Discover','Wells Fargo','Synchrony','Upstart','LendingClub','OneMain Financial','SoFi','Avant','Best Egg','Klarna','Goodleap','Sunbit','RBC Bank','USAA','Republic Finance','Mariner Finance','Regional Finance','Lendmark','Navient','Other / Manual Entry'];
+    const DEBT_TYPES = ['Unsecured Credit Card','Unsecured Personal Loan','Payday Loan','Tribal Loan','Medical Bill','Back Rent','Private Student Loan','Business Debt','Repossession Deficiency','Apartment Back Rent (Collections)','Unsecured Line of Credit','Cell Phone Bill','Utility Bill','USAA','Deficiency','Auto Repo Deficiency','Peer-to-Peer Loan','Timeshare','Mortgage','Federal Student Loan','Navient Student Loan','Judgment','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','SBA Loan','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Other'];
+
+    const CONSUMER_SHIELD_REJECTED_TYPES = new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
+    const CONSUMER_SHIELD_CONDITIONAL_TYPES = new Set(['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt']);
+    const LEVEL_REJECTED_TYPES = new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt']);
+    const LEVEL_CONDITIONAL_CREDITORS = ['Lendmark','Mariner Finance','OneMain','Regional Finance','Republic Finance'];
+    const LEVEL_REJECTED_CREDITORS = ['ALLEVIATE TAX LLC','Acceptance Now','ACIMA','Advance Financial','AGCO FINANCE','STATE EMPLOYEE CREDIT UNION','STATEEMP','Aqua Finance','Bell Finance','BHG Financial','BHG Money','Bobs Discount Furniture','Bobs Finance','Bobs Furniture','Cornerstone Financial','CreditCentral','EMPOWER FCU','Enerbank','ESL Credit Union','Farmers Furniture','FRMRS FURN','Fort Worth Credit Union','Forth Worth CU','Fortera Credit Union','Garden Federal Credit Union','Golden One Credit Union','Goldman Sachs','GoodLeap','Hawaii CU','HC ROYA','HYCITE','Royal Prestige','Heights Financial','Island Finance','ISPC','Kabbage Loans','KIKOFF','Koalafi','Loan Pal','Local Government Federal Credit Union','Matco Tools Financing','Matco Fin','Military Star','Nebraska Furniture','Omni Loans','Opensky','PINNACLE FINANCIAL GROUP','Pioneer Loans','Popular Bank','Banco Popular','PowerPay','Preferred Loans','Quick Help Loans','Red River Credit','REDRIVERCR','REDSTONE Credit Union','RENT-A CENTER','RFFC FINANCIAL','Robinhood','Security Finance','STATE EMPLOYEES C U','Service Finance Company','SVCFIN','SRVFINCO','Snap On Credit','SOLAR MOSAIC','Southern Finance','Sunset Financial','Toledo Finance','Tower Loans','Unacceptable Creditors','West Creek Financial','WSECU','Yendo'];
+
+    const state = {
+      selectedState: '',
+      rows: Array.from({ length: 5 }, (_, i) => ({
+        id: i + 1,
+        creditorName: '',
+        manualName: '',
+        amount: '',
+        debtType: 'Unsecured Credit Card',
+        inCollections: false,
+        inLitigation: false,
+        isSecured: false,
+        paymentMade: true,
+        businessUnprofitable: false
+      }))
+    };
+
+    const el = (id) => document.getElementById(id);
+    const currency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
+
+    const numberOrZero = (value) => {
+      const n = parseFloat(String(value).replace(/[^0-9.]/g, ''));
+      return Number.isFinite(n) ? n : 0;
+    };
+
+    const normalizeCreditorName = (value) =>
+      String(value || '')
+        .toUpperCase()
+        .replace(/&/g, ' AND ')
+        .replace(/[^A-Z0-9 ]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const creditorMatches = (input, patterns) => {
+      const a = normalizeCreditorName(input);
+      if (!a) return false;
+      return patterns.some((p) => {
+        const b = normalizeCreditorName(p);
+        return a === b || a.includes(b) || b.includes(a);
+      });
+    };
+
+    const getCreditorDisplayName = (row) =>
+      row.creditorName === 'Other / Manual Entry' ? (row.manualName || 'Manual Creditor') : (row.creditorName || '');
+
+    function getLevelStateStatus(code) {
+      if (!code) return { status: 'UNKNOWN', label: 'Unknown' };
+      if (LEVEL_BLACKOUT_STATES.has(code)) return { status: 'BLACKOUT', label: 'Black Out' };
+      if (LEVEL_RED_STATES.has(code)) return { status: 'RED', label: 'Attorney Model' };
+      if (LEVEL_GREEN_STATES.has(code)) return { status: 'GREEN', label: 'Standard Model' };
+      return { status: 'BLACKOUT', label: 'Black Out' };
     }
 
-    function money(val) {
-      const n = Number(val || 0);
-      return n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+    function getConsumerShieldStateStatus(code) {
+      if (!code) return { status: 'UNKNOWN', label: 'Unknown' };
+      if (CONSUMER_SHIELD_BLACKOUT_STATES.has(code)) return { status: 'BLACKOUT', label: 'Black Out' };
+      return { status: 'GREEN', label: 'Serviceable' };
     }
 
-    function escapeHtml(str) {
-      return String(str ?? "").replace(/[&<>"']/g, s => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[s]));
+    function getLevelMaxTerm(debt) {
+      if (debt < 10000) return 24;
+      if (debt < 12500) return 30;
+      if (debt < 15000) return 36;
+      if (debt < 25000) return 42;
+      if (debt < 35000) return 48;
+      if (debt < 50000) return 54;
+      return 60;
     }
 
-    function toAmount(value) {
-      const cleaned = String(value ?? "").replace(/\$/g, "").replace(/,/g, "").trim();
-      const num = Number(cleaned);
-      return Number.isFinite(num) ? num : 0;
+    function getConsumerShieldProgramLength(totalDebt) {
+      if (totalDebt >= 4000 && totalDebt <= 4999) return 18;
+      if (totalDebt >= 5000 && totalDebt <= 8800) return 24;
+      if (totalDebt > 8800) return 36;
+      return 0;
     }
 
-    function findCreditorMatch(name) {
-      const n = String(name || "").trim().toLowerCase();
-      if (!n) return null;
-      return CREDITOR_DB.find(c => c.name.toLowerCase() === n) ||
-             CREDITOR_DB.find(c => n.includes(c.name.toLowerCase()) || c.name.toLowerCase().includes(n)) ||
-             null;
+    function getConsumerShieldProgramPayment(totalDebt) {
+      if (totalDebt >= 50000) return 620;
+      if (totalDebt >= 30000) return 520;
+      if (totalDebt >= 25000) return 420;
+      if (totalDebt >= 20000) return 370;
+      if (totalDebt >= 15000) return 320;
+      if (totalDebt >= 10000) return 270;
+      if (totalDebt >= 5500) return 220;
+      if (totalDebt >= 4000) return 220;
+      return 0;
     }
 
-    function classifyDebtType(type, name) {
-      const creditorMatch = findCreditorMatch(name);
-      if (creditorMatch) return creditorMatch.class;
-
-      const t = String(type || "").toLowerCase();
-      const nm = String(name || "").toLowerCase();
-
-      if (t.includes("credit") || t.includes("card") || t.includes("personal loan") || t.includes("collection") || t.includes("medical")) return "Unsecured";
-      if (t.includes("mortgage") || t.includes("heloc") || t.includes("auto") || t.includes("vehicle") || t.includes("title")) return "Secured";
-      if (t.includes("student") || t.includes("tax")) return "Generally Excluded";
-      if (nm.includes("discover")) return "Unsecured";
-      return "Unknown";
+    function calcDoNothing(totalDebt, apr = 0.24) {
+      const monthlyPayment = totalDebt * 0.025;
+      const monthlyRate = apr / 12;
+      if (totalDebt <= 0 || monthlyPayment <= totalDebt * monthlyRate) {
+        return { monthlyPayment: 0, totalDebt, monthsToPayoff: 0, apr, totalPayback: 0 };
+      }
+      const months = Math.max(
+        1,
+        Math.round(Math.log(monthlyPayment / (monthlyPayment - totalDebt * monthlyRate)) / Math.log(1 + monthlyRate))
+      );
+      return { monthlyPayment, totalDebt, monthsToPayoff: months, apr, totalPayback: monthlyPayment * months };
     }
 
-    function addCreditorRow(data = {}) {
-      const tbody = document.getElementById("creditorTableBody");
-      const tr = document.createElement("tr");
+    function collectFlags(rows, totalDebt, stateCode) {
+      const consumerShieldFlags = [];
+      const levelFlags = [];
 
-      tr.innerHTML = `
-        <td><input class="input creditor-name" type="text" value="${escapeHtml(data.name || "")}" placeholder="Creditor name" oninput="autoClassifyRow(this)" /></td>
-        <td>
-          <select class="input creditor-type" onchange="autoClassifyRow(this)">
-            ${[
-              "", "Credit Card", "Personal Loan", "Collection", "Medical", "Retail Card", "Consumer Financing",
-              "Student Loan", "Tax Debt", "Mortgage", "HELOC", "Auto Loan", "Title Loan", "Repossessed Auto Deficiency", "Back Rent", "Other"
-            ].map(opt => `<option ${data.type === opt ? "selected" : ""}>${opt || "Select"}</option>`).join("")}
-          </select>
-        </td>
-        <td><input class="input creditor-amount" type="number" min="0" value="${escapeHtml(data.amount || "")}" placeholder="0" oninput="updateMetrics(); refreshPdfPreview();" /></td>
-        <td>
-          <select class="input creditor-class" onchange="updateMetrics(); refreshPdfPreview();">
-            ${["Unknown","Unsecured","Secured","Conditional","Generally Excluded"].map(opt => `<option ${data.class === opt ? "selected" : ""}>${opt}</option>`).join("")}
-          </select>
-        </td>
-        <td>
-          <select class="input creditor-status" onchange="refreshPdfPreview()">
-            ${["Open","Charged Off","Collections","Closed","Unknown"].map(opt => `<option ${data.status === opt ? "selected" : ""}>${opt}</option>`).join("")}
-          </select>
-        </td>
-        <td class="search-match text-sm subtle">-</td>
-        <td><button class="btn bg-red-100 text-red-700 px-3 py-2" onclick="removeCreditorRow(this)">Remove</button></td>
-      `;
+      if (totalDebt > 0 && totalDebt < 4000) consumerShieldFlags.push('Consumer Shield requires at least $4,000 total enrolled debt.');
+      if (stateCode && getConsumerShieldStateStatus(stateCode).status === 'BLACKOUT') consumerShieldFlags.push('Consumer Shield does not service this state.');
+      if (totalDebt > 0 && totalDebt < 7000) levelFlags.push('Level Debt requires at least $7,000 total enrolled debt.');
 
-      tbody.appendChild(tr);
-      autoClassifyRow(tr.querySelector(".creditor-name"));
-      updateMetrics();
-      refreshPdfPreview();
-    }
+      rows.forEach((row) => {
+        const amount = numberOrZero(row.amount);
+        if (!amount) return;
+        const name = getCreditorDisplayName(row);
 
-    function removeCreditorRow(btn) {
-      btn.closest("tr").remove();
-      updateMetrics();
-      refreshPdfPreview();
-    }
+        if (amount < 100) consumerShieldFlags.push((name || row.debtType) + ' is below Consumer Shield minimum $100 per account.');
+        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) consumerShieldFlags.push(row.debtType + ' is not accepted by Consumer Shield.');
+        if (row.debtType === 'Apartment Back Rent (Collections)' && !row.inCollections) consumerShieldFlags.push('Apartment back rent is only accepted if in collections.');
+        if (row.debtType === 'USAA' && row.isSecured) consumerShieldFlags.push('USAA is only accepted when there is no other secured debt.');
 
-    function autoClassifyRow(input) {
-      const tr = input.closest("tr");
-      const name = tr.querySelector(".creditor-name").value;
-      const type = tr.querySelector(".creditor-type").value;
-      const match = findCreditorMatch(name);
-      const cls = match ? match.class : classifyDebtType(type, name);
-      tr.querySelector(".creditor-class").value = cls;
-      tr.querySelector(".search-match").innerHTML = match
-        ? `<span class="pill bg-emerald-100 text-emerald-700">${escapeHtml(match.name)}</span>`
-        : `<span class="pill bg-slate-100 text-slate-600">No exact match</span>`;
-      updateMetrics();
-      refreshPdfPreview();
-    }
-
-    function getCreditorRows() {
-      return [...document.querySelectorAll("#creditorTableBody tr")].map(tr => ({
-        name: tr.querySelector(".creditor-name").value.trim(),
-        type: tr.querySelector(".creditor-type").value,
-        amount: Number(tr.querySelector(".creditor-amount").value || 0),
-        class: tr.querySelector(".creditor-class").value,
-        status: tr.querySelector(".creditor-status").value
-      })).filter(r => r.name || r.amount > 0 || r.type);
-    }
-
-    function updateMetrics() {
-      const creditors = getCreditorRows();
-      let total = 0, unsecured = 0, secured = 0, unknown = 0, discover = 0;
-
-      creditors.forEach(c => {
-        total += c.amount;
-        if (c.class === "Unsecured") unsecured += c.amount;
-        else if (c.class === "Secured") secured += c.amount;
-        else if (c.class === "Unknown" || c.class === "Conditional" || c.class === "Generally Excluded") unknown += c.amount;
-
-        if (String(c.name).toLowerCase().includes("discover")) discover += c.amount;
+        if (LEVEL_REJECTED_TYPES.has(row.debtType)) levelFlags.push(row.debtType + ' is not accepted by Level Debt.');
+        if (amount < 200 && !row.inCollections) levelFlags.push((name || row.debtType) + ' must be at least $200 unless already in collections or charged off.');
+        if (!row.paymentMade) levelFlags.push((name || row.debtType) + ' must have at least one payment made before Level enrollment.');
+        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) levelFlags.push(name + ' is on the Level rejected creditor list.');
+        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) levelFlags.push(name + ' is secured. Level only allows this if the client agrees to lose the collateral.');
       });
 
-      const discoverPct = unsecured > 0 ? (discover / unsecured) * 100 : 0;
-
-      document.getElementById("metricTotalDebt").textContent = money(total);
-      document.getElementById("metricUnsecuredDebt").textContent = money(unsecured);
-      document.getElementById("metricSecuredDebt").textContent = money(secured);
-      document.getElementById("metricUnknownDebt").textContent = money(unknown);
-      document.getElementById("metricDiscoverPct").textContent = `${discoverPct.toFixed(1)}%`;
-      document.getElementById("metricCreditorCount").textContent = creditors.length;
-    }
-
-    function getCaseData() {
       return {
-        caseId: document.getElementById("caseId").value.trim(),
-        firstName: document.getElementById("firstName").value.trim(),
-        lastName: document.getElementById("lastName").value.trim(),
-        phone: document.getElementById("phone").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        streetAddress: document.getElementById("streetAddress").value.trim(),
-        city: document.getElementById("city").value.trim(),
-        state: document.getElementById("state").value,
-        zip: document.getElementById("zip").value.trim(),
-        incomeStatus: document.getElementById("incomeStatus").value,
-        monthlyIncome: Number(document.getElementById("monthlyIncome").value || 0),
-        affordablePayment: Number(document.getElementById("affordablePayment").value || 0),
-        makingPayments: document.getElementById("makingPayments").value,
-        bankruptcy: document.getElementById("bankruptcy").value,
-        lawsuit: document.getElementById("lawsuit").value,
-        enrolled: document.getElementById("enrolled").value,
-        notes: document.getElementById("notes").value.trim(),
-        creditors: getCreditorRows()
+        consumerShield: Array.from(new Set(consumerShieldFlags)),
+        level: Array.from(new Set(levelFlags))
       };
     }
 
-    function buildPdfPersonalizationData(data) {
-      const fullName = `${data.firstName || ""} ${data.lastName || ""}`.trim();
-      const fullAddress = [
-        data.streetAddress || "",
-        `${data.city || ""}, ${data.state || ""} ${data.zip || ""}`.trim()
-      ].filter(Boolean).join(", ");
+    function chooseRoute(totalDebt, stateCode, flags) {
+      if (!stateCode) return { route: '', reason: 'Select a state to calculate routing.' };
 
-      return {
-        caseId: data.caseId || "",
-        firstName: data.firstName || "",
-        lastName: data.lastName || "",
-        fullName,
-        email: data.email || "",
-        cellPhone: data.phone || "",
-        streetAddress: data.streetAddress || "",
-        city: data.city || "",
-        state: data.state || "",
-        zip: data.zip || "",
-        fullAddress,
-        notes: data.notes || "",
-        totalCreditors: data.creditors.length,
-        creditors: data.creditors.map((c, index) => ({
-          lineNumber: index + 1,
-          creditorName: c.name || "",
-          creditorType: c.type || "",
-          creditorBalance: c.amount || 0,
-          creditorClassification: c.class || "",
-          creditorStatus: c.status || ""
-        }))
+      const csStatus = getConsumerShieldStateStatus(stateCode);
+      const levelStatus = getLevelStateStatus(stateCode);
+
+      const csEligible = csStatus.status !== 'BLACKOUT' && !flags.consumerShield.some((f) => f.includes('not accepted') || f.includes('requires at least'));
+      const levelEligible = levelStatus.status !== 'BLACKOUT' && !flags.level.some((f) => f.includes('not accepted'));
+
+      if (totalDebt > 0 && totalDebt < 7000) {
+        if (csEligible) {
+          return { route: 'CONSUMER SHIELD', reason: 'Debt below $7,000 routes to Consumer Shield when the state and account profile are serviceable.' };
+        }
+        return { route: 'NO OPTION', reason: 'Debt is below $7,000 and Consumer Shield is not serviceable or eligible for this deal.' };
+      }
+
+      if (levelEligible) {
+        return {
+          route: 'LEVEL',
+          reason: levelStatus.status === 'RED'
+            ? 'Best option is Level Debt under the attorney model in this state.'
+            : 'Best option is Level Debt in this serviceable non-attorney state.'
+        };
+      }
+
+      if (csEligible) {
+        return {
+          route: 'CONSUMER SHIELD',
+          reason: 'Consumer Shield remains available for this state and debt profile.'
+        };
+      }
+
+      return { route: 'NO OPTION', reason: 'No available backend is serviceable in this state.' };
+    }
+
+    function computeScenarioData() {
+      const rows = state.rows.filter((r) => numberOrZero(r.amount) > 0);
+      const totalDebt = rows.reduce((sum, row) => sum + numberOrZero(row.amount), 0);
+      const flags = collectFlags(rows, totalDebt, state.selectedState);
+      const routeInfo = chooseRoute(totalDebt, state.selectedState, flags);
+
+      const levelState = getLevelStateStatus(state.selectedState);
+      const csState = getConsumerShieldStateStatus(state.selectedState);
+
+      const feeRate =
+        routeInfo.route === 'LEVEL' ? (levelState.status === 'RED' ? 0.27 : 0.25) :
+        routeInfo.route === 'CONSUMER SHIELD' ? 0.00 :
+        0;
+
+      const repCommissionRate = routeInfo.route === 'LEVEL' ? 0.01 : 0;
+      const repCommission = totalDebt * repCommissionRate;
+      const doNothing = calcDoNothing(totalDebt);
+
+      let shortest = null;
+      let recommended = null;
+
+      if (routeInfo.route === 'LEVEL') {
+        const totalCost = totalDebt * 0.50 + totalDebt * feeRate;
+        shortest = { term: 12, totalCost, monthlyPayment: totalCost / 12 };
+        const maxTerm = getLevelMaxTerm(totalDebt);
+        recommended = { term: maxTerm, totalCost, monthlyPayment: totalCost / maxTerm };
+      } else if (routeInfo.route === 'CONSUMER SHIELD') {
+        const term = getConsumerShieldProgramLength(totalDebt);
+        const monthlyPayment = getConsumerShieldProgramPayment(totalDebt);
+        const totalCost = term * monthlyPayment;
+        shortest = { term, totalCost, monthlyPayment };
+        recommended = { term, totalCost, monthlyPayment };
+      }
+
+      const programs = {
+        consumerShield: {
+          name: 'Consumer Shield',
+          available: csState.status !== 'BLACKOUT' && totalDebt >= 4000,
+          term: getConsumerShieldProgramLength(totalDebt),
+          monthlyPayment: getConsumerShieldProgramPayment(totalDebt),
+          benefits: [
+            'Structured monthly plan',
+            'Credit monitoring support',
+            'Credit-building support tools',
+            'Additional client protection resources'
+          ]
+        },
+        level: {
+          name: 'Level Debt',
+          available: levelState.status !== 'BLACKOUT' && totalDebt >= 7000,
+          term: totalDebt > 0 ? getLevelMaxTerm(totalDebt) : 0,
+          monthlyPayment: totalDebt > 0
+            ? ((totalDebt * 0.50) + (totalDebt * (levelState.status === 'RED' ? 0.27 : 0.25))) / getLevelMaxTerm(totalDebt)
+            : 0,
+          benefits: [
+            'Longer-term payment flexibility',
+            'Affordability-focused structure',
+            'Lower monthly burden potential',
+            'Budget breathing room'
+          ]
+        }
       };
-    }
 
-    function refreshPdfPreview() {
-      const data = getCaseData();
-      const payload = buildPdfPersonalizationData(data);
-      document.getElementById("pdfPreview").textContent = JSON.stringify(payload, null, 2);
-    }
+      const activeFlags = [];
+      if (routeInfo.route === 'LEVEL') activeFlags.push(...flags.level);
+      if (routeInfo.route === 'CONSUMER SHIELD') activeFlags.push(...flags.consumerShield);
+      if (routeInfo.route === 'NO OPTION') activeFlags.push(routeInfo.reason);
 
-    function parseCreditorsFromPayload(payload) {
-      const creditors = [];
-
-      for (let i = 1; i <= 20; i++) {
-        const name =
-          payload[`creditor_${i}_name`] ||
-          payload[`creditor${i}_name`] ||
-          payload[`creditor_name_${i}`] ||
-          "";
-
-        const type =
-          payload[`creditor_${i}_type`] ||
-          payload[`creditor${i}_type`] ||
-          payload[`creditor_type_${i}`] ||
-          "Other";
-
-        const amount =
-          payload[`creditor_${i}_balance`] ||
-          payload[`creditor_${i}_amount`] ||
-          payload[`creditor${i}_balance`] ||
-          payload[`creditor${i}_amount`] ||
-          payload[`creditor_balance_${i}`] ||
-          payload[`creditor_amount_${i}`] ||
-          0;
-
-        const status =
-          payload[`creditor_${i}_status`] ||
-          payload[`creditor${i}_status`] ||
-          payload[`creditor_status_${i}`] ||
-          "Open";
-
-        if (String(name || "").trim()) {
-          creditors.push({
-            name: String(name).trim(),
-            type: String(type || "Other").trim(),
-            amount: toAmount(amount),
-            class: classifyDebtType(String(type || ""), String(name || "")),
-            status: String(status || "Open").trim()
-          });
-        }
-      }
-
-      if (Array.isArray(payload.creditors)) {
-        payload.creditors.forEach(c => {
-          if (!c || !c.name) return;
-          creditors.push({
-            name: String(c.name || "").trim(),
-            type: String(c.type || "Other").trim(),
-            amount: toAmount(c.amount || c.balance),
-            class: classifyDebtType(String(c.type || ""), String(c.name || "")),
-            status: String(c.status || "Open").trim()
-          });
-        });
-      }
-
-      return creditors;
-    }
-
-    function importWebhookJson() {
-      const raw = document.getElementById("webhookJson").value.trim();
-      const statusEl = document.getElementById("webhookStatus");
-
-      if (!raw) {
-        statusEl.textContent = "Paste a JSON payload first.";
-        return;
-      }
-
-      try {
-        const payload = JSON.parse(raw);
-
-        document.getElementById("caseId").value =
-          payload.case_id ||
-          payload.contact_id ||
-          payload.opportunity_id ||
-          "";
-
-        document.getElementById("firstName").value = payload.first_name || payload.firstName || "";
-        document.getElementById("lastName").value = payload.last_name || payload.lastName || "";
-        document.getElementById("phone").value = payload.phone || payload.cell_phone || payload.mobile_phone || "";
-        document.getElementById("email").value = payload.email || "";
-        document.getElementById("streetAddress").value = payload.address1 || payload.street_address || payload.streetAddress || "";
-        document.getElementById("city").value = payload.city || "";
-        document.getElementById("state").value = payload.state || "";
-        document.getElementById("zip").value = payload.postal_code || payload.zip || payload.zip_code || "";
-        document.getElementById("notes").value = payload.notes || payload.internal_notes || "";
-
-        const creditors = parseCreditorsFromPayload(payload);
-        document.getElementById("creditorTableBody").innerHTML = "";
-        creditors.forEach(c => addCreditorRow(c));
-        if (!creditors.length) addCreditorRow();
-
-        updateMetrics();
-        refreshPdfPreview();
-        statusEl.textContent = `Webhook imported successfully. Loaded ${creditors.length} creditor(s).`;
-      } catch (e) {
-        statusEl.textContent = "Invalid JSON payload. Fix the formatting and try again.";
-      }
-    }
-
-    function routeDecision(data) {
-      const unsecured = data.creditors.filter(c => c.class === "Unsecured").reduce((sum, c) => sum + c.amount, 0);
-      const discoverDebt = data.creditors
-        .filter(c => String(c.name).toLowerCase().includes("discover"))
-        .reduce((sum, c) => sum + c.amount, 0);
-
-      const discoverPct = unsecured > 0 ? (discoverDebt / unsecured) * 100 : 0;
-      const affordablePayment = Number(data.affordablePayment || 0);
-      const hasIncome = data.incomeStatus && data.incomeStatus !== "No Income";
-      const serviceableLevel = data.state && !NON_SERVICEABLE_LEVEL.includes(data.state);
-      const serviceableConsumerShield = data.state && !CONSUMER_SHIELD_NON_SERVICEABLE.includes(data.state);
-
-      const reasons = [];
-      const warnings = [];
-      let recommended = "";
-      let badgeClass = "route-warn";
-      let decisionType = "Manual Review";
-
-      if (!data.state) reasons.push("State not selected");
-      if (!data.incomeStatus) reasons.push("Income status not selected");
-      if (!data.makingPayments) reasons.push("Payment status not selected");
-      if (!data.bankruptcy) reasons.push("Bankruptcy status not selected");
-      if (!data.enrolled) reasons.push("Enrollment status not selected");
-
-      if (data.bankruptcy === "Yes") reasons.push("Client is in bankruptcy");
-      if (data.enrolled === "Yes") reasons.push("Client is already enrolled in a debt relief program");
-      if (unsecured < 4000) reasons.push("Qualifying unsecured debt appears under $4,000");
-      if (!hasIncome && affordablePayment < DEFAULT_MIN_PAYMENT) reasons.push("No income and payment ability below minimum");
-      if (affordablePayment > 0 && affordablePayment < DEFAULT_MIN_PAYMENT) warnings.push(`Affordable payment below preferred threshold of ${money(DEFAULT_MIN_PAYMENT)}`);
-      if (data.lawsuit === "Yes") warnings.push("Active lawsuit present - review manually");
-      if (data.makingPayments === "No") warnings.push("Not currently making payments - still review, but may reduce fit");
-      if (discoverPct > DISCOVER_LIMIT_PCT) warnings.push(`Discover concentration exceeds ${DISCOVER_LIMIT_PCT}% of unsecured debt`);
-
-      if (reasons.length > 0) {
-        recommended = "Not Eligible / Do Not Route Yet";
-        badgeClass = "route-bad";
-        decisionType = "Stop";
-      } else {
-        if (serviceableLevel && discoverPct <= DISCOVER_LIMIT_PCT) {
-          recommended = "Route to Level Debt / Pinnacle";
-          badgeClass = "route-good";
-          decisionType = "Primary Route";
-        } else if (serviceableConsumerShield) {
-          recommended = "Route to Consumer Shield Exception Flow";
-          badgeClass = "route-warn";
-          decisionType = "Fallback Route";
-        } else {
-          recommended = "Manual Escalation Required";
-          badgeClass = "route-bad";
-          decisionType = "Escalation";
-        }
+      if (routeInfo.route === 'CONSUMER SHIELD') {
+        activeFlags.push('Consumer Shield support is Monday through Friday, 9am to 7pm EST.');
+        activeFlags.push('Consumer Shield will not send communications after 8pm in the contact local time unless already a client.');
+        activeFlags.push('Consumer Shield uses Equifax for credit pull.');
       }
 
       return {
-        totalDebt: data.creditors.reduce((sum, c) => sum + c.amount, 0),
-        unsecured,
-        discoverPct,
+        rows,
+        totalDebt,
+        routeInfo,
+        doNothing,
+        shortest,
         recommended,
-        badgeClass,
-        decisionType,
-        reasons,
-        warnings,
-        serviceableLevel,
-        serviceableConsumerShield
+        feeRate,
+        repCommissionRate,
+        repCommission,
+        levelState,
+        csState,
+        programs,
+        flags: Array.from(new Set(activeFlags))
       };
     }
 
-    function runRouting() {
-      const data = getCaseData();
-      const result = routeDecision(data);
+    function rowAlerts(row, route) {
+      const alerts = [];
+      const name = getCreditorDisplayName(row);
 
-      const html = `
-        <div>
-          <span class="pill ${result.badgeClass}">${escapeHtml(result.decisionType)}</span>
+      if (route === 'LEVEL') {
+        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) alerts.push({ label: 'Not accepted by Level', tone: 'red' });
+        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) alerts.push({ label: 'Secured / collateral risk', tone: 'amber' });
+        if (LEVEL_REJECTED_TYPES.has(row.debtType)) alerts.push({ label: 'Debt type not accepted', tone: 'red' });
+      }
+
+      if (route === 'CONSUMER SHIELD') {
+        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) alerts.push({ label: 'Not accepted by Consumer Shield', tone: 'red' });
+        if (CONSUMER_SHIELD_CONDITIONAL_TYPES.has(row.debtType)) alerts.push({ label: 'Conditional / docs needed', tone: 'amber' });
+      }
+
+      return alerts;
+    }
+
+    function renderRows() {
+      el('rows').innerHTML = state.rows.map((row, index) => `
+        <div class="row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 border-slate-100 bg-white" data-row="${index}">
+          <div class="space-y-2">
+            <select data-index="${index}" data-key="creditorName">
+              ${CREDITOR_OPTIONS.map((o) => `<option ${row.creditorName === o ? 'selected' : ''} value="${o}">${o || 'Select creditor'}</option>`).join('')}
+            </select>
+            ${row.creditorName === 'Other / Manual Entry' ? `<input class="input" data-index="${index}" data-key="manualName" placeholder="Type creditor name" value="${row.manualName || ''}" />` : ''}
+            <div class="alert-wrap flex flex-wrap gap-2 pt-1"></div>
+          </div>
+          <input class="input" data-index="${index}" data-key="amount" placeholder="$0" value="${row.amount || ''}" />
+          <select data-index="${index}" data-key="debtType">
+            ${DEBT_TYPES.map((t) => `<option ${row.debtType === t ? 'selected' : ''} value="${t}">${t}</option>`).join('')}
+          </select>
+          <select multiple class="conditions-select" data-index="${index}" data-key="conditions" size="1">
+            <option value="inCollections" ${row.inCollections ? 'selected' : ''}>Collections</option>
+            <option value="inLitigation" ${row.inLitigation ? 'selected' : ''}>Litigation</option>
+            <option value="isSecured" ${row.isSecured ? 'selected' : ''}>Secured</option>
+            <option value="paymentMade" ${row.paymentMade ? 'selected' : ''}>Payment made</option>
+            <option value="businessUnprofitable" ${row.businessUnprofitable ? 'selected' : ''}>Business closed / unprofitable</option>
+          </select>
         </div>
-        <div class="text-lg font-extrabold text-slate-900">${escapeHtml(result.recommended)}</div>
-        <div class="text-sm text-slate-700 space-y-1">
-          <div><strong>Case ID:</strong> ${escapeHtml(data.caseId || "-")}</div>
-          <div><strong>Client:</strong> ${escapeHtml(`${data.firstName} ${data.lastName}`.trim() || "-")}</div>
-          <div><strong>Total Debt:</strong> ${money(result.totalDebt)}</div>
-          <div><strong>Qualifying Unsecured Debt:</strong> ${money(result.unsecured)}</div>
-          <div><strong>Discover %:</strong> ${result.discoverPct.toFixed(1)}%</div>
-          <div><strong>Level Serviceable:</strong> ${result.serviceableLevel ? "Yes" : "No"}</div>
-          <div><strong>Consumer Shield Serviceable:</strong> ${result.serviceableConsumerShield ? "Yes" : "No"}</div>
+      `).join('');
+
+      document.querySelectorAll('#rows [data-index]').forEach((node) => {
+        node.addEventListener('input', onFieldChange);
+        node.addEventListener('change', onFieldChange);
+      });
+
+      refreshRowVisuals();
+    }
+
+    function refreshRowVisuals() {
+      const route = computeScenarioData().routeInfo.route;
+      state.rows.forEach((row, index) => {
+        const card = document.querySelector(`[data-row="${index}"]`);
+        if (!card) return;
+        const alerts = rowAlerts(row, route);
+        const wrap = card.querySelector('.alert-wrap');
+        const bg =
+          alerts.some((a) => a.tone === 'red') ? 'border-red-300 bg-red-50' :
+          alerts.some((a) => a.tone === 'amber') ? 'border-amber-300 bg-amber-50' :
+          'border-slate-100 bg-white';
+
+        card.className = `row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 ${bg}`;
+        wrap.innerHTML = alerts.map((a) =>
+          `<span class="rounded-full border px-2 py-1 text-[11px] font-medium ${
+            a.tone === 'red'
+              ? 'bg-red-100 text-red-700 border-red-200'
+              : 'bg-amber-100 text-amber-800 border-amber-200'
+          }">${a.label}</span>`
+        ).join('');
+      });
+    }
+
+    function renderComparison(c) {
+      const totalPaybackRed = `<span style="color:#DC2626;font-weight:800;">${currency(c.doNothing.totalPayback)}</span>`;
+
+      const rows = [
+        ['Monthly Payments', currency(c.doNothing.monthlyPayment), c.shortest ? currency(c.shortest.monthlyPayment) : '—', c.recommended ? currency(c.recommended.monthlyPayment) : '—'],
+        ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.totalDebt) : '—'],
+        ['Months to Payoff', `${c.doNothing.monthsToPayoff} months`, c.shortest ? `${c.shortest.term} months` : '—', c.recommended ? `${c.recommended.term} months` : '—'],
+        ['Estimated Int Rate', `${(c.doNothing.apr * 100).toFixed(0)}% APR`, c.shortest ? '0%' : '—', c.recommended ? '0%' : '—'],
+        ['Estimated Total Payback*', totalPaybackRed, c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
+        ['Estimated Savings', '—', c.shortest ? `<span class="font-extrabold text-white">${currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost))}</span>` : '—', c.recommended ? `<span class="text-white font-black text-[20px]">${currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost))}</span>` : '—']
+      ];
+
+      el('comparisonTable').innerHTML = rows.map((r, idx) => {
+        const savingsRow = idx === 5;
+        return `
+          <tr class="${savingsRow ? 'bg-teal-600 savings-glow' : (idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50')}">
+            <td class="border-b px-4 py-4 text-sm font-medium ${savingsRow ? 'text-white' : 'text-slate-600'}">${r[0]}</td>
+            <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[1]}</td>
+            <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[2]}</td>
+            <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[3]}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderPricingComparison(c) {
+      const cards = [];
+
+      if (c.programs.consumerShield.available) {
+        cards.push(`
+          <div class="plan-card">
+            <div class="flex items-center justify-between gap-3">
+              <span class="plan-chip" style="background:rgba(15,118,110,0.10); color:#0f766e;">Consumer Shield</span>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-4">
+              <div><div class="plan-label">Program Length</div><div class="plan-value">${c.programs.consumerShield.term ? c.programs.consumerShield.term + ' mo' : '—'}</div></div>
+              <div><div class="plan-label">Monthly Payment</div><div class="plan-value">${c.programs.consumerShield.monthlyPayment ? currency(c.programs.consumerShield.monthlyPayment) : '—'}</div></div>
+            </div>
+            <div class="mini-list">${c.programs.consumerShield.benefits.map((b) => `<div>• ${b}</div>`).join('')}</div>
+          </div>
+        `);
+      }
+
+      if (c.programs.level.available) {
+        cards.push(`
+          <div class="plan-card">
+            <div class="flex items-center justify-between gap-3">
+              <span class="plan-chip" style="background:rgba(0,150,136,0.10); color:#009688;">Level Debt</span>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-4">
+              <div><div class="plan-label">Program Length</div><div class="plan-value">${c.programs.level.term ? c.programs.level.term + ' mo' : '—'}</div></div>
+              <div><div class="plan-label">Monthly Payment</div><div class="plan-value">${c.programs.level.monthlyPayment ? currency(c.programs.level.monthlyPayment) : '—'}</div></div>
+            </div>
+            <div class="mini-list">${c.programs.level.benefits.map((b) => `<div>• ${b}</div>`).join('')}</div>
+          </div>
+        `);
+      }
+
+      el('pricingComparison').innerHTML = cards.length
+        ? cards.join('')
+        : '<div class="unavailable-box lg:col-span-2">SERVICE NOT AVAILABLE / NO PROGRAM OPTIONS MATCH THIS STATE AND DEBT SCENARIO</div>';
+
+      el('pricingDifferences').innerHTML = `
+        <div class="diff-box">
+          <h3 class="text-lg font-semibold mb-3">How the Options Differ</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full pricing-compare-table text-sm text-slate-700 bg-white">
+              <thead>
+                <tr class="bg-slate-100">
+                  <th>Program Features</th>
+                  <th>Consumer Shield</th>
+                  <th>Level Debt</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="font-semibold">Primary fit</td>
+                  <td>Often used when debt is below $7,000 and the state is serviceable.</td>
+                  <td>Primary recommended backend when serviceable and debt qualifies.</td>
+                </tr>
+                <tr>
+                  <td class="font-semibold">Monthly payment feel</td>
+                  <td>Tier-based and more fixed.</td>
+                  <td>Often more flexible with longer term options.</td>
+                </tr>
+                <tr>
+                  <td class="font-semibold">Typical advantage</td>
+                  <td>Useful option for smaller debt amounts.</td>
+                  <td>Usually the strongest affordability and economics combination.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-
-        ${result.reasons.length ? `
-          <div class="mt-3">
-            <div class="font-bold text-red-700 mb-1">Blocking Issues</div>
-            <ul class="list-disc pl-5 text-sm text-red-700">
-              ${result.reasons.map(r => `<li>${escapeHtml(r)}</li>`).join("")}
-            </ul>
-          </div>` : ""}
-
-        ${result.warnings.length ? `
-          <div class="mt-3">
-            <div class="font-bold text-amber-700 mb-1">Warnings / Review Items</div>
-            <ul class="list-disc pl-5 text-sm text-amber-700">
-              ${result.warnings.map(w => `<li>${escapeHtml(w)}</li>`).join("")}
-            </ul>
-          </div>` : ""}
       `;
-
-      document.getElementById("routeResult").innerHTML = html;
     }
 
-    function saveCase() {
-      const data = getCaseData();
-      localStorage.setItem("fundingTierDealRouterCase", JSON.stringify(data));
-      alert("Case saved locally.");
+    function renderProviderLogo(route) {
+      const src = ROUTE_LOGOS[route];
+      if (!src) {
+        el('providerLogoBox').innerHTML = '';
+        return;
+      }
+      el('providerLogoBox').innerHTML = `<div class="provider-logo-wrap"><img class="provider-logo" src="${src}" alt="${route} logo" /></div>`;
     }
 
-    function loadCase() {
-      const raw = localStorage.getItem("fundingTierDealRouterCase");
-      if (!raw) {
-        alert("No saved case found.");
+    function buildProviderAvailability(c) {
+      const providers = [
+        { name: 'LEVEL DEBT', available: c.programs.level.available, best: c.routeInfo.route === 'LEVEL' },
+        { name: 'CONSUMER SHIELD', available: c.programs.consumerShield.available, best: c.routeInfo.route === 'CONSUMER SHIELD' }
+      ];
+
+      return providers.map((p) => {
+        const black = !p.available;
+        const icon = black ? '✖' : '✔';
+        const cls = p.best ? 'border-green-500 bg-green-50' : black ? 'border-black bg-black text-white' : 'border-green-300 bg-white';
+        const sub = p.best ? 'BEST OPTION' : black ? 'Not Serviceable' : 'Additional Option';
+
+        return `
+          <div class="rounded-xl border p-3 ${cls}">
+            <div class="flex items-center gap-2 text-sm font-semibold">
+              <span>${icon}</span>
+              <span>${p.name}</span>
+            </div>
+            <div class="mt-1 text-xs ${black ? 'text-white/80' : 'text-slate-600'}">${sub}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMetrics(c) {
+      el('metricsGrid').innerHTML = `
+        <div class="rounded-xl bg-white border border-teal-100 p-3">
+          <div class="text-xs uppercase tracking-wide text-slate-500">Fee Rate</div>
+          <div class="mt-1 text-base font-semibold">${(c.feeRate * 100).toFixed(0)}%</div>
+        </div>
+        <div class="rounded-xl bg-white border border-teal-100 p-3">
+          <div class="text-xs uppercase tracking-wide text-slate-500">Rep Commission</div>
+          <div class="mt-1 text-base font-semibold">${(c.repCommissionRate * 100).toFixed(0)}% • ${currency(c.repCommission)}</div>
+        </div>
+      `;
+    }
+
+    function renderBadges(c) {
+      const stateCode = state.selectedState || '—';
+      const stateFull = state.selectedState ? STATE_NAMES[state.selectedState] : 'No state selected';
+      const isRed = c.routeInfo.route === 'LEVEL' ? c.levelState.status === 'RED' : false;
+
+      const tierColor = isRed ? '#DC2626' : '#16A34A';
+      const tierBg = isRed ? '#FEF2F2' : '#ECFDF5';
+
+      let second = '';
+      if (c.routeInfo.route === 'CONSUMER SHIELD') {
+        second = `<span class="pill border border-teal-300 bg-teal-50 text-teal-700">Consumer Shield: ${c.csState.label}</span>`;
+      } else if (c.routeInfo.route === 'LEVEL') {
+        second = `<span class="pill border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">Level: ${c.levelState.label}</span>`;
+      }
+
+      el('topBadges').innerHTML = `
+        <span title="${stateFull}" class="pill border border-slate-300 bg-white cursor-help">State: ${stateCode}</span>
+        ${second}
+      `;
+    }
+
+    function renderFlags(c) {
+      el('flags').innerHTML = c.flags.map((flag) => `
+        <div class="flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">⚠️ <span>${flag}</span></div>
+      `).join('');
+    }
+
+    function render() {
+      const c = computeScenarioData();
+      el('totalDebt').textContent = currency(c.totalDebt);
+      refreshRowVisuals();
+      renderComparison(c);
+      renderPricingComparison(c);
+      renderProviderLogo(c.routeInfo.route);
+      renderBadges(c);
+      renderMetrics(c);
+      renderFlags(c);
+      el('routeReason').textContent = c.routeInfo.reason;
+      el('providerAvailability').innerHTML = buildProviderAvailability(c);
+
+      const pdfBtn = el('pdfBtn');
+      const sendBtn = el('sendEmailBtn');
+      const canGenerate = !!(c.recommended && state.selectedState && c.totalDebt > 0);
+      pdfBtn.disabled = !canGenerate;
+      sendBtn.disabled = !canGenerate;
+      pdfBtn.style.opacity = canGenerate ? 1 : 0.55;
+      sendBtn.style.opacity = canGenerate ? 1 : 0.55;
+    }
+
+    function onFieldChange(e) {
+      const index = Number(e.target.dataset.index);
+      const key = e.target.dataset.key;
+      if (!Number.isInteger(index) || !state.rows[index]) return;
+
+      if (key === 'conditions') {
+        const values = Array.from(e.target.selectedOptions).map((opt) => opt.value);
+        state.rows[index].inCollections = values.includes('inCollections');
+        state.rows[index].inLitigation = values.includes('inLitigation');
+        state.rows[index].isSecured = values.includes('isSecured');
+        state.rows[index].paymentMade = values.includes('paymentMade');
+        state.rows[index].businessUnprofitable = values.includes('businessUnprofitable');
+        render();
         return;
       }
 
-      const data = JSON.parse(raw);
+      state.rows[index][key] = e.target.value;
 
-      document.getElementById("caseId").value = data.caseId || "";
-      document.getElementById("firstName").value = data.firstName || "";
-      document.getElementById("lastName").value = data.lastName || "";
-      document.getElementById("phone").value = data.phone || "";
-      document.getElementById("email").value = data.email || "";
-      document.getElementById("streetAddress").value = data.streetAddress || "";
-      document.getElementById("city").value = data.city || "";
-      document.getElementById("state").value = data.state || "";
-      document.getElementById("zip").value = data.zip || "";
-      document.getElementById("incomeStatus").value = data.incomeStatus || "";
-      document.getElementById("monthlyIncome").value = data.monthlyIncome || "";
-      document.getElementById("affordablePayment").value = data.affordablePayment || "";
-      document.getElementById("makingPayments").value = data.makingPayments || "";
-      document.getElementById("bankruptcy").value = data.bankruptcy || "";
-      document.getElementById("lawsuit").value = data.lawsuit || "";
-      document.getElementById("enrolled").value = data.enrolled || "";
-      document.getElementById("notes").value = data.notes || "";
+      if (key === 'creditorName') {
+        const rowEl = document.querySelector(`[data-row="${index}"]`);
+        const existing = rowEl ? rowEl.querySelector('[data-key="manualName"]') : null;
 
-      document.getElementById("creditorTableBody").innerHTML = "";
-      (data.creditors || []).forEach(c => addCreditorRow(c));
-      if (!(data.creditors || []).length) addCreditorRow();
+        if (state.rows[index].creditorName === 'Other / Manual Entry' && !existing) {
+          renderRows();
+          render();
+          return;
+        }
+        if (state.rows[index].creditorName !== 'Other / Manual Entry' && existing) {
+          state.rows[index].manualName = '';
+          renderRows();
+          render();
+          return;
+        }
+      }
 
-      updateMetrics();
-      refreshPdfPreview();
-      runRouting();
-      alert("Saved case loaded.");
+      render();
     }
 
-    function clearCase() {
-      if (!confirm("Clear the current case?")) return;
+    async function generatePdfBlob() {
+      const c = computeScenarioData();
+      if (!(c.recommended && state.selectedState && c.totalDebt > 0)) return null;
 
-      document.getElementById("caseId").value = "";
-      document.getElementById("firstName").value = "";
-      document.getElementById("lastName").value = "";
-      document.getElementById("phone").value = "";
-      document.getElementById("email").value = "";
-      document.getElementById("streetAddress").value = "";
-      document.getElementById("city").value = "";
-      document.getElementById("state").value = "";
-      document.getElementById("zip").value = "";
-      document.getElementById("incomeStatus").value = "";
-      document.getElementById("monthlyIncome").value = "";
-      document.getElementById("affordablePayment").value = "";
-      document.getElementById("makingPayments").value = "";
-      document.getElementById("bankruptcy").value = "";
-      document.getElementById("lawsuit").value = "";
-      document.getElementById("enrolled").value = "";
-      document.getElementById("notes").value = "";
-      document.getElementById("webhookJson").value = "";
-      document.getElementById("webhookStatus").textContent = "Paste a payload to test client mapping, creditor population, and PDF data.";
-      document.getElementById("creditorTableBody").innerHTML = "";
-      document.getElementById("routeResult").innerHTML = `<p class="subtle">Run the routing decision to see recommendations.</p>`;
-      document.getElementById("pdfPreview").textContent = 'Run "Refresh Preview" to generate personalization data.';
-      addCreditorRow();
-      updateMetrics();
+      const firstName = el('prospectFirstName').value.trim() || 'Client';
+      const lastName = el('prospectLastName').value.trim() || '';
+      const fullName = `${firstName} ${lastName}`.trim();
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      let y = 20;
+
+      doc.setFontSize(20);
+      doc.setTextColor(0, 150, 136);
+      doc.text('Funding Tier Debt Resolution Summary', 14, y);
+      y += 10;
+
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Prepared for: ${fullName}`, 14, y);
+      y += 7;
+      doc.text(`State: ${state.selectedState || '—'}`, 14, y);
+      y += 10;
+
+      doc.setFontSize(10);
+      doc.setTextColor(91, 94, 109);
+      const introBullets = [
+        'This summary compares your current financial path versus the program option currently recommended based on the available scenario inputs.',
+        'Continuing minimum payments can keep debt active far longer and increase total payback materially.',
+        'This summary is intended to help you understand the estimated financial difference between staying on the current path and moving into a structured debt resolution program.'
+      ];
+
+      introBullets.forEach((line) => {
+        const lines = doc.splitTextToSize('• ' + line, pageWidth - 28);
+        doc.text(lines, 14, y);
+        y += lines.length * 5 + 1;
+      });
+
+      y += 6;
+
+      const tableRows = [
+        ['Monthly Payments', currency(c.doNothing.monthlyPayment), c.shortest ? currency(c.shortest.monthlyPayment) : '—', c.recommended ? currency(c.recommended.monthlyPayment) : '—'],
+        ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.totalDebt) : '—'],
+        ['Months to Payoff', `${c.doNothing.monthsToPayoff} months`, c.shortest ? `${c.shortest.term} months` : '—', c.recommended ? `${c.recommended.term} months` : '—'],
+        ['Estimated Int Rate', `${(c.doNothing.apr * 100).toFixed(0)}% APR`, c.shortest ? '0%' : '—', c.recommended ? '0%' : '—'],
+        ['Estimated Total Payback', currency(c.doNothing.totalPayback), c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
+        ['Estimated Savings', '—', c.shortest ? currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost)) : '—', c.recommended ? currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost)) : '—']
+      ];
+
+      const headers = ['Detail', 'Current Situation', 'Fastest Payoff', 'Recommended Program'];
+      const colX = [14, 58, 126, 162];
+      const rowH = 10;
+
+      doc.setFillColor(241, 245, 249);
+      doc.rect(14, y, 182, rowH, 'F');
+      doc.setFontSize(7);
+      doc.setTextColor(51, 65, 85);
+
+      headers.forEach((h, i) => {
+        const wrapped = doc.splitTextToSize(h, i === 1 ? 64 : 34);
+        doc.text(wrapped, colX[i] + 2, y + 4);
+      });
+
+      y += 14;
+
+      tableRows.forEach((row, idx) => {
+        const isSavingsRow = idx === 5;
+        if (isSavingsRow) {
+          doc.setFillColor(0, 150, 136);
+          doc.rect(14, y, 182, rowH, 'F');
+        } else if (idx % 2 === 1) {
+          doc.setFillColor(248, 250, 252);
+          doc.rect(14, y, 182, rowH, 'F');
+        }
+
+        row.forEach((cell, i) => {
+          if (isSavingsRow) {
+            doc.setTextColor(255, 255, 255);
+            doc.setFont(undefined, 'bold');
+          } else if (idx === 4 && i === 1) {
+            doc.setTextColor(220, 38, 38);
+            doc.setFont(undefined, 'bold');
+          } else {
+            doc.setTextColor(15, 23, 42);
+            doc.setFont(undefined, 'normal');
+          }
+          doc.setFontSize(8);
+          doc.text(String(cell), colX[i] + 2, y + 6);
+        });
+
+        y += rowH;
+      });
+
+      y += 8;
+      doc.setFontSize(9);
+      doc.setTextColor(91, 94, 109);
+      const footerBullets = [
+        'These estimates are illustrative and final program structure may vary based on full underwriting and account-level review.',
+        'The current financial situation assumes ongoing minimum payment behavior and continuing interest impact.',
+        'The recommended program is intended to show a more structured path with the goal of reducing total financial burden.'
+      ];
+
+      footerBullets.forEach((line) => {
+        const lines = doc.splitTextToSize('• ' + line, pageWidth - 28);
+        doc.text(lines, 14, y);
+        y += lines.length * 5 + 1;
+      });
+
+      return doc.output('blob');
     }
 
-    function importSampleCreditors() {
-      document.getElementById("creditorTableBody").innerHTML = "";
-      [
-        { name: "Discover", type: "Credit Card", amount: 12000, class: "Unsecured", status: "Open" },
-        { name: "Capital One", type: "Credit Card", amount: 6500, class: "Unsecured", status: "Open" },
-        { name: "Upstart", type: "Personal Loan", amount: 8400, class: "Unsecured", status: "Open" }
-      ].forEach(c => addCreditorRow(c));
-      updateMetrics();
-      refreshPdfPreview();
-    }
-
-    function buildCSV(rows) {
-      return rows.map(row => row.map(val => {
-        const s = String(val ?? "");
-        return `"${s.replace(/"/g, '""')}"`;
-      }).join(",")).join("\n");
-    }
-
-    function downloadTextFile(filename, content, mime = "text/csv;charset=utf-8;") {
-      const blob = new Blob([content], { type: mime });
+    async function buildPdf() {
+      const blob = await generatePdfBlob();
+      if (!blob) return;
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
-      a.download = filename;
+      a.download = 'Funding-Tier-Debt-Resolution-Summary.pdf';
+      document.body.appendChild(a);
       a.click();
+      a.remove();
       URL.revokeObjectURL(url);
     }
 
-    function exportCreditorsCSV() {
-      const creditors = getCreditorRows();
-      if (!creditors.length) {
-        alert("No creditor entries to export.");
+    async function sendProspectEmail() {
+      const c = computeScenarioData();
+      const firstName = el('prospectFirstName').value.trim();
+      const lastName = el('prospectLastName').value.trim();
+      const email = el('prospectEmail').value.trim();
+
+      if (!email) {
+        alert('Enter a prospect email first.');
         return;
       }
-      const rows = [["Creditor Name", "Debt Type", "Amount", "Class", "Status"]];
-      creditors.forEach(c => rows.push([c.name, c.type, c.amount, c.class, c.status]));
-      downloadTextFile("creditor-entries.csv", buildCSV(rows));
-    }
 
-    function downloadFullDatabaseCSV() {
-      const rows = [["Creditor Name", "Category", "Class", "Program Notes"]];
-      CREDITOR_DB.forEach(c => rows.push([c.name, c.category, c.class, c.notes]));
-      downloadTextFile("internal-creditor-classification-database.csv", buildCSV(rows));
-    }
+      const btn = el('sendEmailBtn');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
 
-    function renderCreditorDatabaseSearch() {
-      const q = document.getElementById("dbSearch").value.trim().toLowerCase();
-      const results = CREDITOR_DB.filter(c => {
-        const combined = `${c.name} ${c.category} ${c.class} ${c.notes}`.toLowerCase();
-        return !q || combined.includes(q);
-      });
+      try {
+        const res = await fetch('/api/generate-plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName,
+            lastName,
+            email,
+            state: state.selectedState,
+            totalDebt: c.totalDebt,
+            doNothing: c.doNothing,
+            shortest: c.shortest,
+            recommended: c.recommended,
+            route: c.routeInfo.route,
+            routeReason: c.routeInfo.reason,
+            rows: c.rows
+          })
+        });
 
-      const tbody = document.getElementById("dbResults");
-      tbody.innerHTML = results.map(c => `
-        <tr>
-          <td>${escapeHtml(c.name)}</td>
-          <td>${escapeHtml(c.category)}</td>
-          <td>${escapeHtml(c.class)}</td>
-          <td>${escapeHtml(c.notes)}</td>
-        </tr>
-      `).join("") || `
-        <tr><td colspan="4" class="subtle">No matches found.</td></tr>
-      `;
-    }
+        const data = await res.json();
 
-    async function downloadPDF() {
-      const data = getCaseData();
-      const result = routeDecision(data);
-      const pdfFields = buildPdfPersonalizationData(data);
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      let y = 15;
-      const line = (text, size = 11, gap = 7) => {
-        doc.setFontSize(size);
-        const split = doc.splitTextToSize(String(text), 180);
-        doc.text(split, 15, y);
-        y += split.length * gap;
-        if (y > 270) {
-          doc.addPage();
-          y = 15;
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || 'Failed to generate and send.');
         }
-      };
 
-      doc.setFontSize(18);
-      doc.text("Funding Tier AI - Deal Router Summary", 15, y);
-      y += 10;
+        alert(`Success.\n\nPlan URL:\n${data.pageUrl}\n\nPDF URL:\n${data.pdfUrl}`);
+      } catch (err) {
+        alert(err.message || 'Failed to generate/send.');
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
 
-      line(`Case ID: ${data.caseId || "-"}`, 11);
-      line(`Client: ${pdfFields.fullName || "-"}`, 11);
-      line(`Phone: ${data.phone} | Email: ${data.email}`, 11);
-      line(`Address: ${pdfFields.fullAddress || "-"}`, 11);
-      line(`Income Status: ${data.incomeStatus}`, 11);
-      line(`Monthly Income: ${money(data.monthlyIncome)}`, 11);
-      line(`Affordable Payment: ${money(data.affordablePayment)}`, 11);
-      line(`Making Payments: ${data.makingPayments}`, 11);
-      line(`Bankruptcy: ${data.bankruptcy} | Lawsuit: ${data.lawsuit} | Enrolled: ${data.enrolled}`, 11);
+    function initStateSelect() {
+      el('state').innerHTML =
+        '<option value="">Select state</option>' +
+        STATES.map(([abbr, name]) => `<option value="${abbr}" title="${name}">${abbr}</option>`).join('');
 
-      y += 4;
-      line(`Routing Recommendation: ${result.recommended}`, 13);
-      line(`Decision Type: ${result.decisionType}`, 11);
-      line(`Total Debt: ${money(result.totalDebt)}`, 11);
-      line(`Qualifying Unsecured Debt: ${money(result.unsecured)}`, 11);
-      line(`Discover Percentage: ${result.discoverPct.toFixed(1)}%`, 11);
-
-      y += 4;
-      line("Creditor Entries:", 13);
-      data.creditors.forEach((c, idx) => {
-        line(`${idx + 1}. ${c.name} | ${c.type} | ${money(c.amount)} | ${c.class} | ${c.status}`, 10, 6);
+      el('state').addEventListener('change', (e) => {
+        state.selectedState = e.target.value;
+        render();
       });
+    }
 
-      if (result.reasons.length) {
-        y += 4;
-        line("Blocking Issues:", 13);
-        result.reasons.forEach(r => line(`- ${r}`, 10, 6));
-      }
-
-      if (result.warnings.length) {
-        y += 4;
-        line("Warnings / Review Items:", 13);
-        result.warnings.forEach(w => line(`- ${w}`, 10, 6));
-      }
-
-      if (data.notes) {
-        y += 4;
-        line("Agent Notes:", 13);
-        line(data.notes, 10, 6);
-      }
-
-      doc.save("funding-tier-deal-router-summary.pdf");
+    function initActionButtons() {
+      el('pdfBtn').addEventListener('click', buildPdf);
+      el('sendEmailBtn').addEventListener('click', sendProspectEmail);
     }
 
     function init() {
-      populateStates();
-      addCreditorRow();
-      renderCreditorDatabaseSearch();
-      updateMetrics();
-      refreshPdfPreview();
+      initStateSelect();
+      initActionButtons();
+      renderRows();
+      render();
     }
 
-    window.addEventListener("DOMContentLoaded", init);
+    init();
   </script>
 </body>
 </html>
