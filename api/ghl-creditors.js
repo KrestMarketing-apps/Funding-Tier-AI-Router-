@@ -1,93 +1,79 @@
-import fs from "fs";
-import path from "path";
+import creditors from '../lib/creditors.json';
 
-function normalizeText(value = "") {
-  return String(value).trim().toLowerCase();
+function normalize(value = '') {
+  return String(value).toLowerCase().trim();
 }
 
-function parseCsv(text) {
-  const lines = text.split(/\r?\n/).filter(Boolean);
-  if (!lines.length) return [];
-
-  const headers = lines[0].split(",").map(h => h.trim());
-
-  return lines.slice(1).map(line => {
-    const values = line.split(",").map(v => v.trim());
-    const row = {};
-    headers.forEach((header, i) => {
-      row[header] = values[i] ?? "";
-    });
-    return row;
-  });
+function includesSearch(text, search) {
+  return normalize(text).includes(search);
 }
 
-function loadCreditors() {
-  const filePath = path.join(process.cwd(), "lib", "creditors.csv");
+function scoreCreditor(item, search) {
+  const name = normalize(item.display_name);
+  const aliases = Array.isArray(item.search_aliases) ? item.search_aliases.map(normalize) : [];
+  const tokens = Array.isArray(item.search_tokens) ? item.search_tokens.map(normalize) : [];
+  const index = Array.isArray(item.search_index) ? item.search_index.map(normalize) : [];
 
-  if (!fs.existsSync(filePath)) {
-    return [];
-  }
+  let score = 0;
 
-  const csvText = fs.readFileSync(filePath, "utf8");
-  return parseCsv(csvText);
+  if (name === search) score += 1000;
+  else if (name.startsWith(search)) score += 700;
+  else if (name.includes(search)) score += 500;
+
+  if (aliases.some(a => a === search)) score += 650;
+  else if (aliases.some(a => a.startsWith(search))) score += 450;
+  else if (aliases.some(a => a.includes(search))) score += 300;
+
+  if (tokens.some(t => t === search)) score += 350;
+  else if (tokens.some(t => t.includes(search))) score += 180;
+
+  if (index.some(i => i === search)) score += 250;
+  else if (index.some(i => i.includes(search))) score += 120;
+
+  // unsecured first
+  score += Number(item.unsecured_priority || 0) * 100;
+  if (!item.secured) score += 100;
+
+  // eligible results before excluded/special handling
+  if (String(item.eligible_for_enrollment || '').toLowerCase() === 'yes') score += 80;
+  if (String(item.routing_category || '').toLowerCase().includes('excluded')) score -= 120;
+
+  return score;
 }
 
 export default function handler(req, res) {
-  if (req.method === "GET") {
-    const search = normalizeText(req.query.search || "");
-    const creditors = loadCreditors();
+  if (req.method !== 'GET') {
+    return res.status(405).json({ ok: false, error: 'Method not allowed' });
+  }
 
-    if (!search) {
-      return res.status(200).json({
-        ok: true,
-        total: creditors.length,
-        results: creditors.slice(0, 25),
-      });
-    }
+  const search = normalize(req.query.search || '');
 
-    const results = creditors.filter(row => {
-      const creditorName = normalizeText(row.creditor_name || row.name || "");
-      const alias = normalizeText(row.alias || "");
-      const category = normalizeText(row.category || "");
-      const classification = normalizeText(row.classification || "");
+  let results = creditors;
 
-      return (
-        creditorName.includes(search) ||
-        alias.includes(search) ||
-        category.includes(search) ||
-        classification.includes(search)
-      );
-    });
+  if (search) {
+    results = creditors.filter((item) => {
+      const fields = [
+        item.display_name,
+        ...(Array.isArray(item.search_aliases) ? item.search_aliases : []),
+        ...(Array.isArray(item.search_tokens) ? item.search_tokens : []),
+        ...(Array.isArray(item.search_index) ? item.search_index : [])
+      ];
 
-    return res.status(200).json({
-      ok: true,
-      search,
-      total: results.length,
-      results: results.slice(0, 50),
+      return fields.some((field) => includesSearch(field, search));
     });
   }
 
-  if (req.method === "POST") {
-    const body = req.body || {};
-    const search = normalizeText(body.search || body.creditor || "");
-    const creditors = loadCreditors();
+  results = results
+    .map((item) => ({
+      ...item,
+      _score: scoreCreditor(item, search)
+    }))
+    .sort((a, b) => b._score - a._score)
+    .slice(0, 12)
+    .map(({ _score, ...item }) => item);
 
-    const results = creditors.filter(row => {
-      const creditorName = normalizeText(row.creditor_name || row.name || "");
-      const alias = normalizeText(row.alias || "");
-      return creditorName.includes(search) || alias.includes(search);
-    });
-
-    return res.status(200).json({
-      ok: true,
-      search,
-      total: results.length,
-      results: results.slice(0, 50),
-    });
-  }
-
-  return res.status(405).json({
-    ok: false,
-    message: "Method not allowed",
+  return res.status(200).json({
+    ok: true,
+    results
   });
 }
