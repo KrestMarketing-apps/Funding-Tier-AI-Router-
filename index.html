@@ -1178,55 +1178,100 @@ function bindCreditorResultClicks() {
     }
 
     async function sendProspectEmail() {
-      const c = computeScenarioData();
-      const firstName = el('prospectFirstName').value.trim();
-      const lastName = el('prospectLastName').value.trim();
-      const email = el('prospectEmail').value.trim();
+  const c = computeScenarioData();
+  const firstNameEl = el('prospectFirstName');
+  const lastNameEl = el('prospectLastName');
+  const firstName = firstNameEl ? firstNameEl.value.trim() : 'Prospect';
+  const lastName = lastNameEl ? lastNameEl.value.trim() : '';
+  const email = el('prospectEmail').value.trim();
 
-      if (!email) {
-        alert('Enter a prospect email first.');
-        return;
-      }
+  if (!email) {
+    alert('Enter a prospect email first.');
+    return;
+  }
 
-      const btn = el('sendEmailBtn');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Generating...';
+  if (!(c.recommended && state.selectedState && c.totalDebt > 0)) {
+    alert('Complete the scenario first.');
+    return;
+  }
 
-      try {
-        const res = await fetch('/api/generate-plan', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            firstName,
-            lastName,
-            email,
-            state: state.selectedState,
-            totalDebt: c.totalDebt,
-            doNothing: c.doNothing,
-            shortest: c.shortest,
-            recommended: c.recommended,
-            route: c.routeInfo.route,
-            routeReason: c.routeInfo.reason,
-            rows: c.rows
-          })
-        });
+  const btn = el('sendEmailBtn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Generating Plan...';
 
-        const data = await res.json();
+  try {
+    const payload = {
+      firstName: firstName || 'Prospect',
+      lastName: lastName || '',
+      email,
+      state: state.selectedState,
+      totalDebt: Math.round(c.totalDebt || 0),
 
-        if (!res.ok || !data.ok) {
-          throw new Error(data.error || 'Failed to generate and send.');
-        }
+      doNothing: {
+        monthlyPayment: Math.round(c.doNothing?.monthlyPayment || 0),
+        monthsToPayoff: Math.round(c.doNothing?.monthsToPayoff || 0),
+        totalPayback: Math.round(c.doNothing?.totalPayback || 0),
+        apr: c.doNothing?.apr || 0
+      },
 
-        alert(`Success.\n\nPlan URL:\n${data.pageUrl}\n\nPDF URL:\n${data.pdfUrl}`);
-      } catch (err) {
-        alert(err.message || 'Failed to generate/send.');
-        console.error(err);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
+      shortest: c.shortest ? {
+        term: Math.round(c.shortest.term || 0),
+        monthlyPayment: Math.round(c.shortest.monthlyPayment || 0),
+        totalCost: Math.round(c.shortest.totalCost || 0)
+      } : {},
+
+      recommended: {
+        term: Math.round(c.recommended?.term || 0),
+        monthlyPayment: Math.round(c.recommended?.monthlyPayment || 0),
+        totalCost: Math.round(c.recommended?.totalCost || 0)
+      },
+
+      route: c.routeInfo?.route || '',
+      routeReason: c.routeInfo?.reason || '',
+
+      rows: state.rows
+        .filter((row) => numberOrZero(row.amount) > 0)
+        .map((row) => ({
+          creditorName: row.creditorName,
+          manualName: row.manualName || '',
+          amount: Math.round(numberOrZero(row.amount)),
+          debtType: row.debtType,
+          inCollections: !!row.inCollections,
+          inLitigation: !!row.inLitigation,
+          isSecured: !!row.isSecured,
+          paymentMade: !!row.paymentMade,
+          businessUnprofitable: !!row.businessUnprofitable
+        }))
+    };
+
+    const res = await fetch('/api/generate-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || 'Failed to generate plan.');
     }
+
+    alert(`Success.
+
+Plan URL:
+${data.pageUrl}
+
+PDF URL:
+${data.pdfUrl}`);
+  } catch (err) {
+    alert(err.message || 'Failed to generate plan.');
+    console.error('sendProspectEmail error:', err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
 
     function initStateSelect() {
       el('state').innerHTML =
