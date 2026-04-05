@@ -1245,13 +1245,21 @@ function bindCreditorResultClicks() {
     }
 
     function init() {
-      initStateSelect();
-      initActionButtons();
-      renderRows();
-      render();
-    }
+  initStateSelect();
+  initActionButtons();
 
-    init();
+  // 👇 ADD THIS RIGHT HERE
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.creditor-search') && !e.target.closest('.creditor-results')) {
+      hideAllCreditorResults();
+    }
+  });
+
+  renderRows();
+  render();
+}
+
+init();
   </script>
 </body>
 </html>
