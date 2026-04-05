@@ -591,37 +591,48 @@ function hideAllCreditorResults() {
       return alerts;
     }
 
-    function renderRows() {
-      el('rows').innerHTML = state.rows.map((row, index) => `
-        <div class="row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 border-slate-100 bg-white" data-row="${index}">
-          <div class="space-y-2">
-            <select data-index="${index}" data-key="creditorName">
-              ${CREDITOR_OPTIONS.map((o) => `<option ${row.creditorName === o ? 'selected' : ''} value="${o}">${o || 'Select creditor'}</option>`).join('')}
-            </select>
-            ${row.creditorName === 'Other / Manual Entry' ? `<input class="input" data-index="${index}" data-key="manualName" placeholder="Type creditor name" value="${row.manualName || ''}" />` : ''}
-            <div class="alert-wrap flex flex-wrap gap-2 pt-1"></div>
-          </div>
-          <input class="input" data-index="${index}" data-key="amount" placeholder="$0" value="${row.amount || ''}" />
-          <select data-index="${index}" data-key="debtType">
-            ${DEBT_TYPES.map((t) => `<option ${row.debtType === t ? 'selected' : ''} value="${t}">${t}</option>`).join('')}
-          </select>
-          <select multiple class="conditions-select" data-index="${index}" data-key="conditions" size="1">
-            <option value="inCollections" ${row.inCollections ? 'selected' : ''}>Collections</option>
-            <option value="inLitigation" ${row.inLitigation ? 'selected' : ''}>Litigation</option>
-            <option value="isSecured" ${row.isSecured ? 'selected' : ''}>Secured</option>
-            <option value="paymentMade" ${row.paymentMade ? 'selected' : ''}>Payment made</option>
-            <option value="businessUnprofitable" ${row.businessUnprofitable ? 'selected' : ''}>Business closed / unprofitable</option>
-          </select>
-        </div>
-      `).join('');
+function renderRows() {
+  el('rows').innerHTML = state.rows.map((row, index) => `
+    <div class="row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 border-slate-100 bg-white" data-row="${index}">
+      <div class="space-y-2 relative">
+        <input
+          class="input creditor-search"
+          data-index="${index}"
+          placeholder="Start typing creditor name..."
+          value="${row.creditorName || ''}"
+          autocomplete="off"
+        />
+        <div
+          class="creditor-results hidden absolute left-0 right-0 z-30 mt-1 rounded-xl border border-slate-200 bg-white shadow-lg max-h-64 overflow-y-auto"
+          data-results-index="${index}"
+        ></div>
+        <div class="alert-wrap flex flex-wrap gap-2 pt-1"></div>
+      </div>
 
-      document.querySelectorAll('#rows [data-index]').forEach((node) => {
-        node.addEventListener('input', onFieldChange);
-        node.addEventListener('change', onFieldChange);
-      });
+      <input class="input" data-index="${index}" data-key="amount" placeholder="$0" value="${row.amount || ''}" />
 
-      refreshRowVisuals();
-    }
+      <select data-index="${index}" data-key="debtType">
+        ${DEBT_TYPES.map((t) => `<option ${row.debtType === t ? 'selected' : ''} value="${t}">${t}</option>`).join('')}
+      </select>
+
+      <select multiple class="conditions-select" data-index="${index}" data-key="conditions" size="1">
+        <option value="inCollections" ${row.inCollections ? 'selected' : ''}>Collections</option>
+        <option value="inLitigation" ${row.inLitigation ? 'selected' : ''}>Litigation</option>
+        <option value="isSecured" ${row.isSecured ? 'selected' : ''}>Secured</option>
+        <option value="paymentMade" ${row.paymentMade ? 'selected' : ''}>Payment made</option>
+        <option value="businessUnprofitable" ${row.businessUnprofitable ? 'selected' : ''}>Business closed / unprofitable</option>
+      </select>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('#rows [data-key="amount"], #rows [data-key="debtType"], #rows [data-key="conditions"]').forEach((node) => {
+    node.addEventListener('input', onFieldChange);
+    node.addEventListener('change', onFieldChange);
+  });
+
+  bindCreditorSearches();
+  refreshRowVisuals();
+}
 
     function refreshRowVisuals() {
       const route = computeScenarioData().routeInfo.route;
