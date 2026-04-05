@@ -1,0 +1,2661 @@
+[
+  {
+    "creditor_group": "Business MCA",
+    "display_name": "Merchant Cash Advance",
+    "search_aliases": [
+      "mca",
+      "merchant cash advance"
+    ],
+    "search_tokens": [
+      "mca",
+      "merchant cash advance"
+    ],
+    "search_index": [
+      "merchant cash advance",
+      "business mca",
+      "mca",
+      "merchant cash advance"
+    ],
+    "product_type": "Business MCA",
+    "classification": "Not Standard Consumer Unsecured Debt",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Business debt",
+    "routing_notes": "Business-only product.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "SBA Loan",
+    "display_name": "SBA Loan",
+    "search_aliases": [
+      "sba loan",
+      "small business administration loan"
+    ],
+    "search_tokens": [
+      "sba loan",
+      "small business administration loan"
+    ],
+    "search_index": [
+      "sba loan",
+      "sba loan",
+      "sba loan",
+      "small business administration loan"
+    ],
+    "product_type": "Business Loan",
+    "classification": "Often Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Business secured debt",
+    "routing_notes": "Check collateral and UCC.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Navy Federal",
+    "display_name": "Navy Federal Share-Secured Loan",
+    "search_aliases": [
+      "navy federal pledge loan",
+      "share secured"
+    ],
+    "search_tokens": [
+      "navy federal pledge loan",
+      "share secured"
+    ],
+    "search_index": [
+      "navy federal share-secured loan",
+      "navy federal",
+      "navy federal pledge loan",
+      "share secured"
+    ],
+    "product_type": "Share-Secured Loan",
+    "classification": "Secured",
+    "routing_category": "Usually Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Deposit collateral",
+    "routing_notes": "Savings/share balance pledged.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Secured Card",
+    "display_name": "Secured Credit Card",
+    "search_aliases": [
+      "secured card",
+      "deposit secured card"
+    ],
+    "search_tokens": [
+      "deposit secured card",
+      "secured card"
+    ],
+    "search_index": [
+      "secured credit card",
+      "secured card",
+      "deposit secured card",
+      "secured card"
+    ],
+    "product_type": "Secured Card",
+    "classification": "Secured",
+    "routing_category": "Usually Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Deposit collateral",
+    "routing_notes": "Do not treat as normal unsecured card.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "HOA",
+    "display_name": "HOA / Condo Assessments",
+    "search_aliases": [
+      "hoa",
+      "homeowners association",
+      "condo association"
+    ],
+    "search_tokens": [
+      "condo association",
+      "hoa",
+      "homeowners association"
+    ],
+    "search_index": [
+      "hoa / condo assessments",
+      "hoa",
+      "condo association",
+      "hoa",
+      "homeowners association"
+    ],
+    "product_type": "HOA Assessments",
+    "classification": "Usually Unsecured / Lien Risk",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "HOA lien risk",
+    "routing_notes": "Can become lien-related.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Rocket Mortgage",
+    "display_name": "Rocket Mortgage",
+    "search_aliases": [
+      "rocket mortgage",
+      "quicken loans"
+    ],
+    "search_tokens": [
+      "quicken loans",
+      "rocket mortgage"
+    ],
+    "search_index": [
+      "rocket mortgage",
+      "rocket mortgage",
+      "quicken loans",
+      "rocket mortgage"
+    ],
+    "product_type": "Mortgage",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Home collateral",
+    "routing_notes": "Treat as secured real-estate debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Pennymac",
+    "display_name": "Pennymac Mortgage",
+    "search_aliases": [
+      "pennymac"
+    ],
+    "search_tokens": [
+      "pennymac"
+    ],
+    "search_index": [
+      "pennymac mortgage",
+      "pennymac",
+      "pennymac"
+    ],
+    "product_type": "Mortgage",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Home collateral",
+    "routing_notes": "Treat as secured real-estate debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Mr. Cooper",
+    "display_name": "Mr. Cooper Mortgage",
+    "search_aliases": [
+      "mr cooper",
+      "nationstar"
+    ],
+    "search_tokens": [
+      "mr cooper",
+      "nationstar"
+    ],
+    "search_index": [
+      "mr. cooper mortgage",
+      "mr. cooper",
+      "mr cooper",
+      "nationstar"
+    ],
+    "product_type": "Mortgage",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Home collateral",
+    "routing_notes": "Treat as secured real-estate debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Local Bank / Credit Union",
+    "display_name": "Mortgage / HELOC",
+    "search_aliases": [
+      "mortgage",
+      "heloc",
+      "home equity"
+    ],
+    "search_tokens": [
+      "heloc",
+      "home equity",
+      "mortgage"
+    ],
+    "search_index": [
+      "mortgage / heloc",
+      "local bank / credit union",
+      "heloc",
+      "home equity",
+      "mortgage"
+    ],
+    "product_type": "Mortgage / HELOC",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Home collateral",
+    "routing_notes": "Treat as secured real-estate debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Pawn Loan",
+    "display_name": "Pawn Loan",
+    "search_aliases": [
+      "pawn loan",
+      "pawn shop"
+    ],
+    "search_tokens": [
+      "pawn loan",
+      "pawn shop"
+    ],
+    "search_index": [
+      "pawn loan",
+      "pawn loan",
+      "pawn loan",
+      "pawn shop"
+    ],
+    "product_type": "Pawn Loan",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Item pledged",
+    "routing_notes": "Item is collateral.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Judgment Debt",
+    "display_name": "Judgment Debt",
+    "search_aliases": [
+      "judgment",
+      "court judgment"
+    ],
+    "search_tokens": [
+      "court judgment",
+      "judgment"
+    ],
+    "search_index": [
+      "judgment debt",
+      "judgment debt",
+      "court judgment",
+      "judgment"
+    ],
+    "product_type": "Judgment Debt",
+    "classification": "Conditional / Lien Risk",
+    "routing_category": "Conditional / Special Handling",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Judgment / lien risk",
+    "routing_notes": "Review whether lien attached.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Foreclosure Deficiency",
+    "display_name": "Foreclosure Deficiency",
+    "search_aliases": [
+      "foreclosure deficiency"
+    ],
+    "search_tokens": [
+      "foreclosure deficiency"
+    ],
+    "search_index": [
+      "foreclosure deficiency",
+      "foreclosure deficiency",
+      "foreclosure deficiency"
+    ],
+    "product_type": "Deficiency Balance",
+    "classification": "Conditional / State-Specific",
+    "routing_category": "Conditional / Special Handling",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Legal / state-specific",
+    "routing_notes": "Legal review may be required.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 0,
+    "secured": false
+  },
+  {
+    "creditor_group": "Law Firm Collection",
+    "display_name": "Debt in Litigation",
+    "search_aliases": [
+      "summons",
+      "complaint",
+      "law firm collection",
+      "attorney collection"
+    ],
+    "search_tokens": [
+      "attorney collection",
+      "complaint",
+      "law firm collection",
+      "summons"
+    ],
+    "search_index": [
+      "debt in litigation",
+      "law firm collection",
+      "attorney collection",
+      "complaint",
+      "law firm collection",
+      "summons"
+    ],
+    "product_type": "Consumer Debt in Litigation",
+    "classification": "Follows Underlying Debt Type",
+    "routing_category": "Conditional / Special Handling",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "Yes",
+    "exclude_reason": "Litigation",
+    "routing_notes": "Lawsuit status may change backend eligibility.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 1,
+    "secured": false
+  },
+  {
+    "creditor_group": "Repo Deficiency",
+    "display_name": "Repossession Deficiency Balance",
+    "search_aliases": [
+      "repo deficiency",
+      "deficiency balance",
+      "post repo"
+    ],
+    "search_tokens": [
+      "deficiency balance",
+      "post repo",
+      "repo deficiency"
+    ],
+    "search_index": [
+      "repossession deficiency balance",
+      "repo deficiency",
+      "deficiency balance",
+      "post repo",
+      "repo deficiency"
+    ],
+    "product_type": "Deficiency Balance",
+    "classification": "Usually Treated Operationally as Unsecured Deficiency",
+    "routing_category": "Conditional / Special Handling",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Prior secured debt / deficiency",
+    "routing_notes": "Need repo status and backend rules.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "County Tax Collector",
+    "display_name": "Property Tax",
+    "search_aliases": [
+      "property tax",
+      "county tax collector"
+    ],
+    "search_tokens": [
+      "county tax collector",
+      "property tax"
+    ],
+    "search_index": [
+      "property tax",
+      "county tax collector",
+      "county tax collector",
+      "property tax"
+    ],
+    "product_type": "Property Tax",
+    "classification": "Lien-Based / Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Property tax lien",
+    "routing_notes": "Tied to property.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Federal Student Aid",
+    "display_name": "Federal Student Loan",
+    "search_aliases": [
+      "federal student aid",
+      "department of education",
+      "edfinancial",
+      "mohela"
+    ],
+    "search_tokens": [
+      "department of education",
+      "edfinancial",
+      "federal student aid",
+      "mohela"
+    ],
+    "search_index": [
+      "federal student loan",
+      "federal student aid",
+      "department of education",
+      "edfinancial",
+      "federal student aid",
+      "mohela"
+    ],
+    "product_type": "Student Loan",
+    "classification": "Usually Unsecured but Special Category",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Student loan",
+    "routing_notes": "Not typical unsecured settlement fit.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Navient / Aidvantage / Nelnet",
+    "display_name": "Student Loan Servicer",
+    "search_aliases": [
+      "navient",
+      "aidvantage",
+      "nelnet",
+      "sallie mae"
+    ],
+    "search_tokens": [
+      "aidvantage",
+      "navient",
+      "nelnet",
+      "sallie mae"
+    ],
+    "search_index": [
+      "student loan servicer",
+      "navient / aidvantage / nelnet",
+      "aidvantage",
+      "navient",
+      "nelnet",
+      "sallie mae"
+    ],
+    "product_type": "Student Loan",
+    "classification": "Usually Unsecured but Special Category",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Student loan",
+    "routing_notes": "Operationally separate from normal unsecured consumer debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "IRS",
+    "display_name": "Federal Tax Debt",
+    "search_aliases": [
+      "irs",
+      "internal revenue service",
+      "federal tax"
+    ],
+    "search_tokens": [
+      "federal tax",
+      "internal revenue service",
+      "irs"
+    ],
+    "search_index": [
+      "federal tax debt",
+      "irs",
+      "federal tax",
+      "internal revenue service",
+      "irs"
+    ],
+    "product_type": "Tax Debt",
+    "classification": "Priority / Can Become Lien-Based",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Tax debt / lien risk",
+    "routing_notes": "Not standard unsecured settlement debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "State Tax Agency",
+    "display_name": "State Tax Debt",
+    "search_aliases": [
+      "ftb",
+      "franchise tax board",
+      "state tax",
+      "state revenue"
+    ],
+    "search_tokens": [
+      "franchise tax board",
+      "ftb",
+      "state revenue",
+      "state tax"
+    ],
+    "search_index": [
+      "state tax debt",
+      "state tax agency",
+      "franchise tax board",
+      "ftb",
+      "state revenue",
+      "state tax"
+    ],
+    "product_type": "Tax Debt",
+    "classification": "Priority / Can Become Lien-Based",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Tax debt / lien risk",
+    "routing_notes": "Not standard unsecured settlement debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Chase",
+    "display_name": "Chase Auto Loan",
+    "search_aliases": [
+      "chase auto",
+      "jpmorgan auto"
+    ],
+    "search_tokens": [
+      "chase auto",
+      "jpmorgan auto"
+    ],
+    "search_index": [
+      "chase auto loan",
+      "chase",
+      "chase auto",
+      "jpmorgan auto"
+    ],
+    "product_type": "Auto Loan",
+    "classification": "Secured",
+    "routing_category": "Usually Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Capital One",
+    "display_name": "Capital One Auto Finance",
+    "search_aliases": [
+      "capital one auto",
+      "auto navigator"
+    ],
+    "search_tokens": [
+      "auto navigator",
+      "capital one auto"
+    ],
+    "search_index": [
+      "capital one auto finance",
+      "capital one",
+      "auto navigator",
+      "capital one auto"
+    ],
+    "product_type": "Auto Loan",
+    "classification": "Secured",
+    "routing_category": "Usually Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Bank of America",
+    "display_name": "Bank of America Auto Loan",
+    "search_aliases": [
+      "bank of america auto",
+      "bofa auto"
+    ],
+    "search_tokens": [
+      "bank of america auto",
+      "bofa auto"
+    ],
+    "search_index": [
+      "bank of america auto loan",
+      "bank of america",
+      "bank of america auto",
+      "bofa auto"
+    ],
+    "product_type": "Auto Loan",
+    "classification": "Secured",
+    "routing_category": "Usually Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Wells Fargo",
+    "display_name": "Wells Fargo Auto Loan",
+    "search_aliases": [
+      "wells fargo auto",
+      "wf auto"
+    ],
+    "search_tokens": [
+      "wells fargo auto",
+      "wf auto"
+    ],
+    "search_index": [
+      "wells fargo auto loan",
+      "wells fargo",
+      "wells fargo auto",
+      "wf auto"
+    ],
+    "product_type": "Auto Loan",
+    "classification": "Secured",
+    "routing_category": "Usually Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Credit Union",
+    "display_name": "Credit Union Auto Loan",
+    "search_aliases": [
+      "credit union auto loan"
+    ],
+    "search_tokens": [
+      "credit union auto loan"
+    ],
+    "search_index": [
+      "credit union auto loan",
+      "credit union",
+      "credit union auto loan"
+    ],
+    "product_type": "Auto Loan",
+    "classification": "Secured",
+    "routing_category": "Usually Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Ally",
+    "display_name": "Ally Auto Loan",
+    "search_aliases": [
+      "ally auto",
+      "ally financial"
+    ],
+    "search_tokens": [
+      "ally auto",
+      "ally financial"
+    ],
+    "search_index": [
+      "ally auto loan",
+      "ally",
+      "ally auto",
+      "ally financial"
+    ],
+    "product_type": "Auto Loan",
+    "classification": "Secured",
+    "routing_category": "Usually Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Santander Consumer",
+    "display_name": "Santander Consumer Auto Loan",
+    "search_aliases": [
+      "santander consumer",
+      "roadloans",
+      "santander auto"
+    ],
+    "search_tokens": [
+      "roadloans",
+      "santander auto",
+      "santander consumer"
+    ],
+    "search_index": [
+      "santander consumer auto loan",
+      "santander consumer",
+      "roadloans",
+      "santander auto",
+      "santander consumer"
+    ],
+    "product_type": "Auto Loan",
+    "classification": "Secured",
+    "routing_category": "Usually Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Toyota Financial",
+    "display_name": "Toyota Financial Auto Loan / Lease",
+    "search_aliases": [
+      "toyota financial",
+      "toyota motor credit"
+    ],
+    "search_tokens": [
+      "toyota financial",
+      "toyota motor credit"
+    ],
+    "search_index": [
+      "toyota financial auto loan / lease",
+      "toyota financial",
+      "toyota financial",
+      "toyota motor credit"
+    ],
+    "product_type": "Auto Loan / Lease",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Honda Financial",
+    "display_name": "Honda Financial Auto Loan / Lease",
+    "search_aliases": [
+      "honda financial",
+      "ahfc"
+    ],
+    "search_tokens": [
+      "ahfc",
+      "honda financial"
+    ],
+    "search_index": [
+      "honda financial auto loan / lease",
+      "honda financial",
+      "ahfc",
+      "honda financial"
+    ],
+    "product_type": "Auto Loan / Lease",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Ford Credit",
+    "display_name": "Ford Credit Auto Loan / Lease",
+    "search_aliases": [
+      "ford credit",
+      "ford motor credit"
+    ],
+    "search_tokens": [
+      "ford credit",
+      "ford motor credit"
+    ],
+    "search_index": [
+      "ford credit auto loan / lease",
+      "ford credit",
+      "ford credit",
+      "ford motor credit"
+    ],
+    "product_type": "Auto Loan / Lease",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "GM Financial",
+    "display_name": "GM Financial Auto Loan / Lease",
+    "search_aliases": [
+      "gm financial",
+      "gmac"
+    ],
+    "search_tokens": [
+      "gm financial",
+      "gmac"
+    ],
+    "search_index": [
+      "gm financial auto loan / lease",
+      "gm financial",
+      "gm financial",
+      "gmac"
+    ],
+    "product_type": "Auto Loan / Lease",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Hyundai Motor Finance",
+    "display_name": "Hyundai Motor Finance Auto Loan / Lease",
+    "search_aliases": [
+      "hyundai motor finance"
+    ],
+    "search_tokens": [
+      "hyundai motor finance"
+    ],
+    "search_index": [
+      "hyundai motor finance auto loan / lease",
+      "hyundai motor finance",
+      "hyundai motor finance"
+    ],
+    "product_type": "Auto Loan / Lease",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Kia Finance",
+    "display_name": "Kia Finance Auto Loan / Lease",
+    "search_aliases": [
+      "kia finance",
+      "kia motor finance"
+    ],
+    "search_tokens": [
+      "kia finance",
+      "kia motor finance"
+    ],
+    "search_index": [
+      "kia finance auto loan / lease",
+      "kia finance",
+      "kia finance",
+      "kia motor finance"
+    ],
+    "product_type": "Auto Loan / Lease",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "BMW Financial",
+    "display_name": "BMW Financial Auto Loan / Lease",
+    "search_aliases": [
+      "bmw financial"
+    ],
+    "search_tokens": [
+      "bmw financial"
+    ],
+    "search_index": [
+      "bmw financial auto loan / lease",
+      "bmw financial",
+      "bmw financial"
+    ],
+    "product_type": "Auto Loan / Lease",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Mercedes-Benz Financial",
+    "display_name": "Mercedes-Benz Financial Auto Loan / Lease",
+    "search_aliases": [
+      "mercedes benz financial",
+      "mbfs"
+    ],
+    "search_tokens": [
+      "mbfs",
+      "mercedes benz financial"
+    ],
+    "search_index": [
+      "mercedes-benz financial auto loan / lease",
+      "mercedes-benz financial",
+      "mbfs",
+      "mercedes benz financial"
+    ],
+    "product_type": "Auto Loan / Lease",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Credit Acceptance",
+    "display_name": "Credit Acceptance Auto Loan",
+    "search_aliases": [
+      "credit acceptance"
+    ],
+    "search_tokens": [
+      "credit acceptance"
+    ],
+    "search_index": [
+      "credit acceptance auto loan",
+      "credit acceptance",
+      "credit acceptance"
+    ],
+    "product_type": "Auto Loan",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Westlake Financial",
+    "display_name": "Westlake Financial Auto Loan",
+    "search_aliases": [
+      "westlake financial"
+    ],
+    "search_tokens": [
+      "westlake financial"
+    ],
+    "search_index": [
+      "westlake financial auto loan",
+      "westlake financial",
+      "westlake financial"
+    ],
+    "product_type": "Auto Loan",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle collateral",
+    "routing_notes": "Treat as secured vehicle debt.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Title Loan",
+    "display_name": "Vehicle Title Loan",
+    "search_aliases": [
+      "title loan",
+      "car title loan"
+    ],
+    "search_tokens": [
+      "car title loan",
+      "title loan"
+    ],
+    "search_index": [
+      "vehicle title loan",
+      "title loan",
+      "car title loan",
+      "title loan"
+    ],
+    "product_type": "Title Loan",
+    "classification": "Secured",
+    "routing_category": "Excluded / Special Handling",
+    "eligible_for_enrollment": "No",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": "Vehicle title collateral",
+    "routing_notes": "Vehicle title is collateral.",
+    "backend_notes": "Usually not routed; review only if current Level Debt or Consumer Shield rules specifically allow.",
+    "unsecured_priority": 0,
+    "secured": true
+  },
+  {
+    "creditor_group": "Chase",
+    "display_name": "Chase Credit Card",
+    "search_aliases": [
+      "chase",
+      "jp morgan chase",
+      "jpmorgan chase",
+      "amazon rewards visa",
+      "freedom",
+      "sapphire",
+      "slate"
+    ],
+    "search_tokens": [
+      "amazon rewards visa",
+      "chase",
+      "freedom",
+      "jp morgan chase",
+      "jpmorgan chase",
+      "sapphire",
+      "slate"
+    ],
+    "search_index": [
+      "chase credit card",
+      "chase",
+      "amazon rewards visa",
+      "chase",
+      "freedom",
+      "jp morgan chase",
+      "jpmorgan chase",
+      "sapphire",
+      "slate"
+    ],
+    "product_type": "Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Standard unsecured revolving debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Chase",
+    "display_name": "Chase Personal Loan",
+    "search_aliases": [
+      "chase personal loan",
+      "jpmcb installment"
+    ],
+    "search_tokens": [
+      "chase personal loan",
+      "jpmcb installment"
+    ],
+    "search_index": [
+      "chase personal loan",
+      "chase",
+      "chase personal loan",
+      "jpmcb installment"
+    ],
+    "product_type": "Personal Loan",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Verify no collateral or pledge.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Capital One",
+    "display_name": "Capital One Credit Card",
+    "search_aliases": [
+      "capital one",
+      "cap one",
+      "quicksilver",
+      "venture",
+      "savor",
+      "kohls card"
+    ],
+    "search_tokens": [
+      "cap one",
+      "capital one",
+      "kohls card",
+      "quicksilver",
+      "savor",
+      "venture"
+    ],
+    "search_index": [
+      "capital one credit card",
+      "capital one",
+      "cap one",
+      "capital one",
+      "kohls card",
+      "quicksilver",
+      "savor",
+      "venture"
+    ],
+    "product_type": "Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Standard unsecured revolving debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Discover",
+    "display_name": "Discover Credit Card",
+    "search_aliases": [
+      "discover",
+      "discover card"
+    ],
+    "search_tokens": [
+      "discover",
+      "discover card"
+    ],
+    "search_index": [
+      "discover credit card",
+      "discover",
+      "discover",
+      "discover card"
+    ],
+    "product_type": "Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Standard unsecured revolving debt; apply backend caps if used internally.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Discover",
+    "display_name": "Discover Personal Loan",
+    "search_aliases": [
+      "discover personal loan"
+    ],
+    "search_tokens": [
+      "discover personal loan"
+    ],
+    "search_index": [
+      "discover personal loan",
+      "discover",
+      "discover personal loan"
+    ],
+    "product_type": "Personal Loan",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Unsecured installment debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "American Express",
+    "display_name": "American Express Card",
+    "search_aliases": [
+      "american express",
+      "amex",
+      "amex card",
+      "amex charge card"
+    ],
+    "search_tokens": [
+      "american express",
+      "amex",
+      "amex card",
+      "amex charge card"
+    ],
+    "search_index": [
+      "american express card",
+      "american express",
+      "american express",
+      "amex",
+      "amex card",
+      "amex charge card"
+    ],
+    "product_type": "Credit / Charge Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Charge cards are operationally treated as unsecured.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Citibank",
+    "display_name": "Citibank Credit Card",
+    "search_aliases": [
+      "citibank",
+      "citi",
+      "citi card",
+      "best buy card"
+    ],
+    "search_tokens": [
+      "best buy card",
+      "citi",
+      "citi card",
+      "citibank"
+    ],
+    "search_index": [
+      "citibank credit card",
+      "citibank",
+      "best buy card",
+      "citi",
+      "citi card",
+      "citibank"
+    ],
+    "product_type": "Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Standard unsecured revolving debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Bank of America",
+    "display_name": "Bank of America Credit Card",
+    "search_aliases": [
+      "bank of america",
+      "bofa",
+      "boa credit card"
+    ],
+    "search_tokens": [
+      "bank of america",
+      "boa credit card",
+      "bofa"
+    ],
+    "search_index": [
+      "bank of america credit card",
+      "bank of america",
+      "bank of america",
+      "boa credit card",
+      "bofa"
+    ],
+    "product_type": "Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Standard unsecured revolving debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Wells Fargo",
+    "display_name": "Wells Fargo Credit Card",
+    "search_aliases": [
+      "wells fargo",
+      "wf credit card"
+    ],
+    "search_tokens": [
+      "wells fargo",
+      "wf credit card"
+    ],
+    "search_index": [
+      "wells fargo credit card",
+      "wells fargo",
+      "wells fargo",
+      "wf credit card"
+    ],
+    "product_type": "Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Standard unsecured revolving debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Barclays",
+    "display_name": "Barclays Credit Card",
+    "search_aliases": [
+      "barclays",
+      "barclaycard",
+      "aviator"
+    ],
+    "search_tokens": [
+      "aviator",
+      "barclaycard",
+      "barclays"
+    ],
+    "search_index": [
+      "barclays credit card",
+      "barclays",
+      "aviator",
+      "barclaycard",
+      "barclays"
+    ],
+    "product_type": "Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Common co-branded card issuer.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Synchrony",
+    "display_name": "Synchrony Credit / Store Card",
+    "search_aliases": [
+      "synchrony",
+      "syncb",
+      "carecredit",
+      "amazon store card",
+      "lowes card",
+      "sams club"
+    ],
+    "search_tokens": [
+      "amazon store card",
+      "carecredit",
+      "lowes card",
+      "sams club",
+      "syncb",
+      "synchrony"
+    ],
+    "search_index": [
+      "synchrony credit / store card",
+      "synchrony",
+      "amazon store card",
+      "carecredit",
+      "lowes card",
+      "sams club",
+      "syncb",
+      "synchrony"
+    ],
+    "product_type": "Store / Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Most store cards and CareCredit are unsecured.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Comenity / Bread",
+    "display_name": "Comenity / Bread Retail Card",
+    "search_aliases": [
+      "comenity",
+      "bread financial",
+      "victoria secret card"
+    ],
+    "search_tokens": [
+      "bread financial",
+      "comenity",
+      "victoria secret card"
+    ],
+    "search_index": [
+      "comenity / bread retail card",
+      "comenity / bread",
+      "bread financial",
+      "comenity",
+      "victoria secret card"
+    ],
+    "product_type": "Retail Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Store-branded retail credit.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Navy Federal",
+    "display_name": "Navy Federal Credit Card",
+    "search_aliases": [
+      "navy federal",
+      "nfcu credit card"
+    ],
+    "search_tokens": [
+      "navy federal",
+      "nfcu credit card"
+    ],
+    "search_index": [
+      "navy federal credit card",
+      "navy federal",
+      "navy federal",
+      "nfcu credit card"
+    ],
+    "product_type": "Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Check that it is not a secured-card variant.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Credit Union",
+    "display_name": "Credit Union Signature Loan",
+    "search_aliases": [
+      "signature loan",
+      "personal signature loan",
+      "credit union personal loan"
+    ],
+    "search_tokens": [
+      "credit union personal loan",
+      "personal signature loan",
+      "signature loan"
+    ],
+    "search_index": [
+      "credit union signature loan",
+      "credit union",
+      "credit union personal loan",
+      "personal signature loan",
+      "signature loan"
+    ],
+    "product_type": "Personal Loan",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Most signature loans are unsecured.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "SoFi",
+    "display_name": "SoFi Personal Loan",
+    "search_aliases": [
+      "sofi"
+    ],
+    "search_tokens": [
+      "sofi"
+    ],
+    "search_index": [
+      "sofi personal loan",
+      "sofi",
+      "sofi"
+    ],
+    "product_type": "Personal Loan",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Marketplace/fintech unsecured loan.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Upstart",
+    "display_name": "Upstart Personal Loan",
+    "search_aliases": [
+      "upstart"
+    ],
+    "search_tokens": [
+      "upstart"
+    ],
+    "search_index": [
+      "upstart personal loan",
+      "upstart",
+      "upstart"
+    ],
+    "product_type": "Personal Loan",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Marketplace/partner-bank unsecured installment.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Upgrade",
+    "display_name": "Upgrade Personal Loan / Line",
+    "search_aliases": [
+      "upgrade"
+    ],
+    "search_tokens": [
+      "upgrade"
+    ],
+    "search_index": [
+      "upgrade personal loan / line",
+      "upgrade",
+      "upgrade"
+    ],
+    "product_type": "Personal Loan / Line",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Verify no secured variant.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Avant",
+    "display_name": "Avant Personal Loan",
+    "search_aliases": [
+      "avant"
+    ],
+    "search_tokens": [
+      "avant"
+    ],
+    "search_index": [
+      "avant personal loan",
+      "avant",
+      "avant"
+    ],
+    "product_type": "Personal Loan",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Common unsecured installment debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "LendingClub",
+    "display_name": "LendingClub Personal Loan",
+    "search_aliases": [
+      "lendingclub"
+    ],
+    "search_tokens": [
+      "lendingclub"
+    ],
+    "search_index": [
+      "lendingclub personal loan",
+      "lendingclub",
+      "lendingclub"
+    ],
+    "product_type": "Personal Loan",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Common unsecured installment debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Best Egg",
+    "display_name": "Best Egg Personal Loan",
+    "search_aliases": [
+      "best egg"
+    ],
+    "search_tokens": [
+      "best egg"
+    ],
+    "search_index": [
+      "best egg personal loan",
+      "best egg",
+      "best egg"
+    ],
+    "product_type": "Personal Loan",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Common unsecured installment debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Prosper",
+    "display_name": "Prosper Personal Loan",
+    "search_aliases": [
+      "prosper"
+    ],
+    "search_tokens": [
+      "prosper"
+    ],
+    "search_index": [
+      "prosper personal loan",
+      "prosper",
+      "prosper"
+    ],
+    "product_type": "Personal Loan",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Common unsecured installment debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Achieve",
+    "display_name": "Achieve / FreedomPlus Personal Loan",
+    "search_aliases": [
+      "achieve",
+      "freedomplus"
+    ],
+    "search_tokens": [
+      "achieve",
+      "freedomplus"
+    ],
+    "search_index": [
+      "achieve / freedomplus personal loan",
+      "achieve",
+      "achieve",
+      "freedomplus"
+    ],
+    "product_type": "Personal Loan",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Verify current branding on tradeline.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "OneMain Financial",
+    "display_name": "OneMain Personal Loan",
+    "search_aliases": [
+      "onemain",
+      "one main"
+    ],
+    "search_tokens": [
+      "one main",
+      "onemain"
+    ],
+    "search_index": [
+      "onemain personal loan",
+      "onemain financial",
+      "one main",
+      "onemain"
+    ],
+    "product_type": "Personal Loan",
+    "classification": "Can Be Unsecured or Secured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Must verify agreement because OneMain offers both secured and unsecured products.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "OppLoans",
+    "display_name": "OppLoans Installment Loan",
+    "search_aliases": [
+      "opploans"
+    ],
+    "search_tokens": [
+      "opploans"
+    ],
+    "search_index": [
+      "opploans installment loan",
+      "opploans",
+      "opploans"
+    ],
+    "product_type": "Installment Loan",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "High APR unsecured installment.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "NetCredit",
+    "display_name": "NetCredit Installment / Line",
+    "search_aliases": [
+      "netcredit"
+    ],
+    "search_tokens": [
+      "netcredit"
+    ],
+    "search_index": [
+      "netcredit installment / line",
+      "netcredit",
+      "netcredit"
+    ],
+    "product_type": "Installment / Line",
+    "classification": "Usually Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Verify state and exact product.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Elastic",
+    "display_name": "Elastic Line of Credit",
+    "search_aliases": [
+      "elastic"
+    ],
+    "search_tokens": [
+      "elastic"
+    ],
+    "search_index": [
+      "elastic line of credit",
+      "elastic",
+      "elastic"
+    ],
+    "product_type": "Line of Credit",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Verify tradeline wording.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Rise",
+    "display_name": "Rise Installment Loan",
+    "search_aliases": [
+      "rise"
+    ],
+    "search_tokens": [
+      "rise"
+    ],
+    "search_index": [
+      "rise installment loan",
+      "rise",
+      "rise"
+    ],
+    "product_type": "Installment Loan",
+    "classification": "Usually Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Verify state and exact product.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "CashNetUSA",
+    "display_name": "CashNetUSA Payday / Installment",
+    "search_aliases": [
+      "cashnetusa"
+    ],
+    "search_tokens": [
+      "cashnetusa"
+    ],
+    "search_index": [
+      "cashnetusa payday / installment",
+      "cashnetusa",
+      "cashnetusa"
+    ],
+    "product_type": "Payday / Installment",
+    "classification": "Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Unsecured but compliance-sensitive.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Speedy Cash",
+    "display_name": "Speedy Cash Payday / Installment",
+    "search_aliases": [
+      "speedy cash"
+    ],
+    "search_tokens": [
+      "speedy cash"
+    ],
+    "search_index": [
+      "speedy cash payday / installment",
+      "speedy cash",
+      "speedy cash"
+    ],
+    "product_type": "Payday / Installment",
+    "classification": "Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Verify exact structure.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "ACE Cash Express",
+    "display_name": "ACE Cash Express Payday / Installment",
+    "search_aliases": [
+      "ace cash express",
+      "ace cash"
+    ],
+    "search_tokens": [
+      "ace cash",
+      "ace cash express"
+    ],
+    "search_index": [
+      "ace cash express payday / installment",
+      "ace cash express",
+      "ace cash",
+      "ace cash express"
+    ],
+    "product_type": "Payday / Installment",
+    "classification": "Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Verify exact structure.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Affirm",
+    "display_name": "Affirm POS Installment",
+    "search_aliases": [
+      "affirm"
+    ],
+    "search_tokens": [
+      "affirm"
+    ],
+    "search_index": [
+      "affirm pos installment",
+      "affirm",
+      "affirm"
+    ],
+    "product_type": "POS Installment",
+    "classification": "Usually Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Review account terms.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Klarna",
+    "display_name": "Klarna POS Installment",
+    "search_aliases": [
+      "klarna"
+    ],
+    "search_tokens": [
+      "klarna"
+    ],
+    "search_index": [
+      "klarna pos installment",
+      "klarna",
+      "klarna"
+    ],
+    "product_type": "POS Installment",
+    "classification": "Usually Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Review account terms.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Afterpay",
+    "display_name": "Afterpay / Clearpay POS Installment",
+    "search_aliases": [
+      "afterpay",
+      "clearpay"
+    ],
+    "search_tokens": [
+      "afterpay",
+      "clearpay"
+    ],
+    "search_index": [
+      "afterpay / clearpay pos installment",
+      "afterpay",
+      "afterpay",
+      "clearpay"
+    ],
+    "product_type": "POS Installment",
+    "classification": "Usually Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Review account terms.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Zip",
+    "display_name": "Zip / Quadpay POS Installment",
+    "search_aliases": [
+      "zip",
+      "quadpay"
+    ],
+    "search_tokens": [
+      "quadpay",
+      "zip"
+    ],
+    "search_index": [
+      "zip / quadpay pos installment",
+      "zip",
+      "quadpay",
+      "zip"
+    ],
+    "product_type": "POS Installment",
+    "classification": "Usually Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Review account terms.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "PayPal",
+    "display_name": "PayPal Credit",
+    "search_aliases": [
+      "paypal credit",
+      "paypal syncb"
+    ],
+    "search_tokens": [
+      "paypal credit",
+      "paypal syncb"
+    ],
+    "search_index": [
+      "paypal credit",
+      "paypal",
+      "paypal credit",
+      "paypal syncb"
+    ],
+    "product_type": "Revolving Credit",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Often issued by Synchrony.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Apple Card",
+    "display_name": "Apple Card",
+    "search_aliases": [
+      "apple card",
+      "goldman sachs card"
+    ],
+    "search_tokens": [
+      "apple card",
+      "goldman sachs card"
+    ],
+    "search_index": [
+      "apple card",
+      "apple card",
+      "apple card",
+      "goldman sachs card"
+    ],
+    "product_type": "Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Standard unsecured revolving debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "CareCredit",
+    "display_name": "CareCredit",
+    "search_aliases": [
+      "carecredit"
+    ],
+    "search_tokens": [
+      "carecredit"
+    ],
+    "search_index": [
+      "carecredit",
+      "carecredit",
+      "carecredit"
+    ],
+    "product_type": "Medical Credit Card",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Medical financing card issued by Synchrony.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "PatientFi",
+    "display_name": "PatientFi Medical Financing",
+    "search_aliases": [
+      "patientfi"
+    ],
+    "search_tokens": [
+      "patientfi"
+    ],
+    "search_index": [
+      "patientfi medical financing",
+      "patientfi",
+      "patientfi"
+    ],
+    "product_type": "Medical Financing",
+    "classification": "Usually Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Verify agreement.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Medical",
+    "display_name": "Hospital / Medical Group Bill",
+    "search_aliases": [
+      "hospital",
+      "medical group",
+      "surgery center",
+      "er bill",
+      "doctor bill"
+    ],
+    "search_tokens": [
+      "doctor bill",
+      "er bill",
+      "hospital",
+      "medical group",
+      "surgery center"
+    ],
+    "search_index": [
+      "hospital / medical group bill",
+      "medical",
+      "doctor bill",
+      "er bill",
+      "hospital",
+      "medical group",
+      "surgery center"
+    ],
+    "product_type": "Medical Bill",
+    "classification": "Unsecured",
+    "routing_category": "Commonly Eligible",
+    "eligible_for_enrollment": "Yes",
+    "needs_supervisor_review": "No",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "No collateral.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Utility",
+    "display_name": "Utility Bill",
+    "search_aliases": [
+      "utility",
+      "electric bill",
+      "gas bill",
+      "water bill"
+    ],
+    "search_tokens": [
+      "electric bill",
+      "gas bill",
+      "utility",
+      "water bill"
+    ],
+    "search_index": [
+      "utility bill",
+      "utility",
+      "electric bill",
+      "gas bill",
+      "utility",
+      "water bill"
+    ],
+    "product_type": "Utility Bill",
+    "classification": "Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Usually unsecured service debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Telecom",
+    "display_name": "Cell / Internet Bill",
+    "search_aliases": [
+      "cell phone bill",
+      "internet bill",
+      "verizon",
+      "att",
+      "tmobile",
+      "comcast"
+    ],
+    "search_tokens": [
+      "att",
+      "cell phone bill",
+      "comcast",
+      "internet bill",
+      "tmobile",
+      "verizon"
+    ],
+    "search_index": [
+      "cell / internet bill",
+      "telecom",
+      "att",
+      "cell phone bill",
+      "comcast",
+      "internet bill",
+      "tmobile",
+      "verizon"
+    ],
+    "product_type": "Telecom Bill",
+    "classification": "Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Usually unsecured service debt.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Rent",
+    "display_name": "Back Rent",
+    "search_aliases": [
+      "back rent",
+      "rent due",
+      "landlord",
+      "property manager"
+    ],
+    "search_tokens": [
+      "back rent",
+      "landlord",
+      "property manager",
+      "rent due"
+    ],
+    "search_index": [
+      "back rent",
+      "rent",
+      "back rent",
+      "landlord",
+      "property manager",
+      "rent due"
+    ],
+    "product_type": "Rent",
+    "classification": "Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Operational rules vary.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Collection Agency",
+    "display_name": "Collection Account",
+    "search_aliases": [
+      "collection",
+      "midland",
+      "portfolio recovery",
+      "lvnv",
+      "resurgent",
+      "jefferson capital",
+      "cavalry"
+    ],
+    "search_tokens": [
+      "cavalry",
+      "collection",
+      "jefferson capital",
+      "lvnv",
+      "midland",
+      "portfolio recovery",
+      "resurgent"
+    ],
+    "search_index": [
+      "collection account",
+      "collection agency",
+      "cavalry",
+      "collection",
+      "jefferson capital",
+      "lvnv",
+      "midland",
+      "portfolio recovery",
+      "resurgent"
+    ],
+    "product_type": "Collection Account",
+    "classification": "Follows Underlying Debt Type",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "Yes",
+    "exclude_reason": null,
+    "routing_notes": "Must identify original creditor and original debt type.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 1,
+    "secured": false
+  },
+  {
+    "creditor_group": "Midland Credit Management",
+    "display_name": "Midland Collection Account",
+    "search_aliases": [
+      "midland",
+      "mcm"
+    ],
+    "search_tokens": [
+      "mcm",
+      "midland"
+    ],
+    "search_index": [
+      "midland collection account",
+      "midland credit management",
+      "mcm",
+      "midland"
+    ],
+    "product_type": "Collection Account",
+    "classification": "Follows Underlying Debt Type",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "Yes",
+    "exclude_reason": null,
+    "routing_notes": "Often former credit-card debt; confirm original account.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 1,
+    "secured": false
+  },
+  {
+    "creditor_group": "Portfolio Recovery",
+    "display_name": "Portfolio Recovery Collection Account",
+    "search_aliases": [
+      "portfolio recovery",
+      "pra"
+    ],
+    "search_tokens": [
+      "portfolio recovery",
+      "pra"
+    ],
+    "search_index": [
+      "portfolio recovery collection account",
+      "portfolio recovery",
+      "portfolio recovery",
+      "pra"
+    ],
+    "product_type": "Collection Account",
+    "classification": "Follows Underlying Debt Type",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "Yes",
+    "exclude_reason": null,
+    "routing_notes": "Often former credit-card debt; confirm original account.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 1,
+    "secured": false
+  },
+  {
+    "creditor_group": "LVNV Funding",
+    "display_name": "LVNV Funding Collection Account",
+    "search_aliases": [
+      "lvnv",
+      "resurgent"
+    ],
+    "search_tokens": [
+      "lvnv",
+      "resurgent"
+    ],
+    "search_index": [
+      "lvnv funding collection account",
+      "lvnv funding",
+      "lvnv",
+      "resurgent"
+    ],
+    "product_type": "Collection Account",
+    "classification": "Follows Underlying Debt Type",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "Yes",
+    "exclude_reason": null,
+    "routing_notes": "Confirm original account type.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 1,
+    "secured": false
+  },
+  {
+    "creditor_group": "Jefferson Capital",
+    "display_name": "Jefferson Capital Collection Account",
+    "search_aliases": [
+      "jefferson capital"
+    ],
+    "search_tokens": [
+      "jefferson capital"
+    ],
+    "search_index": [
+      "jefferson capital collection account",
+      "jefferson capital",
+      "jefferson capital"
+    ],
+    "product_type": "Collection Account",
+    "classification": "Follows Underlying Debt Type",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "Yes",
+    "exclude_reason": null,
+    "routing_notes": "Confirm original account type.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 1,
+    "secured": false
+  },
+  {
+    "creditor_group": "Furniture Financing",
+    "display_name": "Furniture Financing",
+    "search_aliases": [
+      "furniture financing",
+      "rooms to go",
+      "ashley financing"
+    ],
+    "search_tokens": [
+      "ashley financing",
+      "furniture financing",
+      "rooms to go"
+    ],
+    "search_index": [
+      "furniture financing",
+      "furniture financing",
+      "ashley financing",
+      "furniture financing",
+      "rooms to go"
+    ],
+    "product_type": "Installment Financing",
+    "classification": "Can Be Secured or Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Must verify agreement.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Jewelry Financing",
+    "display_name": "Jewelry Financing",
+    "search_aliases": [
+      "jewelry financing",
+      "kay jewelers financing"
+    ],
+    "search_tokens": [
+      "jewelry financing",
+      "kay jewelers financing"
+    ],
+    "search_index": [
+      "jewelry financing",
+      "jewelry financing",
+      "jewelry financing",
+      "kay jewelers financing"
+    ],
+    "product_type": "Installment Financing",
+    "classification": "Can Be Secured or Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Must verify agreement.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Solar Loan",
+    "display_name": "Solar / Home Improvement Loan",
+    "search_aliases": [
+      "solar loan",
+      "home improvement loan"
+    ],
+    "search_tokens": [
+      "home improvement loan",
+      "solar loan"
+    ],
+    "search_index": [
+      "solar / home improvement loan",
+      "solar loan",
+      "home improvement loan",
+      "solar loan"
+    ],
+    "product_type": "Home Improvement Loan",
+    "classification": "Can Be Secured or Unsecured",
+    "routing_category": "Conditional / Special Handling",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Check contract, UCC, and fixture terms.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Business Term Loan",
+    "display_name": "Business Term Loan",
+    "search_aliases": [
+      "business term loan",
+      "business loan"
+    ],
+    "search_tokens": [
+      "business loan",
+      "business term loan"
+    ],
+    "search_index": [
+      "business term loan",
+      "business term loan",
+      "business loan",
+      "business term loan"
+    ],
+    "product_type": "Business Loan",
+    "classification": "Can Be Secured or Unsecured",
+    "routing_category": "Conditional",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Check personal guarantee and UCC.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 2,
+    "secured": false
+  },
+  {
+    "creditor_group": "Lease Deficiency",
+    "display_name": "Lease Deficiency",
+    "search_aliases": [
+      "lease deficiency",
+      "broken lease auto",
+      "equipment lease deficiency"
+    ],
+    "search_tokens": [
+      "broken lease auto",
+      "equipment lease deficiency",
+      "lease deficiency"
+    ],
+    "search_index": [
+      "lease deficiency",
+      "lease deficiency",
+      "broken lease auto",
+      "equipment lease deficiency",
+      "lease deficiency"
+    ],
+    "product_type": "Deficiency Balance",
+    "classification": "Conditional",
+    "routing_category": "Conditional / Special Handling",
+    "eligible_for_enrollment": "ASK BACKEND MANAGER",
+    "needs_supervisor_review": "Yes",
+    "underlying_debt_inherits_original_type": "No",
+    "exclude_reason": null,
+    "routing_notes": "Need contract and deficiency details.",
+    "backend_notes": "Route using current backend rules only: Level Debt or Consumer Shield.",
+    "unsecured_priority": 0,
+    "secured": false
+  }
+]
