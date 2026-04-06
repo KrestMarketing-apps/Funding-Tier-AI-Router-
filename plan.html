@@ -1,1 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Loading Plan...</title>
+  <script>
+    async function loadPlan() {
+      try {
+        const path = window.location.pathname;
+        const slug = path.split('/plan/')[1];
 
+        if (!slug) {
+          document.body.innerHTML = '<h1>Invalid plan link</h1>';
+          return;
+        }
+
+        const dataUrl = `https://xcbefibugdiyl6le.public.blob.vercel-storage.com/plans/${slug}.json`;
+
+        const res = await fetch(dataUrl);
+
+        if (!res.ok) {
+          document.body.innerHTML = '<h1>Plan not found</h1>';
+          return;
+        }
+
+        const data = await res.json();
+
+        // Redirect to your existing renderer
+        window.location.href = `/api/plan?dataUrl=${encodeURIComponent(dataUrl)}`;
+
+      } catch (err) {
+        document.body.innerHTML = '<h1>Error loading plan</h1>';
+      }
+    }
+
+    loadPlan();
+  </script>
+</head>
+<body>
+  <h2 style="text-align:center;margin-top:100px;">
+    Loading your personalized plan...
+  </h2>
+</body>
+</html>
