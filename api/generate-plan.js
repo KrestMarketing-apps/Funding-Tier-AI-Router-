@@ -73,7 +73,7 @@ export default async function handler(req, res) {
     });
 
     const origin = getOrigin(req);
-    const pageUrl = `${origin}/api/plan?dataUrl=${encodeURIComponent(dataBlob.url)}`;
+    const pageUrl = `${origin}/plan/${slug}`;
 
     // keep placeholder PDF for now
     const pdfText = `
