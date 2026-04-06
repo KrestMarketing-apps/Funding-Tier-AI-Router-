@@ -299,7 +299,48 @@
     const CONSUMER_SHIELD_BLACKOUT_STATES = new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
 
     const CREDITOR_OPTIONS = ['', 'American Express','Bank of America','Capital One','Chase','Citi','Discover','Wells Fargo','Synchrony','Upstart','LendingClub','OneMain Financial','SoFi','Avant','Best Egg','Klarna','Goodleap','Sunbit','RBC Bank','USAA','Republic Finance','Mariner Finance','Regional Finance','Lendmark','Navient','Other / Manual Entry'];
-    const DEBT_TYPES = ['Unsecured Credit Card','Unsecured Personal Loan','Payday Loan','Tribal Loan','Medical Bill','Back Rent','Private Student Loan','Business Debt','Repossession Deficiency','Apartment Back Rent (Collections)','Unsecured Line of Credit','Cell Phone Bill','Utility Bill','USAA','Deficiency','Auto Repo Deficiency','Peer-to-Peer Loan','Timeshare','Mortgage','Federal Student Loan','Navient Student Loan','Judgment','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','SBA Loan','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Other'];
+    const DEBT_TYPES = [
+  'AFES Account',
+  'Alimony / Child Support',
+  'Apartment Back Rent (Collections)',
+  'Auto Loan (Secured)',
+  'Auto Repo Deficiency',
+  'Back Rent',
+  'Business Debt',
+  'Casino Debt',
+  'Cash Call',
+  'Cell Phone Bill',
+  'Credit Union Loan',
+  'Cross Collateralized Account',
+  'Deficiency',
+  'Direct Furniture Store Loan',
+  'Employer Debt',
+  'Federal Student Loan',
+  'Furniture Store Financing',
+  'IRS Tax Debt',
+  'Installment Sales Contract',
+  'Judgment',
+  'Loan from Individual',
+  'Medical Bill',
+  'Military Account',
+  'Mortgage',
+  'Navient Student Loan',
+  'Other',
+  'Overdraft Account',
+  'Payday Loan',
+  'Peer-to-Peer Loan',
+  'Private Student Loan',
+  'Repossession Deficiency',
+  'SBA Loan',
+  'Secured Loan',
+  'Timeshare',
+  'Tribal Loan',
+  'Unsecured Credit Card',
+  'Unsecured Line of Credit',
+  'Unsecured Personal Loan',
+  'USAA',
+  'Utility Bill'
+];
 const DEBT_TYPES_ALPHA = [...DEBT_TYPES].sort((a, b) => a.localeCompare(b));
 const STATE_OPTIONS = Object.entries(STATE_NAMES)
   .map(([abbr, name]) => ({ abbr, name, label: `${abbr} - ${name}` }))
@@ -356,16 +397,27 @@ const STATE_OPTIONS = Object.entries(STATE_NAMES)
     const getCreditorDisplayName = (row) =>
       row.creditorName === 'Other / Manual Entry' ? (row.manualName || 'Manual Creditor') : (row.creditorName || '');
 
-  function mapCreditorToDebtType(item) {
+function mapCreditorToDebtType(item) {
   const productType = String(item?.product_type || '').toLowerCase().trim();
   const classification = String(item?.classification || '').toLowerCase().trim();
   const group = String(item?.creditor_group || '').toLowerCase().trim();
+  const displayName = String(item?.display_name || '').toLowerCase().trim();
   const secured = item?.secured === true || item?.secured === 'true';
 
   const isExplicitlySecured =
     secured ||
     classification === 'secured' ||
     classification === 'secured debt';
+
+  const looksLikeAutoLoan =
+    productType.includes('auto') ||
+    productType.includes('vehicle') ||
+    productType.includes('car loan') ||
+    productType.includes('auto loan') ||
+    displayName.includes('auto loan') ||
+    group.includes('auto');
+
+  if (looksLikeAutoLoan && isExplicitlySecured) return 'Auto Loan (Secured)';
 
   if (productType.includes('credit card')) return 'Unsecured Credit Card';
   if (productType.includes('personal loan')) return 'Unsecured Personal Loan';
@@ -376,7 +428,7 @@ const STATE_OPTIONS = Object.entries(STATE_NAMES)
   if (productType.includes('business')) return 'Business Debt';
   if (group.includes('repo') || productType.includes('deficiency')) return 'Repossession Deficiency';
 
-  if (isExplicitlySecured) return 'Other';
+  if (isExplicitlySecured) return 'Secured Loan';
 
   return 'Unsecured Credit Card';
 }
@@ -761,7 +813,8 @@ async function searchCreditors(index, query) {
 
     resultsBox.innerHTML = data.results.map((item) => {
       const debtType = mapCreditorToDebtType(item);
-      const unsecured = !item.secured;
+      const isSecured = item.secured === true || item.secured === 'true';
+const unsecured = !isSecured;
       const eligible = String(item.eligible_for_enrollment || '').toLowerCase() === 'yes';
 
       return `
@@ -771,7 +824,7 @@ async function searchCreditors(index, query) {
           data-pick-index="${index}"
           data-pick-name="${escapeHtml(item.display_name || '')}"
           data-pick-debt-type="${escapeHtml(debtType)}"
-          data-pick-secured="${item.secured ? 'true' : 'false'}"
+          data-pick-secured="${isSecured ? 'true' : 'false'}"
         >
           <div class="font-medium">${escapeHtml(item.display_name || '')}</div>
           <div class="text-xs ${unsecured ? 'text-teal-700' : 'text-red-500'}">
@@ -891,21 +944,24 @@ function bindCreditorResultClicks() {
   btn.onclick = () => {
     const index = Number(btn.dataset.pickIndex);
     const name = btn.dataset.pickName || '';
+    const debtType = btn.dataset.pickDebtType || 'Unsecured Credit Card';
     const secured = btn.dataset.pickSecured === 'true';
 
-    // ✅ Only set creditor name
     state.rows[index].creditorName = name;
-
-    // ✅ Keep secured flag if needed
     state.rows[index].isSecured = secured;
 
-    // ❌ DO NOT TOUCH debtType here
+    // For clearly secured products, set a secured debt type.
+    // Otherwise leave existing debt type alone.
+    if (secured) {
+      state.rows[index].debtType = debtType || 'Secured Loan';
+    } else if (!state.rows[index].debtType || state.rows[index].debtType === 'Other') {
+      state.rows[index].debtType = debtType || 'Unsecured Credit Card';
+    }
 
     const input = document.querySelector(`.creditor-search[data-index="${index}"]`);
     const resultsBox = document.querySelector(`[data-results-index="${index}"]`);
 
     if (input) input.value = name;
-
     if (resultsBox) {
       resultsBox.innerHTML = '';
       resultsBox.classList.add('hidden');
