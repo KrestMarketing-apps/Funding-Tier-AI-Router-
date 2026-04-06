@@ -1,34 +1,18 @@
-export async function POST(req) {
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const contactId = searchParams.get("contactId");
+
+  if (!contactId) {
+    return Response.json(
+      { ok: false, error: "Missing contactId" },
+      { status: 400 }
+    );
+  }
+
   try {
-    const body = await req.json();
-    const { contactId } = body;
-
-    if (!contactId) {
-      return Response.json(
-        { ok: false, error: "Missing contactId" },
-        { status: 400 }
-      );
-    }
-
     const updatePayload = {
-      customFields: [
-        {
-          key: "router_status",
-          field_value: "Completed"
-        },
-        {
-          key: "router_result",
-          field_value: "Test result from Vercel"
-        },
-        {
-          key: "pdf_url",
-          field_value: "https://example.com/test.pdf"
-        },
-        {
-          key: "personalized_page_url",
-          field_value: "https://example.com/test-page"
-        }
-      ]
+      firstName: "Router Test",
+      lastName: "Success"
     };
 
     const res = await fetch(
