@@ -174,6 +174,16 @@ export default async function handler(req, res) {
   color: white;
   box-shadow: 0 10px 25px rgba(220,38,38,0.35);
 }
+.kpi-red::after {
+  content: "⚠ CURRENT PATH";
+  display: block;
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,0.9);
+}
+
     .kpi-red .label {
   color: #000000;
 }
