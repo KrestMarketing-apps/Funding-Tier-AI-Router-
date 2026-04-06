@@ -363,8 +363,9 @@ export default async function handler(req, res) {
           <div class="value">${currency(totalDebt)}</div>
         </div>
 <div class="kpi kpi-red">
-  <div class="label">Your Current Minimum Monthly Payment</div>
-  <div class="value">${currency(doNothing.monthlyPayment || 0)}</div>
+<div class="label" style="color: #fff; font-weight: bold; text-decoration: underline;">
+  Your Current Minimum Monthly Payment
+</div>  <div class="value">${currency(doNothing.monthlyPayment || 0)}</div>
 
   <div style="
     margin-top:8px;
