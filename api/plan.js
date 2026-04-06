@@ -173,9 +173,13 @@ export default async function handler(req, res) {
       border: 1px solid #dc2626;
       color: white;
     }
-    .kpi-red .label,
-    .kpi-red .value {
-      color: white;
+    .kpi-red .label {
+  color: #000000;
+}
+
+.kpi-red .value {
+  color: #ffffff;
+}
     }
     .kpi-green {
       background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
