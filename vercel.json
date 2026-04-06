@@ -2,12 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
-      "source": "/plan/:slug/pdf",
-      "destination": "/api/plan-pdf?slug=:slug"
-    },
-    {
       "source": "/plan/:slug",
-      "destination": "/api/plan-page?slug=:slug"
+      "destination": "/api/plan?slug=:slug"
     }
   ]
 }
