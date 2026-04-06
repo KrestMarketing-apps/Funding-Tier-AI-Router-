@@ -378,6 +378,14 @@ export default async function handler(req, res) {
         <div class="kpi kpi-green">
           <div class="label">New Lower Monthly Payment</div>
           <div class="value">${currency(recommended.monthlyPayment || 0)}</div>
+          <div style="
+  margin-top:8px;
+  font-size:13px;
+  font-weight:600;
+  color:#065f46;
+">
+  This is your new projected lower payment
+</div>
         </div>
         <div class="kpi kpi-green">
           <div class="label">New Program Plan Length</div>
