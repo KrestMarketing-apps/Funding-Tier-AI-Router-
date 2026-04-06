@@ -11,3 +11,8 @@
     }
   ]
 }
+{
+  "rewrites": [
+    { "source": "/plan/:slug", "destination": "/plan.html" }
+  ]
+}
