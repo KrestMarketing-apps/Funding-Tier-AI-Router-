@@ -30,20 +30,41 @@ async function updateGhlContact(contactId, fields = {}) {
 
 export async function POST(req) {
   try {
-    const headerSecret = req.headers.get("x-router-secret");
-
-    if (
-      process.env.ROUTER_SHARED_SECRET &&
-      headerSecret !== process.env.ROUTER_SHARED_SECRET
-    ) {
-      return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await req.json();
-    const contactId = body.contactId || body.contact?.id;
+
+    const contactId =
+      body.contactId ||
+      body.contact_id ||
+      body.contact?.id ||
+      null;
+
+    const firstName =
+      body.firstName ||
+      body.first_name ||
+      body.contact?.firstName ||
+      "";
+
+    const lastName =
+      body.lastName ||
+      body.last_name ||
+      body.contact?.lastName ||
+      "";
+
+    const email =
+      body.email ||
+      body.contact?.email ||
+      "";
+
+    const phone =
+      body.phone ||
+      body.contact?.phone ||
+      "";
 
     if (!contactId) {
-      return Response.json({ ok: false, error: "Missing contactId" }, { status: 400 });
+      return Response.json(
+        { ok: false, error: "Missing contactId", receivedBody: body },
+        { status: 400 }
+      );
     }
 
     const ghlUpdate = await updateGhlContact(contactId, {
@@ -56,6 +77,14 @@ export async function POST(req) {
     return Response.json({
       ok: ghlUpdate.ok,
       status: ghlUpdate.status,
+      message: "Router webhook processed",
+      received: {
+        contactId,
+        firstName,
+        lastName,
+        email,
+        phone
+      },
       ghlResponse: ghlUpdate.text
     });
   } catch (error) {
