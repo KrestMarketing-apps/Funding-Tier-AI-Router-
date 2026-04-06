@@ -169,10 +169,11 @@ export default async function handler(req, res) {
       padding: 18px;
     }
     .kpi-red {
-      background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
-      border: 1px solid #dc2626;
-      color: white;
-    }
+  background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+  border: 1px solid #991b1b;
+  color: white;
+  box-shadow: 0 10px 25px rgba(220,38,38,0.35);
+}
     .kpi-red .label {
   color: #000000;
 }
@@ -351,10 +352,19 @@ export default async function handler(req, res) {
           <div class="label">Total Debt Reviewed</div>
           <div class="value">${currency(totalDebt)}</div>
         </div>
-        <div class="kpi kpi-red">
-          <div class="label">Minimum Monthly Payment</div>
-          <div class="value">${currency(doNothing.monthlyPayment || 0)}</div>
-        </div>
+<div class="kpi kpi-red">
+  <div class="label">Your Current Minimum Monthly Payment</div>
+  <div class="value">${currency(doNothing.monthlyPayment || 0)}</div>
+
+  <div style="
+    margin-top:8px;
+    font-size:13px;
+    font-weight:600;
+    color:#000;
+  ">
+    This is what you are currently stuck paying every month
+  </div>
+</div>
         <div class="kpi kpi-green">
           <div class="label">New Lower Monthly Payment</div>
           <div class="value">${currency(recommended.monthlyPayment || 0)}</div>
