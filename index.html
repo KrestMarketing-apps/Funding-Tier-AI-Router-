@@ -1473,30 +1473,20 @@ function bindCreditorResultClicks() {
     if (!res.ok || !data.ok) {
       throw new Error(data.error || 'Failed to generate plan.');
     }
-
-const resultBox = el('planResultBox');
-const planLink = el('planResultLink');
-
-
-if (resultBox && planLink && pdfLink) {
 const resultBox = el('planResultBox');
 const planBtn = el('planResultLink');
 
 if (resultBox && planBtn) {
-  planBtn.onclick = null;
-
-  planBtn.addEventListener('click', function () {
+  planBtn.onclick = () => {
     window.open(data.pageUrl, '_blank');
-  });
+  };
 
   resultBox.style.display = 'block';
   resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
 } else {
   console.warn('planResultBox or button not found');
-});
-} else {
-  console.warn('planResultBox / links not found in DOM');
 }
+
   } catch (err) {
     alert(err.message || 'Failed to generate plan.');
     console.error('sendProspectEmail error:', err);
