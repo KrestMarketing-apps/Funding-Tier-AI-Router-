@@ -160,10 +160,20 @@
         <p class="mt-1 text-slate-600">Select the state and enter up to 5 debts to estimate program fit and create a prospect-facing comparison summary.</p>
 
         <div class="mt-5 grid gap-4 md:grid-cols-2">
-          <div>
-            <label class="block mb-2 text-sm font-medium">State</label>
-            <select id="state"></select>
-          </div>
+<div class="relative">
+  <label class="block mb-2 text-sm font-medium">State</label>
+  <input
+    id="stateSearch"
+    class="input"
+    type="text"
+    placeholder="Start typing state..."
+    autocomplete="off"
+  />
+  <div
+    id="stateResults"
+    class="hidden absolute left-0 right-0 z-30 mt-1 rounded-xl border border-slate-200 bg-white shadow-lg max-h-64 overflow-y-auto"
+  ></div>
+</div>
           <div>
             <label class="block mb-2 text-sm font-medium">Total Enrolled Debt</label>
             <div id="totalDebt" class="rounded-xl border bg-white/80 px-4 py-3 text-lg font-semibold">$0</div>
@@ -290,7 +300,12 @@
 
     const CREDITOR_OPTIONS = ['', 'American Express','Bank of America','Capital One','Chase','Citi','Discover','Wells Fargo','Synchrony','Upstart','LendingClub','OneMain Financial','SoFi','Avant','Best Egg','Klarna','Goodleap','Sunbit','RBC Bank','USAA','Republic Finance','Mariner Finance','Regional Finance','Lendmark','Navient','Other / Manual Entry'];
     const DEBT_TYPES = ['Unsecured Credit Card','Unsecured Personal Loan','Payday Loan','Tribal Loan','Medical Bill','Back Rent','Private Student Loan','Business Debt','Repossession Deficiency','Apartment Back Rent (Collections)','Unsecured Line of Credit','Cell Phone Bill','Utility Bill','USAA','Deficiency','Auto Repo Deficiency','Peer-to-Peer Loan','Timeshare','Mortgage','Federal Student Loan','Navient Student Loan','Judgment','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','SBA Loan','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Other'];
-
+const DEBT_TYPES_ALPHA = [...DEBT_TYPES].sort((a, b) => a.localeCompare(b));
+const STATE_OPTIONS = Object.entries(STATE_NAMES)
+  .map(([abbr, name]) => ({ abbr, name, label: `${abbr} - ${name}` }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+    
+    
     const CONSUMER_SHIELD_REJECTED_TYPES = new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
     const CONSUMER_SHIELD_CONDITIONAL_TYPES = new Set(['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt']);
     const LEVEL_REJECTED_TYPES = new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt']);
@@ -662,7 +677,7 @@ function renderRows() {
           class="input creditor-search"
           data-index="${index}"
           placeholder="Start typing creditor name..."
-          value="${row.creditorName || ''}"
+          value="${escapeHtml(row.creditorName || '')}"
           autocomplete="off"
         />
         <div
@@ -672,11 +687,27 @@ function renderRows() {
         <div class="alert-wrap flex flex-wrap gap-2 pt-1"></div>
       </div>
 
-      <input class="input" data-index="${index}" data-key="amount" placeholder="$0" value="${row.amount || ''}" />
+      <input
+        class="input"
+        data-index="${index}"
+        data-key="amount"
+        placeholder="$0"
+        value="${row.amount || ''}"
+      />
 
-      <select data-index="${index}" data-key="debtType">
-        ${DEBT_TYPES.map((t) => `<option ${row.debtType === t ? 'selected' : ''} value="${t}">${t}</option>`).join('')}
-      </select>
+      <div class="relative">
+        <input
+          class="input debt-type-search"
+          data-index="${index}"
+          placeholder="Start typing debt type..."
+          value="${escapeHtml(row.debtType || '')}"
+          autocomplete="off"
+        />
+        <div
+          class="debt-type-results hidden absolute left-0 right-0 z-30 mt-1 rounded-xl border border-slate-200 bg-white shadow-lg max-h-64 overflow-y-auto"
+          data-debt-results-index="${index}"
+        ></div>
+      </div>
 
       <select multiple class="conditions-select" data-index="${index}" data-key="conditions" size="1">
         <option value="inCollections" ${row.inCollections ? 'selected' : ''}>Collections</option>
@@ -688,12 +719,13 @@ function renderRows() {
     </div>
   `).join('');
 
-  document.querySelectorAll('#rows [data-key="amount"], #rows [data-key="debtType"], #rows [data-key="conditions"]').forEach((node) => {
+  document.querySelectorAll('#rows [data-key="amount"], #rows [data-key="conditions"]').forEach((node) => {
     node.addEventListener('input', onFieldChange);
     node.addEventListener('change', onFieldChange);
   });
 
   bindCreditorSearches();
+  bindDebtTypeSearches();
   refreshRowVisuals();
 }
 
@@ -760,6 +792,83 @@ async function searchCreditors(index, query) {
   }
 }
 
+function searchDebtTypes(index, query) {
+  const resultsBox = document.querySelector(`[data-debt-results-index="${index}"]`);
+  if (!resultsBox) return;
+
+  const q = String(query || '').trim().toLowerCase();
+
+  if (!q) {
+    resultsBox.innerHTML = '';
+    resultsBox.classList.add('hidden');
+    return;
+  }
+
+  const matches = DEBT_TYPES_ALPHA.filter((type) =>
+    type.toLowerCase().includes(q)
+  );
+
+  if (!matches.length) {
+    resultsBox.innerHTML = '';
+    resultsBox.classList.add('hidden');
+    return;
+  }
+
+  resultsBox.innerHTML = matches.map((type) => `
+    <button
+      type="button"
+      class="block w-full text-left px-3 py-2 text-sm hover:bg-slate-50 border-b last:border-b-0"
+      data-debt-pick-index="${index}"
+      data-debt-pick-value="${escapeHtml(type)}"
+    >
+      ${escapeHtml(type)}
+    </button>
+  `).join('');
+
+  resultsBox.classList.remove('hidden');
+  bindDebtTypeResultClicks();
+}
+
+function bindDebtTypeSearches() {
+  document.querySelectorAll('.debt-type-search').forEach((node) => {
+    node.addEventListener('input', (e) => {
+      const index = Number(e.target.dataset.index);
+      const query = e.target.value || '';
+      state.rows[index].debtType = query;
+      searchDebtTypes(index, query);
+    });
+
+    node.addEventListener('focus', (e) => {
+      const index = Number(e.target.dataset.index);
+      const query = e.target.value || '';
+      searchDebtTypes(index, query);
+    });
+  });
+}
+
+function bindDebtTypeResultClicks() {
+  document.querySelectorAll('[data-debt-pick-index]').forEach((btn) => {
+    btn.onclick = () => {
+      const index = Number(btn.dataset.debtPickIndex);
+      const value = btn.dataset.debtPickValue || '';
+
+      state.rows[index].debtType = value;
+
+      const input = document.querySelector(`.debt-type-search[data-index="${index}"]`);
+      const resultsBox = document.querySelector(`[data-debt-results-index="${index}"]`);
+
+      if (input) input.value = value;
+      if (resultsBox) {
+        resultsBox.innerHTML = '';
+        resultsBox.classList.add('hidden');
+      }
+
+      renderRows();
+      render();
+    };
+  });
+}
+    
 function bindCreditorSearches() {
   document.querySelectorAll('.creditor-search').forEach((node) => {
     node.addEventListener('input', (e) => {
@@ -779,29 +888,33 @@ function bindCreditorSearches() {
 
 function bindCreditorResultClicks() {
   document.querySelectorAll('[data-pick-index]').forEach((btn) => {
-    btn.onclick = () => {
-      const index = Number(btn.dataset.pickIndex);
-      const name = btn.dataset.pickName || '';
-      const debtType = btn.dataset.pickDebtType || 'Unsecured Credit Card';
-      const secured = btn.dataset.pickSecured === 'true';
+  btn.onclick = () => {
+    const index = Number(btn.dataset.pickIndex);
+    const name = btn.dataset.pickName || '';
+    const secured = btn.dataset.pickSecured === 'true';
 
-      state.rows[index].creditorName = name;
-      state.rows[index].debtType = debtType;
-      state.rows[index].isSecured = secured;
+    // ✅ Only set creditor name
+    state.rows[index].creditorName = name;
 
-      const input = document.querySelector(`.creditor-search[data-index="${index}"]`);
-      const resultsBox = document.querySelector(`[data-results-index="${index}"]`);
+    // ✅ Keep secured flag if needed
+    state.rows[index].isSecured = secured;
 
-      if (input) input.value = name;
-      if (resultsBox) {
-        resultsBox.innerHTML = '';
-        resultsBox.classList.add('hidden');
-      }
+    // ❌ DO NOT TOUCH debtType here
 
-      renderRows();
-      render();
-    };
-  });
+    const input = document.querySelector(`.creditor-search[data-index="${index}"]`);
+    const resultsBox = document.querySelector(`[data-results-index="${index}"]`);
+
+    if (input) input.value = name;
+
+    if (resultsBox) {
+      resultsBox.innerHTML = '';
+      resultsBox.classList.add('hidden');
+    }
+
+    renderRows();
+    render();
+  };
+});
 
   document.querySelectorAll('[data-manual-index]').forEach((btn) => {
     btn.onclick = () => {
@@ -1301,16 +1414,82 @@ ${data.pdfUrl}`);
   }
 }
 
-    function initStateSelect() {
-      el('state').innerHTML =
-        '<option value="">Select state</option>' +
-        STATES.map(([abbr, name]) => `<option value="${abbr}" title="${name}">${abbr}</option>`).join('');
+    function searchStates(query) {
+  const resultsBox = el('stateResults');
+  if (!resultsBox) return;
 
-      el('state').addEventListener('change', (e) => {
-        state.selectedState = e.target.value;
-        render();
-      });
-    }
+  const q = String(query || '').trim().toLowerCase();
+
+  if (!q) {
+    resultsBox.innerHTML = '';
+    resultsBox.classList.add('hidden');
+    return;
+  }
+
+  const matches = STATE_OPTIONS.filter((item) =>
+    item.abbr.toLowerCase().includes(q) ||
+    item.name.toLowerCase().includes(q) ||
+    item.label.toLowerCase().includes(q)
+  );
+
+  if (!matches.length) {
+    resultsBox.innerHTML = '';
+    resultsBox.classList.add('hidden');
+    return;
+  }
+
+  resultsBox.innerHTML = matches.map((item) => `
+    <button
+      type="button"
+      class="block w-full text-left px-3 py-2 text-sm hover:bg-slate-50 border-b last:border-b-0"
+      data-state-pick="${item.abbr}"
+      data-state-label="${escapeHtml(item.label)}"
+    >
+      ${escapeHtml(item.label)}
+    </button>
+  `).join('');
+
+  resultsBox.classList.remove('hidden');
+  bindStateResultClicks();
+}
+
+function bindStateResultClicks() {
+  document.querySelectorAll('[data-state-pick]').forEach((btn) => {
+    btn.onclick = () => {
+      const abbr = btn.dataset.statePick || '';
+      const label = btn.dataset.stateLabel || '';
+      const input = el('stateSearch');
+      const resultsBox = el('stateResults');
+
+      state.selectedState = abbr;
+
+      if (input) input.value = label;
+      if (resultsBox) {
+        resultsBox.innerHTML = '';
+        resultsBox.classList.add('hidden');
+      }
+
+      render();
+    };
+  });
+}
+
+function initStateSelect() {
+  const input = el('stateSearch');
+  const resultsBox = el('stateResults');
+  if (!input || !resultsBox) return;
+
+  input.addEventListener('input', (e) => {
+    const query = e.target.value || '';
+    state.selectedState = '';
+    searchStates(query);
+  });
+
+  input.addEventListener('focus', (e) => {
+    const query = e.target.value || '';
+    searchStates(query);
+  });
+}
 
     function initActionButtons() {
       el('pdfBtn').addEventListener('click', buildPdf);
