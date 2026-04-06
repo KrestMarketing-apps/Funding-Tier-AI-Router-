@@ -67,10 +67,29 @@ export async function POST(req) {
       );
     }
 
+    const planId = `plan-${contactId}-${Date.now()}`;
+    const planUrl = `https://ai.fundingtier.com/plan/${contactId}`;
+    const pdfUrl = `https://ai.fundingtier.com/api/generate-pdf?contactId=${contactId}`;
+    const generatedAt = new Date().toISOString();
+
     const ghlUpdate = await updateGhlContact(contactId, {
       customFields: [
-        { key: "router_status", field_value: "Completed" },
-        { key: "router_result", field_value: "Live router test successful" }
+        {
+          key: "debt_resolution_plan_last_generated_timestamp",
+          field_value: generatedAt
+        },
+        {
+          key: "debt_resolution_plan_id",
+          field_value: planId
+        },
+        {
+          key: "debt_resolution_pdf_url",
+          field_value: pdfUrl
+        },
+        {
+          key: "debt_resolution_plan_url",
+          field_value: planUrl
+        }
       ]
     });
 
@@ -84,6 +103,12 @@ export async function POST(req) {
         lastName,
         email,
         phone
+      },
+      writtenFields: {
+        debt_resolution_plan_last_generated_timestamp: generatedAt,
+        debt_resolution_plan_id: planId,
+        debt_resolution_pdf_url: pdfUrl,
+        debt_resolution_plan_url: planUrl
       },
       ghlResponse: ghlUpdate.text
     });
