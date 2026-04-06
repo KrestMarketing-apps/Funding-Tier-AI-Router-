@@ -432,7 +432,6 @@ function mapCreditorToDebtType(item) {
 
   return 'Unsecured Credit Card';
 }
-
 function escapeHtml(value = '') {
   return String(value)
     .replaceAll('&', '&amp;')
@@ -950,8 +949,6 @@ function bindCreditorResultClicks() {
     state.rows[index].creditorName = name;
     state.rows[index].isSecured = secured;
 
-    // For clearly secured products, set a secured debt type.
-    // Otherwise leave existing debt type alone.
     if (secured) {
       state.rows[index].debtType = debtType || 'Secured Loan';
     } else if (!state.rows[index].debtType || state.rows[index].debtType === 'Other') {
