@@ -20,8 +20,7 @@ export default async function handler(req, res) {
     let dataUrl = req.query.dataUrl;
     const slug = req.query.slug;
 
-    // TEMPORARY: uses your current public blob host
-    // If your blob host changes later, update this one line.
+    // Uses your current public Blob host
     if (!dataUrl && slug) {
       dataUrl = `https://xcbefibugdiyl6le.public.blob.vercel-storage.com/plans/${slug}.json`;
     }
@@ -49,11 +48,13 @@ export default async function handler(req, res) {
       doNothing = {},
       shortest = {},
       recommended = {},
-      route = '',
       routeReason = '',
       rows = [],
       savings = 0
     } = data;
+
+    const userFriendlyEstimateNote =
+      'These estimated program details are based on projected settlement assumptions, program fees, and the creditor accounts that were selected to be included in this review. Final terms may vary after full review.';
 
     const html = `
 <!DOCTYPE html>
@@ -110,22 +111,33 @@ export default async function handler(req, res) {
       color: rgba(255,255,255,0.94);
     }
     .hero-card {
-      border-radius: 22px;
-      background: rgba(255,255,255,0.13);
-      border: 1px solid rgba(255,255,255,0.14);
-      padding: 22px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.10) 100%);
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 24px;
       backdrop-filter: blur(10px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.10);
     }
     .hero-card .label {
       font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: .08em;
-      opacity: 0.9;
+      letter-spacing: .10em;
+      opacity: 0.96;
+      font-weight: 800;
     }
     .hero-card .value {
-      margin-top: 8px;
-      font-size: 34px;
-      font-weight: 800;
+      margin-top: 10px;
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1;
+      color: #ffffff;
+      text-shadow: 0 2px 14px rgba(0,0,0,0.14);
+    }
+    .hero-card .subcopy {
+      margin-top: 14px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.95);
     }
     .section {
       margin-top: 28px;
@@ -156,11 +168,29 @@ export default async function handler(req, res) {
       border: 1px solid #e2e8f0;
       padding: 18px;
     }
+    .kpi-red {
+      background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+      border: 1px solid #dc2626;
+      color: white;
+    }
+    .kpi-red .label,
+    .kpi-red .value {
+      color: white;
+    }
+    .kpi-green {
+      background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 1px solid #99f6e4;
+    }
+    .kpi-green .label,
+    .kpi-green .value {
+      color: #0f766e;
+    }
     .kpi .label {
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: .08em;
       color: #64748b;
+      font-weight: 700;
     }
     .kpi .value {
       margin-top: 8px;
@@ -224,6 +254,29 @@ export default async function handler(req, res) {
       color: #0f766e;
       border: 1px solid #99f6e4;
     }
+    .explain-box {
+      margin-top: 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px 18px;
+      border: 1px solid #a7f3d0;
+      background: #ecfdf5;
+      border-radius: 18px;
+    }
+    .check-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: #10b981;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      flex: 0 0 auto;
+      margin-top: 2px;
+    }
     .debt-list {
       margin-top: 22px;
       display: grid;
@@ -241,7 +294,7 @@ export default async function handler(req, res) {
     .footer-note {
       margin-top: 18px;
       font-size: 13px;
-      line-height: 1.7;
+      line-height: 1.8;
       color: #64748b;
     }
     @media (max-width: 900px) {
@@ -250,6 +303,9 @@ export default async function handler(req, res) {
       }
       h1 {
         font-size: 34px;
+      }
+      .hero-card .value {
+        font-size: 36px;
       }
     }
   </style>
@@ -262,18 +318,17 @@ export default async function handler(req, res) {
           <span class="eyebrow">Funding Tier AI Generated Debt Resolution Plan</span>
           <h1>${escapeHtml(firstName)}, here’s your debt resolution comparison</h1>
           <p>
-            This webpage shows the difference between continuing your current financial path versus moving into a structured debt resolution program based on the current scenario inputs.
+            This page is designed to help you clearly understand how your current debt path compares to a potential new structured resolution program, including the estimated monthly payment difference and total projected savings.
           </p>
           <div class="cta-wrap">
-            <a class="btn btn-primary" href="https://krestmarketing.com/start-winning/">Schedule Your Next Step</a>
+            <a class="btn btn-primary" href="https://link.krestmarketing.com/widget/booking/vdZtTXpZHCstjMBql4a5" target="_blank" rel="noopener noreferrer">Schedule Your Next Step</a>
             <a class="btn btn-secondary" href="tel:8337163863">Call Funding Tier</a>
           </div>
         </div>
         <div class="hero-card">
           <div class="label">Estimated Savings vs Current Path</div>
           <div class="value">${currency(savings)}</div>
-          <div style="margin-top:14px;font-size:14px;line-height:1.7;">
-            Recommended route: <strong>${escapeHtml(route || 'N/A')}</strong><br/>
+          <div class="subcopy">
             State: <strong>${escapeHtml(state || 'N/A')}</strong><br/>
             Total debt reviewed: <strong>${currency(totalDebt)}</strong>
           </div>
@@ -284,7 +339,7 @@ export default async function handler(req, res) {
     <section class="section">
       <h2>Your Estimated Snapshot</h2>
       <p class="lead">
-        The numbers below are meant to show why staying on the current path can become more expensive over time, and how a structured program may create a more manageable outcome.
+        Below is a simple estimate showing how your current path compares to a potential new structured program option.
       </p>
 
       <div class="kpi-grid">
@@ -292,16 +347,16 @@ export default async function handler(req, res) {
           <div class="label">Total Debt Reviewed</div>
           <div class="value">${currency(totalDebt)}</div>
         </div>
-        <div class="kpi">
+        <div class="kpi kpi-red">
           <div class="label">Current Monthly Path</div>
           <div class="value">${currency(doNothing.monthlyPayment || 0)}</div>
         </div>
-        <div class="kpi">
-          <div class="label">Recommended Monthly</div>
+        <div class="kpi kpi-green">
+          <div class="label">New Lower Monthly Payment</div>
           <div class="value">${currency(recommended.monthlyPayment || 0)}</div>
         </div>
-        <div class="kpi">
-          <div class="label">Recommended Term</div>
+        <div class="kpi kpi-green">
+          <div class="label">New Program Plan Length</div>
           <div class="value">${recommended.term ? `${recommended.term} mo` : '—'}</div>
         </div>
       </div>
@@ -357,15 +412,18 @@ export default async function handler(req, res) {
         </table>
       </div>
 
-      <div class="footer-note">
-        <strong>Why this matters:</strong> continuing to make minimum payments can stretch debt out for a long time and materially increase total payback. A structured program may provide a more controlled path with a lower total burden compared with the current financial situation.
+      <div class="explain-box">
+        <div class="check-icon">✓</div>
+        <div>
+          <strong>Why this matters:</strong> continuing to make minimum payments can stretch debt out for a long time and materially increase total payback. A structured program may provide a more controlled path with a lower total burden compared with your current financial situation.
+        </div>
       </div>
     </section>
 
     <section class="section">
-      <h2>Accounts Reviewed</h2>
+      <h2>UNSECURED DEBTS / ACCOUNTS</h2>
       <p class="lead">
-        Below is the debt mix used to create this estimate.
+        Below are the accounts and debt entries used to prepare this estimate.
       </p>
 
       <div class="debt-list">
@@ -381,7 +439,23 @@ export default async function handler(req, res) {
       </div>
 
       <div class="footer-note">
-        ${escapeHtml(routeReason || '')}
+        ${escapeHtml(userFriendlyEstimateNote)}
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Next Step</h2>
+      <p class="lead">
+        If this estimated path makes sense to you, the next step is to complete your review so your final program structure can be confirmed.
+      </p>
+
+      <div class="cta-wrap">
+        <a class="btn btn-primary" href="https://link.krestmarketing.com/widget/booking/vdZtTXpZHCstjMBql4a5" target="_blank" rel="noopener noreferrer">Schedule Your Next Step</a>
+        <a class="btn btn-secondary" href="mailto:${escapeHtml(email)}">Email Copy Requested</a>
+      </div>
+
+      <div class="footer-note">
+        These estimates are illustrative only and final terms may vary based on a full review of the account profile and the debts elected to be included.
       </div>
     </section>
   </div>
