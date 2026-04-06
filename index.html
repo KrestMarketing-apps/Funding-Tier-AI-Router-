@@ -1476,16 +1476,24 @@ function bindCreditorResultClicks() {
 
 const resultBox = el('planResultBox');
 const planLink = el('planResultLink');
-const pdfLink = el('pdfResultLink');
+
 
 if (resultBox && planLink && pdfLink) {
-  planLink.href = data.pageUrl;
-planLink.textContent = 'OPEN YOUR PERSONALIZED AI GENERATED DEBT RESOLUTION PLAN WEBPAGE';
-  pdfLink.href = data.pdfUrl;
-  pdfLink.textContent = 'Open PDF';
+const resultBox = el('planResultBox');
+const planBtn = el('planResultLink');
+
+if (resultBox && planBtn) {
+  planBtn.onclick = null;
+
+  planBtn.addEventListener('click', function () {
+    window.open(data.pageUrl, '_blank');
+  });
 
   resultBox.style.display = 'block';
   resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+} else {
+  console.warn('planResultBox or button not found');
+});
 } else {
   console.warn('planResultBox / links not found in DOM');
 }
