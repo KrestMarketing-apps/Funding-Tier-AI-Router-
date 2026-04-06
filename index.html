@@ -341,13 +341,16 @@
     const getCreditorDisplayName = (row) =>
       row.creditorName === 'Other / Manual Entry' ? (row.manualName || 'Manual Creditor') : (row.creditorName || '');
 
-    function mapCreditorToDebtType(item) {
-  const productType = String(item?.product_type || '').toLowerCase();
-  const classification = String(item?.classification || '').toLowerCase();
-  const group = String(item?.creditor_group || '').toLowerCase();
-  const secured = !!item?.secured;
+  function mapCreditorToDebtType(item) {
+  const productType = String(item?.product_type || '').toLowerCase().trim();
+  const classification = String(item?.classification || '').toLowerCase().trim();
+  const group = String(item?.creditor_group || '').toLowerCase().trim();
+  const secured = item?.secured === true || item?.secured === 'true';
 
-  if (secured || classification.includes('secured')) return 'Mortgage';
+  const isExplicitlySecured =
+    secured ||
+    classification === 'secured' ||
+    classification === 'secured debt';
 
   if (productType.includes('credit card')) return 'Unsecured Credit Card';
   if (productType.includes('personal loan')) return 'Unsecured Personal Loan';
@@ -357,6 +360,8 @@
   if (productType.includes('rent')) return 'Back Rent';
   if (productType.includes('business')) return 'Business Debt';
   if (group.includes('repo') || productType.includes('deficiency')) return 'Repossession Deficiency';
+
+  if (isExplicitlySecured) return 'Other';
 
   return 'Unsecured Credit Card';
 }
@@ -609,12 +614,16 @@ function hideAllCreditorResults() {
     }
 
     function mapCreditorToDebtType(item) {
-  const productType = String(item?.product_type || '').toLowerCase();
-  const classification = String(item?.classification || '').toLowerCase();
-  const group = String(item?.creditor_group || '').toLowerCase();
-  const secured = !!item?.secured;
+  const productType = String(item?.product_type || '').toLowerCase().trim();
+  const classification = String(item?.classification || '').toLowerCase().trim();
+  const group = String(item?.creditor_group || '').toLowerCase().trim();
+  const secured = item?.secured === true || item?.secured === 'true';
 
-  if (secured || classification.includes('secured')) return 'Mortgage';
+  const isExplicitlySecured =
+    secured ||
+    classification === 'secured' ||
+    classification === 'secured debt';
+
   if (productType.includes('credit card')) return 'Unsecured Credit Card';
   if (productType.includes('personal loan')) return 'Unsecured Personal Loan';
   if (productType.includes('line of credit')) return 'Unsecured Line of Credit';
@@ -623,6 +632,8 @@ function hideAllCreditorResults() {
   if (productType.includes('rent')) return 'Back Rent';
   if (productType.includes('business')) return 'Business Debt';
   if (group.includes('repo') || productType.includes('deficiency')) return 'Repossession Deficiency';
+
+  if (isExplicitlySecured) return 'Other';
 
   return 'Unsecured Credit Card';
 }
