@@ -3,10 +3,7 @@ export async function GET(req) {
   const contactId = searchParams.get("contactId");
 
   if (!contactId) {
-    return Response.json(
-      { ok: false, error: "Missing contactId" },
-      { status: 400 }
-    );
+    return Response.json({ ok: false, error: "Missing contactId" }, { status: 400 });
   }
 
   try {
@@ -47,9 +44,6 @@ export async function GET(req) {
       }
     );
   } catch (error) {
-    return Response.json(
-      { ok: false, error: error.message },
-      { status: 500 }
-    );
+    return Response.json({ ok: false, error: error.message }, { status: 500 });
   }
 }
