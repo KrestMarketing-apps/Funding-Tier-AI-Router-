@@ -221,9 +221,9 @@ export async function POST(req) {
       }
     );
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://ai.fundingtier.com';
-    const planUrl = `${baseUrl}/plan/${slug}`;
-    const pdfUrl = `${baseUrl}/api/generate-pdf?dataUrl=${encodeURIComponent(blob.url)}`;
+const baseUrl = 'https://ai.fundingtier.com';
+const planUrl = `${baseUrl}/plan/${slug}`;
+const pdfUrl = `${baseUrl}/api/generate-pdf?dataUrl=${encodeURIComponent(blob.url)}`;
     const generatedAt = new Date().toISOString();
 
     const ghlUpdate = await updateGhlContact(contactId, {
