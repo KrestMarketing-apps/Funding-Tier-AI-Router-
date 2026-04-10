@@ -181,9 +181,10 @@
         </div>
 
         <div class="mt-5 overflow-hidden rounded-2xl border border-teal-100 bg-white/80">
-          <div class="grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 bg-gradient-to-r from-teal-50 to-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
+          <div class="grid grid-cols-[1.2fr,0.8fr,0.55fr,1fr,0.9fr] gap-3 bg-gradient-to-r from-teal-50 to-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
             <div>Creditor Name</div>
             <div>Debt Amount</div>
+            <div>% of Total</div>
             <div>Debt Type</div>
             <div>Conditions</div>
           </div>
@@ -195,17 +196,16 @@
         <div class="card bg-white p-5 teal-panel">
           <h2 class="text-lg font-semibold">Recommendation Snapshot</h2>
 
-        <div class="mt-3 flex items-center gap-3">
-  <div id="providerLogoBox"></div>
-  <div id="topBadges" class="flex flex-wrap gap-2"></div>
-</div>
-
-<div id="timeZoneBox" class="mt-2 rounded-xl border border-slate-200 bg-white/90 p-3 text-xs text-slate-700"></div>
+          <div class="mt-3 flex items-center gap-3">
+            <div id="providerLogoBox"></div>
+            <div id="topBadges" class="flex flex-wrap gap-2"></div>
+          </div>
 
           <div id="routeReason" class="mt-3 w-full rounded-xl bg-white/90 border border-teal-100 p-3 text-xs text-slate-700"></div>
           <div id="providerAvailability" class="mt-3 grid gap-3"></div>
           <div id="metricsGrid" class="mt-3 grid gap-2 md:grid-cols-2"></div>
           <div id="flags" class="mt-3 space-y-2"></div>
+          <div id="levelRuleWarnings" class="mt-3 space-y-2"></div>
         </div>
 
         <div class="card bg-white p-4 teal-panel">
@@ -316,24 +316,7 @@
     const LEVEL_GREEN_STATES = new Set(['AL','AZ','AR','CA','DC','FL','ID','IN','IA','KY','MD','MA','MI','MS','MO','NE','NM','NY','OK','TX','VA']);
     const LEVEL_BLACKOUT_STATES = new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
 
-    const CONSUMER_SHIELD_BLACKOUT_STATES = new Set(['CO','PA','NJ','OR','NC','PR','TX','WA']);
-
-const STATE_TIMEZONES = {
-  // EASTERN
-  CT:'ET', DE:'ET', DC:'ET', FL:'ET', GA:'ET', IN:'ET',
-  ME:'ET', MD:'ET', MA:'ET', MI:'ET', NH:'ET', NJ:'ET', NY:'ET',
-  NC:'ET', OH:'ET', PA:'ET', RI:'ET', SC:'ET', VT:'ET', VA:'ET', WV:'ET', PR:'ET',
-
-  // CENTRAL
-  AL:'CT', AR:'CT', IL:'CT', IA:'CT', KS:'CT', KY:'CT', LA:'CT', MN:'CT', MS:'CT',
-  MO:'CT', NE:'CT', ND:'CT', OK:'CT', SD:'CT', TN:'CT', TX:'CT', WI:'CT',
-
-  // MOUNTAIN
-  AZ:'MT', CO:'MT', ID:'MT', MT:'MT', NM:'MT', UT:'MT', WY:'MT',
-
-  // PACIFIC
-  AK:'PT', CA:'PT', GU:'PT', HI:'PT', NV:'PT', OR:'PT', WA:'PT'
-};
+    const CONSUMER_SHIELD_BLACKOUT_STATES = new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
 
     const CREDITOR_OPTIONS = ['', 'American Express','Bank of America','Capital One','Chase','Citi','Discover','Wells Fargo','Synchrony','Upstart','LendingClub','OneMain Financial','SoFi','Avant','Best Egg','Klarna','Goodleap','Sunbit','RBC Bank','USAA','Republic Finance','Mariner Finance','Regional Finance','Lendmark','Navient','Other / Manual Entry'];
     const DEBT_TYPES = [
@@ -384,30 +367,8 @@ const STATE_OPTIONS = Object.entries(STATE_NAMES)
   .sort((a, b) => a.label.localeCompare(b.label));
     
     
-const CONSUMER_SHIELD_REJECTED_TYPES = new Set([
-  'Timeshare',
-  'Mortgage',
-  'Federal Student Loan',
-  'IRS Tax Debt',
-  'Cross Collateralized Account',
-  'Furniture Store Financing',
-  'Loan from Individual',
-  'Installment Sales Contract',
-  'Credit Union Loan',
-  'Direct Furniture Store Loan',
-  'Military Account',
-  'AFES Account'
-]);
-const CONSUMER_SHIELD_CONDITIONAL_TYPES = new Set([
-  'Judgment',
-  'Apartment Back Rent (Collections)',
-  'USAA',
-  'Deficiency',
-  'Auto Repo Deficiency',
-  'Repossession Deficiency',
-  'Tribal Loan',
-  'Business Debt'
-]);
+    const CONSUMER_SHIELD_REJECTED_TYPES = new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
+    const CONSUMER_SHIELD_CONDITIONAL_TYPES = new Set(['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt']);
     const LEVEL_REJECTED_TYPES = new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt']);
     const LEVEL_CONDITIONAL_CREDITORS = ['Lendmark','Mariner Finance','OneMain','Regional Finance','Republic Finance'];
     const LEVEL_REJECTED_CREDITORS = ['ALLEVIATE TAX LLC','Acceptance Now','ACIMA','Advance Financial','AGCO FINANCE','STATE EMPLOYEE CREDIT UNION','STATEEMP','Aqua Finance','Bell Finance','BHG Financial','BHG Money','Bobs Discount Furniture','Bobs Finance','Bobs Furniture','Cornerstone Financial','CreditCentral','EMPOWER FCU','Enerbank','ESL Credit Union','Farmers Furniture','FRMRS FURN','Fort Worth Credit Union','Forth Worth CU','Fortera Credit Union','Garden Federal Credit Union','Golden One Credit Union','Goldman Sachs','GoodLeap','Hawaii CU','HC ROYA','HYCITE','Royal Prestige','Heights Financial','Island Finance','ISPC','Kabbage Loans','KIKOFF','Koalafi','Loan Pal','Local Government Federal Credit Union','Matco Tools Financing','Matco Fin','Military Star','Nebraska Furniture','Omni Loans','Opensky','PINNACLE FINANCIAL GROUP','Pioneer Loans','Popular Bank','Banco Popular','PowerPay','Preferred Loans','Quick Help Loans','Red River Credit','REDRIVERCR','REDSTONE Credit Union','RENT-A CENTER','RFFC FINANCIAL','Robinhood','Security Finance','STATE EMPLOYEES C U','Service Finance Company','SVCFIN','SRVFINCO','Snap On Credit','SOLAR MOSAIC','Southern Finance','Sunset Financial','Toledo Finance','Tower Loans','Unacceptable Creditors','West Creek Financial','WSECU','Yendo'];
@@ -430,6 +391,7 @@ const CONSUMER_SHIELD_CONDITIONAL_TYPES = new Set([
 
     const el = (id) => document.getElementById(id);
     const currency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
+    const pct = (value) => `${(value || 0).toFixed(1)}%`;
 
     const numberOrZero = (value) => {
       const n = parseFloat(String(value).replace(/[^0-9.]/g, ''));
@@ -506,99 +468,6 @@ function hideAllCreditorResults() {
     box.classList.add('hidden');
   });
 }
-
-function getSimpleTimeZoneLabel(stateCode) {
-  return STATE_TIMEZONES[stateCode] || '';
-}
-
-function getBrowserTimeZoneFromLabel(label) {
-  if (label === 'ET') return 'America/New_York';
-  if (label === 'CT') return 'America/Chicago';
-  if (label === 'MT') return 'America/Denver';
-  if (label === 'PT') return 'America/Los_Angeles';
-  return 'America/Los_Angeles';
-}
-
-function getLocalHourForState(stateCode) {
-  const zone = getSimpleTimeZoneLabel(stateCode);
-  const tz = getBrowserTimeZoneFromLabel(zone);
-  const hourStr = new Date().toLocaleTimeString('en-US', {
-    timeZone: tz,
-    hour: '2-digit',
-    hour12: false
-  });
-  return parseInt(hourStr, 10);
-}
-
-function isAfter8PMForProspect(stateCode) {
-  if (!stateCode) return false;
-  const hour = getLocalHourForState(stateCode);
-  return Number.isFinite(hour) && hour >= 20;
-}
-
-function updateTimeZoneClock() {
-  const stateCode = state.selectedState;
-  const box = el('timeZoneBox');
-
-  if (!box) return;
-
-  if (!stateCode) {
-    box.innerHTML = '';
-    return;
-  }
-
-  const zone = getSimpleTimeZoneLabel(stateCode);
-  if (!zone) {
-    box.innerHTML = '';
-    return;
-  }
-
-  const tz = getBrowserTimeZoneFromLabel(zone);
-
-  if (window.__ftClockInterval) {
-    clearInterval(window.__ftClockInterval);
-  }
-
-  function paint() {
-    const now = new Date();
-
-    const time = now.toLocaleTimeString('en-US', {
-      timeZone: tz,
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-
-    const hour = getLocalHourForState(stateCode);
-    const isAfter8PM = hour >= 20;
-
-    box.innerHTML = `
-      <div class="flex flex-wrap items-center gap-2">
-        <span>🕒 <strong>Prospect Local Time:</strong> ${time} (${zone})</span>
-        ${
-          isAfter8PM
-            ? '<span style="color:#b91c1c; font-weight:700;">• After 8PM In the Prospect’s Timezone ⚠️</span>'
-            : '<span style="color:#15803d; font-weight:700;">• Within Contact Hours ✅</span>'
-        }
-      </div>
-    `;
-  }
-
-  paint();
-  window.__ftClockInterval = setInterval(paint, 1000);
-}
-
-function blobToBase64(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = String(reader.result || '');
-      const base64 = result.split(',')[1] || '';
-      resolve(base64);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
     
     function getLevelStateStatus(code) {
       if (!code) return { status: 'UNKNOWN', label: 'Unknown' };
@@ -624,19 +493,24 @@ function blobToBase64(blob) {
       return 60;
     }
 
-function getConsumerShieldProgram(totalDebt) {
-  if (totalDebt < 4000) return null;
+    function getConsumerShieldProgramLength(totalDebt) {
+      if (totalDebt >= 4000 && totalDebt <= 4999) return 18;
+      if (totalDebt >= 5000 && totalDebt <= 8800) return 24;
+      if (totalDebt > 8800) return 36;
+      return 0;
+    }
 
-  if (totalDebt >= 4000 && totalDebt <= 4999) return { term: 18, monthlyPayment: 220, manualReview: true };
-  if (totalDebt >= 5000 && totalDebt <= 8799) return { term: 24, monthlyPayment: 220, manualReview: false };
-  if (totalDebt >= 8800 && totalDebt <= 14999) return { term: 36, monthlyPayment: 270, manualReview: false };
-  if (totalDebt >= 15000 && totalDebt <= 19999) return { term: 36, monthlyPayment: 320, manualReview: false };
-  if (totalDebt >= 20000 && totalDebt <= 24999) return { term: 36, monthlyPayment: 370, manualReview: false };
-  if (totalDebt >= 25000 && totalDebt <= 29999) return { term: 36, monthlyPayment: 420, manualReview: false };
-  if (totalDebt >= 30000 && totalDebt <= 49999) return { term: 36, monthlyPayment: 520, manualReview: false };
-
-  return { term: 36, monthlyPayment: 620, manualReview: false };
-}
+    function getConsumerShieldProgramPayment(totalDebt) {
+      if (totalDebt >= 50000) return 620;
+      if (totalDebt >= 30000) return 520;
+      if (totalDebt >= 25000) return 420;
+      if (totalDebt >= 20000) return 370;
+      if (totalDebt >= 15000) return 320;
+      if (totalDebt >= 10000) return 270;
+      if (totalDebt >= 5500) return 220;
+      if (totalDebt >= 4000) return 220;
+      return 0;
+    }
 
     function calcDoNothing(totalDebt, apr = 0.24) {
       const monthlyPayment = totalDebt * 0.025;
@@ -651,280 +525,239 @@ function getConsumerShieldProgram(totalDebt) {
       return { monthlyPayment, totalDebt, monthsToPayoff: months, apr, totalPayback: monthlyPayment * months };
     }
 
-function collectFlags(rows, totalDebt, stateCode) {
-  const consumerShieldFlags = [];
-  const consumerShieldWarnings = [];
-  const levelFlags = [];
 
-  if (totalDebt > 0 && totalDebt < 4000) {
-    consumerShieldFlags.push('Consumer Shield requires at least $4,000 total enrolled debt.');
-  } else if (totalDebt >= 4000 && totalDebt < 5000) {
-    consumerShieldWarnings.push('Debt is between $4,000 and $4,999. Gabe Germino must manually add the $220 payment.');
-  }
+    function evaluateLevelDebtRuleWarnings(rows, totalDebt, stateCode) {
+      const warnings = [];
+      if (!totalDebt) return warnings;
 
-  if (stateCode && getConsumerShieldStateStatus(stateCode).status === 'BLACKOUT') {
-    consumerShieldFlags.push('Consumer Shield does not service this state.');
-  }
+      const debtAmountFor = (matcher) =>
+        rows.reduce((sum, row) => matcher(row) ? sum + numberOrZero(row.amount) : sum, 0);
 
-  if (totalDebt > 0 && totalDebt < 7000) {
-    levelFlags.push('Level Debt requires at least $7,000 total enrolled debt.');
-  }
+      const medicalAndRent = debtAmountFor((row) =>
+        ['Medical Bill', 'Back Rent', 'Apartment Back Rent (Collections)'].includes(row.debtType)
+      );
+      const privateStudent = debtAmountFor((row) => row.debtType === 'Private Student Loan');
+      const discoverPrivateStudent = rows.filter((row) =>
+        row.debtType === 'Private Student Loan' && normalizeCreditorName(getCreditorDisplayName(row)).includes('DISCOVER')
+      );
+      const businessDebtOpen = rows.filter((row) =>
+        row.debtType === 'Business Debt' && !row.businessUnprofitable
+      );
 
-  const hasOtherSecuredDebt = rows.some((row) => row.isSecured && row.debtType !== 'USAA');
+      if ((medicalAndRent / totalDebt) > 0.50) {
+        warnings.push({
+          tone: 'red',
+          text: `Medical + back rent debt is ${pct((medicalAndRent / totalDebt) * 100)} of enrolled debt. Level guideline is less than 50%.`
+        });
+      }
 
-  rows.forEach((row) => {
-    const amount = numberOrZero(row.amount);
-    if (!amount) return;
+      if ((privateStudent / totalDebt) > 0.25) {
+        warnings.push({
+          tone: 'red',
+          text: `Private student loans are ${pct((privateStudent / totalDebt) * 100)} of enrolled debt. Level guideline is 25% max.`
+        });
+      }
 
-    const name = getCreditorDisplayName(row);
+      if (discoverPrivateStudent.length) {
+        warnings.push({
+          tone: 'red',
+          text: 'Discover private student loans are not accepted for Level routing.'
+        });
+      }
 
-    if (amount < 100) {
-      consumerShieldFlags.push((name || row.debtType) + ' is below Consumer Shield minimum $100 per account.');
+      if (stateCode === 'CA' && privateStudent > 0) {
+        warnings.push({
+          tone: 'red',
+          text: 'Private student loans are not accepted for California residents under the Level guideline set.'
+        });
+      }
+
+      if (businessDebtOpen.length) {
+        warnings.push({
+          tone: 'amber',
+          text: 'Business debt requires the business to be closed or unprofitable. Mark that condition before routing to Level.'
+        });
+      }
+
+      return warnings;
     }
 
-    if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) {
-      consumerShieldFlags.push(row.debtType + ' is not accepted by Consumer Shield.');
-    }
+    function collectFlags(rows, totalDebt, stateCode) {
+      const consumerShieldFlags = [];
+      const levelFlags = [];
 
-    if (row.debtType === 'Apartment Back Rent (Collections)' && !row.inCollections) {
-      consumerShieldFlags.push('Apartment back rent is only accepted if in collections.');
-    }
+      if (totalDebt > 0 && totalDebt < 4000) consumerShieldFlags.push('Consumer Shield requires at least $4,000 total enrolled debt.');
+      if (stateCode && getConsumerShieldStateStatus(stateCode).status === 'BLACKOUT') consumerShieldFlags.push('Consumer Shield does not service this state.');
+      if (totalDebt > 0 && totalDebt < 7000) levelFlags.push('Level Debt requires at least $7,000 total enrolled debt.');
 
-    if (row.debtType === 'Business Debt' && !row.businessUnprofitable) {
-      consumerShieldFlags.push('Business debt is only accepted if the business is dissolved / unprofitable.');
-    }
+      rows.forEach((row) => {
+        const amount = numberOrZero(row.amount);
+        if (!amount) return;
+        const name = getCreditorDisplayName(row);
 
-    if (row.debtType === 'USAA' && hasOtherSecuredDebt) {
-      consumerShieldFlags.push('USAA is only accepted when there is no other secured debt.');
-    }
+        if (amount < 100) consumerShieldFlags.push((name || row.debtType) + ' is below Consumer Shield minimum $100 per account.');
+        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) consumerShieldFlags.push(row.debtType + ' is not accepted by Consumer Shield.');
+        if (row.debtType === 'Apartment Back Rent (Collections)' && !row.inCollections) consumerShieldFlags.push('Apartment back rent is only accepted if in collections.');
+        if (row.debtType === 'USAA' && row.isSecured) consumerShieldFlags.push('USAA is only accepted when there is no other secured debt.');
 
-    if (row.debtType === 'Deficiency' || row.debtType === 'Auto Repo Deficiency' || row.debtType === 'Repossession Deficiency') {
-      consumerShieldWarnings.push((name || row.debtType) + ' requires a deficiency letter prior to enrollment.');
-    }
+        if (LEVEL_REJECTED_TYPES.has(row.debtType)) levelFlags.push(row.debtType + ' is not accepted by Level Debt.');
+        if (amount < 200 && !row.inCollections) levelFlags.push((name || row.debtType) + ' must be at least $200 unless already in collections or charged off.');
+        if (!row.paymentMade) levelFlags.push((name || row.debtType) + ' must have at least one payment made before Level enrollment.');
+        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) levelFlags.push(name + ' is on the Level rejected creditor list.');
+        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) levelFlags.push(name + ' is secured. Level only allows this if the client agrees to lose the collateral.');
+      });
 
-    if (row.debtType === 'Tribal Loan') {
-      consumerShieldWarnings.push((name || row.debtType) + ' requires tribal document signing.');
+      return {
+        consumerShield: Array.from(new Set(consumerShieldFlags)),
+        level: Array.from(new Set(levelFlags))
+      };
     }
-
-    if (row.debtType === 'Judgment') {
-      consumerShieldWarnings.push((name || row.debtType) + ' is case by case and requires manual review.');
-    }
-
-    if (LEVEL_REJECTED_TYPES.has(row.debtType)) {
-      levelFlags.push(row.debtType + ' is not accepted by Level Debt.');
-    }
-
-    if (amount < 200 && !row.inCollections) {
-      levelFlags.push((name || row.debtType) + ' must be at least $200 unless already in collections or charged off.');
-    }
-
-    if (!row.paymentMade) {
-      levelFlags.push((name || row.debtType) + ' must have at least one payment made before Level enrollment.');
-    }
-
-    if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) {
-      levelFlags.push(name + ' is on the Level rejected creditor list.');
-    }
-
-    if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) {
-      levelFlags.push(name + ' is secured. Level only allows this if the client agrees to lose the collateral.');
-    }
-  });
-
-  return {
-    consumerShield: Array.from(new Set(consumerShieldFlags)),
-    consumerShieldWarnings: Array.from(new Set(consumerShieldWarnings)),
-    level: Array.from(new Set(levelFlags))
-  };
-}
 
     function chooseRoute(totalDebt, stateCode, flags) {
-  if (!stateCode) {
-    return { route: '', reason: 'Select a state to calculate routing.' };
-  }
+      if (!stateCode) return { route: '', reason: 'Select a state to calculate routing.' };
 
-  const csStatus = getConsumerShieldStateStatus(stateCode);
-  const levelStatus = getLevelStateStatus(stateCode);
+      const csStatus = getConsumerShieldStateStatus(stateCode);
+      const levelStatus = getLevelStateStatus(stateCode);
 
-  const levelEligible =
-    totalDebt >= 7000 &&
-    levelStatus.status !== 'BLACKOUT' &&
-    !flags.level.some((f) => f.toLowerCase().includes('not accepted'));
+      const csEligible = csStatus.status !== 'BLACKOUT' && !flags.consumerShield.some((f) => f.includes('not accepted') || f.includes('requires at least'));
+      const levelEligible = levelStatus.status !== 'BLACKOUT' && !flags.level.some((f) => f.includes('not accepted'));
 
-  const csEligible =
-    totalDebt >= 4000 &&
-    csStatus.status !== 'BLACKOUT' &&
-    flags.consumerShield.length === 0;
+      if (totalDebt > 0 && totalDebt < 7000) {
+        if (csEligible) {
+          return { route: 'CONSUMER SHIELD', reason: 'Debt below $7,000 routes to Consumer Shield when the state and account profile are serviceable.' };
+        }
+        return { route: 'NO OPTION', reason: 'Debt is below $7,000 and Consumer Shield is not serviceable or eligible for this deal.' };
+      }
 
-  if (levelEligible) {
-    return {
-      route: 'LEVEL',
-      reason:
-        levelStatus.status === 'RED'
-          ? 'Best option is Level Debt under the attorney model in this state.'
-          : 'Best option is Level Debt in this serviceable non-attorney state.'
-    };
-  }
+      if (levelEligible) {
+        return {
+          route: 'LEVEL',
+          reason: levelStatus.status === 'RED'
+            ? 'Best option is Level Debt under the attorney model in this state.'
+            : 'Best option is Level Debt in this serviceable non-attorney state.'
+        };
+      }
 
-  if (csEligible) {
-    return {
-      route: 'CONSUMER SHIELD',
-      reason: 'Level is not available for this scenario, so Consumer Shield is the best available option.'
-    };
-  }
+      if (csEligible) {
+        return {
+          route: 'CONSUMER SHIELD',
+          reason: 'Consumer Shield remains available for this state and debt profile.'
+        };
+      }
 
-  return {
-    route: 'NO OPTION',
-    reason: 'No available backend matches this scenario.'
-  };
-}
-
-function computeScenarioData() {
-  const rows = state.rows.filter((r) => numberOrZero(r.amount) > 0);
-  const totalDebt = rows.reduce((sum, row) => sum + numberOrZero(row.amount), 0);
-  const flags = collectFlags(rows, totalDebt, state.selectedState);
-  const routeInfo = chooseRoute(totalDebt, state.selectedState, flags);
-
-  const levelState = getLevelStateStatus(state.selectedState);
-  const csState = getConsumerShieldStateStatus(state.selectedState);
-  const csProgram = getConsumerShieldProgram(totalDebt);
-
-  const feeRate =
-    routeInfo.route === 'LEVEL' ? (levelState.status === 'RED' ? 0.27 : 0.25) :
-    routeInfo.route === 'CONSUMER SHIELD' ? 0.00 :
-    0;
-
-  const repCommissionRate = routeInfo.route === 'LEVEL' ? 0.01 : 0;
-  const repCommission = totalDebt * repCommissionRate;
-  const doNothing = calcDoNothing(totalDebt);
-
-  let shortest = null;
-  let recommended = null;
-
-  if (routeInfo.route === 'LEVEL') {
-    const totalCost = totalDebt * 0.50 + totalDebt * feeRate;
-    shortest = { term: 12, totalCost, monthlyPayment: totalCost / 12 };
-    const maxTerm = getLevelMaxTerm(totalDebt);
-    recommended = { term: maxTerm, totalCost, monthlyPayment: totalCost / maxTerm };
-  } else if (routeInfo.route === 'CONSUMER SHIELD' && csProgram) {
-    const totalCost = csProgram.term * csProgram.monthlyPayment;
-    shortest = {
-      term: csProgram.term,
-      totalCost,
-      monthlyPayment: csProgram.monthlyPayment
-    };
-    recommended = {
-      term: csProgram.term,
-      totalCost,
-      monthlyPayment: csProgram.monthlyPayment
-    };
-  }
-
-  const programs = {
-    consumerShield: {
-      name: 'Consumer Shield',
-      available: csState.status !== 'BLACKOUT' && totalDebt >= 4000 && flags.consumerShield.length === 0,
-      term: csProgram ? csProgram.term : 0,
-      monthlyPayment: csProgram ? csProgram.monthlyPayment : 0,
-      benefits: [
-        'Credit report removal assistance / collection violation monitoring',
-        'Help lowering common monthly expenses',
-        'Credit builder support during program',
-        'Resolve Law Firm membership protection'
-      ]
-    },
-    level: {
-      name: 'Level Debt',
-      available: levelState.status !== 'BLACKOUT' && totalDebt >= 7000,
-      term: totalDebt > 0 ? getLevelMaxTerm(totalDebt) : 0,
-      monthlyPayment: totalDebt > 0
-        ? ((totalDebt * 0.50) + (totalDebt * (levelState.status === 'RED' ? 0.27 : 0.25))) / getLevelMaxTerm(totalDebt)
-        : 0,
-      benefits: [
-        'Longer-term payment flexibility',
-        'Affordability-focused structure',
-        'Lower monthly burden potential',
-        'Budget breathing room'
-      ]
+      return { route: 'NO OPTION', reason: 'No available backend is serviceable in this state.' };
     }
-  };
 
-  const activeFlags = [];
+    function computeScenarioData() {
+      const rows = state.rows.filter((r) => numberOrZero(r.amount) > 0);
+      const totalDebt = rows.reduce((sum, row) => sum + numberOrZero(row.amount), 0);
+      const flags = collectFlags(rows, totalDebt, state.selectedState);
+      const levelRuleWarnings = evaluateLevelDebtRuleWarnings(rows, totalDebt, state.selectedState);
+      const routeInfo = chooseRoute(totalDebt, state.selectedState, flags);
 
-  if (state.selectedState && isAfter8PMForProspect(state.selectedState)) {
-    activeFlags.push('After 8PM In the Prospect’s Timezone.');
-  }
+      const levelState = getLevelStateStatus(state.selectedState);
+      const csState = getConsumerShieldStateStatus(state.selectedState);
 
-  if (routeInfo.route === 'LEVEL') {
-    activeFlags.push(...flags.level);
-  }
+      const feeRate =
+        routeInfo.route === 'LEVEL' ? (levelState.status === 'RED' ? 0.27 : 0.25) :
+        routeInfo.route === 'CONSUMER SHIELD' ? 0.00 :
+        0;
 
-  if (routeInfo.route === 'CONSUMER SHIELD') {
-    activeFlags.push(...flags.consumerShield);
-    activeFlags.push(...flags.consumerShieldWarnings);
-    activeFlags.push('Consumer Shield support is Monday through Friday, 9AM to 7PM EST.');
-    activeFlags.push('Consumer Shield will not send communications after 8PM in the prospect’s timezone unless already a client.');
-    activeFlags.push('Consumer Shield uses Equifax for credit pull.');
-    activeFlags.push('Initial payment must be within 30 days of enrollment date.');
-  }
+      const repCommissionRate = routeInfo.route === 'LEVEL' ? 0.01 : 0;
+      const repCommission = totalDebt * repCommissionRate;
+      const doNothing = calcDoNothing(totalDebt);
 
-  if (routeInfo.route === 'NO OPTION') {
-    activeFlags.push(routeInfo.reason);
-    activeFlags.push(...flags.consumerShield);
-    activeFlags.push(...flags.level);
-  }
+      let shortest = null;
+      let recommended = null;
 
-  return {
-    rows,
-    totalDebt,
-    routeInfo,
-    doNothing,
-    shortest,
-    recommended,
-    feeRate,
-    repCommissionRate,
-    repCommission,
-    levelState,
-    csState,
-    programs,
-    flags: Array.from(new Set(activeFlags)),
-    consumerShieldWarnings: flags.consumerShieldWarnings || []
-  };
-}
+      if (routeInfo.route === 'LEVEL') {
+        const totalCost = totalDebt * 0.50 + totalDebt * feeRate;
+        shortest = { term: 12, totalCost, monthlyPayment: totalCost / 12 };
+        const maxTerm = getLevelMaxTerm(totalDebt);
+        recommended = { term: maxTerm, totalCost, monthlyPayment: totalCost / maxTerm };
+      } else if (routeInfo.route === 'CONSUMER SHIELD') {
+        const term = getConsumerShieldProgramLength(totalDebt);
+        const monthlyPayment = getConsumerShieldProgramPayment(totalDebt);
+        const totalCost = term * monthlyPayment;
+        shortest = { term, totalCost, monthlyPayment };
+        recommended = { term, totalCost, monthlyPayment };
+      }
+
+      const programs = {
+        consumerShield: {
+          name: 'Consumer Shield',
+          available: csState.status !== 'BLACKOUT' && totalDebt >= 4000,
+          term: getConsumerShieldProgramLength(totalDebt),
+          monthlyPayment: getConsumerShieldProgramPayment(totalDebt),
+          benefits: [
+            'Structured monthly plan',
+            'Credit monitoring support',
+            'Credit-building support tools',
+            'Additional client protection resources'
+          ]
+        },
+        level: {
+          name: 'Level Debt',
+          available: levelState.status !== 'BLACKOUT' && totalDebt >= 7000,
+          term: totalDebt > 0 ? getLevelMaxTerm(totalDebt) : 0,
+          monthlyPayment: totalDebt > 0
+            ? ((totalDebt * 0.50) + (totalDebt * (levelState.status === 'RED' ? 0.27 : 0.25))) / getLevelMaxTerm(totalDebt)
+            : 0,
+          benefits: [
+            'Longer-term payment flexibility',
+            'Affordability-focused structure',
+            'Lower monthly burden potential',
+            'Budget breathing room'
+          ]
+        }
+      };
+
+      const activeFlags = [];
+      if (routeInfo.route === 'LEVEL') activeFlags.push(...flags.level);
+      if (routeInfo.route === 'CONSUMER SHIELD') activeFlags.push(...flags.consumerShield);
+      if (routeInfo.route === 'NO OPTION') activeFlags.push(routeInfo.reason);
+
+      if (routeInfo.route === 'CONSUMER SHIELD') {
+        activeFlags.push('Consumer Shield support is Monday through Friday, 9am to 7pm EST.');
+        activeFlags.push('Consumer Shield will not send communications after 8pm in the contact local time unless already a client.');
+        activeFlags.push('Consumer Shield uses Equifax for credit pull.');
+      }
+
+      return {
+        rows,
+        totalDebt,
+        routeInfo,
+        doNothing,
+        shortest,
+        recommended,
+        feeRate,
+        repCommissionRate,
+        repCommission,
+        levelState,
+        csState,
+        programs,
+        flags: Array.from(new Set(activeFlags)),
+        levelRuleWarnings
+      };
+    }
 
     function rowAlerts(row, route) {
-  const alerts = [];
-  const name = getCreditorDisplayName(row);
+      const alerts = [];
+      const name = getCreditorDisplayName(row);
 
-  if (route === 'LEVEL') {
-    if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) {
-      alerts.push({ label: 'Not accepted by Level', tone: 'red' });
-    }
-    if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) {
-      alerts.push({ label: 'Secured / collateral risk', tone: 'amber' });
-    }
-    if (LEVEL_REJECTED_TYPES.has(row.debtType)) {
-      alerts.push({ label: 'Debt type not accepted', tone: 'red' });
-    }
-  }
+      if (route === 'LEVEL') {
+        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) alerts.push({ label: 'Not accepted by Level', tone: 'red' });
+        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) alerts.push({ label: 'Secured / collateral risk', tone: 'amber' });
+        if (LEVEL_REJECTED_TYPES.has(row.debtType)) alerts.push({ label: 'Debt type not accepted', tone: 'red' });
+      }
 
-  if (route === 'CONSUMER SHIELD') {
-    if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) {
-      alerts.push({ label: 'Not accepted by Consumer Shield', tone: 'red' });
-    }
-    if (row.debtType === 'Apartment Back Rent (Collections)' && !row.inCollections) {
-      alerts.push({ label: 'Must already be in collections', tone: 'red' });
-    }
-    if (row.debtType === 'Business Debt' && !row.businessUnprofitable) {
-      alerts.push({ label: 'Business must be dissolved', tone: 'red' });
-    }
-    if (CONSUMER_SHIELD_CONDITIONAL_TYPES.has(row.debtType)) {
-      alerts.push({ label: 'Conditional / docs needed', tone: 'amber' });
-    }
-  }
+      if (route === 'CONSUMER SHIELD') {
+        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) alerts.push({ label: 'Not accepted by Consumer Shield', tone: 'red' });
+        if (CONSUMER_SHIELD_CONDITIONAL_TYPES.has(row.debtType)) alerts.push({ label: 'Conditional / docs needed', tone: 'amber' });
+      }
 
-  return alerts;
-}
+      return alerts;
+    }
 
     function mapCreditorToDebtType(item) {
   const productType = String(item?.product_type || '').toLowerCase().trim();
@@ -968,8 +801,11 @@ function hideAllCreditorResults() {
 }
     
 function renderRows() {
-  el('rows').innerHTML = state.rows.map((row, index) => `
-    <div class="row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 border-slate-100 bg-white" data-row="${index}">
+  const totalDebt = state.rows.reduce((sum, r) => sum + numberOrZero(r.amount), 0);
+  el('rows').innerHTML = state.rows.map((row, index) => {
+    const rowPercent = totalDebt > 0 ? pct((numberOrZero(row.amount) / totalDebt) * 100) : '0.0%';
+    return `
+    <div class="row-card grid grid-cols-[1.2fr,0.8fr,0.55fr,1fr,0.9fr] gap-3 rounded-xl border p-3 border-slate-100 bg-white" data-row="${index}">
       <div class="space-y-2 relative">
         <input
           class="input creditor-search"
@@ -993,9 +829,13 @@ function renderRows() {
         value="${row.amount || ''}"
       />
 
+      <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 flex items-center justify-center" data-percent-box="${index}">
+        ${rowPercent}
+      </div>
+
       <div class="relative">
         <input
-          class="input debt-type-search"
+          class="input debt-type-search ${row.isSecured ? 'border-red-500 bg-red-600 text-white font-semibold' : ''}"
           data-index="${index}"
           placeholder="Start typing debt type..."
           value="${escapeHtml(row.debtType || '')}"
@@ -1011,11 +851,11 @@ function renderRows() {
         <option value="inCollections" ${row.inCollections ? 'selected' : ''}>Collections</option>
         <option value="inLitigation" ${row.inLitigation ? 'selected' : ''}>Litigation</option>
         <option value="isSecured" ${row.isSecured ? 'selected' : ''}>Secured</option>
-        <option value="paymentMade" ${row.paymentMade ? 'selected' : ''}>Payment made</option>
+        <option value="paymentMade" ${row.paymentMade ? 'selected' : ''}>On-Time / Current Payments</option>
         <option value="businessUnprofitable" ${row.businessUnprofitable ? 'selected' : ''}>Business closed / unprofitable</option>
       </select>
     </div>
-  `).join('');
+  `}).join('');
 
   document.querySelectorAll('#rows [data-key="amount"], #rows [data-key="conditions"]').forEach((node) => {
     node.addEventListener('input', onFieldChange);
@@ -1197,8 +1037,8 @@ function bindCreditorResultClicks() {
     state.rows[index].isSecured = secured;
 
     if (secured) {
-      state.rows[index].debtType = debtType || 'Secured Loan';
-    } else if (!state.rows[index].debtType || state.rows[index].debtType === 'Other') {
+      state.rows[index].debtType = debtType === 'Auto Loan (Secured)' ? 'Auto Loan (Secured)' : 'Secured Loan';
+    } else if (!state.rows[index].debtType || state.rows[index].debtType === 'Other' || state.rows[index].debtType === 'Secured Loan') {
       state.rows[index].debtType = debtType || 'Unsecured Credit Card';
     }
 
@@ -1252,7 +1092,7 @@ function bindCreditorResultClicks() {
           alerts.some((a) => a.tone === 'amber') ? 'border-amber-300 bg-amber-50' :
           'border-slate-100 bg-white';
 
-        card.className = `row-card grid grid-cols-[1.35fr,0.8fr,1fr,0.7fr] gap-3 rounded-xl border p-3 ${bg}`;
+        card.className = `row-card grid grid-cols-[1.2fr,0.8fr,0.55fr,1fr,0.9fr] gap-3 rounded-xl border p-3 ${bg}`;
         wrap.innerHTML = alerts.map((a) =>
           `<span class="rounded-full border px-2 py-1 text-[11px] font-medium ${
             a.tone === 'red'
@@ -1268,7 +1108,7 @@ function bindCreditorResultClicks() {
 
       const rows = [
         ['Monthly Payments', currency(c.doNothing.monthlyPayment), c.shortest ? currency(c.shortest.monthlyPayment) : '—', c.recommended ? currency(c.recommended.monthlyPayment) : '—'],
-        ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.totalDebt) : '—'],
+        ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.recommended.totalDebt) : '—'],
         ['Months to Payoff', `${c.doNothing.monthsToPayoff} months`, c.shortest ? `${c.shortest.term} months` : '—', c.recommended ? `${c.recommended.term} months` : '—'],
         ['Estimated Int Rate', `${(c.doNothing.apr * 100).toFixed(0)}% APR`, c.shortest ? '0%' : '—', c.recommended ? '0%' : '—'],
         ['Estimated Total Payback*', totalPaybackRed, c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
@@ -1407,25 +1247,25 @@ function bindCreditorResultClicks() {
     }
 
     function renderBadges(c) {
-  const stateCode = state.selectedState || '—';
-  const stateFull = state.selectedState ? STATE_NAMES[state.selectedState] : 'No state selected';
-  const isRed = c.routeInfo.route === 'LEVEL' ? c.levelState.status === 'RED' : false;
+      const stateCode = state.selectedState || '—';
+      const stateFull = state.selectedState ? STATE_NAMES[state.selectedState] : 'No state selected';
+      const isRed = c.routeInfo.route === 'LEVEL' ? c.levelState.status === 'RED' : false;
 
-  const tierColor = isRed ? '#DC2626' : '#16A34A';
-  const tierBg = isRed ? '#FEF2F2' : '#ECFDF5';
+      const tierColor = isRed ? '#DC2626' : '#16A34A';
+      const tierBg = isRed ? '#FEF2F2' : '#ECFDF5';
 
-  let second = '';
-  if (c.routeInfo.route === 'CONSUMER SHIELD') {
-    second = `<span class="pill border border-teal-300 bg-teal-50 text-teal-700">Consumer Shield: ${c.csState.label}</span>`;
-  } else if (c.routeInfo.route === 'LEVEL') {
-    second = `<span class="pill border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">Level: ${c.levelState.label}</span>`;
-  }
+      let second = '';
+      if (c.routeInfo.route === 'CONSUMER SHIELD') {
+        second = `<span class="pill border border-teal-300 bg-teal-50 text-teal-700">Consumer Shield: ${c.csState.label}</span>`;
+      } else if (c.routeInfo.route === 'LEVEL') {
+        second = `<span class="pill border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">Level: ${c.levelState.label}</span>`;
+      }
 
-  el('topBadges').innerHTML = `
-    <span title="${stateFull}" class="pill border border-slate-300 bg-white cursor-help">State: ${stateCode}</span>
-    ${second}
-  `;
-}
+      el('topBadges').innerHTML = `
+        <span title="${stateFull}" class="pill border border-slate-300 bg-white cursor-help">State: ${stateCode}</span>
+        ${second}
+      `;
+    }
 
     function renderFlags(c) {
       el('flags').innerHTML = c.flags.map((flag) => `
@@ -1433,28 +1273,48 @@ function bindCreditorResultClicks() {
       `).join('');
     }
 
-    function render() {
-  const c = computeScenarioData();
-  el('totalDebt').textContent = currency(c.totalDebt);
-  refreshRowVisuals();
-  renderComparison(c);
-  renderPricingComparison(c);
-  renderProviderLogo(c.routeInfo.route);
-  renderBadges(c);
-  renderMetrics(c);
-  renderFlags(c);
-  updateTimeZoneClock();
-  el('routeReason').textContent = c.routeInfo.reason;
-  el('providerAvailability').innerHTML = buildProviderAvailability(c);
 
-  const pdfBtn = el('pdfBtn');
-  const sendBtn = el('sendEmailBtn');
-  const canGenerate = !!(c.recommended && state.selectedState && c.totalDebt > 0);
-  pdfBtn.disabled = !canGenerate;
-  sendBtn.disabled = !canGenerate;
-  pdfBtn.style.opacity = canGenerate ? 1 : 0.55;
-  sendBtn.style.opacity = canGenerate ? 1 : 0.55;
-}
+    function renderLevelRuleWarnings(c) {
+      const box = el('levelRuleWarnings');
+      if (!box) return;
+      if (!c.levelRuleWarnings || !c.levelRuleWarnings.length) {
+        box.innerHTML = '';
+        return;
+      }
+      box.innerHTML = `
+        <div class="rounded-xl border border-red-200 bg-red-50 p-3">
+          <div class="text-sm font-semibold text-red-800">Level Debt Rule Warnings</div>
+          <div class="mt-2 space-y-2">
+            ${c.levelRuleWarnings.map((item) => `
+              <div class="text-sm ${item.tone === 'red' ? 'text-red-700' : 'text-amber-800'}">• ${item.text}</div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      const c = computeScenarioData();
+      el('totalDebt').textContent = currency(c.totalDebt);
+      refreshRowVisuals();
+      renderComparison(c);
+      renderPricingComparison(c);
+      renderProviderLogo(c.routeInfo.route);
+      renderBadges(c);
+      renderMetrics(c);
+      renderFlags(c);
+      renderLevelRuleWarnings(c);
+      el('routeReason').textContent = c.routeInfo.reason;
+      el('providerAvailability').innerHTML = buildProviderAvailability(c);
+
+      const pdfBtn = el('pdfBtn');
+      const sendBtn = el('sendEmailBtn');
+      const canGenerate = !!(c.recommended && state.selectedState && c.totalDebt > 0);
+      pdfBtn.disabled = !canGenerate;
+      sendBtn.disabled = !canGenerate;
+      pdfBtn.style.opacity = canGenerate ? 1 : 0.55;
+      sendBtn.style.opacity = canGenerate ? 1 : 0.55;
+    }
 
     function onFieldChange(e) {
       const index = Number(e.target.dataset.index);
@@ -1537,7 +1397,7 @@ function bindCreditorResultClicks() {
 
       const tableRows = [
         ['Monthly Payments', currency(c.doNothing.monthlyPayment), c.shortest ? currency(c.shortest.monthlyPayment) : '—', c.recommended ? currency(c.recommended.monthlyPayment) : '—'],
-        ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.totalDebt) : '—'],
+        ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.recommended.totalCost ? c.totalDebt : c.totalDebt) : '—'],
         ['Months to Payoff', `${c.doNothing.monthsToPayoff} months`, c.shortest ? `${c.shortest.term} months` : '—', c.recommended ? `${c.recommended.term} months` : '—'],
         ['Estimated Int Rate', `${(c.doNothing.apr * 100).toFixed(0)}% APR`, c.shortest ? '0%' : '—', c.recommended ? '0%' : '—'],
         ['Estimated Total Payback', currency(c.doNothing.totalPayback), c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
@@ -1807,7 +1667,6 @@ function initStateSelect() {
   initStateSelect();
   initActionButtons();
 
-  // 👇 ADD THIS RIGHT HERE
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.creditor-search') && !e.target.closest('.creditor-results')) {
       hideAllCreditorResults();
