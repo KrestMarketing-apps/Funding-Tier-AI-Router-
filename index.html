@@ -248,29 +248,54 @@
       box-shadow: 0 10px 20px rgba(13, 148, 136, 0.10);
       border-color: #14b8a6;
     }
+    @media (max-width: 900px) {
+      .topbar-inner {
+        grid-template-columns:1fr;
+      }
+      .brand-group {
+        align-items:center;
+        text-align:center;
+      }
+      .header-delivery-grid {
+        grid-template-columns:1fr 1fr;
+      }
+    }
     @media (max-width: 767px) {
       .sticky-stack { position: static; top: auto; }
       .brand-logo { max-width: 132px; max-height: 52px; }
+      .header-delivery-grid {
+        grid-template-columns:1fr;
+      }
     }
 
     .topbar-inner {
       display:grid;
-      grid-template-columns:minmax(240px,auto) minmax(420px,1fr) auto;
+      grid-template-columns:minmax(180px,220px) minmax(0,1fr);
       gap:16px;
-      align-items:center;
+      align-items:stretch;
     }
     .brand-group {
       display:flex;
-      align-items:center;
-      gap:14px;
+      flex-direction:column;
+      align-items:flex-start;
+      justify-content:center;
+      gap:8px;
       min-width:0;
     }
+    .brand-title {
+      font-size:16px;
+      font-weight:700;
+      letter-spacing:-0.01em;
+      color:#000;
+      line-height:1.15;
+    }
     .header-utility-card {
-      border:1px solid rgba(15,23,42,0.08);
-      background:rgba(255,255,255,0.9);
+      border:2px solid #86efac;
+      background:rgba(255,255,255,0.95);
       border-radius:18px;
-      padding:10px 12px;
+      padding:10px 14px;
       box-shadow:0 8px 18px rgba(15,23,42,0.05);
+      min-width:0;
     }
     .header-delivery-grid {
       display:grid;
@@ -452,7 +477,7 @@
       <div class="topbar-inner">
         <div class="brand-group">
           <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf8e8df54a8b29097c4.png" alt="Funding Tier logo" class="brand-logo" />
-          <div class="text-[16px] font-bold tracking-tight text-black md:text-[22px]">AI DEBT RESOLUTION ESTIMATOR</div>
+          <div class="brand-title">AI DEBT RESOLUTION ESTIMATOR</div>
         </div>
 
         <div class="header-utility-card">
@@ -512,12 +537,6 @@
             </button>
           </div>
         </div>
-
-        <div class="header-clock header-utility-card">
-          <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">System Clock</div>
-          <div id="systemClockTime" class="header-clock-time">--:--:--</div>
-          <div id="systemClockDate" class="header-clock-date">--</div>
-        </div>
       </div>
     </div>
   </header>
@@ -573,7 +592,7 @@
 
       <div class="sticky-stack space-y-4">
         <div class="card bg-white p-4 md:p-5 teal-panel">
-          <h2 class="text-lg font-semibold">Recommendation Snapshot</h2>
+          <h2 class="text-lg font-semibold">Backend / Routing</h2>
 
           <div class="snapshot-topbar mt-3">
             <div id="providerLogoBox"></div>
@@ -1228,27 +1247,8 @@
       return alerts;
     }
 
-
-    function renderSystemClock() {
-      const now = new Date();
-      const timeNode = el('systemClockTime');
-      const dateNode = el('systemClockDate');
-      if (!timeNode || !dateNode) return;
-      timeNode.textContent = new Intl.DateTimeFormat('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-      }).format(now);
-      dateNode.textContent = new Intl.DateTimeFormat('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric'
-      }).format(now);
-    }
-
     function startSystemClock() {
-      renderSystemClock();
+
       if (window.__ftSystemClockInterval) clearInterval(window.__ftSystemClockInterval);
       window.__ftSystemClockInterval = setInterval(renderSystemClock, 1000);
     }
