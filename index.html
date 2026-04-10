@@ -542,7 +542,7 @@
   </header>
 
   <main class="mx-auto max-w-7xl space-y-8 p-4 md:p-6">
-    <section class="grid gap-6 xl:grid-cols-[70%,30%] items-start">
+    <section class="grid gap-6 xl:grid-cols-[67%,33%] items-start">
       <div class="card bg-white p-4 md:p-6 teal-panel">
         <h2 class="text-xl md:text-2xl font-semibold">Debt Scenario Inputs</h2>
         <p class="mt-1 text-sm md:text-base text-slate-600">Select the state and enter debts to estimate program fit and create a prospect-facing comparison summary.</p>
@@ -570,12 +570,10 @@
         </div>
 
         <div class="mt-5 overflow-hidden rounded-2xl border border-teal-100 bg-white/80">
-          <div class="hidden md:grid grid-cols-[1.25fr,0.8fr,0.55fr,1fr,0.9fr,0.28fr] gap-3 bg-gradient-to-r from-teal-50 to-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
+          <div class="hidden md:grid grid-cols-[1.55fr,0.62fr,1fr,0.22fr] gap-3 bg-gradient-to-r from-teal-50 to-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
             <div>Creditor Name</div>
-            <div>Debt Amount</div>
-            <div>% of Total</div>
+            <div>Debt Amount <span title="% of total enrolled debt is shown when you hover over each debt amount field." class="ml-1 cursor-help text-slate-400">ⓘ</span></div>
             <div>Debt Type</div>
-            <div>Conditions</div>
             <div></div>
           </div>
 
@@ -691,7 +689,7 @@
       'Secured Loan',
       'Timeshare',
       'Tribal Loan',
-      'Unsecured Credit Card',
+      'Unsecured',
       'Unsecured Line of Credit',
       'Unsecured Personal Loan',
       'USAA',
@@ -822,7 +820,7 @@
       creditorName: '',
       manualName: '',
       amount: '',
-      debtType: 'Unsecured Credit Card',
+      debtType: 'Unsecured',
       inCollections: false,
       inLitigation: false,
       isSecured: false,
@@ -892,7 +890,7 @@
         group.includes('auto');
 
       if (looksLikeAutoLoan && isExplicitlySecured) return 'Auto Loan (Secured)';
-      if (productType.includes('credit card')) return 'Unsecured Credit Card';
+      if (productType.includes('credit card')) return 'Unsecured';
       if (productType.includes('personal loan')) return 'Unsecured Personal Loan';
       if (productType.includes('line of credit')) return 'Unsecured Line of Credit';
       if (productType.includes('medical')) return 'Medical Bill';
@@ -901,7 +899,7 @@
       if (productType.includes('business')) return 'Business Debt';
       if (group.includes('repo') || productType.includes('deficiency')) return 'Repossession Deficiency';
       if (isExplicitlySecured) return 'Secured Loan';
-      return 'Unsecured Credit Card';
+      return 'Unsecured';
     }
 
     function escapeHtml(value = '') {
@@ -1388,6 +1386,27 @@
       }).join('');
     }
 
+
+    function renderDiscoverInlineWarning(index) {
+      const activeRows = state.rows.filter((r) => numberOrZero(r.amount) > 0);
+      const totalDebt = activeRows.reduce((sum, row) => sum + numberOrZero(row.amount), 0);
+      if (!totalDebt) return '';
+
+      const discoverDebt = activeRows.reduce((sum, row) => {
+        return normalizeCreditorName(getCreditorDisplayName(row)).includes('DISCOVER')
+          ? sum + numberOrZero(row.amount)
+          : sum;
+      }, 0);
+
+      const discoverPct = totalDebt > 0 ? (discoverDebt / totalDebt) * 100 : 0;
+      const currentRow = state.rows[index];
+      const isDiscoverRow = normalizeCreditorName(getCreditorDisplayName(currentRow)).includes('DISCOVER');
+
+      if (!isDiscoverRow || discoverPct <= 60) return '';
+
+      return `<div class="pt-1 text-[11px] font-semibold text-red-600">Discover debt guideline exceeded — ${pct(discoverPct)} of total enrolled debt.</div>`;
+    }
+
     function getTraditionalCreditorMatches(query) {
       const q = String(query || '').trim().toLowerCase();
       if (!q) return [];
@@ -1414,7 +1433,7 @@
 
         return `
           <div class="row-card border rounded-2xl p-3 md:p-3 border-slate-100 bg-white" data-row="${index}">
-            <div class="grid gap-3 md:grid-cols-[1.25fr,0.8fr,0.55fr,1fr,0.9fr,0.28fr] items-start">
+            <div class="grid gap-3 md:grid-cols-[1.55fr,0.62fr,1fr,0.22fr] items-start">
               <div class="space-y-2 relative">
                 <div class="mobile-label md:hidden">Creditor Name</div>
                 <input
@@ -1428,10 +1447,11 @@
                   class="creditor-results hidden absolute left-0 right-0 z-30 mt-1 rounded-xl border border-slate-200 bg-white shadow-lg max-h-64 overflow-y-auto"
                   data-results-index="${index}"
                 ></div>
+                ${renderDiscoverInlineWarning(index)}
                 <div class="alert-wrap flex flex-wrap gap-2 pt-1"></div>
               </div>
 
-              <div>
+              <div title="${rowPercent} of total enrolled debt">
                 <div class="mobile-label md:hidden">Debt Amount</div>
                 <input
                   class="input"
@@ -1439,14 +1459,8 @@
                   data-key="amount"
                   placeholder="$0"
                   value="${row.amount || ''}"
+                  title="${rowPercent} of total enrolled debt"
                 />
-              </div>
-
-              <div>
-                <div class="mobile-label md:hidden">% of Total</div>
-                <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 flex items-center justify-center min-h-[42px]" data-percent-box="${index}">
-                  ${rowPercent}
-                </div>
               </div>
 
               <div class="relative">
@@ -1462,17 +1476,6 @@
                   class="debt-type-results hidden absolute left-0 right-0 z-30 mt-1 rounded-xl border border-slate-200 bg-white shadow-lg max-h-64 overflow-y-auto"
                   data-debt-results-index="${index}"
                 ></div>
-              </div>
-
-              <div>
-                <div class="mobile-label md:hidden">Conditions</div>
-                <select multiple class="conditions-select" data-index="${index}" data-key="conditions" size="1">
-                  <option value="inCollections" ${row.inCollections ? 'selected' : ''}>Collections</option>
-                  <option value="inLitigation" ${row.inLitigation ? 'selected' : ''}>Litigation</option>
-                  <option value="isSecured" ${row.isSecured ? 'selected' : ''}>Secured</option>
-                  <option value="paymentMade" ${row.paymentMade ? 'selected' : ''}>On-Time / Current Payments</option>
-                  <option value="businessUnprofitable" ${row.businessUnprofitable ? 'selected' : ''}>Business closed / unprofitable</option>
-                </select>
               </div>
 
               <div class="flex items-start md:justify-center">
@@ -1492,7 +1495,7 @@
         `;
       }).join('');
 
-      document.querySelectorAll('#rows [data-key="amount"], #rows [data-key="conditions"]').forEach((node) => {
+      document.querySelectorAll('#rows [data-key="amount"]').forEach((node) => {
         node.addEventListener('input', onFieldChange);
         node.addEventListener('change', onFieldChange);
       });
@@ -1512,7 +1515,6 @@
       bindCreditorSearches();
       bindDebtTypeSearches();
       refreshRowVisuals();
-      updatePercentDisplays();
     }
 
     async function searchCreditors(index, query) {
@@ -1559,7 +1561,7 @@
 
         resultsBox.innerHTML = merged.slice(0, 12).map((item) => {
           const debtType = isTraditionalCardCreditor(item.display_name)
-            ? 'Unsecured Credit Card'
+            ? 'Unsecured'
             : mapCreditorToDebtType(item);
 
           const isSecured = item.secured === true || item.secured === 'true';
@@ -1597,11 +1599,11 @@
               class="block w-full text-left px-3 py-2 text-sm hover:bg-slate-50 border-b last:border-b-0"
               data-pick-index="${index}"
               data-pick-name="${escapeHtml(item.display_name || '')}"
-              data-pick-debt-type="Unsecured Credit Card"
+              data-pick-debt-type="Unsecured"
               data-pick-secured="false"
             >
               <div class="font-medium">${escapeHtml(item.display_name || '')}</div>
-              <div class="text-xs text-teal-700">Unsecured Credit Card</div>
+              <div class="text-xs text-teal-700">Unsecured</div>
             </button>
           `).join('');
           resultsBox.classList.remove('hidden');
@@ -1702,7 +1704,7 @@
           state.rows[index].creditorName = query;
 
           if (isTraditionalCardCreditor(query)) {
-            state.rows[index].debtType = 'Unsecured Credit Card';
+            state.rows[index].debtType = 'Unsecured';
             state.rows[index].isSecured = false;
           }
 
@@ -1722,7 +1724,7 @@
         btn.onclick = () => {
           const index = Number(btn.dataset.pickIndex);
           const name = btn.dataset.pickName || '';
-          const debtType = btn.dataset.pickDebtType || 'Unsecured Credit Card';
+          const debtType = btn.dataset.pickDebtType || 'Unsecured';
           const secured = btn.dataset.pickSecured === 'true';
 
           state.rows[index].creditorName = name;
@@ -1731,7 +1733,7 @@
           if (secured) {
             state.rows[index].debtType = debtType === 'Auto Loan (Secured)' ? 'Auto Loan (Secured)' : 'Secured Loan';
           } else {
-            state.rows[index].debtType = isTraditionalCardCreditor(name) ? 'Unsecured Credit Card' : (debtType || 'Unsecured Credit Card');
+            state.rows[index].debtType = isTraditionalCardCreditor(name) ? 'Unsecured' : (debtType || 'Unsecured');
           }
 
           const input = document.querySelector(`.creditor-search[data-index="${index}"]`);
@@ -1754,7 +1756,7 @@
           const value = btn.dataset.manualValue || '';
 
           state.rows[index].creditorName = value;
-          state.rows[index].debtType = isTraditionalCardCreditor(value) ? 'Unsecured Credit Card' : 'Unsecured Credit Card';
+          state.rows[index].debtType = isTraditionalCardCreditor(value) ? 'Unsecured' : 'Unsecured';
           state.rows[index].isSecured = false;
 
           const input = document.querySelector(`.creditor-search[data-index="${index}"]`);
@@ -1803,15 +1805,6 @@
       });
     }
 
-    function updatePercentDisplays() {
-      const totalDebt = state.rows.reduce((sum, r) => sum + numberOrZero(r.amount), 0);
-      state.rows.forEach((row, index) => {
-        const node = document.querySelector(`[data-percent-box="${index}"]`);
-        if (!node) return;
-        const amount = numberOrZero(row.amount);
-        node.textContent = totalDebt > 0 ? pct((amount / totalDebt) * 100) : '0.0%';
-      });
-    }
 
     function renderComparison(c) {
       const totalPaybackRed = `<span style="color:#DC2626;font-weight:800;">${currency(c.doNothing.totalPayback)}</span>`;
@@ -2025,7 +2018,6 @@
       const c = computeScenarioData();
       el('totalDebt').textContent = currency(c.totalDebt);
       refreshRowVisuals();
-      updatePercentDisplays();
       renderComparison(c);
       renderPricingComparison(c);
       renderProviderLogo(c.routeInfo.route);
@@ -2051,31 +2043,11 @@
       const key = e.target.dataset.key;
       if (!Number.isInteger(index) || !state.rows[index]) return;
 
-      if (key === 'conditions') {
-        const values = Array.from(e.target.selectedOptions).map((opt) => opt.value);
-        state.rows[index].inCollections = values.includes('inCollections');
-        state.rows[index].inLitigation = values.includes('inLitigation');
-        state.rows[index].isSecured = values.includes('isSecured');
-        state.rows[index].paymentMade = values.includes('paymentMade');
-        state.rows[index].businessUnprofitable = values.includes('businessUnprofitable');
-
-        if (state.rows[index].isSecured && !['Secured Loan', 'Auto Loan (Secured)'].includes(state.rows[index].debtType)) {
-          state.rows[index].debtType = 'Secured Loan';
-        }
-        if (!state.rows[index].isSecured && ['Secured Loan'].includes(state.rows[index].debtType)) {
-          state.rows[index].debtType = 'Unsecured Credit Card';
-        }
-
-        renderRows();
-        render();
-        return;
-      }
 
       state.rows[index][key] = e.target.value;
 
       if (key === 'amount') {
-        updatePercentDisplays();
-        render();
+          render();
         return;
       }
 
