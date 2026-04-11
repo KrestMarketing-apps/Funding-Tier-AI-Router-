@@ -334,6 +334,134 @@
       line-height: 1.4;
     }
 
+    
+    .header-bar {
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr) auto;
+      align-items:center;
+      gap:12px;
+    }
+    .brand-cluster {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+    .brand-estimator-title {
+      font-size:14px;
+      font-weight:800;
+      letter-spacing:.01em;
+      color:#000;
+      white-space:nowrap;
+    }
+    .header-backend-clocks {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      width:100%;
+      max-width:100%;
+    }
+    .header-backend-card {
+      border:1px solid #d7eeeb;
+      background:#fff;
+      border-radius:12px;
+      padding:8px 10px;
+      display:grid;
+      grid-template-columns:auto 1fr;
+      gap:8px;
+      align-items:center;
+      min-height:54px;
+    }
+    .header-provider-logo-wrap {
+      width:54px;
+      height:24px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #d7eeeb;
+      border-radius:8px;
+      background:#fff;
+      padding:2px;
+      flex:0 0 auto;
+    }
+    .header-provider-logo {
+      max-width:48px;
+      max-height:16px;
+      width:auto;
+      height:auto;
+      object-fit:contain;
+    }
+    .header-backend-meta {
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+    .header-backend-top {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      justify-content:space-between;
+      min-width:0;
+    }
+    .header-backend-name {
+      font-size:11px;
+      font-weight:800;
+      color:#0f172a;
+      white-space:nowrap;
+    }
+    .header-hours {
+      font-size:10px;
+      color:#64748b;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .header-support-line {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+    .header-support-link {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:4px 8px;
+      font-size:10px;
+      font-weight:800;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .header-support-link.level {
+      border:1px solid #ddd6fe;
+      background:#f5f3ff;
+      color:#6d28d9;
+    }
+    .header-support-link.cs {
+      border:1px solid #bae6fd;
+      background:#eff6ff;
+      color:#0369a1;
+    }
+    .system-clock-btn {
+      border:1px solid #d7eeeb;
+      background:#fff;
+      color:#0f172a;
+      border-radius:999px;
+      padding:7px 10px;
+      font-size:11px;
+      font-weight:800;
+      white-space:nowrap;
+      box-shadow:0 4px 12px rgba(15,23,42,.04);
+    }
+
+    @media (max-width: 1100px) {
+      .header-bar { grid-template-columns:1fr; }
+      .header-backend-clocks { grid-template-columns:1fr; }
+      .system-clock-btn { justify-self:start; }
+    }
+
     @media (max-width: 767px) {
       .sticky-stack { position: static; top: auto; }
       .brand-logo { max-width: 132px; max-height: 52px; }
@@ -345,19 +473,23 @@
 </head>
 <body class="min-h-screen bg-gradient-to-br from-teal-100 via-white to-slate-100 text-slate-900">
   <header class="topbar">
-    <div class="mx-auto max-w-7xl px-4 py-4 md:px-6">
-      <div class="flex items-center gap-4 md:gap-[100px]">
-        <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf8e8df54a8b29097c4.png" alt="Funding Tier logo" class="brand-logo" />
-        <div class="text-[16px] font-bold tracking-tight text-black md:text-[22px]">AI DEBT RESOLUTION ESTIMATOR</div>
+    <div class="mx-auto max-w-7xl px-4 py-3 md:px-6">
+      <div class="header-bar">
+        <div class="brand-cluster">
+          <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf8e8df54a8b29097c4.png" alt="Funding Tier logo" class="brand-logo" />
+          <div class="brand-estimator-title">AI DEBT RESOLUTION ESTIMATOR</div>
+        </div>
+        <div id="headerBackendClockBox" class="header-backend-clocks"></div>
+        <button id="systemClockBtn" type="button" class="system-clock-btn" aria-label="System clock">--:-- -- PT</button>
       </div>
     </div>
   </header>
 
   <main class="mx-auto max-w-7xl space-y-8 p-4 md:p-6">
-    <section class="grid gap-6 xl:grid-cols-[70%,30%] items-start">
+    <section class="grid gap-6 xl:grid-cols-[60%,40%] items-start">
       <div class="card bg-white p-4 md:p-6 teal-panel">
         <h2 class="text-xl md:text-2xl font-semibold">Debt Scenario Inputs</h2>
-        <p class="mt-1 text-sm md:text-base text-slate-600">Select the state and enter debts to estimate program fit and create a prospect-facing comparison summary.</p>
+        <p class="mt-1 text-sm md:text-base text-slate-600">Select the state and enter debts to estimate fit and generate a custom program comparison summary.</p>
 
         <div class="mt-5 grid gap-4 md:grid-cols-2">
           <div class="relative">
@@ -394,7 +526,7 @@
           <div id="rows" class="space-y-3 p-3"></div>
 
           <div class="p-3 pt-0">
-            <button id="addCreditorBtn" type="button" class="plus-button">
+            <button id="addCreditorBtn" type="button" class="plus-button" onclick="addRow()">
               <span class="text-2xl leading-none">+</span>
               <span>Add Creditor</span>
             </button>
@@ -404,7 +536,7 @@
 
       <div class="sticky-stack space-y-4">
         <div class="card bg-white p-4 md:p-5 teal-panel">
-          <h2 class="text-lg font-semibold">Recommendation Snapshot</h2>
+          <h2 class="text-lg font-semibold">Backend / Routing</h2>
 
           <div class="mt-3 flex items-center gap-3">
             <div id="providerLogoBox"></div>
@@ -412,8 +544,7 @@
           </div>
 
           <div id="routeReason" class="mt-3 w-full rounded-xl bg-white/90 border border-teal-100 p-3 text-xs text-slate-700"></div>
-          <div id="backendClockBox" class="mt-3 rounded-xl border border-slate-200 bg-white p-3"></div>
-          <div id="providerAvailability" class="mt-3 grid grid-cols-2 gap-3"></div>
+                    <div id="providerAvailability" class="mt-3 grid grid-cols-2 gap-3"></div>
           <div id="metricsGrid" class="mt-3 grid gap-2 md:grid-cols-2"></div>
           <div id="flags" class="mt-3 space-y-2"></div>
           <div id="levelRuleWarnings" class="mt-3 space-y-2"></div>
@@ -503,6 +634,7 @@
       'Secured Loan',
       'Timeshare',
       'Tribal Loan',
+      'Unsecured',
       'Unsecured Credit Card',
       'Unsecured Line of Credit',
       'Unsecured Personal Loan',
@@ -612,7 +744,7 @@
         openMinute: 0,
         closeHour: 18,
         closeMinute: 0,
-        note: 'Level cutoff is editable here. Update if the real push cutoff changes.'
+        note: ''
       },
       {
         key: 'CONSUMER SHIELD',
@@ -623,7 +755,7 @@
         openMinute: 0,
         closeHour: 19,
         closeMinute: 0,
-        note: 'Consumer Shield support window is set to 9:00 AM–7:00 PM Eastern.'
+        note: ''
       }
     ];
 
@@ -634,7 +766,7 @@
       creditorName: '',
       manualName: '',
       amount: '',
-      debtType: 'Unsecured Credit Card',
+      debtType: 'Unsecured',
       inCollections: false,
       inLitigation: false,
       isSecured: false,
@@ -1088,8 +1220,7 @@
       const minutesUntilOpen = openMinutes - currentMinutes;
 
       let badgeClass = 'closed';
-      let badgeText = 'Closed / Too Late To Push';
-      let subText = `Open ${String(config.openHour).padStart(2, '0')}:${String(config.openMinute).padStart(2, '0')} to ${String(config.closeHour).padStart(2, '0')}:${String(config.closeMinute).padStart(2, '0')} ET`;
+      let badgeText = 'Closed';
 
       if (isOpenNow) {
         if (minutesUntilClose <= 60) {
@@ -1097,7 +1228,7 @@
           badgeText = `Open Now • Closes In ${minutesUntilClose} Min`;
         } else {
           badgeClass = 'open';
-          badgeText = 'Open Now • Safe To Push';
+          badgeText = 'Open Now';
         }
       } else if (isOpenDay && currentMinutes < openMinutes) {
         badgeClass = 'closed';
@@ -1107,66 +1238,46 @@
         badgeText = 'Closed Today';
       }
 
-      return {
-        nowLabel: formatTimeInZone(config.timeZone),
-        badgeClass,
-        badgeText,
-        subText
+      return { badgeClass, badgeText };
+    }
+
+    
+function formatEtHoursWithPt(config) {
+      const ptOpen = (config.openHour + 21) % 24;
+      const ptClose = (config.closeHour + 21) % 24;
+      const fmt = (hour) => {
+        const suffix = hour >= 12 ? 'PM' : 'AM';
+        const h = hour % 12 === 0 ? 12 : hour % 12;
+        return `${h}${suffix}`;
       };
+      return `${fmt(ptOpen)}-${fmt(ptClose)} PST • ${fmt(config.openHour)}-${fmt(config.closeHour)} EST`;
     }
 
     function renderBackendClock() {
-      const box = el('backendClockBox');
+      const box = el('headerBackendClockBox');
       if (!box) return;
 
-      box.innerHTML = `
-        <div class="text-sm font-semibold text-slate-900">Backend Clock / Push Status</div>
-        <div class="mt-3 clock-grid">
-          ${BACKEND_CLOCKS.map((backend) => {
-            const status = getBackendClockStatus(backend);
-
-            let supportLink = '';
-            if (backend.key === 'CONSUMER SHIELD') {
-              supportLink = `
-                <a
-                  href="https://teams.live.com/l/invite/FBA2mu0C9EQERh1bQ8"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="support-btn border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100"
-                >
-                  Open Consumer Shield Teams Support
-                </a>
-              `;
-            }
-
-            if (backend.key === 'LEVEL') {
-              supportLink = `
-                <a
-                  href="https://funding-tier.slack.com/archives/C0AMBM9EBNV"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="support-btn border border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100"
-                >
-                  Open Level Debt Slack Support
-                </a>
-              `;
-            }
-
-            return `
-              <div class="clock-card">
-                <div class="clock-top">
-                  <div class="clock-name">${backend.label}</div>
-                  <div class="clock-status ${status.badgeClass}">${status.badgeText}</div>
-                </div>
-                <div class="clock-sub">${status.nowLabel}</div>
-                <div class="clock-sub">${status.subText}</div>
-                <div class="clock-sub">${backend.note}</div>
-                ${supportLink}
+      box.innerHTML = BACKEND_CLOCKS.map((backend) => {
+        const status = getBackendClockStatus(backend);
+        const supportClass = backend.key === 'LEVEL' ? 'level' : 'cs';
+        return `
+          <div class="header-backend-card">
+            <div class="header-provider-logo-wrap">
+              <img class="header-provider-logo" src="${ROUTE_LOGOS[backend.key === 'CONSUMER SHIELD' ? 'CONSUMER SHIELD' : 'LEVEL']}" alt="${backend.label} logo" />
+            </div>
+            <div class="header-backend-meta">
+              <div class="header-backend-top">
+                <div class="header-backend-name">${backend.label}</div>
+                <div class="clock-status ${status.badgeClass}">${status.badgeText}</div>
               </div>
-            `;
-          }).join('')}
-        </div>
-      `;
+              <div class="header-hours">${formatEtHoursWithPt(backend)}</div>
+              <div class="header-support-line">
+                <a href="${backend.key === 'CONSUMER SHIELD' ? 'https://teams.live.com/l/invite/FBA2mu0C9EQERh1bQ8' : 'https://funding-tier.slack.com/archives/C0AMBM9EBNV'}" target="_blank" rel="noopener noreferrer" class="header-support-link ${supportClass}">GET CHAT SUPPORT</a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function getTraditionalCreditorMatches(query) {
@@ -2160,6 +2271,22 @@
         searchStates(query);
       });
     }
+
+    
+    function renderSystemClock() {
+      const btn = el('systemClockBtn');
+      if (!btn) return;
+      const now = new Date();
+      const label = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Los_Angeles',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      }).format(now);
+      btn.textContent = `${label} PT`;
+    }
+
 
     function initActionButtons() {
       el('pdfBtn').addEventListener('click', buildPdf);
