@@ -53,8 +53,7 @@
       height: auto;
       object-fit: contain;
     }
-    .sticky-stack { position: sticky; top: 94px; }
-    .teal-panel {
+        .teal-panel {
       background: linear-gradient(135deg, rgba(0,150,136,0.11) 0%, rgba(0,150,136,0.04) 48%, rgba(255,255,255,1) 100%);
     }
     .provider-logo-wrap {
@@ -261,7 +260,6 @@
       }
     }
     @media (max-width: 767px) {
-      .sticky-stack { position: static; top: auto; }
       .brand-logo { max-width: 132px; max-height: 52px; }
       .header-delivery-grid {
         grid-template-columns:1fr;
@@ -538,11 +536,40 @@
           </div>
         </div>
       </div>
+
+      <div class="routing-bar mt-4">
+        <div class="routing-panel routing-panel-primary">
+          <div class="routing-panel-label">Backend / Routing</div>
+          <div class="snapshot-topbar mt-2">
+            <div id="providerLogoBox"></div>
+            <div id="topBadges" class="flex flex-wrap gap-2 min-w-0"></div>
+          </div>
+          <div id="routeReason" class="mt-3 w-full rounded-xl bg-white/90 border border-teal-100 p-3 text-xs text-slate-700"></div>
+        </div>
+
+        <div class="routing-panel">
+          <div class="routing-panel-label">Availability</div>
+          <div class="routing-status-grid mt-2">
+            <div id="backendClockBox" class="snapshot-table"></div>
+            <div id="providerAvailability" class="snapshot-table"></div>
+          </div>
+        </div>
+
+        <div class="routing-panel">
+          <div class="routing-panel-label">Quick Metrics</div>
+          <div id="metricsGrid" class="routing-metrics-grid mt-2"></div>
+        </div>
+      </div>
+
+      <div class="routing-bottom mt-3">
+        <div id="flags" class="routing-bottom-col"></div>
+        <div id="levelRuleWarnings" class="routing-bottom-col"></div>
+      </div>
     </div>
   </header>
 
   <main class="mx-auto max-w-7xl space-y-8 p-4 md:p-6">
-    <section class="grid gap-6 xl:grid-cols-[67%,33%] items-start">
+    <section class="space-y-6">
       <div class="card bg-white p-4 md:p-6 teal-panel">
         <h2 class="text-xl md:text-2xl font-semibold">Debt Scenario Inputs</h2>
         <p class="mt-1 text-sm md:text-base text-slate-600">Select the state and enter debts to estimate program fit and create a prospect-facing comparison summary.</p>
@@ -569,15 +596,17 @@
           </div>
         </div>
 
+        <div id="miniSummary" class="mini-summary mt-4"></div>
+
         <div class="mt-5 overflow-hidden rounded-2xl border border-teal-100 bg-white/80">
-          <div class="hidden md:grid grid-cols-[1.55fr,0.62fr,1fr,0.22fr] gap-3 bg-gradient-to-r from-teal-50 to-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
+          <div class="hidden md:grid grid-cols-[1.55fr,0.56fr,1fr,0.22fr] gap-3 bg-gradient-to-r from-teal-50 to-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
             <div>Creditor Name</div>
             <div>Debt Amount <span title="% of total enrolled debt is shown when you hover over each debt amount field." class="ml-1 cursor-help text-slate-400">ⓘ</span></div>
             <div>Debt Type</div>
             <div></div>
           </div>
 
-          <div id="rows" class="space-y-3 p-3"></div>
+          <div id="rows" class="space-y-2 p-3"></div>
 
           <div class="p-3 pt-0">
             <button id="addCreditorBtn" type="button" class="plus-button">
@@ -585,26 +614,6 @@
               <span>Add Creditor</span>
             </button>
           </div>
-        </div>
-      </div>
-
-      <div class="sticky-stack space-y-4">
-        <div class="card bg-white p-4 md:p-5 teal-panel">
-          <h2 class="text-lg font-semibold">Backend / Routing</h2>
-
-          <div class="snapshot-topbar mt-3">
-            <div id="providerLogoBox"></div>
-            <div id="topBadges" class="flex flex-wrap gap-2 min-w-0"></div>
-          </div>
-
-          <div id="routeReason" class="mt-3 w-full rounded-xl bg-white/90 border border-teal-100 p-3 text-xs text-slate-700"></div>
-          <div class="snapshot-grid">
-            <div id="backendClockBox" class="snapshot-table"></div>
-            <div id="providerAvailability" class="snapshot-table"></div>
-          </div>
-          <div id="metricsGrid" class="mt-3 grid gap-2 md:grid-cols-2"></div>
-          <div id="flags" class="mt-3 space-y-2"></div>
-          <div id="levelRuleWarnings" class="mt-3 space-y-2"></div>
         </div>
       </div>
     </section>
@@ -1806,7 +1815,37 @@
     }
 
 
-    function renderComparison(c) {
+    
+    function renderMiniSummary(c) {
+      const discoverDebt = c.rows.reduce((sum, row) => {
+        return normalizeCreditorName(getCreditorDisplayName(row)).includes('DISCOVER')
+          ? sum + numberOrZero(row.amount)
+          : sum;
+      }, 0);
+      const discoverPct = c.totalDebt > 0 ? (discoverDebt / c.totalDebt) * 100 : 0;
+      const issueCount = (c.flags ? c.flags.length : 0) + (c.levelRuleWarnings ? c.levelRuleWarnings.length : 0);
+
+      el('miniSummary').innerHTML = `
+        <div class="mini-summary-card">
+          <div class="mini-summary-label">Total Debt</div>
+          <div class="mini-summary-value">${currency(c.totalDebt)}</div>
+        </div>
+        <div class="mini-summary-card">
+          <div class="mini-summary-label">Discover %</div>
+          <div class="mini-summary-value">${pct(discoverPct)}</div>
+        </div>
+        <div class="mini-summary-card">
+          <div class="mini-summary-label">Accounts</div>
+          <div class="mini-summary-value">${c.rows.length}</div>
+        </div>
+        <div class="mini-summary-card ${issueCount ? 'bad' : ''}">
+          <div class="mini-summary-label">Flags</div>
+          <div class="mini-summary-value">${issueCount ? issueCount + ' Issue' + (issueCount === 1 ? '' : 's') : 'Clear'}</div>
+        </div>
+      `;
+    }
+
+function renderComparison(c) {
       const totalPaybackRed = `<span style="color:#DC2626;font-weight:800;">${currency(c.doNothing.totalPayback)}</span>`;
 
       const rows = [
@@ -1990,8 +2029,13 @@
     }
 
     function renderFlags(c) {
-      el('flags').innerHTML = c.flags.map((flag) => `
-        <div class="flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">⚠️ <span>${flag}</span></div>
+      const flags = c.flags || [];
+      if (!flags.length) {
+        el('flags').innerHTML = '<div class="compact-flag" style="border-color:#bbf7d0;background:#ecfdf5;color:#166534;">✓ <span>No active routing flags.</span></div>';
+        return;
+      }
+      el('flags').innerHTML = flags.slice(0, 4).map((flag) => `
+        <div class="compact-flag">⚠️ <span>${flag}</span></div>
       `).join('');
     }
 
@@ -2003,11 +2047,11 @@
         return;
       }
       box.innerHTML = `
-        <div class="rounded-xl border border-red-200 bg-red-50 p-3">
-          <div class="text-sm font-semibold text-red-800">Level Debt Rule Warnings</div>
-          <div class="mt-2 space-y-2">
-            ${c.levelRuleWarnings.map((item) => `
-              <div class="text-sm ${item.tone === 'red' ? 'text-red-700' : 'text-amber-800'}">• ${item.text}</div>
+        <div class="compact-rule-box">
+          <div class="compact-rule-title">Level Debt Rule Warnings</div>
+          <div class="space-y-2">
+            ${c.levelRuleWarnings.slice(0, 4).map((item) => `
+              <div class="compact-rule-item ${item.tone === 'red' ? 'text-red-700' : 'text-amber-800'}">• ${item.text}</div>
             `).join('')}
           </div>
         </div>
@@ -2017,6 +2061,7 @@
     function render() {
       const c = computeScenarioData();
       el('totalDebt').textContent = currency(c.totalDebt);
+      renderMiniSummary(c);
       refreshRowVisuals();
       renderComparison(c);
       renderPricingComparison(c);
