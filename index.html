@@ -483,40 +483,30 @@
       padding:14px;
       box-shadow:0 8px 18px rgba(15,23,42,0.05);
     }
+    .workspace-grid {
+      display:grid;
+      grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);
+      gap:24px;
+      align-items:start;
+    }
+    .header-routing-card {
+      height:100%;
+    }
     .header-routing-grid {
       display:grid;
-      grid-template-columns:1.1fr 1.1fr .9fr 1fr;
+      grid-template-columns:1fr;
       gap:12px;
       align-items:start;
     }
-    .mini-summary {
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:10px;
-    }
-    .mini-summary > div {
-      background:#fff;
-      border:1px solid #e5efef;
-      padding:10px 12px;
-      border-radius:12px;
-      font-weight:800;
-      text-align:center;
-    }
-    .summary-label {
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.04em;
-      color:#64748b;
-      margin-bottom:4px;
-      font-weight:700;
+    .input-shell-compact {
+      margin-top:14px;
     }
     @media (max-width: 1279px) {
       .topbar-inner { grid-template-columns:1fr; }
-      .header-routing-grid { grid-template-columns:1fr 1fr; }
+      .workspace-grid { grid-template-columns:1fr; }
     }
     @media (max-width: 767px) {
       .header-routing-grid { grid-template-columns:1fr; }
-      .mini-summary { grid-template-columns:1fr 1fr; }
     }
 
   </style>
@@ -567,33 +557,12 @@
   </header>
 
   <main class="mx-auto max-w-7xl space-y-8 p-4 md:p-6">
-    <section>
-      <div class="header-routing-card card bg-white p-4 md:p-5 teal-panel">
-        <div class="flex items-center justify-between gap-3 flex-wrap">
-          <h2 class="text-lg font-semibold text-slate-900">Backend / Routing</h2>
-        </div>
-        <div class="snapshot-topbar mt-3">
-          <div id="providerLogoBox"></div>
-          <div id="topBadges" class="flex flex-wrap gap-2 min-w-0"></div>
-        </div>
-        <div id="routeReason" class="mt-3 w-full rounded-xl bg-white/90 border border-teal-100 p-3 text-xs text-slate-700"></div>
-        <div class="header-routing-grid mt-3">
-          <div id="backendClockBox" class="snapshot-table"></div>
-          <div id="providerAvailability" class="snapshot-table"></div>
-          <div id="metricsGrid" class="grid gap-2 md:grid-cols-2"></div>
-          <div class="space-y-2">
-            <div id="flags" class="space-y-2"></div>
-            <div id="levelRuleWarnings" class="space-y-2"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section>
+    <section class="workspace-grid">
       <div class="card bg-white p-4 md:p-6 teal-panel">
         <h2 class="text-xl md:text-2xl font-semibold">Debt Scenario Inputs</h2>
         <p class="mt-1 text-sm md:text-base text-slate-600">Select the state and enter debts to estimate program fit and create a prospect-facing comparison summary.</p>
 
-        <div class="mt-5 grid gap-4 md:grid-cols-2">
+        <div class="input-shell-compact grid gap-4 md:grid-cols-[1.35fr,.85fr]">
           <div class="relative">
             <label class="block mb-2 text-sm font-medium">State</label>
             <input id="stateSearch" class="input" type="text" placeholder="Start typing state..." autocomplete="off" />
@@ -603,13 +572,6 @@
             <label class="block mb-2 text-sm font-medium">Total Enrolled Debt</label>
             <div id="totalDebt" class="rounded-xl border bg-white/80 px-4 py-3 text-lg font-semibold">$0</div>
           </div>
-        </div>
-
-        <div class="mini-summary mt-4">
-          <div><div class="summary-label">Total Debt</div><div id="summaryTotalDebt">$0</div></div>
-          <div><div class="summary-label">Discover %</div><div id="summaryDiscoverPct">0.0%</div></div>
-          <div><div class="summary-label">Accounts</div><div id="summaryAccounts">0</div></div>
-          <div><div class="summary-label">Flags</div><div id="summaryFlags">0</div></div>
         </div>
 
         <div class="mt-5 overflow-hidden rounded-2xl border border-teal-100 bg-white/80">
@@ -625,6 +587,26 @@
               <span class="text-2xl leading-none">+</span>
               <span>Add Creditor</span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-routing-card card bg-white p-4 md:p-5 teal-panel sticky-stack">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <h2 class="text-lg font-semibold text-slate-900">Backend / Routing</h2>
+        </div>
+        <div class="snapshot-topbar mt-3">
+          <div id="providerLogoBox"></div>
+          <div id="topBadges" class="flex flex-wrap gap-2 min-w-0"></div>
+        </div>
+        <div id="routeReason" class="mt-3 w-full rounded-xl bg-white/90 border border-teal-100 p-3 text-xs text-slate-700"></div>
+        <div class="header-routing-grid mt-3">
+          <div id="backendClockBox" class="snapshot-table"></div>
+          <div id="providerAvailability" class="snapshot-table"></div>
+          <div id="metricsGrid" class="grid gap-2 md:grid-cols-2"></div>
+          <div class="space-y-2">
+            <div id="flags" class="space-y-2"></div>
+            <div id="levelRuleWarnings" class="space-y-2"></div>
           </div>
         </div>
       </div>
@@ -2042,14 +2024,6 @@
         return normalizeCreditorName(name).includes('DISCOVER') ? sum + numberOrZero(row.amount) : sum;
       }, 0);
       const discoverPct = c.totalDebt > 0 ? (discoverDebt / c.totalDebt) * 100 : 0;
-      const summaryTotal = el('summaryTotalDebt');
-      const summaryDiscover = el('summaryDiscoverPct');
-      const summaryAccounts = el('summaryAccounts');
-      const summaryFlags = el('summaryFlags');
-      if (summaryTotal) summaryTotal.textContent = currency(c.totalDebt);
-      if (summaryDiscover) summaryDiscover.textContent = pct(discoverPct);
-      if (summaryAccounts) summaryAccounts.textContent = String(c.rows.length);
-      if (summaryFlags) summaryFlags.textContent = String((c.flags || []).length + (c.levelRuleWarnings || []).length);
     }
 
     function render() {
