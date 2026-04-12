@@ -4,6 +4,14 @@
     {
       "source": "/plan/:slug",
       "destination": "/api/plan?slug=:slug"
+    },
+    {
+      "source": "/profit-engine",
+      "destination": "https://funding-tier-profit-engine.vercel.app"
+    },
+    {
+      "source": "/profit-engine/:path*",
+      "destination": "https://funding-tier-profit-engine.vercel.app/:path*"
     }
   ]
 }
