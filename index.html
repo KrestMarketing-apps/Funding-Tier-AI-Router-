@@ -3,2413 +3,1467 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Funding Tier AI - Debt Resolution Estimator</title>
+  <title>Funding Tier — AI Deal Router</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body { font-family: Arial, Helvetica, sans-serif; }
-    .card { border-radius: 20px; box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08); }
-    .input, select {
-      width: 100%;
-      border: 1px solid #d1d5db;
-      border-radius: 14px;
-      background: #fff;
-      padding: 10px 12px;
-      font-size: 14px;
-      outline: none;
-      min-height: 42px;
+    :root {
+      --ft-green:       #0f9d8a;
+      --ft-green-dark:  #0b7d6e;
+      --ft-dark:        #0f172a;
+      --ft-blue:        #1a6ed8;
+      --ft-amber:       #f59e0b;
+      --ft-red:         #ef4444;
+      --ft-border:      #e2e8f0;
+      --ft-bg:          #f8fafc;
     }
-    .input.compact {
-      padding: 8px 10px;
-      min-height: 38px;
-      font-size: 13px;
+    * { box-sizing: border-box; }
+    body {
+      font-family: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+      background: var(--ft-bg);
+      color: var(--ft-dark);
+      min-height: 100vh;
     }
-    .input:focus, select:focus, .conditions-select:focus {
-      border-color: #009688;
-      box-shadow: 0 0 0 3px rgba(0,150,136,0.12);
-    }
-    .conditions-select {
-      min-height: 42px;
-      font-size: 12px;
-      padding: 6px 8px;
-      border-radius: 14px;
-      border: 1px solid #d1d5db;
-      background: #fff;
-      width: 100%;
-    }
+
+    /* ── TOPBAR ── */
     .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 80;
-      backdrop-filter: blur(14px);
-      background: linear-gradient(90deg, rgba(255,255,255,0.97) 0%, rgba(239,250,248,0.97) 50%, rgba(255,255,255,0.97) 100%);
-      border-bottom: 1px solid rgba(0,150,136,0.14);
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+      position: sticky; top: 0; z-index: 80;
+      background: linear-gradient(135deg, var(--ft-dark) 0%, #0b3b50 45%, #0f766e 100%);
+      box-shadow: 0 4px 24px rgba(15,23,42,0.22);
     }
-    .brand-logo {
-      max-width: 170px;
-      max-height: 64px;
-      width: auto;
-      height: auto;
-      object-fit: contain;
+    .brand-logo { max-height: 36px; width: auto; object-fit: contain; }
+    .brand-title { font-size: 18px; font-weight: 900; color: #fff; letter-spacing: -0.5px; line-height: 1; }
+    .brand-sub   { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; font-weight: 600; }
+
+    /* ── CARDS ── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--ft-border);
+      border-radius: 16px;
+      box-shadow: 0 3px 12px rgba(15,23,42,0.05);
+      padding: 20px;
     }
-    .sticky-stack { position: sticky; top: 94px; }
-    .teal-panel {
-      background: linear-gradient(135deg, rgba(0,150,136,0.11) 0%, rgba(0,150,136,0.04) 48%, rgba(255,255,255,1) 100%);
+    .card-header {
+      font-size: 17px; font-weight: 900; color: var(--ft-dark);
+      margin-bottom: 16px; padding-bottom: 12px;
+      border-bottom: 2px solid var(--ft-green);
+      display: flex; align-items: center; gap: 10px;
     }
-    .provider-logo-wrap {
-      width: 80px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid #d7eeeb;
+    .card-header img { height: 28px; width: auto; object-fit: contain; }
+
+    /* ── INPUTS ── */
+    .ft-input {
+      width: 100%;
+      border: 1.5px solid var(--ft-border);
       border-radius: 10px;
       background: #fff;
-      padding: 3px;
-      flex: 0 0 auto;
-    }
-    .provider-logo {
-      max-width: 72px;
-      max-height: 22px;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-    }
-    .pill {
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .plan-card {
-      border-radius: 20px;
-      border: 1px solid #d7eeeb;
-      padding: 18px;
-      background: linear-gradient(180deg, #ffffff 0%, #f5fbfa 100%);
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-    .plan-card:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
-    }
-    .plan-chip {
-      display: inline-block;
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .plan-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: #64748b;
-    }
-    .plan-value {
-      font-size: 26px;
-      font-weight: 800;
-      line-height: 1.1;
-    }
-    .mini-list { margin-top: 12px; display: grid; gap: 8px; }
-    .mini-list div { font-size: 14px; color: #334155; }
-    .diff-box {
-      border: 1px solid #bfe3dd;
-      border-radius: 18px;
-      padding: 18px;
-      background: linear-gradient(180deg, #f7fcfb 0%, #eef9f7 100%);
-    }
-    .pricing-compare-table td, .pricing-compare-table th {
-      border: 1px solid #cbd5e1;
-      padding: 12px;
-      vertical-align: top;
-    }
-    .proposal-header {
-      background: linear-gradient(90deg, rgba(0,150,136,0.08), rgba(255,255,255,1));
-    }
-    .savings-glow {
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 0 24px rgba(0,150,136,0.10);
-    }
-    .unavailable-box {
-      margin-top: 16px;
-      border: 1px solid #fecaca;
-      background: #fef2f2;
-      color: #b91c1c;
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-weight: 700;
+      padding: 10px 13px;
       font-size: 14px;
-      line-height: 1.45;
+      font-weight: 600;
+      color: var(--ft-dark);
+      outline: none;
+      transition: border-color 0.2s;
+      min-height: 40px;
     }
-    .clock-grid {
+    .ft-input:focus { border-color: var(--ft-green); box-shadow: 0 0 0 3px rgba(15,157,138,0.12); }
+    .ft-input.compact { padding: 8px 11px; font-size: 13px; min-height: 36px; }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer;
+      font-weight: 800; font-size: 13px; white-space: nowrap; transition: all 0.15s;
+      background: linear-gradient(135deg, var(--ft-green), var(--ft-green-dark));
+      color: #fff; box-shadow: 0 4px 14px rgba(15,157,138,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(15,157,138,0.4); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer;
+      font-weight: 800; font-size: 13px; white-space: nowrap; transition: all 0.15s;
+      background: var(--ft-dark); color: #fff;
+    }
+    .btn-secondary:hover { background: #1e293b; }
+    .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-add {
+      width: 100%; min-height: 50px;
+      border: 2px dashed var(--ft-green);
+      background: rgba(15,157,138,0.04);
+      color: var(--ft-green-dark);
+      border-radius: 14px; font-size: 15px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn-add:hover { background: rgba(15,157,138,0.08); transform: translateY(-1px); }
+
+    /* ── TABLE HEADER ── */
+    .row-header {
       display: grid;
+      grid-template-columns: 1.55fr 0.65fr 1fr 32px;
       gap: 10px;
-    }
-    .clock-card {
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 12px;
-      background: #fff;
-    }
-    .clock-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .clock-name {
-      font-size: 13px;
-      font-weight: 800;
-      color: #0f172a;
-      letter-spacing: 0.02em;
-    }
-    .clock-sub {
-      margin-top: 6px;
-      font-size: 12px;
-      color: #64748b;
-    }
-    .clock-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border-radius: 999px;
-      padding: 5px 10px;
-      font-size: 11px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-    .clock-status.open {
-      background: #dcfce7;
-      color: #166534;
-      border: 1px solid #86efac;
-    }
-    .clock-status.closed {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fca5a5;
-    }
-    .clock-status.soon {
-      background: #fef3c7;
-      color: #92400e;
-      border: 1px solid #fcd34d;
-    }
-    .clock-card a {
-      text-decoration: none;
-      transition: background-color .15s ease, transform .15s ease;
-    }
-    .clock-card a:hover {
-      transform: translateY(-1px);
-    }
-    .row-card {
-      transition: box-shadow .15s ease, border-color .15s ease, background-color .15s ease;
-    }
-    .row-card:hover {
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
-    }
-    .mobile-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #64748b;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-    .support-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 12px;
-      padding: 9px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      margin-top: 10px;
-    }
-    .plus-button {
-      width: 100%;
-      min-height: 54px;
-      border: 2px dashed #99f6e4;
-      background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%);
-      color: #0f766e;
-      border-radius: 18px;
-      font-size: 16px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-    }
-    .plus-button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 20px rgba(13, 148, 136, 0.10);
-      border-color: #14b8a6;
-    }
-    @media (max-width: 900px) {
-      .topbar-inner {
-        grid-template-columns:1fr;
-      }
-      .brand-group {
-        align-items:center;
-        text-align:center;
-      }
-      .header-delivery-grid {
-        grid-template-columns:1fr 1fr;
-      }
-    }
-    @media (max-width: 767px) {
-      .sticky-stack { position: static; top: auto; }
-      .brand-logo { max-width: 132px; max-height: 52px; }
-      .header-delivery-grid {
-        grid-template-columns:1fr;
-      }
+      background: var(--ft-dark);
+      padding: 10px 14px;
+      border-radius: 12px 12px 0 0;
+      font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7);
+      text-transform: uppercase; letter-spacing: 0.5px;
     }
 
-    .topbar-inner {
-      display:grid;
-      grid-template-columns:minmax(180px,220px) minmax(0,1fr);
-      gap:16px;
-      align-items:stretch;
+    /* ── ROW CARD ── */
+    .row-card {
+      border: 1.5px solid var(--ft-border);
+      border-radius: 12px; padding: 12px; background: #fff;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
     }
-    .brand-group {
-      display:flex;
-      flex-direction:column;
-      align-items:flex-start;
-      justify-content:center;
-      gap:8px;
-      min-width:0;
+    .row-card.flagged-red   { border-color: var(--ft-red);   background: #fef2f2; }
+    .row-card.flagged-amber { border-color: var(--ft-amber); background: #fffbeb; }
+    .row-inner {
+      display: grid;
+      grid-template-columns: 1.55fr 0.65fr 1fr 32px;
+      gap: 10px; align-items: start;
     }
-    .brand-title {
-      font-size:16px;
-      font-weight:700;
-      letter-spacing:-0.01em;
-      color:#000;
-      line-height:1.15;
+
+    /* ── DROPDOWN RESULTS ── */
+    .search-results {
+      position: absolute; left: 0; right: 0; z-index: 50;
+      margin-top: 2px; border-radius: 12px;
+      border: 1.5px solid var(--ft-border); background: #fff;
+      box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+      max-height: 240px; overflow-y: auto;
     }
-    .header-utility-card {
-      border:2px solid #86efac;
-      background:rgba(255,255,255,0.95);
-      border-radius:18px;
-      padding:10px 14px;
-      box-shadow:0 8px 18px rgba(15,23,42,0.05);
-      min-width:0;
+    .search-results button {
+      display: block; width: 100%; text-align: left;
+      padding: 10px 13px; font-size: 13px; border: none;
+      background: #fff; cursor: pointer; border-bottom: 1px solid var(--ft-border);
+      transition: background 0.1s;
     }
-    .header-delivery-grid {
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr)) auto auto;
-      gap:10px;
-      align-items:end;
+    .search-results button:last-child { border-bottom: none; border-radius: 0 0 12px 12px; }
+    .search-results button:first-child { border-radius: 12px 12px 0 0; }
+    .search-results button:hover { background: rgba(15,157,138,0.06); }
+
+    /* ── STATUS PILLS ── */
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      border-radius: 999px; padding: 4px 10px;
+      font-size: 11px; font-weight: 800;
+    }
+    .pill-green  { background: rgba(15,157,138,0.12); color: var(--ft-green-dark); border: 1px solid rgba(15,157,138,0.3); }
+    .pill-red    { background: #fef2f2; color: var(--ft-red);   border: 1px solid rgba(239,68,68,0.3); }
+    .pill-amber  { background: #fffbeb; color: #92400e;         border: 1px solid rgba(245,158,11,0.3); }
+    .pill-blue   { background: #eff6ff; color: var(--ft-blue);  border: 1px solid rgba(26,110,216,0.3); }
+    .pill-gray   { background: #f8fafc; color: #64748b;         border: 1px solid var(--ft-border); }
+
+    /* ── CLOCK STATUS ── */
+    .clock-open   { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .clock-closed { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .clock-soon   { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+
+    /* ── METRIC CARDS ── */
+    .metric-card {
+      background: #fff; border: 1px solid var(--ft-border);
+      border-radius: 12px; padding: 14px; position: relative; overflow: hidden;
+    }
+    .metric-card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--ft-green); border-radius: 12px 12px 0 0;
+    }
+    .metric-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; margin-top: 4px; }
+    .metric-value { font-size: 22px; font-weight: 900; color: var(--ft-dark); line-height: 1.1; }
+    .metric-sub   { font-size: 12px; color: #64748b; margin-top: 6px; font-weight: 500; line-height: 1.5; }
+
+    /* ── CS PROGRAM TILE ── */
+    .cs-program-tile {
+      border: 1.5px solid var(--ft-border); border-radius: 12px;
+      padding: 12px; background: #fff; text-align: center;
+      transition: all 0.15s; cursor: default;
+    }
+    .cs-program-tile.active {
+      border: 2px solid var(--ft-blue); background: rgba(26,110,216,0.06);
+      box-shadow: 0 0 0 3px rgba(26,110,216,0.12);
+    }
+    .cs-prog-label { font-size: 12px; font-weight: 800; color: #64748b; }
+    .cs-prog-range { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+    .cs-prog-payment { font-size: 18px; font-weight: 900; color: var(--ft-dark); margin-top: 6px; }
+    .cs-prog-term { font-size: 11px; color: #64748b; margin-top: 2px; }
+    .cs-program-tile.active .cs-prog-label { color: var(--ft-blue); }
+    .cs-program-tile.active .cs-prog-payment { color: var(--ft-blue); }
+
+    /* ── PLAN CARD ── */
+    .plan-card {
+      border: 1.5px solid var(--ft-border); border-radius: 16px; padding: 20px;
+      background: #fff; transition: all 0.15s;
+    }
+    .plan-card:hover { box-shadow: 0 8px 24px rgba(15,23,42,0.08); transform: translateY(-1px); }
+    .plan-card.recommended { border: 2px solid var(--ft-green); background: rgba(15,157,138,0.03); }
+
+    /* ── LOGO WRAP ── */
+    .logo-wrap {
+      width: 72px; height: 28px; display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--ft-border); border-radius: 8px; background: #fff; padding: 3px; flex-shrink: 0;
+    }
+    .logo-wrap img { max-width: 64px; max-height: 20px; width: auto; height: auto; object-fit: contain; }
+    .logo-wrap.sm  { width: 48px; height: 22px; border-radius: 7px; }
+    .logo-wrap.sm img { max-width: 42px; max-height: 14px; }
+
+    /* ── COMPARISON TABLE ── */
+    .cmp-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    .cmp-table th, .cmp-table td { padding: 12px 14px; border: 1px solid var(--ft-border); font-size: 13px; }
+    .cmp-table thead th { font-weight: 800; background: var(--ft-dark); color: #fff; }
+    .cmp-table tbody tr:nth-child(even) td { background: var(--ft-bg); }
+    .cmp-table .savings-row td { font-weight: 900; font-size: 15px; }
+    .cmp-table .savings-row td:nth-child(1) { background: #fff3f3; color: var(--ft-red); }
+    .cmp-table .savings-row td:nth-child(2) { background: #fef2f2; color: var(--ft-red); font-weight: 900; }
+    .cmp-table .savings-row td:nth-child(3) { background: #eff6ff; color: var(--ft-blue); font-weight: 900; }
+    .cmp-table .savings-row td:nth-child(4) { background: rgba(15,157,138,0.12); color: var(--ft-green-dark); font-weight: 900; }
+
+    /* ── FLAG / WARNING BOX ── */
+    .flag-box {
+      display: flex; gap: 8px; align-items: flex-start;
+      border-radius: 10px; padding: 10px 13px; font-size: 13px; font-weight: 600; line-height: 1.6;
+    }
+    .flag-amber { background: #fffbeb; border: 1px solid rgba(245,158,11,0.3); color: #92400e; }
+    .flag-red   { background: #fef2f2; border: 1px solid rgba(239,68,68,0.3);  color: #b91c1c; }
+
+    /* ── SNAPSHOT ROWS ── */
+    .snapshot-row {
+      display: grid; grid-template-columns: 48px 1fr auto;
+      gap: 10px; align-items: center;
+      padding: 11px 13px; border-bottom: 1px solid var(--ft-border);
+    }
+    .snapshot-row:last-child { border-bottom: none; }
+    .snapshot-name { font-size: 13px; font-weight: 800; color: var(--ft-dark); }
+    .snapshot-time { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+    /* ── ROUTING BADGE ── */
+    .route-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 900;
+    }
+    .route-level    { background: rgba(15,157,138,0.12); color: var(--ft-green-dark); border: 1.5px solid var(--ft-green); }
+    .route-cs       { background: rgba(26,110,216,0.12); color: var(--ft-blue);        border: 1.5px solid var(--ft-blue); }
+    .route-none     { background: #fef2f2; color: var(--ft-red); border: 1.5px solid var(--ft-red); }
+
+    /* ── LAYOUT ── */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+      gap: 20px; align-items: start;
+    }
+    .sticky-panel { position: sticky; top: 80px; }
+
+    @media (max-width: 1100px) {
+      .workspace-grid { grid-template-columns: 1fr; }
+      .sticky-panel { position: static; }
+      .row-header { display: none; }
+      .row-inner { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .row-header { display: none; }
+      .row-inner  { grid-template-columns: 1fr; }
+    }
+
+    /* Header grid */
+    .header-inner {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 20px; align-items: center;
+    }
+    .header-fields {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr) auto auto;
+      gap: 10px; align-items: end;
     }
     .header-label {
-      display:block;
-      margin-bottom:6px;
-      font-size:11px;
-      font-weight:700;
-      color:#475569;
-      text-transform:uppercase;
-      letter-spacing:.04em;
+      display: block; margin-bottom: 5px;
+      font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5);
+      text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .header-clock {
-      min-width:190px;
-      display:flex;
-      flex-direction:column;
-      align-items:flex-end;
-      justify-content:center;
-      text-align:right;
+    @media (max-width: 900px) {
+      .header-inner { grid-template-columns: 1fr; }
+      .header-fields { grid-template-columns: 1fr 1fr; }
     }
-    .header-clock-time {
-      font-size:18px;
-      font-weight:800;
-      color:#0f172a;
-      line-height:1.1;
-    }
-    .header-clock-date {
-      font-size:12px;
-      color:#64748b;
-      margin-top:4px;
-    }
-    .snapshot-topbar {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .provider-logo-wrap.compact {
-      width:48px;
-      height:24px;
-      padding:2px;
-      border-radius:8px;
-    }
-    .provider-logo-wrap.compact .provider-logo {
-      max-width:42px;
-      max-height:16px;
-    }
-    .snapshot-grid {
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:10px;
-      margin-top:12px;
-    }
-    .snapshot-table {
-      border:1px solid #dbe5e7;
-      border-radius:16px;
-      background:#fff;
-      overflow:hidden;
-    }
-    .snapshot-row {
-      display:grid;
-      grid-template-columns:auto 1fr auto;
-      gap:10px;
-      align-items:center;
-      padding:12px;
-      border-bottom:1px solid #eef2f7;
-    }
-    .snapshot-row:last-child { border-bottom:none; }
-    .snapshot-name {
-      font-size:13px;
-      font-weight:800;
-      color:#0f172a;
-      white-space:nowrap;
-    }
-    .snapshot-meta {
-      min-width:0;
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-    .snapshot-time {
-      font-size:11px;
-      color:#64748b;
-      line-height:1.35;
-    }
-    .snapshot-support {
-      font-size:11px;
-      padding:7px 9px;
-      margin-top:0;
-      white-space:nowrap;
-    }
-    .program-header {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .program-brand {
-      display:flex;
-      align-items:center;
-      gap:8px;
-      min-width:0;
-    }
-    .program-brand .provider-logo-wrap {
-      width:46px;
-      height:22px;
-      border-radius:8px;
-      padding:2px;
-    }
-    .program-brand .provider-logo {
-      max-width:40px;
-      max-height:14px;
-    }
-    .program-brand-name {
-      font-size:13px;
-      font-weight:800;
-      color:#0f172a;
-      line-height:1.1;
-    }
-    .mini-list {
-      margin-top: 12px;
-      display: grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:8px 12px;
-    }
-    .mini-list div {
-      font-size: 13px;
-      color: #334155;
-      line-height:1.35;
-      padding:8px 10px;
-      border:1px solid #dcefed;
-      border-radius:12px;
-      background:#ffffff;
-    }
-    @media (max-width: 1100px) {
-      .topbar-inner {
-        grid-template-columns:1fr;
-        align-items:stretch;
-      }
-      .header-utility-card {
-        order:2;
-      }
-      .header-clock {
-        order:3;
-        align-items:flex-start;
-        text-align:left;
-      }
-      .header-delivery-grid {
-        grid-template-columns:repeat(2,minmax(0,1fr));
-      }
-    }
-    @media (max-width: 767px) {
-      .header-delivery-grid {
-        grid-template-columns:1fr;
-      }
-      .snapshot-grid {
-        grid-template-columns:1fr;
-      }
-      .snapshot-row {
-        grid-template-columns:auto 1fr;
-      }
-      .snapshot-row .snapshot-support {
-        grid-column:1 / -1;
-      }
-      .mini-list {
-        grid-template-columns:1fr;
-      }
+    @media (max-width: 500px) {
+      .header-fields { grid-template-columns: 1fr; }
     }
 
-  
-    .topbar-inner {
-      display:grid;
-      grid-template-columns:minmax(260px,320px) minmax(0,1fr);
-      gap:16px;
-      align-items:start;
+    /* Plan result box */
+    #planResultBox {
+      display: none; margin-top: 12px; padding: 12px;
+      border-radius: 12px; border: 1px solid var(--ft-green);
+      background: rgba(15,157,138,0.08);
     }
-    .header-routing-card {
-      border:1px solid #bfe3dd;
-      background:rgba(255,255,255,0.96);
-      border-radius:20px;
-      padding:14px;
-      box-shadow:0 8px 18px rgba(15,23,42,0.05);
-    }
-    .workspace-grid {
-      display:grid;
-      grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);
-      gap:24px;
-      align-items:start;
-    }
-    .header-routing-card {
-      height:100%;
-    }
-    .header-routing-grid {
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
-      align-items:start;
-    }
-    .input-shell-compact {
-      margin-top:14px;
-    }
-    @media (max-width: 1279px) {
-      .topbar-inner { grid-template-columns:1fr; }
-      .workspace-grid { grid-template-columns:1fr; }
-    }
-    @media (max-width: 767px) {
-      .header-routing-grid { grid-template-columns:1fr; }
-    }
-
   </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-teal-100 via-white to-slate-100 text-slate-900">
-  <header class="topbar">
-    <div class="mx-auto max-w-7xl px-4 py-4 md:px-6">
-      <div class="topbar-inner">
-        <div class="brand-group">
-          <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf8e8df54a8b29097c4.png" alt="Funding Tier logo" class="brand-logo" />
-          <div class="brand-title">AI DEBT RESOLUTION ESTIMATOR</div>
+<body>
+
+<!-- ══════════════════════════════════
+     STICKY HEADER
+══════════════════════════════════ -->
+<header class="topbar">
+  <div style="max-width:1380px;margin:0 auto;padding:12px 20px;">
+    <div class="header-inner">
+
+      <!-- Brand -->
+      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png"
+             alt="Funding Tier" class="brand-logo" />
+        <div>
+          <div class="brand-title">AI Deal Router</div>
+          <div class="brand-sub">Debt Resolution Estimator</div>
         </div>
+      </div>
 
-        <div class="header-utility-card">
-          <div class="flex items-center justify-between gap-3 flex-wrap">
-            <h2 class="text-sm font-semibold text-slate-900">Prospect Delivery</h2>
-            <div class="text-[11px] text-slate-500">Send plan + PDF fast</div>
+      <!-- Prospect delivery fields -->
+      <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px 16px;">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Prospect Delivery</div>
+        <div class="header-fields">
+          <div>
+            <label class="header-label">First Name</label>
+            <input id="prospectFirstName" class="ft-input compact" type="text" placeholder="John"
+              style="background:rgba(255,255,255,0.9);border-color:rgba(255,255,255,0.2);" />
           </div>
-
-          <div class="header-delivery-grid mt-3">
-            <div>
-              <label class="header-label">First Name</label>
-              <input id="prospectFirstName" class="input compact" type="text" placeholder="John" />
-            </div>
-            <div>
-              <label class="header-label">Last Name</label>
-              <input id="prospectLastName" class="input compact" type="text" placeholder="Smith" />
-            </div>
-            <div>
-              <label class="header-label">Email</label>
-              <input id="prospectEmail" class="input compact" type="email" placeholder="prospect@email.com" />
-            </div>
-            <button id="pdfBtn" class="w-full rounded-xl py-2.5 px-3 text-xs font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-500 whitespace-nowrap">Download PDF</button>
-            <button id="sendEmailBtn" class="w-full rounded-xl py-2.5 px-3 text-xs font-semibold text-white bg-gradient-to-r from-teal-700 to-teal-600 whitespace-nowrap">Generate + Send Email</button>
+          <div>
+            <label class="header-label">Last Name</label>
+            <input id="prospectLastName" class="ft-input compact" type="text" placeholder="Smith"
+              style="background:rgba(255,255,255,0.9);border-color:rgba(255,255,255,0.2);" />
           </div>
-
-          <div id="planResultBox" style="display:none; margin-top:12px; padding:12px; border-radius:12px; border:1px solid #99f6e4; background:#ecfeff;">
-            <div style="font-weight:700; color:#0f172a; margin-bottom:8px;">Plan Created Successfully</div>
-            <button id="planResultLink" style="display:inline-flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(90deg,#16a34a,#22c55e);color:white;font-weight:700;border:none;border-radius:12px;cursor:pointer;box-shadow:0 8px 20px rgba(34,197,94,0.25);">
-              <span style="width:22px;height:22px;border-radius:999px;background:white;color:#16a34a;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;">✓</span>
-              GENERATE PERSONALIZED PLAN
-            </button>
+          <div>
+            <label class="header-label">Email</label>
+            <input id="prospectEmail" class="ft-input compact" type="email" placeholder="prospect@email.com"
+              style="background:rgba(255,255,255,0.9);border-color:rgba(255,255,255,0.2);" />
           </div>
+          <button id="pdfBtn" class="btn-primary" style="height:36px;font-size:12px;">↓ PDF</button>
+          <button id="sendEmailBtn" class="btn-secondary" style="height:36px;font-size:12px;">Generate + Send</button>
         </div>
+        <div id="planResultBox">
+          <div style="font-weight:700;color:var(--ft-dark);margin-bottom:8px;">Plan Created</div>
+          <button id="planResultLink" class="btn-primary">✓ View Personalized Plan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════
+     MAIN
+══════════════════════════════════ -->
+<main style="max-width:1380px;margin:0 auto;padding:20px 20px 60px;display:grid;gap:20px;">
+
+  <!-- ── WORKSPACE ── -->
+  <div class="workspace-grid">
+
+    <!-- LEFT: Debt Inputs -->
+    <div class="card">
+      <div class="card-header">Debt Scenario Inputs</div>
+      <p style="font-size:13px;color:#64748b;margin-bottom:18px;font-weight:500;">Select a state and enter the client's debts to get a routing recommendation and program estimate.</p>
+
+      <!-- State + Total Debt -->
+      <div style="display:grid;grid-template-columns:1.4fr 0.9fr;gap:14px;margin-bottom:18px;">
+        <div style="position:relative;">
+          <label style="display:block;font-size:13px;font-weight:700;color:var(--ft-dark);margin-bottom:6px;">State</label>
+          <input id="stateSearch" class="ft-input" type="text" placeholder="Start typing state..." autocomplete="off" />
+          <div id="stateResults" class="search-results" style="display:none;"></div>
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;font-weight:700;color:var(--ft-dark);margin-bottom:6px;">Total Enrolled Debt</label>
+          <div id="totalDebt" style="background:rgba(15,157,138,0.08);border:1.5px solid var(--ft-green);border-radius:10px;padding:10px 14px;font-size:20px;font-weight:900;color:var(--ft-green-dark);">$0</div>
+        </div>
+      </div>
+
+      <!-- Row table -->
+      <div style="border:1.5px solid var(--ft-border);border-radius:14px;overflow:hidden;">
+        <div class="row-header">
+          <div>Creditor Name</div>
+          <div>Amount</div>
+          <div>Debt Type</div>
+          <div></div>
+        </div>
+        <div id="rows" style="display:grid;gap:8px;padding:10px;"></div>
+        <div style="padding:0 10px 10px;">
+          <button id="addCreditorBtn" class="btn-add" type="button">
+            <span style="font-size:22px;line-height:1;">+</span>
+            <span>Add Creditor</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Routing Panel -->
+    <div class="sticky-panel" style="display:grid;gap:14px;">
+
+      <!-- Routing Decision -->
+      <div class="card" id="routingCard">
+        <div class="card-header">Backend Routing</div>
+
+        <div id="routeBadgeRow" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;"></div>
+        <div id="routeReason" style="font-size:13px;color:#475569;font-weight:500;line-height:1.65;background:var(--ft-bg);border:1px solid var(--ft-border);border-radius:10px;padding:10px 13px;margin-bottom:14px;"></div>
+
+        <!-- Provider availability -->
+        <div id="providerAvailability" style="border:1px solid var(--ft-border);border-radius:12px;overflow:hidden;margin-bottom:14px;"></div>
+
+        <!-- Backend clocks -->
+        <div id="backendClockBox" style="border:1px solid var(--ft-border);border-radius:12px;overflow:hidden;margin-bottom:14px;"></div>
+
+        <!-- Flags -->
+        <div id="flags" style="display:grid;gap:6px;"></div>
+        <div id="levelRuleWarnings" style="margin-top:8px;display:grid;gap:6px;"></div>
+      </div>
+
+      <!-- Commission Summary -->
+      <div class="card" id="commissionCard" style="display:none;">
+        <div class="card-header" style="color:var(--ft-amber);border-color:var(--ft-amber);">Potential Commission — Based on Program Selection</div>
+        <div id="commissionDetail"></div>
+      </div>
+
+      <!-- CS Program Breakdown (shown when CS is relevant) -->
+      <div class="card" id="csProgramCard" style="display:none;">
+        <div class="card-header">
+          <div class="logo-wrap sm">
+            <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png" alt="Consumer Shield" />
+          </div>
+          Consumer Shield Program
+        </div>
+        <div id="csActiveProgramDetail" style="margin-bottom:16px;"></div>
+        <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">All Program Tiers</div>
+        <div id="csProgramGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
       </div>
 
     </div>
-  </header>
+  </div>
 
-  <main class="mx-auto max-w-7xl space-y-8 p-4 md:p-6">
-    <section class="workspace-grid">
-      <div class="card bg-white p-4 md:p-6 teal-panel">
-        <h2 class="text-xl md:text-2xl font-semibold">Debt Scenario Inputs</h2>
-        <p class="mt-1 text-sm md:text-base text-slate-600">Select the state and enter debts to estimate program fit and create a prospect-facing comparison summary.</p>
+  <!-- ── PROGRAM COMPARISON ── -->
+  <div class="card">
+    <div class="card-header">Program Comparison</div>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;font-weight:500;">Only currently available and eligible options are shown based on the state and debt scenario.</p>
+    <div id="pricingComparison" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"></div>
+    <div id="pricingDifferences" style="margin-top:16px;"></div>
+  </div>
 
-        <div class="input-shell-compact grid gap-4 md:grid-cols-[1.35fr,.85fr]">
-          <div class="relative">
-            <label class="block mb-2 text-sm font-medium">State</label>
-            <input id="stateSearch" class="input" type="text" placeholder="Start typing state..." autocomplete="off" />
-            <div id="stateResults" class="hidden absolute left-0 right-0 z-30 mt-1 rounded-xl border border-slate-200 bg-white shadow-lg max-h-64 overflow-y-auto"></div>
-          </div>
-          <div>
-            <label class="block mb-2 text-sm font-medium">Total Enrolled Debt</label>
-            <div id="totalDebt" class="rounded-xl border bg-white/80 px-4 py-3 text-lg font-semibold">$0</div>
-          </div>
+  <!-- ── FULL COMPARISON TABLE ── -->
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div style="padding:20px 20px 0;border-bottom:2px solid var(--ft-green);margin-bottom:0;">
+      <div style="font-size:17px;font-weight:900;color:var(--ft-dark);margin-bottom:6px;">Program Comparison vs Current Financial Situation</div>
+      <p style="font-size:13px;color:#64748b;font-weight:500;padding-bottom:14px;">Continuing minimum payments is almost always the most expensive long-term path.</p>
+    </div>
+    <div style="overflow-x:auto;padding:20px;">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;width:180px;">Detail</th>
+            <th style="text-align:left;background:#1e293b;">Current Situation</th>
+            <th style="text-align:left;">Fastest Available Payoff</th>
+            <th style="text-align:left;background:rgba(15,157,138,0.08);color:var(--ft-green-dark);">
+              Recommended Program
+              <span style="display:inline-block;margin-left:6px;background:var(--ft-green);color:#fff;border-radius:999px;padding:2px 8px;font-size:10px;">Best Option</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="comparisonTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script>
+
+// ─── AGENT COMMISSION DATA ───────────────────────────
+const CS_AGENT_COMMISSIONS = {
+  A:{p2:150,p4:0,total:150},
+  B:{p2:150,p4:0,total:150},
+  C:{p2:150,p4:0,total:150},
+  D:{p2:175,p4:50,total:225},
+  E:{p2:200,p4:75,total:275},
+  F:{p2:250,p4:100,total:350},
+  G:{p2:300,p4:100,total:400},
+  H:{p2:375,p4:125,total:500},
+  I:{p2:450,p4:150,total:600},
+};
+const LD_TIERS=[
+  {id:1,label:'Tier 1',range:'$0–$999k/mo',rate:0.010,rateLabel:'1.00%'},
+  {id:2,label:'Tier 2',range:'$1M–$1.99M/mo',rate:0.0115,rateLabel:'1.15%'},
+  {id:3,label:'Tier 3',range:'$2M+/mo',rate:0.013,rateLabel:'1.30%'},
+];
+
+// ─── BRAND ASSETS ──────────────────────────────────────
+const LOGO_URL = 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png';
+const ROUTE_LOGOS = {
+  'CONSUMER SHIELD': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png',
+  'LEVEL': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp'
+};
+
+// ─── CONSUMER SHIELD PROGRAM GRID ─────────────────────
+const CS_PROGRAMS = [
+  { label:"A", range:"$4,000 – $4,999",   min:4000,  max:4999,     payment:220, term:18, netPayment:180 },
+  { label:"B", range:"$5,000 – $8,799",   min:5000,  max:8799,     payment:220, term:24, netPayment:180 },
+  { label:"C", range:"$8,800 – $9,999",   min:8800,  max:9999,     payment:220, term:36, netPayment:180 },
+  { label:"D", range:"$10,000 – $14,999", min:10000, max:14999,    payment:270, term:36, netPayment:230 },
+  { label:"E", range:"$15,000 – $19,999", min:15000, max:19999,    payment:320, term:36, netPayment:280 },
+  { label:"F", range:"$20,000 – $24,999", min:20000, max:24999,    payment:370, term:36, netPayment:330 },
+  { label:"G", range:"$25,000 – $29,999", min:25000, max:29999,    payment:420, term:36, netPayment:380 },
+  { label:"H", range:"$30,000 – $49,999", min:30000, max:49999,    payment:520, term:36, netPayment:480 },
+  { label:"I", range:"$50,000+",          min:50000, max:Infinity, payment:620, term:36, netPayment:580 },
+];
+
+function getCsProgram(debt){
+  return CS_PROGRAMS.find(p => debt >= p.min && debt <= p.max) ?? null;
+}
+
+// ─── STATE DATA ───────────────────────────────────────
+const STATE_NAMES = {
+  AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',
+  CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',
+  HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',
+  LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',
+  MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',
+  NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',
+  OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',
+  SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',
+  WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',GU:'Guam',PR:'Puerto Rico'
+};
+
+const LEVEL_RED_STATES = new Set(['CT','GA','LA','MN','NV','NH','NJ','ND','OH','PA','TN','WA','WY']);
+const LEVEL_GREEN_STATES = new Set(['AL','AZ','AR','CA','DC','FL','ID','IN','IA','KY','MD','MA','MI','MS','MO','NE','NM','NY','OK','TX','VA']);
+const LEVEL_BLACKOUT_STATES = new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
+const CONSUMER_SHIELD_BLACKOUT_STATES = new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
+
+const DEBT_TYPES = [
+  'AFES Account','Alimony / Child Support','Apartment Back Rent (Collections)',
+  'Auto Loan (Secured)','Auto Repo Deficiency','Back Rent','Business Debt',
+  'Casino Debt','Cash Call','Cell Phone Bill','Credit Union Loan',
+  'Cross Collateralized Account','Deficiency','Direct Furniture Store Loan',
+  'Employer Debt','Federal Student Loan','Furniture Store Financing','IRS Tax Debt',
+  'Installment Sales Contract','Judgment','Loan from Individual','Medical Bill',
+  'Military Account','Mortgage','Navient Student Loan','Other','Overdraft Account',
+  'Payday Loan','Peer-to-Peer Loan','Private Student Loan','Repossession Deficiency',
+  'SBA Loan','Secured Loan','Timeshare','Tribal Loan','Unsecured',
+  'Unsecured Line of Credit','Unsecured Personal Loan','USAA','Utility Bill'
+].sort((a,b)=>a.localeCompare(b));
+
+const TRADITIONAL_CREDIT_CARD_COMPANIES = [
+  'American Express','Amex','Bank of America','Capital One','Chase','Citi','Citibank',
+  'Discover','Wells Fargo','Synchrony','Barclays','Barclaycard','Comenity Bank',
+  'Bread Financial','HSBC','Merrick Bank','Mission Lane','First Premier Bank','Credit One',
+  'Milestone','Upgrade','Avant','Best Egg','LendingClub','SoFi','OneMain Financial',
+  'Upstart','Prosper','Marcus','PayPal Credit','Apple Card','Navy Federal','USAA','PNC',
+  'TD Bank','U.S. Bank','US Bank','Regions Bank','Fifth Third Bank','Truist','SunTrust',
+  'BB&T','M&T Bank','KeyBank','Citizens Bank','Santander','Nordstrom Card','Macy\'s Card',
+  'Macys Card','JCPenney Card','Kohl\'s Card','Kohls Card','Best Buy Card','Home Depot Card',
+  'Lowe\'s Card','Lowes Card','Walmart Card','Target RedCard','Target Card','Amazon Store Card',
+  'CareCredit','Sam\'s Club Card','Sams Club Card','Costco Card','Dell Financial'
+];
+
+const CONSUMER_SHIELD_REJECTED_TYPES = new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
+const CONSUMER_SHIELD_CONDITIONAL_TYPES = new Set(['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt']);
+const LEVEL_REJECTED_TYPES = new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt']);
+const LEVEL_CONDITIONAL_CREDITORS = ['Lendmark','Mariner Finance','OneMain','Regional Finance','Republic Finance'];
+const LEVEL_REJECTED_CREDITORS = ['ALLEVIATE TAX LLC','Acceptance Now','ACIMA','Advance Financial','AGCO FINANCE','STATE EMPLOYEE CREDIT UNION','STATEEMP','Aqua Finance','Bell Finance','BHG Financial','BHG Money','Bobs Discount Furniture','Bobs Finance','Bobs Furniture','Cornerstone Financial','CreditCentral','EMPOWER FCU','Enerbank','ESL Credit Union','Farmers Furniture','FRMRS FURN','Fort Worth Credit Union','Forth Worth CU','Fortera Credit Union','Garden Federal Credit Union','Golden One Credit Union','Goldman Sachs','GoodLeap','Hawaii CU','HC ROYA','HYCITE','Royal Prestige','Heights Financial','Island Finance','ISPC','Kabbage Loans','KIKOFF','Koalafi','Loan Pal','Local Government Federal Credit Union','Matco Tools Financing','Matco Fin','Military Star','Nebraska Furniture','Omni Loans','Opensky','PINNACLE FINANCIAL GROUP','Pioneer Loans','Popular Bank','Banco Popular','PowerPay','Preferred Loans','Quick Help Loans','Red River Credit','REDRIVERCR','REDSTONE Credit Union','RENT-A CENTER','RFFC FINANCIAL','Robinhood','Security Finance','STATE EMPLOYEES C U','Service Finance Company','SVCFIN','SRVFINCO','Snap On Credit','SOLAR MOSAIC','Southern Finance','Sunset Financial','Toledo Finance','Tower Loans','West Creek Financial','WSECU','Yendo'];
+
+const BACKEND_CLOCKS = [
+  { key:'LEVEL', label:'Level Debt', timeZone:'America/New_York', openDays:[1,2,3,4,5], openHour:9, openMinute:0, closeHour:18, closeMinute:0 },
+  { key:'CONSUMER SHIELD', label:'Consumer Shield', timeZone:'America/New_York', openDays:[1,2,3,4,5], openHour:9, openMinute:0, closeHour:19, closeMinute:0 }
+];
+
+const MAX_ROWS = 10;
+const STATE_OPTIONS = Object.entries(STATE_NAMES).map(([abbr,name])=>({abbr,name,label:`${abbr} — ${name}`})).sort((a,b)=>a.label.localeCompare(b.label));
+
+// ─── APP STATE ────────────────────────────────────────
+const state = {
+  selectedState: '',
+  nextRowId: 2,
+  rows: [createEmptyRow(1)]
+};
+
+function createEmptyRow(id){ return { id, creditorName:'', manualName:'', amount:'', debtType:'Unsecured', inCollections:false, inLitigation:false, isSecured:false, paymentMade:true, businessUnprofitable:false }; }
+const el = id => document.getElementById(id);
+const currency = v => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(v||0);
+const pct = v => `${(v||0).toFixed(1)}%`;
+
+function numberOrZero(v){ const n=parseFloat(String(v).replace(/[^0-9.]/g,'')); return Number.isFinite(n)?n:0; }
+function normalizeCreditorName(v){ return String(v||'').toUpperCase().replace(/&/g,' AND ').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function creditorMatches(input,patterns){ const a=normalizeCreditorName(input); if(!a)return false; return patterns.some(p=>{ const b=normalizeCreditorName(p); return a===b||a.includes(b)||b.includes(a); }); }
+function isTraditionalCardCreditor(name){ return creditorMatches(name,TRADITIONAL_CREDIT_CARD_COMPANIES); }
+function getCreditorDisplayName(row){ return row.creditorName==='Other / Manual Entry'?(row.manualName||'Manual Creditor'):(row.creditorName||''); }
+
+function escapeHtml(v=''){ return String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
+
+function mapCreditorToDebtType(item){
+  const pt=String(item?.product_type||'').toLowerCase();
+  const cl=String(item?.classification||'').toLowerCase();
+  const secured=item?.secured===true||item?.secured==='true';
+  if((pt.includes('auto')||pt.includes('vehicle'))&&secured) return 'Auto Loan (Secured)';
+  if(pt.includes('credit card')) return 'Unsecured';
+  if(pt.includes('personal loan')) return 'Unsecured Personal Loan';
+  if(pt.includes('line of credit')) return 'Unsecured Line of Credit';
+  if(pt.includes('medical')) return 'Medical Bill';
+  if(pt.includes('student')) return 'Private Student Loan';
+  if(secured) return 'Secured Loan';
+  return 'Unsecured';
+}
+
+// ─── STATE HELPERS ────────────────────────────────────
+function getLevelStateStatus(code){
+  if(!code) return {status:'UNKNOWN',label:'Unknown'};
+  if(LEVEL_BLACKOUT_STATES.has(code)) return {status:'BLACKOUT',label:'Black Out'};
+  if(LEVEL_RED_STATES.has(code)) return {status:'RED',label:'Attorney Model'};
+  return {status:'GREEN',label:'Standard Model'};
+}
+function getConsumerShieldStateStatus(code){
+  if(!code) return {status:'UNKNOWN',label:'Unknown'};
+  if(CONSUMER_SHIELD_BLACKOUT_STATES.has(code)) return {status:'BLACKOUT',label:'Black Out'};
+  return {status:'GREEN',label:'Serviceable'};
+}
+
+// ─── LEVEL DEBT CALCULATIONS ──────────────────────────
+function getLevelMaxTerm(debt){
+  if(debt<10000)return 24; if(debt<12500)return 30; if(debt<15000)return 36;
+  if(debt<25000)return 42; if(debt<35000)return 48; if(debt<50000)return 54; return 60;
+}
+
+function calcDoNothing(totalDebt,apr=0.24){
+  const monthlyPayment=totalDebt*0.025; const monthlyRate=apr/12;
+  if(totalDebt<=0||monthlyPayment<=totalDebt*monthlyRate) return {monthlyPayment:0,totalDebt,monthsToPayoff:0,apr,totalPayback:0};
+  const months=Math.max(1,Math.round(Math.log(monthlyPayment/(monthlyPayment-totalDebt*monthlyRate))/Math.log(1+monthlyRate)));
+  return {monthlyPayment,totalDebt,monthsToPayoff:months,apr,totalPayback:monthlyPayment*months};
+}
+
+// ─── FLAGS ────────────────────────────────────────────
+function evaluateLevelDebtRuleWarnings(rows,totalDebt,stateCode){
+  const warnings=[];
+  if(!totalDebt) return warnings;
+  const debtAmountFor=matcher=>rows.reduce((sum,row)=>matcher(row)?sum+numberOrZero(row.amount):sum,0);
+  const medRent=debtAmountFor(row=>['Medical Bill','Back Rent','Apartment Back Rent (Collections)'].includes(row.debtType));
+  const privStud=debtAmountFor(row=>row.debtType==='Private Student Loan');
+  const discPriv=rows.filter(row=>row.debtType==='Private Student Loan'&&normalizeCreditorName(getCreditorDisplayName(row)).includes('DISCOVER'));
+  const bizOpen=rows.filter(row=>row.debtType==='Business Debt'&&!row.businessUnprofitable);
+  if((medRent/totalDebt)>0.50) warnings.push({tone:'red',text:`Medical + back rent is ${pct((medRent/totalDebt)*100)} of enrolled debt. Level guideline is < 50%.`});
+  if((privStud/totalDebt)>0.25) warnings.push({tone:'red',text:`Private student loans are ${pct((privStud/totalDebt)*100)} of enrolled debt. Level max is 25%.`});
+  if(discPriv.length) warnings.push({tone:'red',text:'Discover private student loans are not accepted for Level routing.'});
+  if(stateCode==='CA'&&privStud>0) warnings.push({tone:'red',text:'Private student loans not accepted for California residents under Level guidelines.'});
+  if(bizOpen.length) warnings.push({tone:'amber',text:'Business debt requires the business to be closed or unprofitable.'});
+  return warnings;
+}
+
+function collectFlags(rows,totalDebt,stateCode){
+  const csFlags=[], ldFlags=[];
+  if(totalDebt>0&&totalDebt<4000) csFlags.push('Consumer Shield requires at least $4,000 total enrolled debt.');
+  if(stateCode&&getConsumerShieldStateStatus(stateCode).status==='BLACKOUT') csFlags.push('Consumer Shield does not service this state.');
+  if(totalDebt>0&&totalDebt<7000) ldFlags.push('Level Debt requires at least $7,000 total enrolled debt.');
+
+  const discoverDebt=rows.reduce((sum,row)=>normalizeCreditorName(getCreditorDisplayName(row)).includes('DISCOVER')?sum+numberOrZero(row.amount):sum,0);
+  const discoverPct=totalDebt>0?(discoverDebt/totalDebt)*100:0;
+  if(discoverPct>60) ldFlags.push(`Discover debt is ${pct(discoverPct)} of enrolled debt. Level guideline is 60% max.`);
+
+  const mixedDebt=rows.reduce((sum,row)=>['Medical Bill','Back Rent','Apartment Back Rent (Collections)','Repossession Deficiency','Auto Repo Deficiency'].includes(row.debtType)?sum+numberOrZero(row.amount):sum,0);
+  const mixedPct=totalDebt>0?(mixedDebt/totalDebt)*100:0;
+  if(mixedPct>50) ldFlags.push(`Medical, back rent, and repo deficiency is ${pct(mixedPct)} of enrolled debt. Level guideline is < 50%.`);
+
+  const privStudDebt=rows.reduce((sum,row)=>row.debtType==='Private Student Loan'?sum+numberOrZero(row.amount):sum,0);
+  const privStudPct=totalDebt>0?(privStudDebt/totalDebt)*100:0;
+  if(privStudPct>25) ldFlags.push(`Private student loans are ${pct(privStudPct)} of enrolled debt. Level max is 25%.`);
+
+  rows.forEach(row=>{
+    const amt=numberOrZero(row.amount); if(!amt) return;
+    const name=getCreditorDisplayName(row);
+    if(amt<100) csFlags.push(`${name||row.debtType} is below Consumer Shield minimum $100 per account.`);
+    if(CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) csFlags.push(`${row.debtType} is not accepted by Consumer Shield.`);
+    if(row.debtType==='Apartment Back Rent (Collections)'&&!row.inCollections) csFlags.push('Apartment back rent only accepted if in collections.');
+    if(LEVEL_REJECTED_TYPES.has(row.debtType)) ldFlags.push(`${row.debtType} is not accepted by Level Debt.`);
+    if(amt<200&&!row.inCollections) ldFlags.push(`${name||row.debtType} must be at least $200 unless in collections or charged off.`);
+    if(!row.paymentMade) ldFlags.push(`${name||row.debtType} must have at least one payment made before Level enrollment.`);
+    if(creditorMatches(name,LEVEL_REJECTED_CREDITORS)) ldFlags.push(`${name} is on the Level Debt rejected creditor list.`);
+    if(creditorMatches(name,LEVEL_CONDITIONAL_CREDITORS)&&row.isSecured) ldFlags.push(`${name} is secured — Level only allows this if client agrees to lose the collateral.`);
+    if(row.inLitigation) ldFlags.push(`${name||row.debtType} is in litigation — requires legal review before routing.`);
+    if(row.debtType==='Business Debt'&&!row.businessUnprofitable) ldFlags.push(`${name||row.debtType} requires the business to be closed or unprofitable.`);
+    if(row.debtType==='Private Student Loan'&&stateCode==='CA') ldFlags.push('Private student loans not accepted for California residents.');
+    if(row.debtType==='Private Student Loan'&&normalizeCreditorName(name).includes('DISCOVER')) ldFlags.push('Discover private student loans are not accepted.');
+  });
+
+  return { consumerShield:Array.from(new Set(csFlags)), level:Array.from(new Set(ldFlags)) };
+}
+
+// ─── ROUTING LOGIC ────────────────────────────────────
+function chooseRoute(totalDebt,stateCode,flags){
+  if(!stateCode) return {route:'',reason:'Select a state to calculate routing.'};
+  const csStatus=getConsumerShieldStateStatus(stateCode);
+  const levelStatus=getLevelStateStatus(stateCode);
+  const csEligible=csStatus.status!=='BLACKOUT'&&!flags.consumerShield.some(f=>f.includes('not accepted')||f.includes('requires at least'));
+  const levelHardStops=flags.level.some(f=>f.includes('not accepted')||f.includes('requires at least')||f.includes('60% max')||f.includes('25% max')||f.includes('not accepted for California')||f.includes('Discover private'));
+  const levelEligible=levelStatus.status!=='BLACKOUT'&&!levelHardStops;
+
+  if(totalDebt>0&&totalDebt<7000){
+    if(csEligible) return {route:'CONSUMER SHIELD',reason:'Debt below $7,000 routes to Consumer Shield when the state and account profile are serviceable.'};
+    return {route:'NO OPTION',reason:'Debt is below $7,000 and Consumer Shield is not serviceable or eligible for this deal.'};
+  }
+  if(levelEligible) return {route:'LEVEL',reason:levelStatus.status==='RED'?'Best option is Level Debt under the attorney model in this state.':'Best option is Level Debt — serviceable standard state.'};
+  if(csEligible) return {route:'CONSUMER SHIELD',reason:'Consumer Shield is available for this state and debt profile.'};
+  return {route:'NO OPTION',reason:'No available backend is serviceable in this state.'};
+}
+
+// ─── COMPUTE SCENARIO ────────────────────────────────
+function computeScenarioData(){
+  const rows=state.rows.filter(r=>numberOrZero(r.amount)>0);
+  const totalDebt=rows.reduce((sum,row)=>sum+numberOrZero(row.amount),0);
+  const flags=collectFlags(rows,totalDebt,state.selectedState);
+  const levelRuleWarnings=evaluateLevelDebtRuleWarnings(rows,totalDebt,state.selectedState);
+  const routeInfo=chooseRoute(totalDebt,state.selectedState,flags);
+  const levelState=getLevelStateStatus(state.selectedState);
+  const csState=getConsumerShieldStateStatus(state.selectedState);
+
+  // CS program
+  const csProg=getCsProgram(totalDebt);
+  const csAvailable=csState.status!=='BLACKOUT'&&totalDebt>=4000&&!flags.consumerShield.some(f=>f.includes('not accepted')||f.includes('requires at least'));
+
+  const feeRate=routeInfo.route==='LEVEL'?(levelState.status==='RED'?0.27:0.25):0;
+  const doNothing=calcDoNothing(totalDebt);
+
+  let shortest=null, recommended=null;
+  if(routeInfo.route==='LEVEL'){
+    const totalCost=totalDebt*0.50+totalDebt*feeRate;
+    shortest={term:12,totalCost,monthlyPayment:totalCost/12};
+    const maxTerm=getLevelMaxTerm(totalDebt);
+    recommended={term:maxTerm,totalCost,monthlyPayment:totalCost/maxTerm};
+  } else if(routeInfo.route==='CONSUMER SHIELD'&&csProg){
+    const totalCost=csProg.term*csProg.payment;
+    shortest={term:csProg.term,totalCost,monthlyPayment:csProg.payment};
+    recommended={term:csProg.term,totalCost,monthlyPayment:csProg.payment};
+  }
+
+  const programs={
+    consumerShield:{
+      name:'Consumer Shield',
+      available:csAvailable,
+      prog:csProg,
+      term:csProg?csProg.term:0,
+      monthlyPayment:csProg?csProg.payment:0,
+      netPayment:csProg?csProg.netPayment:0,
+      benefits:['Fixed monthly payment structure','Debt validation process','Credit monitoring support','No debt settlement fee']
+    },
+    level:{
+      name:'Level Debt',
+      available:levelState.status!=='BLACKOUT'&&totalDebt>=7000,
+      term:totalDebt>0?getLevelMaxTerm(totalDebt):0,
+      monthlyPayment:totalDebt>0?((totalDebt*0.50)+(totalDebt*(levelState.status==='RED'?0.27:0.25)))/getLevelMaxTerm(totalDebt):0,
+      benefits:['Longer-term payment flexibility','Affordability-focused structure','Lower monthly burden potential','Budget breathing room']
+    }
+  };
+
+  const activeFlags=[];
+  if(routeInfo.route==='LEVEL') activeFlags.push(...flags.level);
+  if(routeInfo.route==='CONSUMER SHIELD') activeFlags.push(...flags.consumerShield);
+  if(routeInfo.route==='NO OPTION') activeFlags.push(routeInfo.reason);
+  if(routeInfo.route==='CONSUMER SHIELD'){
+    activeFlags.push('Consumer Shield support: Mon–Fri, 9am–7pm EST.');
+    activeFlags.push('Consumer Shield uses Equifax for credit pull.');
+  }
+
+  return {rows,totalDebt,routeInfo,doNothing,shortest,recommended,feeRate,levelState,csState,programs,csProg,flags:Array.from(new Set(activeFlags)),levelRuleWarnings};
+}
+
+// ─── ROW ALERTS ───────────────────────────────────────
+function rowAlerts(row,route){
+  const alerts=[]; const name=getCreditorDisplayName(row);
+  if(route==='LEVEL'){
+    if(creditorMatches(name,LEVEL_REJECTED_CREDITORS)) alerts.push({label:'Not accepted by Level',tone:'red'});
+    if(creditorMatches(name,LEVEL_CONDITIONAL_CREDITORS)&&row.isSecured) alerts.push({label:'Secured / collateral risk',tone:'amber'});
+    if(LEVEL_REJECTED_TYPES.has(row.debtType)) alerts.push({label:'Debt type not accepted',tone:'red'});
+  }
+  if(route==='CONSUMER SHIELD'){
+    if(CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) alerts.push({label:'Not accepted by Consumer Shield',tone:'red'});
+    if(CONSUMER_SHIELD_CONDITIONAL_TYPES.has(row.debtType)) alerts.push({label:'Conditional / docs needed',tone:'amber'});
+  }
+  return alerts;
+}
+
+// ─── CLOCK ────────────────────────────────────────────
+function getTimePartsInZone(tz){
+  const now=new Date();
+  const f=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  const parts=f.formatToParts(now); const map={};
+  parts.forEach(p=>{ if(p.type!=='literal') map[p.type]=p.value; });
+  const wmap={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
+  return {hour:Number(map.hour),minute:Number(map.minute),weekday:wmap[map.weekday]};
+}
+function formatTimeInZone(tz){
+  return new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date());
+}
+function getBackendClockStatus(cfg){
+  const p=getTimePartsInZone(cfg.timeZone);
+  const cur=p.hour*60+p.minute, open=cfg.openHour*60+cfg.openMinute, close=cfg.closeHour*60+cfg.closeMinute;
+  const isDay=cfg.openDays.includes(p.weekday), isOpen=isDay&&cur>=open&&cur<close;
+  const mClose=close-cur;
+  if(isOpen){
+    if(mClose<=60) return {badgeClass:'clock-soon',badgeText:`Open · Closes in ${mClose} min`,nowLabel:formatTimeInZone(cfg.timeZone)};
+    return {badgeClass:'clock-open',badgeText:'Open · Safe to push',nowLabel:formatTimeInZone(cfg.timeZone)};
+  }
+  if(isDay&&cur<open) return {badgeClass:'clock-closed',badgeText:`Closed · Opens in ${open-cur} min`,nowLabel:formatTimeInZone(cfg.timeZone)};
+  return {badgeClass:'clock-closed',badgeText:'Closed today',nowLabel:formatTimeInZone(cfg.timeZone)};
+}
+function renderBackendClock(){
+  const box=el('backendClockBox'); if(!box) return;
+  box.innerHTML=BACKEND_CLOCKS.map(cfg=>{
+    const s=getBackendClockStatus(cfg); const logo=ROUTE_LOGOS[cfg.key]||'';
+    const support=cfg.key==='CONSUMER SHIELD'
+      ?`<a href="https://teams.live.com/l/invite/FBA2mu0C9EQERh1bQ8" target="_blank" style="font-size:11px;font-weight:700;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:4px 8px;text-decoration:none;">Chat Support</a>`
+      :`<a href="https://funding-tier.slack.com/archives/C0AMBM9EBNV" target="_blank" style="font-size:11px;font-weight:700;color:#6d28d9;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:4px 8px;text-decoration:none;">Chat Support</a>`;
+    return `<div class="snapshot-row">
+      <div style="width:44px;height:22px;display:flex;align-items:center;justify-content:center;border:1px solid #e2e8f0;border-radius:7px;background:#fff;padding:2px;">
+        ${logo?`<img src="${logo}" style="max-width:38px;max-height:14px;width:auto;height:auto;object-fit:contain;" />`:''}
+      </div>
+      <div>
+        <div class="snapshot-name">${cfg.label}</div>
+        <div class="snapshot-time">${s.nowLabel}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
+        <span class="pill ${s.badgeClass}" style="font-size:10px;padding:3px 8px;">${s.badgeText}</span>
+        ${support}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── CS PROGRAM DISPLAY ───────────────────────────────
+function renderCsProgramCard(c){
+  const card=el('csProgramCard');
+  if(!c.programs.consumerShield.available||!c.csProg){
+    card.style.display='none'; return;
+  }
+  card.style.display='block';
+  const p=c.csProg;
+  const totalCost=p.term*p.payment;
+  const frontRev=p.netPayment*Math.min(4,p.term);
+  const tailMonthly=Math.round(p.netPayment*0.35);
+
+  // Active program detail
+  el('csActiveProgramDetail').innerHTML=`
+    <div style="background:rgba(26,110,216,0.06);border:2px solid #1a6ed8;border-radius:12px;padding:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <span style="font-size:14px;font-weight:900;color:#1a6ed8;">CS Program ${p.label}</span>
+          <span style="font-size:12px;color:#64748b;margin-left:8px;">${p.range}</span>
         </div>
+        <span class="pill pill-blue">Active Program</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div style="text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">Monthly Payment</div>
+          <div style="font-size:22px;font-weight:900;color:#1a6ed8;margin-top:4px;">${currency(p.payment)}</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px;">per month</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">Program Length</div>
+          <div style="font-size:22px;font-weight:900;color:#1a6ed8;margin-top:4px;">${p.term} mo</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px;">total term</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">Total Program Cost</div>
+          <div style="font-size:22px;font-weight:900;color:#1a6ed8;margin-top:4px;">${currency(totalCost)}</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:2px;">${currency(p.payment)} × ${p.term}</div>
+        </div>
+      </div>
+    </div>
+  `;
 
-        <div class="mt-5 overflow-hidden rounded-2xl border border-teal-100 bg-white/80">
-          <div class="hidden md:grid grid-cols-[1.55fr,0.62fr,1fr,0.22fr] gap-3 bg-gradient-to-r from-teal-50 to-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">
-            <div>Creditor Name</div>
-            <div>Debt Amount</div>
-            <div>Debt Type</div>
-            <div></div>
+  // All program tiles
+  el('csProgramGrid').innerHTML=CS_PROGRAMS.map(prog=>{
+    const isActive=prog.label===p.label;
+    return `<div class="cs-program-tile${isActive?' active':''}">
+      <div class="cs-prog-label">Program ${prog.label}</div>
+      <div class="cs-prog-range">${prog.range}</div>
+      <div class="cs-prog-payment">${currency(prog.payment)}<span style="font-size:11px;font-weight:600;color:#94a3b8;">/mo</span></div>
+      <div class="cs-prog-term">${prog.term} months</div>
+    </div>`;
+  }).join('');
+}
+
+
+// ─── RENDER COMMISSION CARD ──────────────────────────
+function renderCommissionCard(c){
+  const card=el('commissionCard');
+  const detail=el('commissionDetail');
+  if(!c.totalDebt||!state.selectedState||c.routeInfo.route==='NO OPTION'||c.routeInfo.route===''){
+    card.style.display='none'; return;
+  }
+  card.style.display='block';
+
+  let html='';
+
+  if(c.routeInfo.route==='LEVEL'){
+    const comm=LD_TIERS.map(t=>({...t,commission:Math.round(c.totalDebt*t.rate)}));
+    const activeTier=comm[0]; // agents check with manager for their tier
+    html=`
+      <div style="font-size:13px;color:#475569;font-weight:500;line-height:1.65;margin-bottom:14px;">
+        Commission is based on <strong style="color:var(--ft-dark);">your monthly enrolled debt volume tier</strong>.
+        The table below shows what you earn on this deal at each tier. Check with your manager for your current tier.
+      </div>
+      <div style="display:grid;gap:8px;margin-bottom:14px;">
+        ${comm.map(t=>`
+          <div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;
+            padding:12px 14px;border-radius:10px;border:1.5px solid var(--ft-border);background:#fff;">
+            <span style="font-size:13px;font-weight:800;color:var(--ft-dark);width:52px;">${t.label}</span>
+            <span style="font-size:12px;color:#64748b;font-weight:600;">${t.range}</span>
+            <span style="font-size:12px;font-weight:700;color:#64748b;">${t.rateLabel} of ${new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(c.totalDebt)}</span>
+            <span style="font-size:20px;font-weight:900;color:var(--ft-green-dark);min-width:70px;text-align:right;">${new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(t.commission)}</span>
           </div>
-          <div id="rows" class="space-y-3 p-3"></div>
-          <div class="p-3 pt-0">
-            <button id="addCreditorBtn" type="button" class="plus-button">
-              <span class="text-2xl leading-none">+</span>
-              <span>Add Creditor</span>
-            </button>
+        `).join('')}
+      </div>
+      <div style="background:rgba(15,157,138,0.08);border:1px solid rgba(15,157,138,0.25);border-radius:10px;padding:11px 14px;font-size:13px;color:var(--ft-green-dark);font-weight:600;line-height:1.65;">
+        Paid on the <strong>20th of Month 3</strong> after 2 program payments clear. Commission rate is applied to Total Cleared Enrolled Debt.
+      </div>
+    `;
+  } else if(c.routeInfo.route==='CONSUMER SHIELD'&&c.csProg){
+    const p=c.csProg;
+    const comm=CS_AGENT_COMMISSIONS[p.label]||{p2:150,p4:0,total:150};
+    const hasSplit=comm.p4>0;
+    html=`
+      <div style="font-size:13px;color:#475569;font-weight:500;line-height:1.65;margin-bottom:14px;">
+        Consumer Shield uses a <strong style="color:var(--ft-dark);">flat rate commission</strong> based on the program tier.
+        This deal falls under <strong style="color:#1a6ed8;">Program ${p.label}</strong> (${p.range}).
+      </div>
+      <div style="background:rgba(26,110,216,0.06);border:2px solid #1a6ed8;border-radius:12px;padding:16px;margin-bottom:12px;">
+        <div style="display:grid;grid-template-columns:${hasSplit?'1fr 1fr 1fr':'1fr 1fr'};gap:12px;">
+          <div style="text-align:center;">
+            <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">Paid at Payment 2</div>
+            <div style="font-size:26px;font-weight:900;color:#1a6ed8;">${new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(comm.p2)}</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:3px;">20th of Month 3</div>
+          </div>
+          ${hasSplit?`
+          <div style="text-align:center;">
+            <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">Paid at Payment 4</div>
+            <div style="font-size:26px;font-weight:900;color:#1a6ed8;">${new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(comm.p4)}</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:3px;">20th of Month 5</div>
+          </div>`:''}
+          <div style="text-align:center;${hasSplit?'':'grid-column:2'}">
+            <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">Total Commission</div>
+            <div style="font-size:26px;font-weight:900;color:var(--ft-green-dark);">${new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(comm.total)}</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:3px;">Full amount for this deal</div>
           </div>
         </div>
       </div>
+      <div style="background:rgba(26,110,216,0.06);border:1px solid rgba(26,110,216,0.2);border-radius:10px;padding:11px 14px;font-size:13px;color:#1e40af;font-weight:600;line-height:1.65;">
+        ${hasSplit
+          ? `<strong>${new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(comm.p2)}</strong> paid 20th of Month 3 (after Payment 2 clears) · <strong>${new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(comm.p4)}</strong> paid 20th of Month 5 (after Payment 4 clears). The Payment 2 portion is subject to clawback if the deal cancels before Payment 4 within 60 days.`
+          : `Full <strong>${new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(comm.total)}</strong> paid on 20th of Month 3 after Payment 2 clears. No split — single payout on Programs A, B, and C.`
+        }
+      </div>
+    `;
+  }
 
-      <div class="header-routing-card card bg-white p-4 md:p-5 teal-panel sticky-stack">
-        <div class="flex items-center justify-between gap-3 flex-wrap">
-          <h2 class="text-lg font-semibold text-slate-900">Backend / Routing</h2>
-        </div>
-        <div class="snapshot-topbar mt-3">
-          <div id="providerLogoBox"></div>
-          <div id="topBadges" class="flex flex-wrap gap-2 min-w-0"></div>
-        </div>
-        <div id="routeReason" class="mt-3 w-full rounded-xl bg-white/90 border border-teal-100 p-3 text-xs text-slate-700"></div>
-        <div class="header-routing-grid mt-3">
-          <div id="backendClockBox" class="snapshot-table"></div>
-          <div id="providerAvailability" class="snapshot-table"></div>
-          <div id="metricsGrid" class="grid gap-2 md:grid-cols-2"></div>
-          <div class="space-y-2">
-            <div id="flags" class="space-y-2"></div>
-            <div id="levelRuleWarnings" class="space-y-2"></div>
+  detail.innerHTML=html;
+}
+
+// ─── RENDER ROUTING PANEL ─────────────────────────────
+function renderRoutingPanel(c){
+  // Route badge
+  const badgeClass=c.routeInfo.route==='LEVEL'?'route-level':c.routeInfo.route==='CONSUMER SHIELD'?'route-cs':'route-none';
+  const routeLabel=c.routeInfo.route==='LEVEL'?'Route: Level Debt':c.routeInfo.route==='CONSUMER SHIELD'?'Route: Consumer Shield':'No Available Route';
+  const logoSrc=ROUTE_LOGOS[c.routeInfo.route]||'';
+
+  el('routeBadgeRow').innerHTML=`
+    ${logoSrc?`<div class="logo-wrap sm"><img src="${logoSrc}" alt="" /></div>`:''}
+    <span class="route-badge ${badgeClass}">${routeLabel}</span>
+    <span class="pill ${c.levelState.status==='BLACKOUT'?'pill-red':c.levelState.status==='RED'?'pill-amber':'pill-green'}">
+      LD: ${c.levelState.label}
+    </span>
+    <span class="pill ${c.csState.status==='BLACKOUT'?'pill-red':'pill-green'}">
+      CS: ${c.csState.label}
+    </span>
+  `;
+
+  el('routeReason').textContent=c.routeInfo.reason||'Enter debts above to calculate routing.';
+
+  // Provider availability
+  el('providerAvailability').innerHTML=[
+    {key:'LEVEL',name:'Level Debt',available:c.programs.level.available,best:c.routeInfo.route==='LEVEL',model:c.levelState.label},
+    {key:'CONSUMER SHIELD',name:'Consumer Shield',available:c.programs.consumerShield.available,best:c.routeInfo.route==='CONSUMER SHIELD',model:c.csState.label}
+  ].map(p=>`
+    <div class="snapshot-row">
+      <div style="width:44px;height:22px;display:flex;align-items:center;justify-content:center;border:1px solid #e2e8f0;border-radius:7px;background:#fff;padding:2px;">
+        ${ROUTE_LOGOS[p.key]?`<img src="${ROUTE_LOGOS[p.key]}" style="max-width:38px;max-height:14px;width:auto;height:auto;object-fit:contain;" />`:''}
+      </div>
+      <div><div class="snapshot-name">${p.name}</div><div class="snapshot-time">${p.model}</div></div>
+      <span class="pill ${p.best?'pill-green':p.available?'pill-blue':'pill-red'}" style="font-size:10px;">
+        ${p.best?'✓ Best Option':p.available?'Available':'Not Serviceable'}
+      </span>
+    </div>
+  `).join('');
+
+  // Flags
+  el('flags').innerHTML=c.flags.map(f=>`<div class="flag-box flag-amber"><span>⚠</span><span>${f}</span></div>`).join('');
+
+  // Level rule warnings
+  const lrw=el('levelRuleWarnings');
+  if(c.levelRuleWarnings&&c.levelRuleWarnings.length){
+    lrw.innerHTML=`<div style="border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:13px;background:#fef2f2;">
+      <div style="font-size:13px;font-weight:800;color:#b91c1c;margin-bottom:8px;">Level Debt Rule Warnings</div>
+      ${c.levelRuleWarnings.map(w=>`<div class="flag-box ${w.tone==='red'?'flag-red':'flag-amber'}" style="margin-bottom:6px;"><span>${w.tone==='red'?'✗':'⚠'}</span><span>${w.text}</span></div>`).join('')}
+    </div>`;
+  } else {
+    lrw.innerHTML='';
+  }
+}
+
+// ─── RENDER PROGRAM COMPARISON ────────────────────────
+function renderPricingComparison(c){
+  const cards=[];
+
+  if(c.programs.consumerShield.available&&c.csProg){
+    const p=c.csProg;
+    const isRecommended=c.routeInfo.route==='CONSUMER SHIELD';
+    cards.push(`
+      <div class="plan-card${isRecommended?' recommended':''}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="logo-wrap sm"><img src="${ROUTE_LOGOS['CONSUMER SHIELD']}" alt="Consumer Shield" /></div>
+            <div style="font-size:14px;font-weight:900;color:var(--ft-dark);">Consumer Shield</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="pill pill-blue">Program ${p.label}</span>
+            ${isRecommended?'<span class="pill pill-green">✓ Recommended</span>':'<span class="pill pill-blue">Available</span>'}
           </div>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div class="metric-card" style="--ft-green:#1a6ed8;">
+            <div class="metric-label">Monthly Payment</div>
+            <div class="metric-value" style="color:#1a6ed8;">${currency(p.payment)}</div>
+            <div class="metric-sub">Fixed for ${p.term} months</div>
+          </div>
+          <div class="metric-card" style="--ft-green:#1a6ed8;">
+            <div class="metric-label">Program Length</div>
+            <div class="metric-value" style="color:#1a6ed8;">${p.term} months</div>
+            <div class="metric-sub">Total: ${currency(p.term*p.payment)}</div>
+          </div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Program Benefits</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          ${c.programs.consumerShield.benefits.map(b=>`<div style="font-size:13px;color:#334155;padding:7px 10px;border:1px solid #dce8f5;border-radius:10px;background:#fff;">· ${b}</div>`).join('')}
+        </div>
+        <div style="margin-top:12px;background:rgba(26,110,216,0.06);border:1px solid rgba(26,110,216,0.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#1e40af;font-weight:600;line-height:1.6;">
+          <strong>Debt Validation</strong> — Client pays a fixed monthly amount. Debts are formally challenged and validated through the legal process.
+          No percentage fee on enrolled debt. ${p.range} total debt range.
+        </div>
       </div>
-    </section>
+    `);
+  }
 
-    <section class="card bg-white p-4 md:p-6 teal-panel">
-      <h2 class="text-xl md:text-2xl font-semibold">Program Comparison</h2>
-      <p class="mt-1 text-slate-600">Only currently available options are shown.</p>
-      <div id="pricingComparison" class="mt-6 grid gap-6 lg:grid-cols-2"></div>
-      <div id="pricingDifferences" class="mt-6"></div>
-    </section>
-
-    <section class="card bg-white overflow-hidden">
-      <div class="p-4 md:p-6 pb-0 proposal-header">
-        <h2 class="text-xl md:text-2xl font-semibold">Program Comparison vs Current Financial Situation</h2>
-        <p class="mt-1 text-slate-600">Designed to clearly show why continuing minimum-payment behavior is usually the most expensive long-term path.</p>
+  if(c.programs.level.available){
+    const isRecommended=c.routeInfo.route==='LEVEL';
+    const monthlyPay=Math.round(c.programs.level.monthlyPayment);
+    cards.push(`
+      <div class="plan-card${isRecommended?' recommended':''}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="logo-wrap sm"><img src="${ROUTE_LOGOS['LEVEL']}" alt="Level Debt" /></div>
+            <div style="font-size:14px;font-weight:900;color:var(--ft-dark);">Level Debt</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="pill ${c.levelState.status==='RED'?'pill-amber':'pill-green'}">${c.levelState.label}</span>
+            ${isRecommended?'<span class="pill pill-green">✓ Recommended</span>':'<span class="pill pill-green">Available</span>'}
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div class="metric-card">
+            <div class="metric-label">Est. Monthly Payment</div>
+            <div class="metric-value">${currency(monthlyPay)}</div>
+            <div class="metric-sub">Over ${c.programs.level.term} months</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Program Length</div>
+            <div class="metric-value">${c.programs.level.term} months</div>
+            <div class="metric-sub">Est. total: ${currency(Math.round(monthlyPay*c.programs.level.term))}</div>
+          </div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Program Benefits</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          ${c.programs.level.benefits.map(b=>`<div style="font-size:13px;color:#334155;padding:7px 10px;border:1px solid #dcefed;border-radius:10px;background:#fff;">· ${b}</div>`).join('')}
+        </div>
+        <div style="margin-top:12px;background:rgba(15,157,138,0.06);border:1px solid rgba(15,157,138,0.2);border-radius:10px;padding:10px 13px;font-size:12px;color:var(--ft-green-dark);font-weight:600;line-height:1.6;">
+          <strong>Debt Settlement</strong> — Negotiations with creditors to settle enrolled debt. Program fee applies. Minimum $7,000 enrolled debt required.
+          ${c.levelState.status==='RED'?'Attorney model applies in this state.':'Standard model in this state.'}
+        </div>
       </div>
-      <div class="overflow-x-auto p-4 md:p-6">
-        <table class="w-full min-w-[980px] border-collapse">
-          <thead>
-            <tr>
-              <th class="border-b bg-slate-100 px-4 py-4 text-left text-sm font-semibold text-slate-700">Detail</th>
-              <th class="border-b bg-red-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">Current Financial Situation</th>
-              <th class="border-b bg-white px-4 py-4 text-left text-sm font-semibold text-slate-900">Fastest Available Payoff</th>
-              <th class="border-b bg-emerald-50 px-4 py-4 text-left text-sm font-semibold text-slate-900">Recommended Program<div class="mt-1 inline-flex rounded-full bg-teal-600 px-2 py-1 text-[11px] font-medium text-white">Best Option</div></th>
-            </tr>
-          </thead>
-          <tbody id="comparisonTable"></tbody>
+    `);
+  }
+
+  el('pricingComparison').innerHTML=cards.length
+    ? cards.join('')
+    : `<div style="grid-column:1/-1;border:1px solid rgba(239,68,68,0.3);background:#fef2f2;color:#b91c1c;border-radius:12px;padding:14px;font-weight:700;font-size:14px;">
+        No program options are available for this state and debt scenario.
+      </div>`;
+
+  el('pricingDifferences').innerHTML=`
+    <div style="border:1.5px solid var(--ft-border);border-radius:14px;overflow:hidden;">
+      <div style="background:var(--ft-dark);padding:13px 16px;font-size:14px;font-weight:800;color:#fff;">How the Programs Differ</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:600px;font-size:13px;">
+          <thead><tr style="background:var(--ft-bg);">
+            <th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--ft-border);">Feature</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:800;color:#1a6ed8;border-bottom:1px solid var(--ft-border);">Consumer Shield</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--ft-green-dark);border-bottom:1px solid var(--ft-border);">Level Debt</th>
+          </tr></thead>
+          <tbody>
+            <tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--ft-border);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--ft-border);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--ft-border);">Debt Settlement</td></tr>
+            <tr style="background:var(--ft-bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--ft-border);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--ft-border);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--ft-border);">$7,000</td></tr>
+            <tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--ft-border);">Payment Structure</td><td style="padding:10px 14px;border-bottom:1px solid var(--ft-border);">Fixed tier-based monthly payment</td><td style="padding:10px 14px;border-bottom:1px solid var(--ft-border);">Flexible term, monthly savings deposits</td></tr>
+            <tr style="background:var(--ft-bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--ft-border);">Best Fit</td><td style="padding:10px 14px;border-bottom:1px solid var(--ft-border);">Deals under $7k, or specific states</td><td style="padding:10px 14px;border-bottom:1px solid var(--ft-border);">Primary recommended backend when serviceable</td></tr>
+          </tbody>
         </table>
       </div>
-    </section>
-  </main>
+    </div>
+  `;
+}
 
-  <script>
-    const LOGO_URL = 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf8e8df54a8b29097c4.png';
-    const ROUTE_LOGOS = {
-      'CONSUMER SHIELD': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png',
-      'LEVEL': 'https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp'
-    };
+// ─── RENDER COMPARISON TABLE ──────────────────────────
+function renderComparison(c){
+  const rows=[
+    ['Monthly Payments', currency(c.doNothing.monthlyPayment), c.shortest?currency(c.shortest.monthlyPayment):'—', c.recommended?currency(c.recommended.monthlyPayment):'—'],
+    ['Total Enrolled Debt', currency(c.totalDebt), c.shortest?currency(c.totalDebt):'—', c.recommended?currency(c.totalDebt):'—'],
+    ['Months to Payoff', `${c.doNothing.monthsToPayoff} months`, c.shortest?`${c.shortest.term} months`:'—', c.recommended?`${c.recommended.term} months`:'—'],
+    ['Est. Interest Rate', `${(c.doNothing.apr*100).toFixed(0)}% APR`, c.shortest?'0%':'—', c.recommended?'0%':'—'],
+    ['Est. Total Payback', `<span style="color:var(--ft-red);font-weight:900;">${currency(c.doNothing.totalPayback)}</span>`, c.shortest?currency(c.shortest.totalCost):'—', c.recommended?currency(c.recommended.totalCost):'—'],
+    ['Est. Savings vs Minimum Pay', '—', c.shortest?`<strong>${currency(Math.max(0,c.doNothing.totalPayback-c.shortest.totalCost))}</strong>`:'—', c.recommended?`<strong style="font-size:17px;">${currency(Math.max(0,c.doNothing.totalPayback-c.recommended.totalCost))}</strong>`:'—']
+  ];
 
-    const STATE_NAMES = {
-      AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',GU:'Guam',PR:'Puerto Rico'
-    };
+  el('comparisonTable').innerHTML=rows.map((r,idx)=>{
+    const isSavings=idx===5;
+    return `<tr class="${isSavings?'savings-row':''}">
+      <td style="font-weight:700;${isSavings?'':'color:#64748b;'}">${r[0]}</td>
+      <td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td>
+    </tr>`;
+  }).join('');
+}
 
-    const LEVEL_RED_STATES = new Set(['CT','GA','LA','MN','NV','NH','NJ','ND','OH','PA','TN','WA','WY']);
-    const LEVEL_GREEN_STATES = new Set(['AL','AZ','AR','CA','DC','FL','ID','IN','IA','KY','MD','MA','MI','MS','MO','NE','NM','NY','OK','TX','VA']);
-    const LEVEL_BLACKOUT_STATES = new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
-    const CONSUMER_SHIELD_BLACKOUT_STATES = new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
+// ─── RENDER ROWS ─────────────────────────────────────
+function getTraditionalCreditorMatches(query){
+  const q=String(query||'').trim().toLowerCase(); if(!q) return [];
+  return TRADITIONAL_CREDIT_CARD_COMPANIES.filter(n=>n.toLowerCase().includes(q)).slice(0,8).map(n=>({display_name:n,secured:false,product_type:'credit card'}));
+}
 
-    const DEBT_TYPES = [
-      'AFES Account',
-      'Alimony / Child Support',
-      'Apartment Back Rent (Collections)',
-      'Auto Loan (Secured)',
-      'Auto Repo Deficiency',
-      'Back Rent',
-      'Business Debt',
-      'Casino Debt',
-      'Cash Call',
-      'Cell Phone Bill',
-      'Credit Union Loan',
-      'Cross Collateralized Account',
-      'Deficiency',
-      'Direct Furniture Store Loan',
-      'Employer Debt',
-      'Federal Student Loan',
-      'Furniture Store Financing',
-      'IRS Tax Debt',
-      'Installment Sales Contract',
-      'Judgment',
-      'Loan from Individual',
-      'Medical Bill',
-      'Military Account',
-      'Mortgage',
-      'Navient Student Loan',
-      'Other',
-      'Overdraft Account',
-      'Payday Loan',
-      'Peer-to-Peer Loan',
-      'Private Student Loan',
-      'Repossession Deficiency',
-      'SBA Loan',
-      'Secured Loan',
-      'Timeshare',
-      'Tribal Loan',
-      'Unsecured',
-      'Unsecured Line of Credit',
-      'Unsecured Personal Loan',
-      'USAA',
-      'Utility Bill'
-    ];
+function hideAllDropdowns(){
+  document.querySelectorAll('.search-results').forEach(d=>{d.innerHTML='';d.style.display='none';});
+}
 
-    const TRADITIONAL_CREDIT_CARD_COMPANIES = [
-      'American Express',
-      'Amex',
-      'Bank of America',
-      'Capital One',
-      'Chase',
-      'Citi',
-      'Citibank',
-      'Discover',
-      'Wells Fargo',
-      'Synchrony',
-      'Barclays',
-      'Barclaycard',
-      'Comenity Bank',
-      'Bread Financial',
-      'HSBC',
-      'Merrick Bank',
-      'Mission Lane',
-      'First Premier Bank',
-      'Credit One',
-      'Milestone',
-      'Upgrade',
-      'Avant',
-      'Best Egg',
-      'LendingClub',
-      'SoFi',
-      'OneMain Financial',
-      'Upstart',
-      'Prosper',
-      'Marcus',
-      'PayPal Credit',
-      'Apple Card',
-      'Navy Federal',
-      'USAA',
-      'PNC',
-      'TD Bank',
-      'U.S. Bank',
-      'US Bank',
-      'Regions Bank',
-      'Fifth Third Bank',
-      'Truist',
-      'SunTrust',
-      'BB&T',
-      'M&T Bank',
-      'KeyBank',
-      'Citizens Bank',
-      'Santander',
-      'Nordstrom Card',
-      'Macy’s Card',
-      'Macys Card',
-      'Bloomingdale’s Card',
-      'Bloomingdales Card',
-      'JCPenney Card',
-      'Kohl’s Card',
-      'Kohls Card',
-      'Best Buy Card',
-      'Home Depot Card',
-      'Lowe’s Card',
-      'Lowes Card',
-      'Walmart Card',
-      'Target RedCard',
-      'Target Card',
-      'Amazon Store Card',
-      'CareCredit',
-      'Sam’s Club Card',
-      'Sams Club Card',
-      'Costco Card',
-      'Dell Financial',
-      'Newegg Card',
-      'Chevron Card',
-      'Shell Card',
-      'ExxonMobil Card',
-      'Marathon Card',
-      'BP Card',
-      'Firestone Card',
-      'Discount Tire Card',
-      'Goodyear Card',
-      'Cabela’s Card',
-      'Cabelas Card'
-    ];
+function renderRows(){
+  const totalDebt=state.rows.reduce((s,r)=>s+numberOrZero(r.amount),0);
+  el('rows').innerHTML=state.rows.map((row,idx)=>{
+    const pctOfTotal=totalDebt>0?((numberOrZero(row.amount)/totalDebt)*100).toFixed(1)+'%':'—';
+    const removeBtn=state.rows.length>1?`<button type="button" data-remove="${idx}" style="width:32px;height:32px;border:1.5px solid rgba(239,68,68,0.4);border-radius:8px;background:#fef2f2;color:var(--ft-red);font-weight:900;font-size:16px;cursor:pointer;margin-top:6px;">−</button>`:`<div></div>`;
+    return `<div class="row-card" data-row="${idx}">
+      <div class="row-inner">
+        <div style="position:relative;">
+          <input class="ft-input creditor-search" data-index="${idx}" placeholder="Type creditor name..." value="${escapeHtml(row.creditorName||'')}" autocomplete="off" />
+          <div class="search-results" data-results-index="${idx}" style="display:none;"></div>
+          <div class="alert-wrap" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div>
+        </div>
+        <div>
+          <input class="ft-input" data-index="${idx}" data-key="amount" placeholder="$0" value="${row.amount||''}" title="${pctOfTotal} of total" />
+          ${totalDebt>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${pctOfTotal}</div>`:''}
+        </div>
+        <div style="position:relative;">
+          <input class="ft-input debt-type-search" data-index="${idx}" placeholder="Debt type..." value="${escapeHtml(row.debtType||'')}" autocomplete="off" />
+          <div class="search-results" data-debt-results-index="${idx}" style="display:none;"></div>
+        </div>
+        ${removeBtn}
+      </div>
+    </div>`;
+  }).join('');
 
-    const DEBT_TYPES_ALPHA = [...DEBT_TYPES].sort((a, b) => a.localeCompare(b));
-    const STATE_OPTIONS = Object.entries(STATE_NAMES)
-      .map(([abbr, name]) => ({ abbr, name, label: `${abbr} - ${name}` }))
-      .sort((a, b) => a.label.localeCompare(b.label));
+  el('addCreditorBtn').style.display=state.rows.length<MAX_ROWS?'flex':'none';
 
-    const CONSUMER_SHIELD_REJECTED_TYPES = new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
-    const CONSUMER_SHIELD_CONDITIONAL_TYPES = new Set(['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt']);
-    const LEVEL_REJECTED_TYPES = new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt']);
-    const LEVEL_CONDITIONAL_CREDITORS = ['Lendmark','Mariner Finance','OneMain','Regional Finance','Republic Finance'];
-    const LEVEL_REJECTED_CREDITORS = ['ALLEVIATE TAX LLC','Acceptance Now','ACIMA','Advance Financial','AGCO FINANCE','STATE EMPLOYEE CREDIT UNION','STATEEMP','Aqua Finance','Bell Finance','BHG Financial','BHG Money','Bobs Discount Furniture','Bobs Finance','Bobs Furniture','Cornerstone Financial','CreditCentral','EMPOWER FCU','Enerbank','ESL Credit Union','Farmers Furniture','FRMRS FURN','Fort Worth Credit Union','Forth Worth CU','Fortera Credit Union','Garden Federal Credit Union','Golden One Credit Union','Goldman Sachs','GoodLeap','Hawaii CU','HC ROYA','HYCITE','Royal Prestige','Heights Financial','Island Finance','ISPC','Kabbage Loans','KIKOFF','Koalafi','Loan Pal','Local Government Federal Credit Union','Matco Tools Financing','Matco Fin','Military Star','Nebraska Furniture','Omni Loans','Opensky','PINNACLE FINANCIAL GROUP','Pioneer Loans','Popular Bank','Banco Popular','PowerPay','Preferred Loans','Quick Help Loans','Red River Credit','REDRIVERCR','REDSTONE Credit Union','RENT-A CENTER','RFFC FINANCIAL','Robinhood','Security Finance','STATE EMPLOYEES C U','Service Finance Company','SVCFIN','SRVFINCO','Snap On Credit','SOLAR MOSAIC','Southern Finance','Sunset Financial','Toledo Finance','Tower Loans','Unacceptable Creditors','West Creek Financial','WSECU','Yendo'];
+  // Bind amount inputs
+  document.querySelectorAll('[data-key="amount"]').forEach(n=>{
+    n.addEventListener('input',onFieldChange);
+    n.addEventListener('change',onFieldChange);
+  });
 
-    const BACKEND_CLOCKS = [
-      {
-        key: 'LEVEL',
-        label: 'Level Debt',
-        timeZone: 'America/New_York',
-        openDays: [1, 2, 3, 4, 5],
-        openHour: 9,
-        openMinute: 0,
-        closeHour: 18,
-        closeMinute: 0,
-        note: 'Level cutoff is editable here. Update if the real push cutoff changes.'
-      },
-      {
-        key: 'CONSUMER SHIELD',
-        label: 'Consumer Shield',
-        timeZone: 'America/New_York',
-        openDays: [1, 2, 3, 4, 5],
-        openHour: 9,
-        openMinute: 0,
-        closeHour: 19,
-        closeMinute: 0,
-        note: 'Consumer Shield support window is set to 9:00 AM–7:00 PM Eastern.'
-      }
-    ];
+  // Bind remove buttons
+  document.querySelectorAll('[data-remove]').forEach(btn=>{
+    btn.addEventListener('click',()=>removeRow(Number(btn.dataset.remove)));
+  });
 
-    const MAX_ROWS = 10;
+  bindCreditorSearches();
+  bindDebtTypeSearches();
+  refreshRowVisuals();
+}
 
-    const createEmptyRow = (id) => ({
-      id,
-      creditorName: '',
-      manualName: '',
-      amount: '',
-      debtType: 'Unsecured',
-      inCollections: false,
-      inLitigation: false,
-      isSecured: false,
-      paymentMade: true,
-      businessUnprofitable: false
+function refreshRowVisuals(){
+  const route=computeScenarioData().routeInfo.route;
+  state.rows.forEach((row,idx)=>{
+    const card=document.querySelector(`[data-row="${idx}"]`); if(!card) return;
+    const alerts=rowAlerts(row,route);
+    const wrap=card.querySelector('.alert-wrap');
+    card.className='row-card'+(alerts.some(a=>a.tone==='red')?' flagged-red':alerts.some(a=>a.tone==='amber')?' flagged-amber':'');
+    if(row.isSecured) card.className='row-card flagged-red';
+    if(wrap) wrap.innerHTML=alerts.map(a=>`<span class="pill ${a.tone==='red'?'pill-red':'pill-amber'}" style="font-size:10px;">${a.label}</span>`).join('');
+  });
+}
+
+async function searchCreditors(idx,query){
+  const box=document.querySelector(`[data-results-index="${idx}"]`); if(!box) return;
+  if(!query||query.trim().length<1){box.innerHTML='';box.style.display='none';return;}
+  const local=getTraditionalCreditorMatches(query);
+  try{
+    const res=await fetch(`/api/ghl-creditors?search=${encodeURIComponent(query)}`);
+    const data=await res.json();
+    const api=(data.ok&&Array.isArray(data.results))?data.results:[];
+    const merged=[]; [...local,...api].forEach(item=>{
+      const name=String(item.display_name||'').trim(); if(!name) return;
+      if(!merged.some(x=>normalizeCreditorName(x.display_name)===normalizeCreditorName(name))) merged.push(item);
     });
+    if(!merged.length){
+      box.innerHTML=`<button type="button" data-manual-index="${idx}" data-manual-value="${escapeHtml(query)}" class="w-full text-left">Use "${escapeHtml(query)}" as manual entry</button>`;
+      box.style.display='block'; bindCreditorResultClicks(); return;
+    }
+    box.innerHTML=merged.slice(0,10).map(item=>{
+      const dt=isTraditionalCardCreditor(item.display_name)?'Unsecured':mapCreditorToDebtType(item);
+      const sec=item.secured===true||item.secured==='true';
+      return `<button type="button" data-pick-index="${idx}" data-pick-name="${escapeHtml(item.display_name||'')}" data-pick-debt-type="${escapeHtml(dt)}" data-pick-secured="${sec}">
+        <div style="font-weight:700;color:var(--ft-dark);">${escapeHtml(item.display_name||'')}</div>
+        <div style="font-size:11px;color:${sec?'var(--ft-red)':'var(--ft-green-dark)'};">${escapeHtml(dt)} · ${sec?'Secured':'Unsecured'}</div>
+      </button>`;
+    }).join('');
+    box.style.display='block'; bindCreditorResultClicks();
+  }catch(e){
+    if(local.length){
+      box.innerHTML=local.map(item=>`<button type="button" data-pick-index="${idx}" data-pick-name="${escapeHtml(item.display_name||'')}" data-pick-debt-type="Unsecured" data-pick-secured="false">
+        <div style="font-weight:700;">${escapeHtml(item.display_name||'')}</div>
+        <div style="font-size:11px;color:var(--ft-green-dark);">Unsecured</div>
+      </button>`).join('');
+      box.style.display='block'; bindCreditorResultClicks();
+    } else {box.innerHTML='';box.style.display='none';}
+  }
+}
 
-    const state = {
-      selectedState: '',
-      nextRowId: 2,
-      rows: [createEmptyRow(1)]
+function searchDebtTypes(idx,query){
+  const box=document.querySelector(`[data-debt-results-index="${idx}"]`); if(!box) return;
+  const q=String(query||'').trim().toLowerCase();
+  if(!q){box.innerHTML='';box.style.display='none';return;}
+  const matches=DEBT_TYPES.filter(t=>t.toLowerCase().includes(q));
+  if(!matches.length){box.innerHTML='';box.style.display='none';return;}
+  box.innerHTML=matches.map(t=>`<button type="button" data-debt-pick-index="${idx}" data-debt-pick-value="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
+  box.style.display='block'; bindDebtTypeResultClicks();
+}
+
+function bindCreditorSearches(){
+  document.querySelectorAll('.creditor-search').forEach(n=>{
+    n.addEventListener('input',e=>{
+      const idx=Number(e.target.dataset.index); const q=e.target.value||'';
+      state.rows[idx].creditorName=q;
+      if(isTraditionalCardCreditor(q)){state.rows[idx].debtType='Unsecured';state.rows[idx].isSecured=false;}
+      searchCreditors(idx,q);
+    });
+    n.addEventListener('focus',e=>searchCreditors(Number(e.target.dataset.index),e.target.value||''));
+  });
+}
+
+function bindDebtTypeSearches(){
+  document.querySelectorAll('.debt-type-search').forEach(n=>{
+    n.addEventListener('input',e=>{
+      const idx=Number(e.target.dataset.index); state.rows[idx].debtType=e.target.value||'';
+      searchDebtTypes(idx,e.target.value||'');
+    });
+    n.addEventListener('focus',e=>searchDebtTypes(Number(e.target.dataset.index),e.target.value||''));
+  });
+}
+
+function bindCreditorResultClicks(){
+  document.querySelectorAll('[data-pick-index]').forEach(btn=>{
+    btn.onclick=()=>{
+      const idx=Number(btn.dataset.pickIndex); const name=btn.dataset.pickName||'';
+      const dt=btn.dataset.pickDebtType||'Unsecured'; const sec=btn.dataset.pickSecured==='true';
+      state.rows[idx].creditorName=name; state.rows[idx].isSecured=sec;
+      state.rows[idx].debtType=sec?(dt==='Auto Loan (Secured)'?'Auto Loan (Secured)':'Secured Loan'):isTraditionalCardCreditor(name)?'Unsecured':(dt||'Unsecured');
+      const inp=document.querySelector(`.creditor-search[data-index="${idx}"]`);
+      const box=document.querySelector(`[data-results-index="${idx}"]`);
+      if(inp) inp.value=name; if(box){box.innerHTML='';box.style.display='none';}
+      renderRows(); render();
     };
-
-    const el = (id) => document.getElementById(id);
-    const currency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
-    const pct = (value) => `${(value || 0).toFixed(1)}%`;
-
-    function numberOrZero(value) {
-      const n = parseFloat(String(value).replace(/[^0-9.]/g, ''));
-      return Number.isFinite(n) ? n : 0;
-    }
-
-    function normalizeCreditorName(value) {
-      return String(value || '')
-        .toUpperCase()
-        .replace(/&/g, ' AND ')
-        .replace(/[^A-Z0-9 ]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
-
-    function creditorMatches(input, patterns) {
-      const a = normalizeCreditorName(input);
-      if (!a) return false;
-      return patterns.some((p) => {
-        const b = normalizeCreditorName(p);
-        return a === b || a.includes(b) || b.includes(a);
-      });
-    }
-
-    function isTraditionalCardCreditor(name) {
-      return creditorMatches(name, TRADITIONAL_CREDIT_CARD_COMPANIES);
-    }
-
-    function getCreditorDisplayName(row) {
-      return row.creditorName === 'Other / Manual Entry' ? (row.manualName || 'Manual Creditor') : (row.creditorName || '');
-    }
-
-    function mapCreditorToDebtType(item) {
-      const productType = String(item?.product_type || '').toLowerCase().trim();
-      const classification = String(item?.classification || '').toLowerCase().trim();
-      const group = String(item?.creditor_group || '').toLowerCase().trim();
-      const displayName = String(item?.display_name || '').toLowerCase().trim();
-      const secured = item?.secured === true || item?.secured === 'true';
-
-      const isExplicitlySecured =
-        secured ||
-        classification === 'secured' ||
-        classification === 'secured debt';
-
-      const looksLikeAutoLoan =
-        productType.includes('auto') ||
-        productType.includes('vehicle') ||
-        productType.includes('car loan') ||
-        productType.includes('auto loan') ||
-        displayName.includes('auto loan') ||
-        group.includes('auto');
-
-      if (looksLikeAutoLoan && isExplicitlySecured) return 'Auto Loan (Secured)';
-      if (productType.includes('credit card')) return 'Unsecured';
-      if (productType.includes('personal loan')) return 'Unsecured Personal Loan';
-      if (productType.includes('line of credit')) return 'Unsecured Line of Credit';
-      if (productType.includes('medical')) return 'Medical Bill';
-      if (productType.includes('student')) return 'Private Student Loan';
-      if (productType.includes('rent')) return 'Back Rent';
-      if (productType.includes('business')) return 'Business Debt';
-      if (group.includes('repo') || productType.includes('deficiency')) return 'Repossession Deficiency';
-      if (isExplicitlySecured) return 'Secured Loan';
-      return 'Unsecured';
-    }
-
-    function escapeHtml(value = '') {
-      return String(value)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
-    }
-
-    function hideAllCreditorResults() {
-      document.querySelectorAll('.creditor-results').forEach((box) => {
-        box.innerHTML = '';
-        box.classList.add('hidden');
-      });
-    }
-
-    function hideAllDebtTypeResults() {
-      document.querySelectorAll('.debt-type-results').forEach((box) => {
-        box.innerHTML = '';
-        box.classList.add('hidden');
-      });
-    }
-
-    function getLevelStateStatus(code) {
-      if (!code) return { status: 'UNKNOWN', label: 'Unknown' };
-      if (LEVEL_BLACKOUT_STATES.has(code)) return { status: 'BLACKOUT', label: 'Black Out' };
-      if (LEVEL_RED_STATES.has(code)) return { status: 'RED', label: 'Attorney Model' };
-      if (LEVEL_GREEN_STATES.has(code)) return { status: 'GREEN', label: 'Standard Model' };
-      return { status: 'GREEN', label: 'Standard Model' };
-    }
-
-    function getConsumerShieldStateStatus(code) {
-      if (!code) return { status: 'UNKNOWN', label: 'Unknown' };
-      if (CONSUMER_SHIELD_BLACKOUT_STATES.has(code)) return { status: 'BLACKOUT', label: 'Black Out' };
-      return { status: 'GREEN', label: 'Serviceable' };
-    }
-
-    function getLevelMaxTerm(debt) {
-      if (debt < 10000) return 24;
-      if (debt < 12500) return 30;
-      if (debt < 15000) return 36;
-      if (debt < 25000) return 42;
-      if (debt < 35000) return 48;
-      if (debt < 50000) return 54;
-      return 60;
-    }
-
-    function getConsumerShieldProgramLength(totalDebt) {
-      if (totalDebt >= 4000 && totalDebt <= 4999) return 18;
-      if (totalDebt >= 5000 && totalDebt <= 8800) return 24;
-      if (totalDebt > 8800) return 36;
-      return 0;
-    }
-
-    function getConsumerShieldProgramPayment(totalDebt) {
-      if (totalDebt >= 50000) return 620;
-      if (totalDebt >= 30000) return 520;
-      if (totalDebt >= 25000) return 420;
-      if (totalDebt >= 20000) return 370;
-      if (totalDebt >= 15000) return 320;
-      if (totalDebt >= 10000) return 270;
-      if (totalDebt >= 5500) return 220;
-      if (totalDebt >= 4000) return 220;
-      return 0;
-    }
-
-    function calcDoNothing(totalDebt, apr = 0.24) {
-      const monthlyPayment = totalDebt * 0.025;
-      const monthlyRate = apr / 12;
-      if (totalDebt <= 0 || monthlyPayment <= totalDebt * monthlyRate) {
-        return { monthlyPayment: 0, totalDebt, monthsToPayoff: 0, apr, totalPayback: 0 };
-      }
-      const months = Math.max(
-        1,
-        Math.round(Math.log(monthlyPayment / (monthlyPayment - totalDebt * monthlyRate)) / Math.log(1 + monthlyRate))
-      );
-      return { monthlyPayment, totalDebt, monthsToPayoff: months, apr, totalPayback: monthlyPayment * months };
-    }
-
-    function evaluateLevelDebtRuleWarnings(rows, totalDebt, stateCode) {
-      const warnings = [];
-      if (!totalDebt) return warnings;
-
-      const debtAmountFor = (matcher) =>
-        rows.reduce((sum, row) => matcher(row) ? sum + numberOrZero(row.amount) : sum, 0);
-
-      const medicalAndRent = debtAmountFor((row) =>
-        ['Medical Bill', 'Back Rent', 'Apartment Back Rent (Collections)'].includes(row.debtType)
-      );
-      const privateStudent = debtAmountFor((row) => row.debtType === 'Private Student Loan');
-      const discoverPrivateStudent = rows.filter((row) =>
-        row.debtType === 'Private Student Loan' && normalizeCreditorName(getCreditorDisplayName(row)).includes('DISCOVER')
-      );
-      const businessDebtOpen = rows.filter((row) =>
-        row.debtType === 'Business Debt' && !row.businessUnprofitable
-      );
-
-      if ((medicalAndRent / totalDebt) > 0.50) {
-        warnings.push({
-          tone: 'red',
-          text: `Medical + back rent debt is ${pct((medicalAndRent / totalDebt) * 100)} of enrolled debt. Level guideline is less than 50%.`
-        });
-      }
-
-      if ((privateStudent / totalDebt) > 0.25) {
-        warnings.push({
-          tone: 'red',
-          text: `Private student loans are ${pct((privateStudent / totalDebt) * 100)} of enrolled debt. Level guideline is 25% max.`
-        });
-      }
-
-      if (discoverPrivateStudent.length) {
-        warnings.push({
-          tone: 'red',
-          text: 'Discover private student loans are not accepted for Level routing.'
-        });
-      }
-
-      if (stateCode === 'CA' && privateStudent > 0) {
-        warnings.push({
-          tone: 'red',
-          text: 'Private student loans are not accepted for California residents under the Level guideline set.'
-        });
-      }
-
-      if (businessDebtOpen.length) {
-        warnings.push({
-          tone: 'amber',
-          text: 'Business debt requires the business to be closed or unprofitable. Mark that condition before routing to Level.'
-        });
-      }
-
-      return warnings;
-    }
-
-    function collectFlags(rows, totalDebt, stateCode) {
-      const consumerShieldFlags = [];
-      const levelFlags = [];
-
-      if (totalDebt > 0 && totalDebt < 4000) consumerShieldFlags.push('Consumer Shield requires at least $4,000 total enrolled debt.');
-      if (stateCode && getConsumerShieldStateStatus(stateCode).status === 'BLACKOUT') consumerShieldFlags.push('Consumer Shield does not service this state.');
-      if (totalDebt > 0 && totalDebt < 7000) levelFlags.push('Level Debt requires at least $7,000 total enrolled debt.');
-
-      const discoverDebt = rows.reduce((sum, row) => normalizeCreditorName(getCreditorDisplayName(row)).includes('DISCOVER') ? sum + numberOrZero(row.amount) : sum, 0);
-      const discoverPct = totalDebt > 0 ? (discoverDebt / totalDebt) * 100 : 0;
-      const mixedSpecialDebt = rows.reduce((sum, row) => ['Medical Bill','Back Rent','Apartment Back Rent (Collections)','Repossession Deficiency','Auto Repo Deficiency'].includes(row.debtType) ? sum + numberOrZero(row.amount) : sum, 0);
-      const mixedSpecialPct = totalDebt > 0 ? (mixedSpecialDebt / totalDebt) * 100 : 0;
-      const privateStudentDebt = rows.reduce((sum, row) => row.debtType === 'Private Student Loan' ? sum + numberOrZero(row.amount) : sum, 0);
-      const privateStudentPct = totalDebt > 0 ? (privateStudentDebt / totalDebt) * 100 : 0;
-
-      if (discoverPct > 60) {
-        levelFlags.push(`Discover debt is ${pct(discoverPct)} of enrolled debt. Level guideline is 60% max.`);
-      }
-      if (mixedSpecialPct > 50) {
-        levelFlags.push(`Medical, back rent, and repo deficiency debt is ${pct(mixedSpecialPct)} of enrolled debt. Level guideline is under 50%.`);
-      }
-      if (privateStudentPct > 25) {
-        levelFlags.push(`Private student loans are ${pct(privateStudentPct)} of enrolled debt. Level guideline is 25% max.`);
-      }
-
-      rows.forEach((row) => {
-        const amount = numberOrZero(row.amount);
-        if (!amount) return;
-        const name = getCreditorDisplayName(row);
-        const normalizedName = normalizeCreditorName(name);
-        const inCollectionsLike = row.inCollections;
-
-        if (amount < 100) consumerShieldFlags.push((name || row.debtType) + ' is below Consumer Shield minimum $100 per account.');
-        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) consumerShieldFlags.push(row.debtType + ' is not accepted by Consumer Shield.');
-        if (row.debtType === 'Apartment Back Rent (Collections)' && !row.inCollections) consumerShieldFlags.push('Apartment back rent is only accepted if in collections.');
-        if (row.debtType === 'USAA' && row.isSecured) consumerShieldFlags.push('USAA is only accepted when there is no other secured debt.');
-
-        if (LEVEL_REJECTED_TYPES.has(row.debtType)) levelFlags.push(row.debtType + ' is not accepted by Level Debt.');
-        if (amount < 200 && !inCollectionsLike) levelFlags.push((name || row.debtType) + ' must be at least $200 unless already in collections or charged off.');
-        if (!row.paymentMade) levelFlags.push((name || row.debtType) + ' must have at least one payment made before Level enrollment.');
-        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) levelFlags.push(name + ' is on the Level rejected creditor list.');
-        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) levelFlags.push(name + ' is secured. Level only allows this if the client agrees to lose the collateral.');
-        if (row.inLitigation) levelFlags.push((name || row.debtType) + ' is in litigation and requires legal review before routing.');
-        if (row.debtType === 'Business Debt' && !row.businessUnprofitable) levelFlags.push((name || row.debtType) + ' requires the business to be closed or not profitable.');
-        if (row.debtType === 'Private Student Loan' && stateCode === 'CA') levelFlags.push('Private student loans are not accepted for California residents.');
-        if (row.debtType === 'Private Student Loan' && normalizedName.includes('DISCOVER')) levelFlags.push('Discover private student loans are not accepted.');
-      });
-
-      return {
-        consumerShield: Array.from(new Set(consumerShieldFlags)),
-        level: Array.from(new Set(levelFlags))
-      };
-    }
-
-    function chooseRoute(totalDebt, stateCode, flags) {
-      if (!stateCode) return { route: '', reason: 'Select a state to calculate routing.' };
-
-      const csStatus = getConsumerShieldStateStatus(stateCode);
-      const levelStatus = getLevelStateStatus(stateCode);
-
-      const csEligible = csStatus.status !== 'BLACKOUT' && !flags.consumerShield.some((f) => f.includes('not accepted') || f.includes('requires at least'));
-      const levelHardStops = flags.level.some((f) =>
-        f.includes('not accepted') ||
-        f.includes('requires at least') ||
-        f.includes('60% max') ||
-        f.includes('25% max') ||
-        f.includes('not accepted for California residents') ||
-        f.includes('Discover private student loans are not accepted')
-      );
-      const levelEligible = levelStatus.status !== 'BLACKOUT' && !levelHardStops;
-
-      if (totalDebt > 0 && totalDebt < 7000) {
-        if (csEligible) {
-          return { route: 'CONSUMER SHIELD', reason: 'Debt below $7,000 routes to Consumer Shield when the state and account profile are serviceable.' };
-        }
-        return { route: 'NO OPTION', reason: 'Debt is below $7,000 and Consumer Shield is not serviceable or eligible for this deal.' };
-      }
-
-      if (levelEligible) {
-        return {
-          route: 'LEVEL',
-          reason: levelStatus.status === 'RED'
-            ? 'Best option is Level Debt under the attorney model in this state.'
-            : 'Best option is Level Debt in this serviceable non-attorney state.'
-        };
-      }
-
-      if (csEligible) {
-        return {
-          route: 'CONSUMER SHIELD',
-          reason: 'Consumer Shield remains available for this state and debt profile.'
-        };
-      }
-
-      return { route: 'NO OPTION', reason: 'No available backend is serviceable in this state.' };
-    }
-
-    function computeScenarioData() {
-      const rows = state.rows.filter((r) => numberOrZero(r.amount) > 0);
-      const totalDebt = rows.reduce((sum, row) => sum + numberOrZero(row.amount), 0);
-      const flags = collectFlags(rows, totalDebt, state.selectedState);
-      const levelRuleWarnings = evaluateLevelDebtRuleWarnings(rows, totalDebt, state.selectedState);
-      const routeInfo = chooseRoute(totalDebt, state.selectedState, flags);
-
-      const levelState = getLevelStateStatus(state.selectedState);
-      const csState = getConsumerShieldStateStatus(state.selectedState);
-
-      const feeRate =
-        routeInfo.route === 'LEVEL' ? (levelState.status === 'RED' ? 0.27 : 0.25) :
-        routeInfo.route === 'CONSUMER SHIELD' ? 0.00 :
-        0;
-
-      const repCommissionRate = routeInfo.route === 'LEVEL' ? 0.01 : 0;
-      const repCommission = totalDebt * repCommissionRate;
-      const doNothing = calcDoNothing(totalDebt);
-
-      let shortest = null;
-      let recommended = null;
-
-      if (routeInfo.route === 'LEVEL') {
-        const totalCost = totalDebt * 0.50 + totalDebt * feeRate;
-        shortest = { term: 12, totalCost, monthlyPayment: totalCost / 12 };
-        const maxTerm = getLevelMaxTerm(totalDebt);
-        recommended = { term: maxTerm, totalCost, monthlyPayment: totalCost / maxTerm };
-      } else if (routeInfo.route === 'CONSUMER SHIELD') {
-        const term = getConsumerShieldProgramLength(totalDebt);
-        const monthlyPayment = getConsumerShieldProgramPayment(totalDebt);
-        const totalCost = term * monthlyPayment;
-        shortest = { term, totalCost, monthlyPayment };
-        recommended = { term, totalCost, monthlyPayment };
-      }
-
-      const programs = {
-        consumerShield: {
-          name: 'Consumer Shield',
-          available: csState.status !== 'BLACKOUT' && totalDebt >= 4000,
-          term: getConsumerShieldProgramLength(totalDebt),
-          monthlyPayment: getConsumerShieldProgramPayment(totalDebt),
-          benefits: [
-            'Structured monthly plan',
-            'Credit monitoring support',
-            'Credit-building support tools',
-            'Additional client protection resources'
-          ]
-        },
-        level: {
-          name: 'Level Debt',
-          available: levelState.status !== 'BLACKOUT' && totalDebt >= 7000,
-          term: totalDebt > 0 ? getLevelMaxTerm(totalDebt) : 0,
-          monthlyPayment: totalDebt > 0
-            ? ((totalDebt * 0.50) + (totalDebt * (levelState.status === 'RED' ? 0.27 : 0.25))) / getLevelMaxTerm(totalDebt)
-            : 0,
-          benefits: [
-            'Longer-term payment flexibility',
-            'Affordability-focused structure',
-            'Lower monthly burden potential',
-            'Budget breathing room'
-          ]
-        }
-      };
-
-      const activeFlags = [];
-      if (routeInfo.route === 'LEVEL') activeFlags.push(...flags.level);
-      if (routeInfo.route === 'CONSUMER SHIELD') activeFlags.push(...flags.consumerShield);
-      if (routeInfo.route === 'NO OPTION') activeFlags.push(routeInfo.reason);
-
-      if (routeInfo.route === 'CONSUMER SHIELD') {
-        activeFlags.push('Consumer Shield support is Monday through Friday, 9am to 7pm EST.');
-        activeFlags.push('Consumer Shield will not send communications after 8pm in the contact local time unless already a client.');
-        activeFlags.push('Consumer Shield uses Equifax for credit pull.');
-      }
-
-      return {
-        rows,
-        totalDebt,
-        routeInfo,
-        doNothing,
-        shortest,
-        recommended,
-        feeRate,
-        repCommissionRate,
-        repCommission,
-        levelState,
-        csState,
-        programs,
-        flags: Array.from(new Set(activeFlags)),
-        levelRuleWarnings
-      };
-    }
-
-    function rowAlerts(row, route) {
-      const alerts = [];
-      const name = getCreditorDisplayName(row);
-
-      if (route === 'LEVEL') {
-        if (creditorMatches(name, LEVEL_REJECTED_CREDITORS)) alerts.push({ label: 'Not accepted by Level', tone: 'red' });
-        if (creditorMatches(name, LEVEL_CONDITIONAL_CREDITORS) && row.isSecured) alerts.push({ label: 'Secured / collateral risk', tone: 'amber' });
-        if (LEVEL_REJECTED_TYPES.has(row.debtType)) alerts.push({ label: 'Debt type not accepted', tone: 'red' });
-      }
-
-      if (route === 'CONSUMER SHIELD') {
-        if (CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) alerts.push({ label: 'Not accepted by Consumer Shield', tone: 'red' });
-        if (CONSUMER_SHIELD_CONDITIONAL_TYPES.has(row.debtType)) alerts.push({ label: 'Conditional / docs needed', tone: 'amber' });
-      }
-
-      return alerts;
-    }
-
-    function startSystemClock() {
-
-      if (window.__ftSystemClockInterval) clearInterval(window.__ftSystemClockInterval);
-      window.__ftSystemClockInterval = setInterval(renderSystemClock, 1000);
-    }
-
-    function getTimePartsInZone(timeZone) {
-      const now = new Date();
-      const formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone,
-        weekday: 'short',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      });
-
-      const parts = formatter.formatToParts(now);
-      const map = {};
-      parts.forEach((p) => {
-        if (p.type !== 'literal') map[p.type] = p.value;
-      });
-
-      const weekdayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-
-      return {
-        year: Number(map.year),
-        month: Number(map.month),
-        day: Number(map.day),
-        hour: Number(map.hour),
-        minute: Number(map.minute),
-        second: Number(map.second),
-        weekdayShort: map.weekday,
-        weekday: weekdayMap[map.weekday]
-      };
-    }
-
-    function formatTimeInZone(timeZone) {
-      return new Intl.DateTimeFormat('en-US', {
-        timeZone,
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-      }).format(new Date());
-    }
-
-    function getBackendClockStatus(config) {
-      const parts = getTimePartsInZone(config.timeZone);
-      const currentMinutes = parts.hour * 60 + parts.minute;
-      const openMinutes = (config.openHour * 60) + config.openMinute;
-      const closeMinutes = (config.closeHour * 60) + config.closeMinute;
-
-      const isOpenDay = config.openDays.includes(parts.weekday);
-      const isOpenNow = isOpenDay && currentMinutes >= openMinutes && currentMinutes < closeMinutes;
-
-      const minutesUntilClose = closeMinutes - currentMinutes;
-      const minutesUntilOpen = openMinutes - currentMinutes;
-
-      let badgeClass = 'closed';
-      let badgeText = 'Closed / Too Late To Push';
-      let subText = `Open ${String(config.openHour).padStart(2, '0')}:${String(config.openMinute).padStart(2, '0')} to ${String(config.closeHour).padStart(2, '0')}:${String(config.closeMinute).padStart(2, '0')} ET`;
-
-      if (isOpenNow) {
-        if (minutesUntilClose <= 60) {
-          badgeClass = 'soon';
-          badgeText = `Open Now • Closes In ${minutesUntilClose} Min`;
-        } else {
-          badgeClass = 'open';
-          badgeText = 'Open Now • Safe To Push';
-        }
-      } else if (isOpenDay && currentMinutes < openMinutes) {
-        badgeClass = 'closed';
-        badgeText = `Closed • Opens In ${minutesUntilOpen} Min`;
-      } else if (!isOpenDay) {
-        badgeClass = 'closed';
-        badgeText = 'Closed Today';
-      }
-
-      return {
-        nowLabel: formatTimeInZone(config.timeZone),
-        badgeClass,
-        badgeText,
-        subText
-      };
-    }
-
-    function renderBackendClock() {
-      const box = el('backendClockBox');
-      if (!box) return;
-
-      box.innerHTML = BACKEND_CLOCKS.map((backend) => {
-        const status = getBackendClockStatus(backend);
-        const logoSrc = ROUTE_LOGOS[backend.key] || '';
-        let supportLink = '';
-        if (backend.key === 'CONSUMER SHIELD') {
-          supportLink = `
-            <a
-              href="https://teams.live.com/l/invite/FBA2mu0C9EQERh1bQ8"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="support-btn snapshot-support border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100"
-            >
-              Chat Support
-            </a>
-          `;
-        }
-
-        if (backend.key === 'LEVEL') {
-          supportLink = `
-            <a
-              href="https://funding-tier.slack.com/archives/C0AMBM9EBNV"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="support-btn snapshot-support border border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100"
-            >
-              Chat Support
-            </a>
-          `;
-        }
-
-        return `
-          <div class="snapshot-row">
-            <div class="provider-logo-wrap compact">${logoSrc ? `<img class="provider-logo" src="${logoSrc}" alt="${backend.key} logo">` : ''}</div>
-            <div class="snapshot-meta">
-              <div class="snapshot-name">${backend.label}</div>
-              <div class="snapshot-time">${status.nowLabel}</div>
-            </div>
-            <div class="clock-status ${status.badgeClass}">${status.badgeText}</div>
-            ${supportLink}
-          </div>
-        `;
-      }).join('');
-    }
-
-
-    function renderDiscoverInlineWarning(index) {
-      const activeRows = state.rows.filter((r) => numberOrZero(r.amount) > 0);
-      const totalDebt = activeRows.reduce((sum, row) => sum + numberOrZero(row.amount), 0);
-      if (!totalDebt) return '';
-
-      const discoverDebt = activeRows.reduce((sum, row) => {
-        return normalizeCreditorName(getCreditorDisplayName(row)).includes('DISCOVER')
-          ? sum + numberOrZero(row.amount)
-          : sum;
-      }, 0);
-
-      const discoverPct = totalDebt > 0 ? (discoverDebt / totalDebt) * 100 : 0;
-      const currentRow = state.rows[index];
-      const isDiscoverRow = normalizeCreditorName(getCreditorDisplayName(currentRow)).includes('DISCOVER');
-
-      if (!isDiscoverRow || discoverPct <= 60) return '';
-
-      return `<div class="pt-1 text-[11px] font-semibold text-red-600">Discover debt guideline exceeded — ${pct(discoverPct)} of total enrolled debt.</div>`;
-    }
-
-    function getTraditionalCreditorMatches(query) {
-      const q = String(query || '').trim().toLowerCase();
-      if (!q) return [];
-      return TRADITIONAL_CREDIT_CARD_COMPANIES
-        .filter((name) => name.toLowerCase().includes(q))
-        .slice(0, 8)
-        .map((name) => ({
-          display_name: name,
-          secured: false,
-          eligible_for_enrollment: 'yes',
-          product_type: 'credit card',
-          classification: 'unsecured',
-          creditor_group: 'credit card'
-        }));
-    }
-
-    function renderRows() {
-      const totalDebt = state.rows.reduce((sum, r) => sum + numberOrZero(r.amount), 0);
-      const canAddMore = state.rows.length < MAX_ROWS;
-
-      el('rows').innerHTML = state.rows.map((row, index) => {
-        const rowPercent = totalDebt > 0 ? pct((numberOrZero(row.amount) / totalDebt) * 100) : '0.0%';
-        const removeVisible = state.rows.length > 1;
-
-        return `
-          <div class="row-card border rounded-2xl p-3 md:p-3 border-slate-100 bg-white" data-row="${index}">
-            <div class="grid gap-3 md:grid-cols-[1.55fr,0.62fr,1fr,0.22fr] items-start">
-              <div class="space-y-2 relative">
-                <div class="mobile-label md:hidden">Creditor Name</div>
-                <input
-                  class="input creditor-search"
-                  data-index="${index}"
-                  placeholder="Start typing creditor name..."
-                  value="${escapeHtml(row.creditorName || '')}"
-                  autocomplete="off"
-                />
-                <div
-                  class="creditor-results hidden absolute left-0 right-0 z-30 mt-1 rounded-xl border border-slate-200 bg-white shadow-lg max-h-64 overflow-y-auto"
-                  data-results-index="${index}"
-                ></div>
-                ${renderDiscoverInlineWarning(index)}
-                <div class="alert-wrap flex flex-wrap gap-2 pt-1"></div>
-              </div>
-
-              <div title="${rowPercent} of total enrolled debt">
-                <div class="mobile-label md:hidden">Debt Amount</div>
-                <input
-                  class="input"
-                  data-index="${index}"
-                  data-key="amount"
-                  placeholder="$0"
-                  value="${row.amount || ''}"
-                  title="${rowPercent} of total enrolled debt"
-                />
-              </div>
-
-              <div class="relative">
-                <div class="mobile-label md:hidden">Debt Type</div>
-                <input
-                  class="input debt-type-search ${row.isSecured ? 'border-red-500 bg-red-600 text-white font-semibold' : ''}"
-                  data-index="${index}"
-                  placeholder="Start typing debt type..."
-                  value="${escapeHtml(row.debtType || '')}"
-                  autocomplete="off"
-                />
-                <div
-                  class="debt-type-results hidden absolute left-0 right-0 z-30 mt-1 rounded-xl border border-slate-200 bg-white shadow-lg max-h-64 overflow-y-auto"
-                  data-debt-results-index="${index}"
-                ></div>
-              </div>
-
-              <div class="flex items-start md:justify-center">
-                ${removeVisible ? `
-                  <button
-                    type="button"
-                    class="w-full md:w-10 min-h-[42px] rounded-xl border border-red-200 bg-red-50 text-red-700 font-bold hover:bg-red-100"
-                    data-remove-row="${index}"
-                    title="Remove row"
-                  >
-                    −
-                  </button>
-                ` : `<div class="hidden md:block"></div>`}
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      document.querySelectorAll('#rows [data-key="amount"]').forEach((node) => {
-        node.addEventListener('input', onFieldChange);
-        node.addEventListener('change', onFieldChange);
-      });
-
-      document.querySelectorAll('[data-remove-row]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const index = Number(btn.dataset.removeRow);
-          removeRow(index);
-        });
-      });
-
-      const addBtn = el('addCreditorBtn');
-      if (addBtn) {
-        addBtn.style.display = canAddMore ? 'flex' : 'none';
-      }
-
-      bindCreditorSearches();
-      bindDebtTypeSearches();
-      refreshRowVisuals();
-    }
-
-    async function searchCreditors(index, query) {
-      const resultsBox = document.querySelector(`[data-results-index="${index}"]`);
-      if (!resultsBox) return;
-
-      if (!query || query.trim().length < 1) {
-        resultsBox.innerHTML = '';
-        resultsBox.classList.add('hidden');
-        return;
-      }
-
-      const localMatches = getTraditionalCreditorMatches(query);
-
-      try {
-        const res = await fetch(`/api/ghl-creditors?search=${encodeURIComponent(query)}`);
-        const data = await res.json();
-
-        const apiResults = (data.ok && Array.isArray(data.results)) ? data.results : [];
-        const merged = [];
-
-        [...localMatches, ...apiResults].forEach((item) => {
-          const name = String(item.display_name || '').trim();
-          if (!name) return;
-          const exists = merged.some((x) => normalizeCreditorName(x.display_name) === normalizeCreditorName(name));
-          if (!exists) merged.push(item);
-        });
-
-        if (!merged.length) {
-          resultsBox.innerHTML = `
-            <button
-              type="button"
-              class="block w-full text-left px-3 py-2 text-sm hover:bg-slate-50"
-              data-manual-index="${index}"
-              data-manual-value="${escapeHtml(query)}"
-            >
-              Use "${escapeHtml(query)}" as manual entry
-            </button>
-          `;
-          resultsBox.classList.remove('hidden');
-          bindCreditorResultClicks();
-          return;
-        }
-
-        resultsBox.innerHTML = merged.slice(0, 12).map((item) => {
-          const debtType = isTraditionalCardCreditor(item.display_name)
-            ? 'Unsecured'
-            : mapCreditorToDebtType(item);
-
-          const isSecured = item.secured === true || item.secured === 'true';
-          const unsecured = !isSecured;
-          const eligible = String(item.eligible_for_enrollment || '').toLowerCase() === 'yes' || isTraditionalCardCreditor(item.display_name);
-
-          return `
-            <button
-              type="button"
-              class="block w-full text-left px-3 py-2 text-sm hover:bg-slate-50 border-b last:border-b-0"
-              data-pick-index="${index}"
-              data-pick-name="${escapeHtml(item.display_name || '')}"
-              data-pick-debt-type="${escapeHtml(debtType)}"
-              data-pick-secured="${isSecured ? 'true' : 'false'}"
-            >
-              <div class="font-medium">${escapeHtml(item.display_name || '')}</div>
-              <div class="text-xs ${unsecured ? 'text-teal-700' : 'text-red-500'}">
-                ${escapeHtml(debtType)}
-                ${unsecured ? ' • Unsecured' : ' • Secured'}
-                ${eligible ? '' : ' • Review'}
-              </div>
-            </button>
-          `;
-        }).join('');
-
-        resultsBox.classList.remove('hidden');
-        bindCreditorResultClicks();
-      } catch (err) {
-        console.error('Creditor search failed:', err);
-
-        if (localMatches.length) {
-          resultsBox.innerHTML = localMatches.map((item) => `
-            <button
-              type="button"
-              class="block w-full text-left px-3 py-2 text-sm hover:bg-slate-50 border-b last:border-b-0"
-              data-pick-index="${index}"
-              data-pick-name="${escapeHtml(item.display_name || '')}"
-              data-pick-debt-type="Unsecured"
-              data-pick-secured="false"
-            >
-              <div class="font-medium">${escapeHtml(item.display_name || '')}</div>
-              <div class="text-xs text-teal-700">Unsecured</div>
-            </button>
-          `).join('');
-          resultsBox.classList.remove('hidden');
-          bindCreditorResultClicks();
-        } else {
-          resultsBox.innerHTML = '';
-          resultsBox.classList.add('hidden');
-        }
-      }
-    }
-
-    function searchDebtTypes(index, query) {
-      const resultsBox = document.querySelector(`[data-debt-results-index="${index}"]`);
-      if (!resultsBox) return;
-
-      const q = String(query || '').trim().toLowerCase();
-
-      if (!q) {
-        resultsBox.innerHTML = '';
-        resultsBox.classList.add('hidden');
-        return;
-      }
-
-      const matches = DEBT_TYPES_ALPHA.filter((type) =>
-        type.toLowerCase().includes(q)
-      );
-
-      if (!matches.length) {
-        resultsBox.innerHTML = '';
-        resultsBox.classList.add('hidden');
-        return;
-      }
-
-      resultsBox.innerHTML = matches.map((type) => `
-        <button
-          type="button"
-          class="block w-full text-left px-3 py-2 text-sm hover:bg-slate-50 border-b last:border-b-0"
-          data-debt-pick-index="${index}"
-          data-debt-pick-value="${escapeHtml(type)}"
-        >
-          ${escapeHtml(type)}
-        </button>
-      `).join('');
-
-      resultsBox.classList.remove('hidden');
-      bindDebtTypeResultClicks();
-    }
-
-    function bindDebtTypeSearches() {
-      document.querySelectorAll('.debt-type-search').forEach((node) => {
-        node.addEventListener('input', (e) => {
-          const index = Number(e.target.dataset.index);
-          const query = e.target.value || '';
-          state.rows[index].debtType = query;
-          searchDebtTypes(index, query);
-        });
-
-        node.addEventListener('focus', (e) => {
-          const index = Number(e.target.dataset.index);
-          const query = e.target.value || '';
-          searchDebtTypes(index, query);
-        });
-      });
-    }
-
-    function bindDebtTypeResultClicks() {
-      document.querySelectorAll('[data-debt-pick-index]').forEach((btn) => {
-        btn.onclick = () => {
-          const index = Number(btn.dataset.debtPickIndex);
-          const value = btn.dataset.debtPickValue || '';
-
-          state.rows[index].debtType = value;
-
-          const input = document.querySelector(`.debt-type-search[data-index="${index}"]`);
-          const resultsBox = document.querySelector(`[data-debt-results-index="${index}"]`);
-
-          if (input) input.value = value;
-          if (resultsBox) {
-            resultsBox.innerHTML = '';
-            resultsBox.classList.add('hidden');
-          }
-
-          if (value === 'Secured Loan' || value === 'Auto Loan (Secured)') {
-            state.rows[index].isSecured = true;
-          }
-
-          renderRows();
-          render();
-        };
-      });
-    }
-
-    function bindCreditorSearches() {
-      document.querySelectorAll('.creditor-search').forEach((node) => {
-        node.addEventListener('input', (e) => {
-          const index = Number(e.target.dataset.index);
-          const query = e.target.value || '';
-          state.rows[index].creditorName = query;
-
-          if (isTraditionalCardCreditor(query)) {
-            state.rows[index].debtType = 'Unsecured';
-            state.rows[index].isSecured = false;
-          }
-
-          searchCreditors(index, query);
-        });
-
-        node.addEventListener('focus', (e) => {
-          const index = Number(e.target.dataset.index);
-          const query = e.target.value || '';
-          searchCreditors(index, query);
-        });
-      });
-    }
-
-    function bindCreditorResultClicks() {
-      document.querySelectorAll('[data-pick-index]').forEach((btn) => {
-        btn.onclick = () => {
-          const index = Number(btn.dataset.pickIndex);
-          const name = btn.dataset.pickName || '';
-          const debtType = btn.dataset.pickDebtType || 'Unsecured';
-          const secured = btn.dataset.pickSecured === 'true';
-
-          state.rows[index].creditorName = name;
-          state.rows[index].isSecured = secured;
-
-          if (secured) {
-            state.rows[index].debtType = debtType === 'Auto Loan (Secured)' ? 'Auto Loan (Secured)' : 'Secured Loan';
-          } else {
-            state.rows[index].debtType = isTraditionalCardCreditor(name) ? 'Unsecured' : (debtType || 'Unsecured');
-          }
-
-          const input = document.querySelector(`.creditor-search[data-index="${index}"]`);
-          const resultsBox = document.querySelector(`[data-results-index="${index}"]`);
-
-          if (input) input.value = name;
-          if (resultsBox) {
-            resultsBox.innerHTML = '';
-            resultsBox.classList.add('hidden');
-          }
-
-          renderRows();
-          render();
-        };
-      });
-
-      document.querySelectorAll('[data-manual-index]').forEach((btn) => {
-        btn.onclick = () => {
-          const index = Number(btn.dataset.manualIndex);
-          const value = btn.dataset.manualValue || '';
-
-          state.rows[index].creditorName = value;
-          state.rows[index].debtType = isTraditionalCardCreditor(value) ? 'Unsecured' : 'Unsecured';
-          state.rows[index].isSecured = false;
-
-          const input = document.querySelector(`.creditor-search[data-index="${index}"]`);
-          const resultsBox = document.querySelector(`[data-results-index="${index}"]`);
-
-          if (input) input.value = value;
-          if (resultsBox) {
-            resultsBox.innerHTML = '';
-            resultsBox.classList.add('hidden');
-          }
-
-          renderRows();
-          render();
-        };
-      });
-    }
-
-    function refreshRowVisuals() {
-      const route = computeScenarioData().routeInfo.route;
-      state.rows.forEach((row, index) => {
-        const card = document.querySelector(`[data-row="${index}"]`);
-        if (!card) return;
-        const alerts = rowAlerts(row, route);
-        const wrap = card.querySelector('.alert-wrap');
-
-        let bg =
-          alerts.some((a) => a.tone === 'red') ? 'border-red-300 bg-red-50' :
-          alerts.some((a) => a.tone === 'amber') ? 'border-amber-300 bg-amber-50' :
-          'border-slate-100 bg-white';
-
-        if (row.isSecured) {
-          bg = 'border-red-400 bg-red-50';
-        }
-
-        card.className = `row-card border rounded-2xl p-3 md:p-3 ${bg}`;
-
-        if (wrap) {
-          wrap.innerHTML = alerts.map((a) =>
-            `<span class="rounded-full border px-2 py-1 text-[11px] font-medium ${
-              a.tone === 'red'
-                ? 'bg-red-100 text-red-700 border-red-200'
-                : 'bg-amber-100 text-amber-800 border-amber-200'
-            }">${a.label}</span>`
-          ).join('');
-        }
-      });
-    }
-
-
-    function renderComparison(c) {
-      const totalPaybackRed = `<span style="color:#DC2626;font-weight:800;">${currency(c.doNothing.totalPayback)}</span>`;
-
-      const rows = [
-        ['Monthly Payments', currency(c.doNothing.monthlyPayment), c.shortest ? currency(c.shortest.monthlyPayment) : '—', c.recommended ? currency(c.recommended.monthlyPayment) : '—'],
-        ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.totalDebt) : '—'],
-        ['Months to Payoff', `${c.doNothing.monthsToPayoff} months`, c.shortest ? `${c.shortest.term} months` : '—', c.recommended ? `${c.recommended.term} months` : '—'],
-        ['Estimated Int Rate', `${(c.doNothing.apr * 100).toFixed(0)}% APR`, c.shortest ? '0%' : '—', c.recommended ? '0%' : '—'],
-        ['Estimated Total Payback*', totalPaybackRed, c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
-        ['Estimated Savings', '—', c.shortest ? `<span class="font-extrabold text-white">${currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost))}</span>` : '—', c.recommended ? `<span class="text-white font-black text-[20px]">${currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost))}</span>` : '—']
-      ];
-
-      el('comparisonTable').innerHTML = rows.map((r, idx) => {
-        const savingsRow = idx === 5;
-        return `
-          <tr class="${savingsRow ? 'bg-teal-600 savings-glow' : (idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50')}">
-            <td class="border-b px-4 py-4 text-sm font-medium ${savingsRow ? 'text-white' : 'text-slate-600'}">${r[0]}</td>
-            <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[1]}</td>
-            <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[2]}</td>
-            <td class="border-b px-4 py-4 text-sm font-semibold ${savingsRow ? 'text-white' : 'text-slate-900'}">${r[3]}</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function renderPricingComparison(c) {
-      const cards = [];
-
-      if (c.programs.consumerShield.available) {
-        cards.push(`
-          <div class="plan-card">
-            <div class="program-header">
-              <div class="program-brand">
-                <div class="provider-logo-wrap"><img class="provider-logo" src="${ROUTE_LOGOS['CONSUMER SHIELD']}" alt="Consumer Shield logo" /></div>
-                <div class="program-brand-name">Consumer Shield</div>
-              </div>
-              <span class="plan-chip" style="background:rgba(15,118,110,0.10); color:#0f766e;">Available</span>
-            </div>
-            <div class="mt-4 grid grid-cols-2 gap-4">
-              <div><div class="plan-label">Program Length</div><div class="plan-value">${c.programs.consumerShield.term ? c.programs.consumerShield.term + ' mo' : '—'}</div></div>
-              <div><div class="plan-label">Monthly Payment</div><div class="plan-value">${c.programs.consumerShield.monthlyPayment ? currency(c.programs.consumerShield.monthlyPayment) : '—'}</div></div>
-            </div>
-            <div class="mini-list">${c.programs.consumerShield.benefits.map((b) => `<div>• ${b}</div>`).join('')}</div>
-          </div>
-        `);
-      }
-
-      if (c.programs.level.available) {
-        cards.push(`
-          <div class="plan-card">
-            <div class="program-header">
-              <div class="program-brand">
-                <div class="provider-logo-wrap"><img class="provider-logo" src="${ROUTE_LOGOS['LEVEL']}" alt="Level Debt logo" /></div>
-                <div class="program-brand-name">Level Debt</div>
-              </div>
-              <span class="plan-chip" style="background:rgba(0,150,136,0.10); color:#009688;">Available</span>
-            </div>
-            <div class="mt-4 grid grid-cols-2 gap-4">
-              <div><div class="plan-label">Program Length</div><div class="plan-value">${c.programs.level.term ? c.programs.level.term + ' mo' : '—'}</div></div>
-              <div><div class="plan-label">Monthly Payment</div><div class="plan-value">${c.programs.level.monthlyPayment ? currency(c.programs.level.monthlyPayment) : '—'}</div></div>
-            </div>
-            <div class="mini-list">${c.programs.level.benefits.map((b) => `<div>• ${b}</div>`).join('')}</div>
-          </div>
-        `);
-      }
-
-      el('pricingComparison').innerHTML = cards.length
-        ? cards.join('')
-        : '<div class="unavailable-box lg:col-span-2">SERVICE NOT AVAILABLE / NO PROGRAM OPTIONS MATCH THIS STATE AND DEBT SCENARIO</div>';
-
-      el('pricingDifferences').innerHTML = `
-        <div class="diff-box">
-          <h3 class="text-lg font-semibold mb-3">How the Options Differ</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full pricing-compare-table text-sm text-slate-700 bg-white">
-              <thead>
-                <tr class="bg-slate-100">
-                  <th>Program Features</th>
-                  <th>Consumer Shield</th>
-                  <th>Level Debt</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="font-semibold">Primary fit</td>
-                  <td>Often used when debt is below $7,000 and the state is serviceable.</td>
-                  <td>Primary recommended backend when serviceable and debt qualifies.</td>
-                </tr>
-                <tr>
-                  <td class="font-semibold">Monthly payment feel</td>
-                  <td>Tier-based and more fixed.</td>
-                  <td>Often more flexible with longer term options.</td>
-                </tr>
-                <tr>
-                  <td class="font-semibold">Typical advantage</td>
-                  <td>Useful option for smaller debt amounts.</td>
-                  <td>Usually the strongest affordability and economics combination.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderProviderLogo(route) {
-      const src = ROUTE_LOGOS[route];
-      if (!src) {
-        el('providerLogoBox').innerHTML = '';
-        return;
-      }
-      el('providerLogoBox').innerHTML = `<div class="provider-logo-wrap compact"><img class="provider-logo" src="${src}" alt="${route} logo" /></div>`;
-    }
-
-    function buildProviderAvailability(c) {
-      const providers = [
-        {
-          key: 'LEVEL',
-          name: 'Level Debt',
-          model: c.levelState.label,
-          available: c.programs.level.available,
-          best: c.routeInfo.route === 'LEVEL'
-        },
-        {
-          key: 'CONSUMER SHIELD',
-          name: 'Consumer Shield',
-          model: c.csState.label,
-          available: c.programs.consumerShield.available,
-          best: c.routeInfo.route === 'CONSUMER SHIELD'
-        }
-      ];
-
-      return providers.map((p) => {
-        const black = !p.available;
-        const statusText = p.best ? 'Best Option' : black ? 'Not Serviceable' : 'Available';
-        const logoSrc = ROUTE_LOGOS[p.key] || '';
-        return `
-          <div class="snapshot-row">
-            <div class="provider-logo-wrap compact">${logoSrc ? `<img class="provider-logo" src="${logoSrc}" alt="${p.name} logo">` : ''}</div>
-            <div class="snapshot-meta">
-              <div class="snapshot-name">${p.name}</div>
-              <div class="snapshot-time">${p.model}</div>
-            </div>
-            <div class="clock-status ${black ? 'closed' : (p.best ? 'open' : 'soon')}">${statusText}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderMetrics(c) {
-      el('metricsGrid').innerHTML = `
-        <div class="rounded-xl bg-white border border-teal-100 p-3">
-          <div class="text-xs uppercase tracking-wide text-slate-500">Fee Rate</div>
-          <div class="mt-1 text-base font-semibold">${(c.feeRate * 100).toFixed(0)}%</div>
-        </div>
-        <div class="rounded-xl bg-white border border-teal-100 p-3">
-          <div class="text-xs uppercase tracking-wide text-slate-500">Rep Commission</div>
-          <div class="mt-1 text-base font-semibold">${(c.repCommissionRate * 100).toFixed(0)}% • ${currency(c.repCommission)}</div>
-        </div>
-      `;
-    }
-
-    function renderBadges(c) {
-      const stateCode = state.selectedState || '—';
-      const stateFull = state.selectedState ? STATE_NAMES[state.selectedState] : 'No state selected';
-      const isRed = c.routeInfo.route === 'LEVEL' ? c.levelState.status === 'RED' : false;
-
-      const tierColor = isRed ? '#DC2626' : '#16A34A';
-      const tierBg = isRed ? '#FEF2F2' : '#ECFDF5';
-
-      let second = '';
-      if (c.routeInfo.route === 'CONSUMER SHIELD') {
-        second = `<span class="pill border border-teal-300 bg-teal-50 text-teal-700">Consumer Shield: ${c.csState.label}</span>`;
-      } else if (c.routeInfo.route === 'LEVEL') {
-        second = `<span class="pill border" style="border-color:${tierColor}; color:${tierColor}; background:${tierBg}">Level: ${c.levelState.label}</span>`;
-      }
-
-      el('topBadges').innerHTML = `
-        <span title="${stateFull}" class="pill border border-slate-300 bg-white cursor-help">State: ${stateCode}</span>
-        ${second}
-      `;
-    }
-
-    function renderFlags(c) {
-      el('flags').innerHTML = c.flags.map((flag) => `
-        <div class="flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">⚠️ <span>${flag}</span></div>
-      `).join('');
-    }
-
-    function renderLevelRuleWarnings(c) {
-      const box = el('levelRuleWarnings');
-      if (!box) return;
-      if (!c.levelRuleWarnings || !c.levelRuleWarnings.length) {
-        box.innerHTML = '';
-        return;
-      }
-      box.innerHTML = `
-        <div class="rounded-xl border border-red-200 bg-red-50 p-3">
-          <div class="text-sm font-semibold text-red-800">Level Debt Rule Warnings</div>
-          <div class="mt-2 space-y-2">
-            ${c.levelRuleWarnings.map((item) => `
-              <div class="text-sm ${item.tone === 'red' ? 'text-red-700' : 'text-amber-800'}">• ${item.text}</div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-
-    function updateSummaryStrip(c) {
-      const discoverDebt = c.rows.reduce((sum, row) => {
-        const name = getCreditorDisplayName(row);
-        return normalizeCreditorName(name).includes('DISCOVER') ? sum + numberOrZero(row.amount) : sum;
-      }, 0);
-      const discoverPct = c.totalDebt > 0 ? (discoverDebt / c.totalDebt) * 100 : 0;
-    }
-
-    function render() {
-      const c = computeScenarioData();
-      el('totalDebt').textContent = currency(c.totalDebt);
-      refreshRowVisuals();
-      renderComparison(c);
-      renderPricingComparison(c);
-      renderProviderLogo(c.routeInfo.route);
-      renderBadges(c);
-      renderMetrics(c);
-      renderFlags(c);
-      renderLevelRuleWarnings(c);
-      renderBackendClock();
-      el('routeReason').textContent = c.routeInfo.reason;
-      el('providerAvailability').innerHTML = buildProviderAvailability(c);
-
-      const pdfBtn = el('pdfBtn');
-      const sendBtn = el('sendEmailBtn');
-      const canGenerate = !!(c.recommended && state.selectedState && c.totalDebt > 0);
-      pdfBtn.disabled = !canGenerate;
-      sendBtn.disabled = !canGenerate;
-      pdfBtn.style.opacity = canGenerate ? 1 : 0.55;
-      sendBtn.style.opacity = canGenerate ? 1 : 0.55;
-    }
-
-    function onFieldChange(e) {
-      const index = Number(e.target.dataset.index);
-      const key = e.target.dataset.key;
-      if (!Number.isInteger(index) || !state.rows[index]) return;
-
-
-      state.rows[index][key] = e.target.value;
-
-      if (key === 'amount') {
-          render();
-        return;
-      }
-
+  });
+  document.querySelectorAll('[data-manual-index]').forEach(btn=>{
+    btn.onclick=()=>{
+      const idx=Number(btn.dataset.manualIndex); const val=btn.dataset.manualValue||'';
+      state.rows[idx].creditorName=val; state.rows[idx].debtType='Unsecured'; state.rows[idx].isSecured=false;
+      const inp=document.querySelector(`.creditor-search[data-index="${idx}"]`);
+      const box=document.querySelector(`[data-results-index="${idx}"]`);
+      if(inp) inp.value=val; if(box){box.innerHTML='';box.style.display='none';}
+      renderRows(); render();
+    };
+  });
+}
+
+function bindDebtTypeResultClicks(){
+  document.querySelectorAll('[data-debt-pick-index]').forEach(btn=>{
+    btn.onclick=()=>{
+      const idx=Number(btn.dataset.debtPickIndex); const val=btn.dataset.debtPickValue||'';
+      state.rows[idx].debtType=val;
+      const inp=document.querySelector(`.debt-type-search[data-index="${idx}"]`);
+      const box=document.querySelector(`[data-debt-results-index="${idx}"]`);
+      if(inp) inp.value=val; if(box){box.innerHTML='';box.style.display='none';}
+      if(val==='Secured Loan'||val==='Auto Loan (Secured)') state.rows[idx].isSecured=true;
+      renderRows(); render();
+    };
+  });
+}
+
+// ─── STATE SEARCH ─────────────────────────────────────
+function searchStates(query){
+  const box=el('stateResults'); if(!box) return;
+  const q=String(query||'').trim().toLowerCase();
+  if(!q){box.innerHTML='';box.style.display='none';return;}
+  const matches=STATE_OPTIONS.filter(s=>s.abbr.toLowerCase().includes(q)||s.name.toLowerCase().includes(q)||s.label.toLowerCase().includes(q));
+  if(!matches.length){box.innerHTML='';box.style.display='none';return;}
+  box.innerHTML=matches.map(s=>`<button type="button" data-state-pick="${s.abbr}" data-state-label="${escapeHtml(s.label)}">${escapeHtml(s.label)}</button>`).join('');
+  box.style.display='block';
+  document.querySelectorAll('[data-state-pick]').forEach(btn=>{
+    btn.onclick=()=>{
+      state.selectedState=btn.dataset.statePick||'';
+      const inp=el('stateSearch'); const box2=el('stateResults');
+      if(inp) inp.value=btn.dataset.stateLabel||'';
+      if(box2){box2.innerHTML='';box2.style.display='none';}
       render();
-    }
+    };
+  });
+}
 
-    function addRow() {
-      if (state.rows.length >= MAX_ROWS) return;
-      state.rows.push(createEmptyRow(state.nextRowId++));
-      renderRows();
-      render();
-    }
+// ─── FIELD CHANGE ─────────────────────────────────────
+function onFieldChange(e){
+  const idx=Number(e.target.dataset.index); const key=e.target.dataset.key;
+  if(!Number.isInteger(idx)||!state.rows[idx]) return;
+  state.rows[idx][key]=e.target.value;
+  render();
+}
 
-    function removeRow(index) {
-      if (state.rows.length <= 1) return;
-      state.rows.splice(index, 1);
-      renderRows();
-      render();
-    }
+function addRow(){ if(state.rows.length>=MAX_ROWS) return; state.rows.push(createEmptyRow(state.nextRowId++)); renderRows(); render(); }
+function removeRow(idx){ if(state.rows.length<=1) return; state.rows.splice(idx,1); renderRows(); render(); }
 
-    async function generatePdfBlob() {
-      const c = computeScenarioData();
-      if (!(c.recommended && state.selectedState && c.totalDebt > 0)) return null;
+// ─── MAIN RENDER ──────────────────────────────────────
+function render(){
+  const c=computeScenarioData();
+  el('totalDebt').textContent=currency(c.totalDebt);
+  refreshRowVisuals();
+  renderRoutingPanel(c);
+  renderCsProgramCard(c);
+  renderCommissionCard(c);
+  renderPricingComparison(c);
+  renderComparison(c);
+  renderBackendClock();
+  const can=!!(c.recommended&&state.selectedState&&c.totalDebt>0);
+  const pdfB=el('pdfBtn'); const sendB=el('sendEmailBtn');
+  pdfB.disabled=!can; sendB.disabled=!can;
+  pdfB.style.opacity=can?1:0.5; sendB.style.opacity=can?1:0.5;
+}
 
-      const firstName = el('prospectFirstName').value.trim() || 'Client';
-      const lastName = el('prospectLastName').value.trim() || '';
-      const fullName = `${firstName} ${lastName}`.trim();
+// ─── PDF ──────────────────────────────────────────────
+async function generatePdfBlob(){
+  const c=computeScenarioData();
+  if(!(c.recommended&&state.selectedState&&c.totalDebt>0)) return null;
+  const firstName=el('prospectFirstName').value.trim()||'Client';
+  const lastName=el('prospectLastName').value.trim()||'';
+  const fullName=`${firstName} ${lastName}`.trim();
+  const {jsPDF}=window.jspdf; const doc=new jsPDF(); const pw=doc.internal.pageSize.getWidth(); let y=20;
+  doc.setFontSize(20); doc.setTextColor(15,157,138); doc.text('Funding Tier — Debt Resolution Summary',14,y); y+=10;
+  doc.setFontSize(11); doc.setTextColor(0,0,0); doc.text(`Prepared for: ${fullName}`,14,y); y+=7;
+  const progType=c.routeInfo.route==='LEVEL'?'Debt Settlement':c.routeInfo.route==='CONSUMER SHIELD'?'Debt Validation':'—';
+  doc.text(`State: ${state.selectedState||'—'}  |  Program Selection: ${progType}`,14,y); y+=10;
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      let y = 20;
+  if(c.csProg&&c.routeInfo.route==='CONSUMER SHIELD'){
+    doc.setFontSize(12); doc.setTextColor(26,110,216);
+    doc.text(`Consumer Shield Program ${c.csProg.label}: ${c.csProg.range}`,14,y); y+=7;
+    doc.setFontSize(10); doc.setTextColor(71,85,105);
+    doc.text(`Monthly Payment: ${currency(c.csProg.payment)}  |  Term: ${c.csProg.term} months  |  Total: ${currency(c.csProg.term*c.csProg.payment)}`,14,y); y+=10;
+  }
 
-      doc.setFontSize(20);
-      doc.setTextColor(0, 150, 136);
-      doc.text('Funding Tier Debt Resolution Summary', 14, y);
-      y += 10;
+  const tableRows=[
+    ['Monthly Payments',currency(c.doNothing.monthlyPayment),c.shortest?currency(c.shortest.monthlyPayment):'—',c.recommended?currency(c.recommended.monthlyPayment):'—'],
+    ['Total Enrolled Debt',currency(c.totalDebt),c.shortest?currency(c.totalDebt):'—',c.recommended?currency(c.totalDebt):'—'],
+    ['Months to Payoff',`${c.doNothing.monthsToPayoff} mo`,c.shortest?`${c.shortest.term} mo`:'—',c.recommended?`${c.recommended.term} mo`:'—'],
+    ['Est. Total Payback',currency(c.doNothing.totalPayback),c.shortest?currency(c.shortest.totalCost):'—',c.recommended?currency(c.recommended.totalCost):'—'],
+    ['Est. Savings','—',c.shortest?currency(Math.max(0,c.doNothing.totalPayback-c.shortest.totalCost)):'—',c.recommended?currency(Math.max(0,c.doNothing.totalPayback-c.recommended.totalCost)):'—']
+  ];
+  const headers=['Detail','Current Situation','Fastest Payoff','Recommended'];
+  const cx=[14,64,124,162]; const rh=10;
+  doc.setFillColor(241,245,249); doc.rect(14,y,182,rh,'F');
+  doc.setFontSize(7); doc.setTextColor(51,65,85);
+  headers.forEach((h,i)=>{doc.text(doc.splitTextToSize(h,40),cx[i]+2,y+4);}); y+=14;
+  tableRows.forEach((row,idx)=>{
+    const isSav=idx===4;
+    if(isSav){doc.setFillColor(15,157,138);doc.rect(14,y,182,rh,'F');}
+    else if(idx%2===1){doc.setFillColor(248,250,252);doc.rect(14,y,182,rh,'F');}
+    row.forEach((cell,i)=>{
+      if(isSav){doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');}
+      else if(idx===3&&i===1){doc.setTextColor(239,68,68);doc.setFont(undefined,'bold');}
+      else{doc.setTextColor(15,23,42);doc.setFont(undefined,'normal');}
+      doc.setFontSize(8); doc.text(String(cell),cx[i]+2,y+6);
+    }); y+=rh;
+  });
+  return doc.output('blob');
+}
 
-      doc.setFontSize(11);
-      doc.setTextColor(0, 0, 0);
-      doc.text(`Prepared for: ${fullName}`, 14, y);
-      y += 7;
-      doc.text(`State: ${state.selectedState || '—'}`, 14, y);
-      y += 10;
+async function buildPdf(){
+  const blob=await generatePdfBlob(); if(!blob) return;
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download='Funding-Tier-Debt-Resolution-Summary.pdf';
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
 
-      doc.setFontSize(10);
-      doc.setTextColor(91, 94, 109);
-      const introBullets = [
-        'This summary compares your current financial path versus the program option currently recommended based on the available scenario inputs.',
-        'Continuing minimum payments can keep debt active far longer and increase total payback materially.',
-        'This summary is intended to help you understand the estimated financial difference between staying on the current path and moving into a structured debt resolution program.'
-      ];
+async function sendProspectEmail(){
+  const c=computeScenarioData();
+  const email=el('prospectEmail').value.trim();
+  if(!email){
+    el('prospectEmail').style.borderColor='var(--ft-red)';
+    el('prospectEmail').focus();
+    el('prospectEmail').placeholder='⚠ Email required';
+    setTimeout(()=>{el('prospectEmail').style.borderColor='';el('prospectEmail').placeholder='prospect@email.com';},3000);
+    return;
+  }
+  if(!(c.recommended&&state.selectedState&&c.totalDebt>0)){
+    alert('Complete the scenario — add debts and select a state first.');return;
+  }
+  const btn=el('sendEmailBtn'); const orig=btn.textContent;
+  btn.disabled=true; btn.textContent='Generating...';
+  try{
+    const payload={
+      firstName:el('prospectFirstName').value.trim()||'Prospect',
+      lastName:el('prospectLastName').value.trim()||'',
+      email, state:state.selectedState, totalDebt:Math.round(c.totalDebt||0),
+      doNothing:{monthlyPayment:Math.round(c.doNothing?.monthlyPayment||0),monthsToPayoff:Math.round(c.doNothing?.monthsToPayoff||0),totalPayback:Math.round(c.doNothing?.totalPayback||0),apr:c.doNothing?.apr||0},
+      shortest:c.shortest?{term:Math.round(c.shortest.term||0),monthlyPayment:Math.round(c.shortest.monthlyPayment||0),totalCost:Math.round(c.shortest.totalCost||0)}:{},
+      recommended:{term:Math.round(c.recommended?.term||0),monthlyPayment:Math.round(c.recommended?.monthlyPayment||0),totalCost:Math.round(c.recommended?.totalCost||0)},
+      route:c.routeInfo?.route||'', routeReason:c.routeInfo?.reason||'',
+      csProgramLabel:c.csProg?`Program ${c.csProg.label}`:'',
+      csProgramDetails:c.csProg?{label:c.csProg.label,range:c.csProg.range,payment:c.csProg.payment,term:c.csProg.term}:null,
+      rows:state.rows.filter(r=>numberOrZero(r.amount)>0).map(r=>({creditorName:r.creditorName,manualName:r.manualName||'',amount:Math.round(numberOrZero(r.amount)),debtType:r.debtType,inCollections:!!r.inCollections,inLitigation:!!r.inLitigation,isSecured:!!r.isSecured,paymentMade:!!r.paymentMade,businessUnprofitable:!!r.businessUnprofitable}))
+    };
+    const res=await fetch('/api/generate-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data=await res.json();
+    if(!res.ok||!data.ok) throw new Error(data.error||'Failed to generate plan.');
+    const rb=el('planResultBox'); const pb=el('planResultLink');
+    if(rb&&pb){pb.onclick=()=>window.open(data.pageUrl,'_blank');rb.style.display='block';rb.scrollIntoView({behavior:'smooth',block:'center'});}
+  }catch(e){alert(e.message||'Failed to generate plan.');}
+  finally{btn.disabled=false;btn.textContent=orig;}
+}
 
-      introBullets.forEach((line) => {
-        const lines = doc.splitTextToSize('• ' + line, pageWidth - 28);
-        doc.text(lines, 14, y);
-        y += lines.length * 5 + 1;
-      });
+// ─── INIT ─────────────────────────────────────────────
+function init(){
+  el('stateSearch').addEventListener('input',e=>{state.selectedState='';searchStates(e.target.value||'');});
+  el('stateSearch').addEventListener('focus',e=>searchStates(e.target.value||''));
+  el('pdfBtn').addEventListener('click',buildPdf);
+  el('sendEmailBtn').addEventListener('click',sendProspectEmail);
+  el('addCreditorBtn').addEventListener('click',addRow);
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.creditor-search')&&!e.target.closest('[data-results-index]')) document.querySelectorAll('[data-results-index]').forEach(b=>{b.innerHTML='';b.style.display='none';});
+    if(!e.target.closest('.debt-type-search')&&!e.target.closest('[data-debt-results-index]')) document.querySelectorAll('[data-debt-results-index]').forEach(b=>{b.innerHTML='';b.style.display='none';});
+    if(!e.target.closest('#stateSearch')&&!e.target.closest('#stateResults')){const sb=el('stateResults');if(sb){sb.innerHTML='';sb.style.display='none';}}
+  });
+  renderRows();
+  render();
+  setInterval(renderBackendClock,1000);
+}
 
-      y += 6;
-
-      const tableRows = [
-        ['Monthly Payments', currency(c.doNothing.monthlyPayment), c.shortest ? currency(c.shortest.monthlyPayment) : '—', c.recommended ? currency(c.recommended.monthlyPayment) : '—'],
-        ['Total Estimated Debt', currency(c.totalDebt), c.shortest ? currency(c.totalDebt) : '—', c.recommended ? currency(c.totalDebt) : '—'],
-        ['Months to Payoff', `${c.doNothing.monthsToPayoff} months`, c.shortest ? `${c.shortest.term} months` : '—', c.recommended ? `${c.recommended.term} months` : '—'],
-        ['Estimated Int Rate', `${(c.doNothing.apr * 100).toFixed(0)}% APR`, c.shortest ? '0%' : '—', c.recommended ? '0%' : '—'],
-        ['Estimated Total Payback', currency(c.doNothing.totalPayback), c.shortest ? currency(c.shortest.totalCost) : '—', c.recommended ? currency(c.recommended.totalCost) : '—'],
-        ['Estimated Savings', '—', c.shortest ? currency(Math.max(0, c.doNothing.totalPayback - c.shortest.totalCost)) : '—', c.recommended ? currency(Math.max(0, c.doNothing.totalPayback - c.recommended.totalCost)) : '—']
-      ];
-
-      const headers = ['Detail', 'Current Situation', 'Fastest Payoff', 'Recommended Program'];
-      const colX = [14, 58, 126, 162];
-      const rowH = 10;
-
-      doc.setFillColor(241, 245, 249);
-      doc.rect(14, y, 182, rowH, 'F');
-      doc.setFontSize(7);
-      doc.setTextColor(51, 65, 85);
-
-      headers.forEach((h, i) => {
-        const wrapped = doc.splitTextToSize(h, i === 1 ? 64 : 34);
-        doc.text(wrapped, colX[i] + 2, y + 4);
-      });
-
-      y += 14;
-
-      tableRows.forEach((row, idx) => {
-        const isSavingsRow = idx === 5;
-        if (isSavingsRow) {
-          doc.setFillColor(0, 150, 136);
-          doc.rect(14, y, 182, rowH, 'F');
-        } else if (idx % 2 === 1) {
-          doc.setFillColor(248, 250, 252);
-          doc.rect(14, y, 182, rowH, 'F');
-        }
-
-        row.forEach((cell, i) => {
-          if (isSavingsRow) {
-            doc.setTextColor(255, 255, 255);
-            doc.setFont(undefined, 'bold');
-          } else if (idx === 4 && i === 1) {
-            doc.setTextColor(220, 38, 38);
-            doc.setFont(undefined, 'bold');
-          } else {
-            doc.setTextColor(15, 23, 42);
-            doc.setFont(undefined, 'normal');
-          }
-          doc.setFontSize(8);
-          doc.text(String(cell), colX[i] + 2, y + 6);
-        });
-
-        y += rowH;
-      });
-
-      y += 8;
-      doc.setFontSize(9);
-      doc.setTextColor(91, 94, 109);
-      const footerBullets = [
-        'These estimates are illustrative and final program structure may vary based on full underwriting and account-level review.',
-        'The current financial situation assumes ongoing minimum payment behavior and continuing interest impact.',
-        'The recommended program is intended to show a more structured path with the goal of reducing total financial burden.'
-      ];
-
-      footerBullets.forEach((line) => {
-        const lines = doc.splitTextToSize('• ' + line, pageWidth - 28);
-        doc.text(lines, 14, y);
-        y += lines.length * 5 + 1;
-      });
-
-      return doc.output('blob');
-    }
-
-    async function buildPdf() {
-      const blob = await generatePdfBlob();
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'Funding-Tier-Debt-Resolution-Summary.pdf';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
-
-    async function sendProspectEmail() {
-      const c = computeScenarioData();
-      const firstNameEl = el('prospectFirstName');
-      const lastNameEl = el('prospectLastName');
-      const firstName = firstNameEl ? firstNameEl.value.trim() : 'Prospect';
-      const lastName = lastNameEl ? lastNameEl.value.trim() : '';
-      const email = el('prospectEmail').value.trim();
-
-      if (!email) {
-        alert('Enter a prospect email first.');
-        return;
-      }
-
-      if (!(c.recommended && state.selectedState && c.totalDebt > 0)) {
-        alert('Complete the scenario first.');
-        return;
-      }
-
-      const btn = el('sendEmailBtn');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Generating Plan...';
-
-      try {
-        const payload = {
-          firstName: firstName || 'Prospect',
-          lastName: lastName || '',
-          email,
-          state: state.selectedState,
-          totalDebt: Math.round(c.totalDebt || 0),
-
-          doNothing: {
-            monthlyPayment: Math.round(c.doNothing?.monthlyPayment || 0),
-            monthsToPayoff: Math.round(c.doNothing?.monthsToPayoff || 0),
-            totalPayback: Math.round(c.doNothing?.totalPayback || 0),
-            apr: c.doNothing?.apr || 0
-          },
-
-          shortest: c.shortest ? {
-            term: Math.round(c.shortest.term || 0),
-            monthlyPayment: Math.round(c.shortest.monthlyPayment || 0),
-            totalCost: Math.round(c.shortest.totalCost || 0)
-          } : {},
-
-          recommended: {
-            term: Math.round(c.recommended?.term || 0),
-            monthlyPayment: Math.round(c.recommended?.monthlyPayment || 0),
-            totalCost: Math.round(c.recommended?.totalCost || 0)
-          },
-
-          route: c.routeInfo?.route || '',
-          routeReason: c.routeInfo?.reason || '',
-
-          rows: state.rows
-            .filter((row) => numberOrZero(row.amount) > 0)
-            .map((row) => ({
-              creditorName: row.creditorName,
-              manualName: row.manualName || '',
-              amount: Math.round(numberOrZero(row.amount)),
-              debtType: row.debtType,
-              inCollections: !!row.inCollections,
-              inLitigation: !!row.inLitigation,
-              isSecured: !!row.isSecured,
-              paymentMade: !!row.paymentMade,
-              businessUnprofitable: !!row.businessUnprofitable
-            }))
-        };
-
-        const res = await fetch('/api/generate-plan', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        if (!res.ok || !data.ok) {
-          throw new Error(data.error || 'Failed to generate plan.');
-        }
-
-        const resultBox = el('planResultBox');
-        const planBtn = el('planResultLink');
-
-        if (resultBox && planBtn) {
-          planBtn.onclick = () => {
-            window.open(data.pageUrl, '_blank');
-          };
-
-          resultBox.style.display = 'block';
-          resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-      } catch (err) {
-        alert(err.message || 'Failed to generate plan.');
-        console.error('sendProspectEmail error:', err);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
-    }
-
-    function searchStates(query) {
-      const resultsBox = el('stateResults');
-      if (!resultsBox) return;
-
-      const q = String(query || '').trim().toLowerCase();
-
-      if (!q) {
-        resultsBox.innerHTML = '';
-        resultsBox.classList.add('hidden');
-        return;
-      }
-
-      const matches = STATE_OPTIONS.filter((item) =>
-        item.abbr.toLowerCase().includes(q) ||
-        item.name.toLowerCase().includes(q) ||
-        item.label.toLowerCase().includes(q)
-      );
-
-      if (!matches.length) {
-        resultsBox.innerHTML = '';
-        resultsBox.classList.add('hidden');
-        return;
-      }
-
-      resultsBox.innerHTML = matches.map((item) => `
-        <button
-          type="button"
-          class="block w-full text-left px-3 py-2 text-sm hover:bg-slate-50 border-b last:border-b-0"
-          data-state-pick="${item.abbr}"
-          data-state-label="${escapeHtml(item.label)}"
-        >
-          ${escapeHtml(item.label)}
-        </button>
-      `).join('');
-
-      resultsBox.classList.remove('hidden');
-      bindStateResultClicks();
-    }
-
-    function bindStateResultClicks() {
-      document.querySelectorAll('[data-state-pick]').forEach((btn) => {
-        btn.onclick = () => {
-          const abbr = btn.dataset.statePick || '';
-          const label = btn.dataset.stateLabel || '';
-          const input = el('stateSearch');
-          const resultsBox = el('stateResults');
-
-          state.selectedState = abbr;
-
-          if (input) input.value = label;
-          if (resultsBox) {
-            resultsBox.innerHTML = '';
-            resultsBox.classList.add('hidden');
-          }
-
-          render();
-        };
-      });
-    }
-
-    function initStateSelect() {
-      const input = el('stateSearch');
-      const resultsBox = el('stateResults');
-      if (!input || !resultsBox) return;
-
-      input.addEventListener('input', (e) => {
-        const query = e.target.value || '';
-        state.selectedState = '';
-        searchStates(query);
-      });
-
-      input.addEventListener('focus', (e) => {
-        const query = e.target.value || '';
-        searchStates(query);
-      });
-    }
-
-    function initActionButtons() {
-      el('pdfBtn').addEventListener('click', buildPdf);
-      el('sendEmailBtn').addEventListener('click', sendProspectEmail);
-      el('addCreditorBtn').addEventListener('click', addRow);
-    }
-
-    function init() {
-      initStateSelect();
-      initActionButtons();
-
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.creditor-search') && !e.target.closest('.creditor-results')) {
-          hideAllCreditorResults();
-        }
-        if (!e.target.closest('.debt-type-search') && !e.target.closest('.debt-type-results')) {
-          hideAllDebtTypeResults();
-        }
-      });
-
-      renderRows();
-      render();
-      renderBackendClock();
-      setInterval(renderBackendClock, 1000);
-      startSystemClock();
-    }
-
-    init();
-  </script>
+init();
+</script>
 </body>
 </html>
