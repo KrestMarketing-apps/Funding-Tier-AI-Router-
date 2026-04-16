@@ -418,6 +418,103 @@
         <div id="commissionDetail"></div>
       </div>
 
+      <!-- Level Acceptable Debt Types Reference -->
+      <div class="card" id="levelDebtTypesCard">
+        <div class="card-header" style="cursor:pointer;user-select:none;margin-bottom:0;" onclick="toggleDebtTypes()" id="debtTypesHeader">
+          <div class="logo-wrap sm">
+            <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp" alt="Level Debt" />
+          </div>
+          <span style="flex:1;">Level Debt — Acceptable Debt Types</span>
+          <span id="debtTypesChevron" style="font-size:18px;font-weight:900;color:var(--ft-green);margin-left:auto;transition:transform 0.2s;">+</span>
+        </div>
+        <div id="debtTypesBody" style="display:none;margin-top:14px;">
+
+          <!-- ACCEPTED -->
+          <div style="margin-bottom:14px;">
+            <div style="font-size:11px;font-weight:800;color:var(--ft-green-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">✓ Accepted</div>
+            <div style="display:grid;gap:6px;">
+
+              <div style="border:1px solid rgba(15,157,138,0.25);border-radius:10px;padding:10px 13px;background:rgba(15,157,138,0.04);">
+                <div style="font-size:13px;font-weight:800;color:var(--ft-dark);">Unsecured Debt</div>
+                <div style="font-size:12px;color:#475569;margin-top:3px;line-height:1.55;">Credit cards and unsecured personal loans.</div>
+              </div>
+
+              <div style="border:1px solid rgba(15,157,138,0.25);border-radius:10px;padding:10px 13px;background:rgba(15,157,138,0.04);">
+                <div style="font-size:13px;font-weight:800;color:var(--ft-dark);">Payday Loans &amp; Tribal Loans</div>
+                <div style="font-size:12px;color:#475569;margin-top:3px;line-height:1.55;">Accepted.</div>
+              </div>
+
+              <div style="border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:10px 13px;background:#fffbeb;">
+                <div style="font-size:13px;font-weight:800;color:#92400e;">Repossessions, Medical &amp; Back Rent</div>
+                <div style="font-size:12px;color:#475569;margin-top:3px;line-height:1.55;">
+                  Accepted — but combined total must be <strong>less than 50%</strong> of overall enrolled debt.
+                  Repossession only accepted if the client <strong>no longer has the vehicle</strong>.
+                </div>
+              </div>
+
+              <div style="border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:10px 13px;background:#fffbeb;">
+                <div style="font-size:13px;font-weight:800;color:#92400e;">Private Student Loans</div>
+                <div style="font-size:12px;color:#475569;margin-top:3px;line-height:1.6;">
+                  Must <strong>not exceed 25% of total enrolled debt</strong>. Client must no longer be enrolled in the originating school.
+                  If a co-signer is listed on the loan, the co-signer must also enroll in the program.
+                  Proof that the loan is private is required.
+                </div>
+                <div style="margin-top:7px;display:grid;gap:5px;">
+                  <div style="font-size:11px;font-weight:700;color:var(--ft-red);background:#fef2f2;border:1px solid rgba(239,68,68,0.25);border-radius:7px;padding:5px 9px;">⛔ Discover private student loans are NOT accepted.</div>
+                  <div style="font-size:11px;font-weight:700;color:var(--ft-red);background:#fef2f2;border:1px solid rgba(239,68,68,0.25);border-radius:7px;padding:5px 9px;">⛔ Not accepted at all for California residents.</div>
+                </div>
+              </div>
+
+              <div style="border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:10px 13px;background:#fffbeb;">
+                <div style="font-size:13px;font-weight:800;color:#92400e;">Business Debt</div>
+                <div style="font-size:12px;color:#475569;margin-top:3px;line-height:1.55;">
+                  Accepted if the business is <strong>no longer operational</strong>, OR if the business is active but the client states <strong>on a recorded line</strong> that it is not profitable.
+                </div>
+              </div>
+
+              <div style="border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:10px 13px;background:#fffbeb;">
+                <div style="font-size:13px;font-weight:800;color:#92400e;">Discover Debt / Loans</div>
+                <div style="font-size:12px;color:#475569;margin-top:3px;line-height:1.55;">
+                  Accepted — but must <strong>not exceed 60% of total enrolled debt</strong>.
+                  Discover payment formula: <span style="font-family:monospace;background:#f1f5f9;padding:1px 5px;border-radius:4px;">($Discover × 70%) ÷ 24</span>
+                </div>
+              </div>
+
+              <div style="border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:10px 13px;background:#fffbeb;">
+                <div style="font-size:13px;font-weight:800;color:#92400e;">Accounts in Active or Pending Litigation</div>
+                <div style="font-size:12px;color:#475569;margin-top:3px;line-height:1.55;">
+                  Case-by-case basis. Must be reviewed by the <strong>legal team</strong> before routing.
+                </div>
+              </div>
+
+              <div style="border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:10px 13px;background:#fffbeb;">
+                <div style="font-size:13px;font-weight:800;color:#92400e;">Secured Accounts — Specific Creditors Only</div>
+                <div style="font-size:12px;color:#475569;margin-top:3px;line-height:1.6;">
+                  Accepted <strong>only if the client agrees on a recorded call</strong> that they are willing to lose the collateral. Applies only to:
+                </div>
+                <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+                  ${['Republic Finance','Mariner Finance','Regional Finance','OneMain','Lendmark'].map(n=>`
+                    <div style="font-size:12px;font-weight:700;color:var(--ft-dark);background:#fff;border:1px solid var(--ft-border);border-radius:7px;padding:5px 9px;">· ${n}</div>
+                  `).join('')}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- NOT ACCEPTED -->
+          <div>
+            <div style="font-size:11px;font-weight:800;color:var(--ft-red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">⛔ Not Accepted</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+              ${['Federal Student Loans','Navient Student Loans','SBA Loans','Timeshares','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Accounts','Employer Debt','Mortgages','Auto Loans (Secured)','Cross-Collateralized Accounts','Furniture Store Financing','Credit Union Loans','Military Accounts','AFES Accounts'].map(t=>`
+                <div style="font-size:12px;font-weight:600;color:#b91c1c;background:#fef2f2;border:1px solid rgba(239,68,68,0.2);border-radius:7px;padding:5px 9px;">⛔ ${t}</div>
+              `).join('')}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       <!-- CS Program Breakdown (shown when CS is relevant) -->
       <div class="card" id="csProgramCard" style="display:none;">
         <div class="card-header">
@@ -530,18 +627,19 @@ const LEVEL_GREEN_STATES = new Set(['AL','AZ','AR','CA','DC','FL','ID','IN','IA'
 const LEVEL_BLACKOUT_STATES = new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
 const CONSUMER_SHIELD_BLACKOUT_STATES = new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
 
-const DEBT_TYPES = [
-  'AFES Account','Alimony / Child Support','Apartment Back Rent (Collections)',
-  'Auto Loan (Secured)','Auto Repo Deficiency','Back Rent','Business Debt',
-  'Casino Debt','Cash Call','Cell Phone Bill','Credit Union Loan',
-  'Cross Collateralized Account','Deficiency','Direct Furniture Store Loan',
-  'Employer Debt','Federal Student Loan','Furniture Store Financing','IRS Tax Debt',
-  'Installment Sales Contract','Judgment','Loan from Individual','Medical Bill',
-  'Military Account','Mortgage','Navient Student Loan','Other','Overdraft Account',
-  'Payday Loan','Peer-to-Peer Loan','Private Student Loan','Repossession Deficiency',
-  'SBA Loan','Secured Loan','Timeshare','Tribal Loan','Unsecured',
-  'Unsecured Line of Credit','Unsecured Personal Loan','USAA','Utility Bill'
-].sort((a,b)=>a.localeCompare(b));
+const DEBT_TYPE_CATEGORIES = {
+  'Credit Cards & Loans': ['Unsecured','Unsecured Personal Loan','Unsecured Line of Credit','Medical Bill','Payday Loan','Tribal Loan'],
+  'Auto & Vehicle': ['Auto Loan (Secured)','Auto Repo Deficiency','Repossession Deficiency','Deficiency'],
+  'Student Loans': ['Private Student Loan','Federal Student Loan','Navient Student Loan'],
+  'Housing & Utilities': ['Back Rent','Apartment Back Rent (Collections)','Utility Bill','Mortgage'],
+  'Business': ['Business Debt','SBA Loan'],
+  'Special / Other': ['AFES Account','USAA','Military Account','Judgment','Peer-to-Peer Loan','Secured Loan','Cross Collateralized Account','Installment Sales Contract','Furniture Store Financing','Direct Furniture Store Loan','Credit Union Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Cell Phone Bill','Loan from Individual','Other'],
+};
+
+const DEBT_TYPES = Object.values(DEBT_TYPE_CATEGORIES).flat();
+const DEBT_TYPE_ACCEPTED_SET = new Set(['Unsecured','Unsecured Personal Loan','Unsecured Line of Credit','Medical Bill','Payday Loan','Tribal Loan','Auto Repo Deficiency','Repossession Deficiency','Private Student Loan','Business Debt','Deficiency','Judgment','Back Rent','Apartment Back Rent (Collections)','Cell Phone Bill','Utility Bill','Peer-to-Peer Loan','USAA']);
+const DEBT_TYPE_CONDITIONAL_SET = new Set(['Private Student Loan','Medical Bill','Back Rent','Apartment Back Rent (Collections)','Repossession Deficiency','Auto Repo Deficiency','Business Debt','Judgment','USAA','Deficiency','Tribal Loan']);
+const DEBT_TYPE_REJECTED_SET = new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Mortgage','Auto Loan (Secured)','Cross Collateralized Account','Furniture Store Financing','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','Secured Loan','Installment Sales Contract']);
 
 const TRADITIONAL_CREDIT_CARD_COMPANIES = [
   'American Express','Amex','Bank of America','Capital One','Chase','Citi','Citibank',
@@ -559,8 +657,114 @@ const TRADITIONAL_CREDIT_CARD_COMPANIES = [
 const CONSUMER_SHIELD_REJECTED_TYPES = new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
 const CONSUMER_SHIELD_CONDITIONAL_TYPES = new Set(['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt']);
 const LEVEL_REJECTED_TYPES = new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt']);
-const LEVEL_CONDITIONAL_CREDITORS = ['Lendmark','Mariner Finance','OneMain','Regional Finance','Republic Finance'];
-const LEVEL_REJECTED_CREDITORS = ['ALLEVIATE TAX LLC','Acceptance Now','ACIMA','Advance Financial','AGCO FINANCE','STATE EMPLOYEE CREDIT UNION','STATEEMP','Aqua Finance','Bell Finance','BHG Financial','BHG Money','Bobs Discount Furniture','Bobs Finance','Bobs Furniture','Cornerstone Financial','CreditCentral','EMPOWER FCU','Enerbank','ESL Credit Union','Farmers Furniture','FRMRS FURN','Fort Worth Credit Union','Forth Worth CU','Fortera Credit Union','Garden Federal Credit Union','Golden One Credit Union','Goldman Sachs','GoodLeap','Hawaii CU','HC ROYA','HYCITE','Royal Prestige','Heights Financial','Island Finance','ISPC','Kabbage Loans','KIKOFF','Koalafi','Loan Pal','Local Government Federal Credit Union','Matco Tools Financing','Matco Fin','Military Star','Nebraska Furniture','Omni Loans','Opensky','PINNACLE FINANCIAL GROUP','Pioneer Loans','Popular Bank','Banco Popular','PowerPay','Preferred Loans','Quick Help Loans','Red River Credit','REDRIVERCR','REDSTONE Credit Union','RENT-A CENTER','RFFC FINANCIAL','Robinhood','Security Finance','STATE EMPLOYEES C U','Service Finance Company','SVCFIN','SRVFINCO','Snap On Credit','SOLAR MOSAIC','Southern Finance','Sunset Financial','Toledo Finance','Tower Loans','West Creek Financial','WSECU','Yendo'];
+// ─── CREDITOR RULES ENGINE ───────────────────────────
+// Each entry: names = all known variants/aliases, status = rejected|conditional|partial
+// rule = human-readable explanation shown to agent, aliases = extra fuzzy match tokens
+
+const CREDITOR_RULES = [
+  // ── FULLY REJECTED ──────────────────────────────────
+  { names:['Alleviate Tax','Alleviate Tax LLC','Alleviate'],                           status:'rejected', rule:'Tax relief firm — not accepted by Level Debt.' },
+  { names:['Acceptance Now','AcceptanceNow'],                                           status:'rejected', rule:'Rent-to-own / lease-to-own — not accepted.' },
+  { names:['ACIMA','Acima Credit'],                                                     status:'rejected', rule:'Lease-to-own financing — not accepted.' },
+  { names:['Advance Financial','AdvanceFinancial','AF247'],                             status:'rejected', rule:'Payday lender — not accepted.' },
+  { names:['AGCO Finance','AGCO Financial'],                                            status:'rejected', rule:'Agricultural equipment financing — not accepted.' },
+  { names:['Aqua Finance','AquaFinance'],                                               status:'rejected', rule:'Home improvement / HVAC financing — not accepted.' },
+  { names:['Bell Finance','Bell Financial'],                                            status:'rejected', rule:'Consumer installment lender — not accepted.' },
+  { names:['BHG Financial','BHG Money','BHG','Bankers Healthcare Group'],              status:'rejected', rule:'All BHG entities not accepted.' },
+  { names:["Bob's Discount Furniture","Bobs Discount Furniture","Bob's Finance","Bobs Finance","Bob's Furniture","Bobs Furniture"], status:'rejected', rule:'Retail furniture / in-house financing — not accepted.' },
+  { names:['Concord Servicing','ConcordServicing'],                                    status:'rejected', rule:'Loan servicer — not accepted.' },
+  { names:['Cornerstone Financial','Cornerstone Finance'],                             status:'rejected', rule:'Consumer installment lender — not accepted.' },
+  { names:['Credit Central','CreditCentral'],                                          status:'rejected', rule:'Consumer installment lender — not accepted.' },
+  { names:['Credologi','Credologi LLC'],                                               status:'rejected', rule:'Debt relief / personal lender — not accepted.' },
+  { names:['DR Bank'],                                                                  status:'rejected', rule:'Community bank — not accepted.' },
+  { names:['EMPOWER FCU','Empower Federal Credit Union','Empower FCU'],                status:'rejected', rule:'Federal credit union — not accepted.' },
+  { names:['Enerbank','EnerBank USA'],                                                 status:'rejected', rule:'Home improvement financing — not accepted.' },
+  { names:['ESL Credit Union','ESL FCU','ESL Federal Credit Union'],                   status:'rejected', rule:'Credit union — not accepted.' },
+  { names:['Farmers Furniture','FRMRS FURN','Farmers Home Furniture'],                 status:'rejected', rule:'Rent-to-own furniture — not accepted.' },
+  { names:['FCRP Capital','FCRP Capital LLC'],                                         status:'rejected', rule:'Specialty finance — not accepted.' },
+  { names:['Fort Worth Credit Union','Fort Worth CU','Forth Worth CU','FWCU'],         status:'rejected', rule:'Federal credit union — not accepted.' },
+  { names:['Fortera Credit Union','Fortera CU','Fortera FCU'],                         status:'rejected', rule:'Federal credit union — not accepted.' },
+  { names:['Garden Federal Credit Union','Garden FCU','Garden CU'],                   status:'rejected', rule:'Federal credit union — not accepted.' },
+  { names:['Golden One Credit Union','Golden 1 Credit Union','Golden1','Golden One CU'], status:'rejected', rule:'State-chartered credit union — not accepted.' },
+  { names:['Goldman Sachs','Goldman Sachs Credit Card','Marcus Credit Card','GS Card'], status:'rejected', rule:'Goldman Sachs credit cards only are excluded. Apple Cards and GS personal loans ARE accepted — verify account type.', partial:true },
+  { names:['GoodLeap','Good Leap','Loan Pal','LoanPal'],                              status:'rejected', rule:'Solar / home improvement financing — not accepted.' },
+  { names:['Hawaii CU','Hawaii Credit Union','Hawaii USA Federal Credit Union','HiWay Federal'], status:'rejected', rule:'Federal credit union — not accepted.' },
+  { names:['HC ROYA','HYCITE','HyCite','Royal Prestige','RoyalPrestige'],              status:'rejected', rule:'Direct sales / MLM cookware company — not accepted.' },
+  { names:['Heights Financial','Heights Finance'],                                     status:'rejected', rule:'Consumer installment lender — not accepted.' },
+  { names:['Island Finance','Island Finance PR'],                                      status:'rejected', rule:'Puerto Rico consumer finance — not accepted.' },
+  { names:['ISPC'],                                                                    status:'rejected', rule:'Insurance / service contract financing — not accepted.' },
+  { names:['Kabbage','Kabbage Loans','American Express Business Blueprint','Amex Blueprint'], status:'rejected', rule:'Small business / working capital loans — not accepted.' },
+  { names:['KIKOFF','Kikoff'],                                                         status:'rejected', rule:'Credit builder lender — not accepted.' },
+  { names:['Koalafi'],                                                                 status:'rejected', rule:'Lease-to-own / POS financing — not accepted.' },
+  { names:['LHPCC Trust','LHPCC Trust I','LHPCC'],                                    status:'rejected', rule:'Structured trust / debt purchaser — not accepted.' },
+  { names:['Local Government Federal Credit Union','LGFCU'],                           status:'rejected', rule:'Federal credit union (NC) — not accepted.' },
+  { names:['Matco Tools Financing','Matco Fin','Matco Financial','Matco Tools'],       status:'rejected', rule:'Tool franchise financing — not accepted.' },
+  { names:['Military Star','Military Star Card','Exchange Credit Program'],            status:'rejected', rule:'DoD retail credit card — not accepted.' },
+  { names:['Nebraska Furniture','Nebraska Furniture Mart','NFM'],                      status:'rejected', rule:'Retail furniture / appliance — not accepted.' },
+  { names:['Omni Loans','Omni Financial','Omni Military Loans'],                       status:'rejected', rule:'Consumer personal loans — not accepted.' },
+  { names:['Opensky','OpenSky','Open Sky Credit Card'],                                status:'rejected', rule:'Secured credit card — not accepted.' },
+  { names:['PINNACLE FINANCIAL GROUP','Pinnacle Financial','Pinnacle Finance'],        status:'rejected', rule:'Consumer finance / installment lender — not accepted.' },
+  { names:['Pioneer Loans','Pioneer Finance'],                                         status:'rejected', rule:'Consumer installment lender — not accepted.' },
+  { names:['Popular Bank','Banco Popular','Popular Bank PR','Banco Popular PR'],       status:'rejected', rule:'Puerto Rico commercial bank — not accepted.' },
+  { names:['PowerPay','Power Pay'],                                                    status:'rejected', rule:'Home improvement / contractor financing — not accepted.' },
+  { names:['Preferred Loans','Preferred Finance'],                                     status:'rejected', rule:'Consumer installment lender — not accepted.' },
+  { names:['Quick Help Loans','Quick Help'],                                           status:'rejected', rule:'Short-term personal lender — not accepted.' },
+  { names:['Red River Credit','REDRIVERCR','Red River CU','Red River Credit Union'],  status:'rejected', rule:'Federal credit union — not accepted.' },
+  { names:['REDSTONE Credit Union','Redstone FCU','Redstone Federal Credit Union'],   status:'rejected', rule:'Federal credit union (Military/Government) — not accepted.' },
+  { names:['RENT-A-CENTER','Rent-A-Center','Rent A Center','RAC'],                    status:'rejected', rule:'Rent-to-own retailer — not accepted.' },
+  { names:['RFFC Financial','RFFC'],                                                   status:'rejected', rule:'Consumer finance — not accepted.' },
+  { names:['Robinhood','Robinhood Financial'],                                         status:'rejected', rule:'Investment / brokerage / cash management — not accepted.' },
+  { names:['Security Finance','Security Finance Corp','Security Finance Corporation'], status:'rejected', rule:'Consumer installment lender — not accepted.' },
+  { names:['State Employees Credit Union','SECU','STATE EMPLOYEES C U','STATEEMP','State Employee Credit Union','State Employees CU','NCSECU'], status:'rejected', rule:'State employee credit union — ALL state variants not accepted.' },
+  { names:['Service Finance Company','SVCFIN','SRVFINCO','ServiceFinance'],           status:'rejected', rule:'Home improvement / HVAC financing — not accepted.' },
+  { names:['Snap-On Credit','Snap On Credit','Snapon Credit','Snap-on Financial'],    status:'rejected', rule:'Tool dealer financing — not accepted.' },
+  { names:['Solar Mosaic','SOLAR MOSAIC','Mosaic Solar'],                              status:'rejected', rule:'Solar energy financing — not accepted.' },
+  { names:['Southern Finance','Southern Finance Corp'],                                status:'rejected', rule:'Consumer installment lender — not accepted.' },
+  { names:['Sunset Financial','Sunset Finance'],                                       status:'rejected', rule:'Consumer installment lender — not accepted.' },
+  { names:['Toledo Finance'],                                                          status:'rejected', rule:'Auto / subprime financing — not accepted.' },
+  { names:['Tower Loans','Tower Finance','Tower Loan'],                               status:'rejected', rule:'Consumer installment lender — not accepted.' },
+  { names:['West Creek Financial','West Creek Finance','Westcreek'],                  status:'rejected', rule:'Subprime auto / consumer financing — not accepted.' },
+  { names:['WSECU','Washington State Employees Credit Union','WA State Employees CU'], status:'rejected', rule:'Washington state employees credit union — not accepted.' },
+  { names:['Yendo'],                                                                   status:'rejected', rule:'Vehicle-equity credit card — not accepted.' },
+
+  // ── CONDITIONAL: Unsecured OK, Secured EXCLUDED ──────
+  { names:['Lendmark','Lendmark Financial','Lendmark Financial Services'],            status:'conditional', rule:'Unsecured accounts OK — secured accounts are NOT accepted. Verify before routing.' },
+  { names:['Mariner Finance','Mariner'],                                               status:'conditional', rule:'Unsecured accounts OK — secured accounts are NOT accepted. Verify before routing.' },
+  { names:['OneMain','OneMain Financial','One Main Financial'],                        status:'conditional', rule:'Unsecured accounts OK — secured accounts are NOT accepted. Verify before routing.' },
+  { names:['Regional Finance','Regional Finance Corp'],                                status:'conditional', rule:'Unsecured accounts OK — secured accounts are NOT accepted. Verify before routing.' },
+  { names:['Republic Finance'],                                                        status:'conditional', rule:'Unsecured accounts OK — secured accounts are NOT accepted. Verify before routing.' },
+];
+
+// Build fast lookup maps from rules
+const _rejectedNames   = [];
+const _conditionalNames = [];
+CREDITOR_RULES.forEach(rule => {
+  rule.names.forEach(n => {
+    if(rule.status === 'rejected')    _rejectedNames.push(n);
+    if(rule.status === 'conditional') _conditionalNames.push(n);
+  });
+});
+
+// Keep legacy arrays for backward compat with existing flag logic
+const LEVEL_REJECTED_CREDITORS   = _rejectedNames;
+const LEVEL_CONDITIONAL_CREDITORS = _conditionalNames;
+
+// Enhanced rule lookup — returns the matching rule object or null
+function getCreditorRule(name){
+  if(!name) return null;
+  const a = normalizeCreditorName(name);
+  return CREDITOR_RULES.find(rule =>
+    rule.names.some(n => {
+      const b = normalizeCreditorName(n);
+      // Exact match OR one fully contains the other OR token-based partial match
+      if(a === b || a.includes(b) || b.includes(a)) return true;
+      // Token match: every word in the shorter string appears in the longer
+      const tokA = a.split(' '), tokB = b.split(' ');
+      const [shorter, longer] = tokA.length <= tokB.length ? [tokA, tokB] : [tokB, tokA];
+      return shorter.length >= 2 && shorter.every(t => t.length > 2 && longer.includes(t));
+    })
+  ) ?? null;
+}
 
 const BACKEND_CLOCKS = [
   { key:'LEVEL', label:'Level Debt', timeZone:'America/New_York', openDays:[1,2,3,4,5], openHour:9, openMinute:0, closeHour:18, closeMinute:0 },
@@ -674,8 +878,9 @@ function collectFlags(rows,totalDebt,stateCode){
     if(LEVEL_REJECTED_TYPES.has(row.debtType)) ldFlags.push(`${row.debtType} is not accepted by Level Debt.`);
     if(amt<200&&!row.inCollections) ldFlags.push(`${name||row.debtType} must be at least $200 unless in collections or charged off.`);
     if(!row.paymentMade) ldFlags.push(`${name||row.debtType} must have at least one payment made before Level enrollment.`);
-    if(creditorMatches(name,LEVEL_REJECTED_CREDITORS)) ldFlags.push(`${name} is on the Level Debt rejected creditor list.`);
-    if(creditorMatches(name,LEVEL_CONDITIONAL_CREDITORS)&&row.isSecured) ldFlags.push(`${name} is secured — Level only allows this if client agrees to lose the collateral.`);
+    const credRule=getCreditorRule(name);
+    if(credRule&&credRule.status==='rejected') ldFlags.push(`${name}: ${credRule.rule}`);
+    if(credRule&&credRule.status==='conditional'&&row.isSecured) ldFlags.push(`${name} (secured): ${credRule.rule}`);
     if(row.inLitigation) ldFlags.push(`${name||row.debtType} is in litigation — requires legal review before routing.`);
     if(row.debtType==='Business Debt'&&!row.businessUnprofitable) ldFlags.push(`${name||row.debtType} requires the business to be closed or unprofitable.`);
     if(row.debtType==='Private Student Loan'&&stateCode==='CA') ldFlags.push('Private student loans not accepted for California residents.');
@@ -767,13 +972,32 @@ function computeScenarioData(){
 function rowAlerts(row,route){
   const alerts=[]; const name=getCreditorDisplayName(row);
   if(route==='LEVEL'){
-    if(creditorMatches(name,LEVEL_REJECTED_CREDITORS)) alerts.push({label:'Not accepted by Level',tone:'red'});
-    if(creditorMatches(name,LEVEL_CONDITIONAL_CREDITORS)&&row.isSecured) alerts.push({label:'Secured / collateral risk',tone:'amber'});
-    if(LEVEL_REJECTED_TYPES.has(row.debtType)) alerts.push({label:'Debt type not accepted',tone:'red'});
+    // Use rich rule engine
+    const rule=getCreditorRule(name);
+    if(rule){
+      if(rule.status==='rejected'){
+        alerts.push({label:'⛔ Not accepted by Level Debt',tone:'red',detail:rule.rule});
+      } else if(rule.status==='conditional'){
+        if(row.isSecured){
+          alerts.push({label:'⚠ Secured — verify before routing',tone:'red',detail:rule.rule});
+        } else {
+          alerts.push({label:'⚠ Conditional — unsecured only',tone:'amber',detail:rule.rule});
+        }
+      }
+    }
+    if(LEVEL_REJECTED_TYPES.has(row.debtType)) alerts.push({label:'⛔ Debt type not accepted by Level',tone:'red',detail:row.debtType+' is not accepted.'});
   }
   if(route==='CONSUMER SHIELD'){
-    if(CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) alerts.push({label:'Not accepted by Consumer Shield',tone:'red'});
-    if(CONSUMER_SHIELD_CONDITIONAL_TYPES.has(row.debtType)) alerts.push({label:'Conditional / docs needed',tone:'amber'});
+    const rule=getCreditorRule(name);
+    if(rule&&rule.status==='rejected') alerts.push({label:'⚠ Check with CS',tone:'amber',detail:'This creditor is flagged on the Level excluded list — verify CS acceptance separately.'});
+    if(CONSUMER_SHIELD_REJECTED_TYPES.has(row.debtType)) alerts.push({label:'⛔ Not accepted by Consumer Shield',tone:'red',detail:row.debtType+' is not accepted by CS.'});
+    if(CONSUMER_SHIELD_CONDITIONAL_TYPES.has(row.debtType)) alerts.push({label:'⚠ Conditional — docs needed',tone:'amber',detail:row.debtType+' requires additional documentation.'});
+  }
+  // Always flag regardless of route
+  const rule=getCreditorRule(name);
+  if(rule&&route!=='LEVEL'&&route!=='CONSUMER SHIELD'){
+    if(rule.status==='rejected') alerts.push({label:'⛔ Level excluded creditor',tone:'red',detail:rule.rule});
+    if(rule.status==='conditional') alerts.push({label:'⚠ Conditional creditor',tone:'amber',detail:rule.rule});
   }
   return alerts;
 }
@@ -1163,8 +1387,15 @@ function renderRows(){
           ${totalDebt>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${pctOfTotal}</div>`:''}
         </div>
         <div style="position:relative;">
-          <input class="ft-input debt-type-search" data-index="${idx}" placeholder="Debt type..." value="${escapeHtml(row.debtType||'')}" autocomplete="off" />
-          <div class="search-results" data-debt-results-index="${idx}" style="display:none;"></div>
+          <div style="position:relative;">
+            <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:#94a3b8;pointer-events:none;z-index:1;">🔍</span>
+            <input class="ft-input debt-type-search" data-index="${idx}"
+              placeholder="Search debt type..."
+              value="${escapeHtml(row.debtType||'')}"
+              autocomplete="off"
+              style="padding-left:32px;cursor:pointer;" />
+            <div class="search-results" data-debt-results-index="${idx}" style="display:none;max-height:280px;overflow-y:auto;"></div>
+          </div>
         </div>
         ${removeBtn}
       </div>
@@ -1197,7 +1428,12 @@ function refreshRowVisuals(){
     const wrap=card.querySelector('.alert-wrap');
     card.className='row-card'+(alerts.some(a=>a.tone==='red')?' flagged-red':alerts.some(a=>a.tone==='amber')?' flagged-amber':'');
     if(row.isSecured) card.className='row-card flagged-red';
-    if(wrap) wrap.innerHTML=alerts.map(a=>`<span class="pill ${a.tone==='red'?'pill-red':'pill-amber'}" style="font-size:10px;">${a.label}</span>`).join('');
+    if(wrap) wrap.innerHTML=alerts.map(a=>`
+      <span class="pill ${a.tone==='red'?'pill-red':'pill-amber'}"
+        style="font-size:11px;font-weight:800;cursor:help;max-width:100%;"
+        title="${a.detail||a.label}">
+        ${a.label}
+      </span>`).join('');
   });
 }
 
@@ -1220,9 +1456,18 @@ async function searchCreditors(idx,query){
     box.innerHTML=merged.slice(0,10).map(item=>{
       const dt=isTraditionalCardCreditor(item.display_name)?'Unsecured':mapCreditorToDebtType(item);
       const sec=item.secured===true||item.secured==='true';
-      return `<button type="button" data-pick-index="${idx}" data-pick-name="${escapeHtml(item.display_name||'')}" data-pick-debt-type="${escapeHtml(dt)}" data-pick-secured="${sec}">
-        <div style="font-weight:700;color:var(--ft-dark);">${escapeHtml(item.display_name||'')}</div>
-        <div style="font-size:11px;color:${sec?'var(--ft-red)':'var(--ft-green-dark)'};">${escapeHtml(dt)} · ${sec?'Secured':'Unsecured'}</div>
+      const rule=getCreditorRule(item.display_name||'');
+      const isRejected=rule&&rule.status==='rejected';
+      const isCond=rule&&rule.status==='conditional';
+      return `<button type="button" data-pick-index="${idx}" data-pick-name="${escapeHtml(item.display_name||'')}" data-pick-debt-type="${escapeHtml(dt)}" data-pick-secured="${sec}"
+        style="background:${isRejected?'#fef2f2':isCond?'#fffbeb':'#fff'};">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+          <div style="font-weight:800;color:${isRejected?'var(--ft-red)':isCond?'#92400e':'var(--ft-dark)'};">${escapeHtml(item.display_name||'')}</div>
+          ${isRejected?`<span style="font-size:10px;font-weight:800;background:var(--ft-red);color:#fff;border-radius:999px;padding:2px 7px;white-space:nowrap;">⛔ Level excluded</span>`:''}
+          ${isCond?`<span style="font-size:10px;font-weight:800;background:var(--ft-amber);color:#fff;border-radius:999px;padding:2px 7px;white-space:nowrap;">⚠ Conditional</span>`:''}
+        </div>
+        <div style="font-size:11px;color:${isRejected?'var(--ft-red)':sec?'var(--ft-red)':'var(--ft-green-dark)'};">${escapeHtml(dt)} · ${sec?'Secured':'Unsecured'}</div>
+        ${rule?`<div style="font-size:11px;color:#64748b;margin-top:2px;font-style:italic;">${escapeHtml(rule.rule)}</div>`:''}
       </button>`;
     }).join('');
     box.style.display='block'; bindCreditorResultClicks();
@@ -1237,13 +1482,47 @@ async function searchCreditors(idx,query){
   }
 }
 
-function searchDebtTypes(idx,query){
+function getDebtTypeStatus(t){
+  if(DEBT_TYPE_REJECTED_SET.has(t))    return {icon:'⛔',label:'Not accepted',color:'var(--ft-red)',bg:'#fef2f2'};
+  if(DEBT_TYPE_CONDITIONAL_SET.has(t)) return {icon:'⚠',label:'Conditional',color:'#92400e',bg:'#fffbeb'};
+  return {icon:'✓',label:'Accepted',color:'var(--ft-green-dark)',bg:'rgba(15,157,138,0.05)'};
+}
+
+function searchDebtTypes(idx, query){
   const box=document.querySelector(`[data-debt-results-index="${idx}"]`); if(!box) return;
   const q=String(query||'').trim().toLowerCase();
-  if(!q){box.innerHTML='';box.style.display='none';return;}
-  const matches=DEBT_TYPES.filter(t=>t.toLowerCase().includes(q));
-  if(!matches.length){box.innerHTML='';box.style.display='none';return;}
-  box.innerHTML=matches.map(t=>`<button type="button" data-debt-pick-index="${idx}" data-debt-pick-value="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
+  const fmtBtn=(t,cat)=>{
+    const s=getDebtTypeStatus(t);
+    return `<button type="button"
+      data-debt-pick-index="${idx}"
+      data-debt-pick-value="${escapeHtml(t)}"
+      style="padding:9px 13px;border-bottom:1px solid #f1f5f9;background:${s.bg};text-align:left;width:100%;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <span style="font-size:13px;font-weight:700;color:var(--ft-dark);">${escapeHtml(t)}</span>
+        <span style="font-size:10px;font-weight:800;color:${s.color};white-space:nowrap;">${s.icon} ${s.label}</span>
+      </div>
+      ${cat?`<div style="font-size:10px;color:#94a3b8;margin-top:2px;">${escapeHtml(cat)}</div>`:''}
+    </button>`;
+  };
+
+  if(!q){
+    // Show all categories
+    let html='';
+    Object.entries(DEBT_TYPE_CATEGORIES).forEach(([cat,types])=>{
+      html+=`<div style="padding:7px 13px 4px;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.5px;background:#f8fafc;border-bottom:1px solid #f1f5f9;">${escapeHtml(cat)}</div>`;
+      html+=types.map(t=>fmtBtn(t,'')).join('');
+    });
+    box.innerHTML=html; box.style.display='block';
+    bindDebtTypeResultClicks(); return;
+  }
+
+  // Filter across all types
+  const results=[];
+  Object.entries(DEBT_TYPE_CATEGORIES).forEach(([cat,types])=>{
+    types.filter(t=>t.toLowerCase().includes(q)).forEach(t=>results.push({t,cat}));
+  });
+  if(!results.length){box.innerHTML='<div style="padding:10px 13px;font-size:13px;color:#94a3b8;">No match found</div>';box.style.display='block';return;}
+  box.innerHTML=results.map(({t,cat})=>fmtBtn(t,cat)).join('');
   box.style.display='block'; bindDebtTypeResultClicks();
 }
 
@@ -1265,7 +1544,15 @@ function bindDebtTypeSearches(){
       const idx=Number(e.target.dataset.index); state.rows[idx].debtType=e.target.value||'';
       searchDebtTypes(idx,e.target.value||'');
     });
-    n.addEventListener('focus',e=>searchDebtTypes(Number(e.target.dataset.index),e.target.value||''));
+    // Always show on focus — empty query shows all categories
+    n.addEventListener('focus',e=>{
+      const idx=Number(e.target.dataset.index);
+      searchDebtTypes(idx,e.target.value||'');
+    });
+    // Clear the field on focus so agent can type fresh
+    n.addEventListener('mousedown',e=>{
+      if(document.activeElement===e.target) return; // already focused
+    });
   });
 }
 
@@ -1447,6 +1734,15 @@ async function sendProspectEmail(){
 }
 
 // ─── INIT ─────────────────────────────────────────────
+function toggleDebtTypes(){
+  const body=el('debtTypesBody');
+  const chevron=el('debtTypesChevron');
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  chevron.textContent=isOpen?'+':'−';
+  chevron.style.transform=isOpen?'rotate(0deg)':'rotate(45deg)';
+}
+
 function init(){
   el('stateSearch').addEventListener('input',e=>{state.selectedState='';searchStates(e.target.value||'');});
   el('stateSearch').addEventListener('focus',e=>searchStates(e.target.value||''));
