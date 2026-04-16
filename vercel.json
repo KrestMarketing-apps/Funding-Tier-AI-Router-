@@ -13,5 +13,11 @@
       "source": "/profit-engine/:path*",
       "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*"
     }
+
+    {
+      "source": "/commission-simulator/:path*",
+      "destination": "/commission-simulator/:path*"
+    }
+  
   ]
 }
