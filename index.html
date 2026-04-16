@@ -295,6 +295,67 @@
       border-radius: 12px; border: 1px solid var(--ft-green);
       background: rgba(15,157,138,0.08);
     }
+
+    /* ── DEBT TYPE AUTOCOMPLETE ── */
+    .dt-wrap { position: relative; }
+    .dt-input {
+      width: 100%; padding: 11px 38px 11px 38px;
+      border: 2px solid var(--ft-border); border-radius: 10px;
+      font-size: 14px; font-weight: 600; color: var(--ft-dark);
+      background: #fff; outline: none; transition: border-color .15s, box-shadow .15s;
+      cursor: text; font-family: inherit;
+    }
+    .dt-input:focus { border-color: var(--ft-green); box-shadow: 0 0 0 4px rgba(15,157,138,0.1); }
+    .dt-input::placeholder { color: #94a3b8; font-weight: 400; }
+    .dt-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    .dt-clear {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      width: 20px; height: 20px; border-radius: 50%; background: #e2e8f0;
+      border: none; cursor: pointer; display: none; align-items: center;
+      justify-content: center; font-size: 11px; color: #64748b; transition: background .1s; padding: 0;
+    }
+    .dt-clear:hover { background: #cbd5e1; }
+    .dt-panel {
+      position: absolute; top: calc(100% + 5px); left: 0; right: 0; z-index: 200;
+      background: #fff; border: 1.5px solid var(--ft-border); border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(15,23,42,0.10);
+      overflow: hidden; display: none; max-height: 320px; overflow-y: auto;
+    }
+    .dt-panel.open { display: block; }
+    .dt-cat {
+      padding: 7px 13px 5px; font-size: 10px; font-weight: 800;
+      color: #94a3b8; text-transform: uppercase; letter-spacing: .6px;
+      background: #f8fafc; border-bottom: 1px solid #f1f5f9;
+      position: sticky; top: 0; z-index: 1;
+    }
+    .dt-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 10px 13px; cursor: pointer; border-bottom: 1px solid #f8fafc;
+      transition: background .08s;
+    }
+    .dt-item:last-child { border-bottom: none; }
+    .dt-item:hover, .dt-item.dt-active { background: rgba(15,157,138,0.06); }
+    .dt-item-name { font-size: 13px; font-weight: 700; color: var(--ft-dark); }
+    .dt-item-name mark { background: none; color: var(--ft-green); font-weight: 900; }
+    .dt-item-cat { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+    .dt-badge {
+      flex-shrink: 0; font-size: 10px; font-weight: 800;
+      padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+    }
+    .dt-ok   { background: rgba(15,157,138,0.1); color: #0b7d6e; border: 1px solid rgba(15,157,138,0.25); }
+    .dt-cond { background: #fffbeb; color: #92400e; border: 1px solid rgba(245,158,11,0.25); }
+    .dt-no   { background: #fef2f2; color: #b91c1c; border: 1px solid rgba(239,68,68,0.25); }
+    .dt-none { padding: 16px 13px; font-size: 13px; color: #94a3b8; text-align: center; }
+    .dt-selected {
+      display: none; margin-top: 6px;
+      align-items: center; gap: 7px;
+      padding: 6px 11px; border-radius: 999px;
+      font-size: 12px; font-weight: 700;
+    }
+    .dt-selected-ok   { display: inline-flex; background: rgba(15,157,138,0.1); color: #0b7d6e; border: 1.5px solid rgba(15,157,138,0.3); }
+    .dt-selected-cond { display: inline-flex; background: #fffbeb; color: #92400e; border: 1.5px solid rgba(245,158,11,0.3); }
+    .dt-selected-no   { display: inline-flex; background: #fef2f2; color: #b91c1c; border: 1.5px solid rgba(239,68,68,0.3); }
+    .dt-selected button { background: none; border: none; cursor: pointer; padding: 0; line-height: 1; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -1387,14 +1448,20 @@ function renderRows(){
           ${totalDebt>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${pctOfTotal}</div>`:''}
         </div>
         <div style="position:relative;">
-          <div style="position:relative;">
-            <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:#94a3b8;pointer-events:none;z-index:1;">🔍</span>
-            <input class="ft-input debt-type-search" data-index="${idx}"
-              placeholder="Search debt type..."
+          <div class="dt-wrap" data-dt-wrap="${idx}">
+            <svg class="dt-icon" width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg>
+            <input class="dt-input" data-dt-index="${idx}"
+              placeholder="Search debt type…"
               value="${escapeHtml(row.debtType||'')}"
-              autocomplete="off"
-              style="padding-left:32px;cursor:pointer;" />
-            <div class="search-results" data-debt-results-index="${idx}" style="display:none;max-height:280px;overflow-y:auto;"></div>
+              autocomplete="off" />
+            <button class="dt-clear" data-dt-clear="${idx}" style="${row.debtType?'display:flex;':''}">✕</button>
+            <div class="dt-panel" data-dt-panel="${idx}"></div>
+          </div>
+          <div class="dt-selected ${row.debtType?'dt-selected-'+(DEBT_TYPE_REJECTED_SET.has(row.debtType)?'no':DEBT_TYPE_CONDITIONAL_SET.has(row.debtType)?'cond':'ok'):''}
+               " data-dt-selected="${idx}"
+               style="${row.debtType?'':'display:none;'}">
+            <span>${escapeHtml(row.debtType||'')}</span>
+            <button data-dt-clear-sel="${idx}">✕</button>
           </div>
         </div>
         ${removeBtn}
@@ -1437,264 +1504,290 @@ function refreshRowVisuals(){
   });
 }
 
-async function searchCreditors(idx,query){
-  const box=document.querySelector(`[data-results-index="${idx}"]`); if(!box) return;
-  if(!query||query.trim().length<1){box.innerHTML='';box.style.display='none';return;}
-  const local=getTraditionalCreditorMatches(query);
-  try{
-    const res=await fetch(`/api/ghl-creditors?search=${encodeURIComponent(query)}`);
-    const data=await res.json();
-    const api=(data.ok&&Array.isArray(data.results))?data.results:[];
-    const merged=[]; [...local,...api].forEach(item=>{
-      const name=String(item.display_name||'').trim(); if(!name) return;
-      if(!merged.some(x=>normalizeCreditorName(x.display_name)===normalizeCreditorName(name))) merged.push(item);
+// ─── SMART CREDITOR CLASSIFICATION ─────────────────────
+// Maps a creditor name to the correct debt type based on what we know about them
+function classifyRuleCreditor(name){
+  const n = normalizeCreditorName(name||'');
+  // Solar / home improvement / HVAC
+  if(['GOODLEAP','LOAN PAL','LOANPAL','SOLAR MOSAIC','MOSAIC','AQUA FINANCE','ENERBANK',
+      'SERVICE FINANCE','SVCFIN','SRVFINCO','POWERPAY','POWER PAY'].some(k=>n.includes(k)))
+    return 'Secured Loan'; // home improvement liens are secured
+  // Rent-to-own
+  if(['ACIMA','ACCEPTANCE NOW','KOALAFI','RENT A CENTER','RENTACENTER',
+      'FARMERS FURNITURE','FRMRS FURN','NEBRASKA FURNITURE','BOBS DISCOUNT',
+      'BOBS FURNITURE','BOBS FINANCE'].some(k=>n.includes(k)))
+    return 'Installment Sales Contract';
+  // Equipment / tool financing
+  if(['MATCO','SNAP ON','SNAPON','AGCO'].some(k=>n.includes(k)))
+    return 'Secured Loan';
+  // Credit union
+  if(['CREDIT UNION','FCU','EMPOWER FCU','ESL','REDSTONE','WSECU',
+      'GARDEN FCU','FORTERA','FORT WORTH CU','GOLDEN ONE','HAWAII CU',
+      'RED RIVER','LGFCU','STATE EMPLOYEES'].some(k=>n.includes(k)))
+    return 'Credit Union Loan';
+  // Payday / short-term
+  if(['ADVANCE FINANCIAL','KIKOFF','YENDO'].some(k=>n.includes(k)))
+    return 'Payday Loan';
+  // Tax relief
+  if(['ALLEVIATE'].some(k=>n.includes(k)))
+    return 'IRS Tax Debt';
+  // Military
+  if(['MILITARY STAR'].some(k=>n.includes(k)))
+    return 'Military Account';
+  // Default for unknown excluded creditors
+  return 'Unsecured';
+}
+
+// Fix mapCreditorToDebtType to not blindly default to Unsecured
+function mapCreditorToDebtType(item){
+  const pt  = String(item?.product_type||'').toLowerCase().trim();
+  const cl  = String(item?.classification||'').toLowerCase().trim();
+  const grp = String(item?.creditor_group||'').toLowerCase().trim();
+  const dn  = String(item?.display_name||'').toLowerCase().trim();
+  const secured = item?.secured===true||item?.secured==='true'||cl==='secured';
+
+  // Solar / home improvement always secured
+  if(pt.includes('solar')||pt.includes('home improvement')||pt.includes('hvac')||
+     dn.includes('solar')||dn.includes('goodleap')||dn.includes('mosaic')||
+     dn.includes('enerbank')||dn.includes('aqua finance')||dn.includes('powerpay')||
+     dn.includes('service finance')) return 'Secured Loan';
+
+  // Auto
+  if((pt.includes('auto')||pt.includes('vehicle'))&&secured) return 'Auto Loan (Secured)';
+  if(pt.includes('auto repo')||pt.includes('repossession')||grp.includes('repo')) return 'Repossession Deficiency';
+
+  // Product type mappings
+  if(pt.includes('credit card')) return 'Unsecured';
+  if(pt.includes('payday')||pt.includes('tribal')) return 'Payday Loan';
+  if(pt.includes('personal loan')&&!secured) return 'Unsecured Personal Loan';
+  if(pt.includes('line of credit')&&!secured) return 'Unsecured Line of Credit';
+  if(pt.includes('medical')) return 'Medical Bill';
+  if(pt.includes('student')) return 'Private Student Loan';
+  if(pt.includes('rent')||pt.includes('lease to own')) return 'Back Rent';
+  if(pt.includes('business')) return 'Business Debt';
+  if(pt.includes('tax')) return 'IRS Tax Debt';
+
+  // Classification fallback
+  if(secured) return 'Secured Loan';
+  if(cl.includes('unsecured')) return 'Unsecured';
+
+  // Name-based heuristics
+  const dnUpper = dn.toUpperCase();
+  if(['CREDIT UNION','FCU'].some(k=>dnUpper.includes(k))) return 'Credit Union Loan';
+  if(['FURNITURE','MATTRESS','ASHLEY'].some(k=>dnUpper.includes(k))) return 'Furniture Store Financing';
+
+  return 'Unsecured';
+}
+
+
+// ─── DEBT TYPE AUTOCOMPLETE SYSTEM ─────────────────────
+const DT_ALL = [];
+Object.entries(DEBT_TYPE_CATEGORIES).forEach(([cat,types])=>{
+  types.forEach(t=>DT_ALL.push({t,cat,
+    s: DEBT_TYPE_REJECTED_SET.has(t)?'no':DEBT_TYPE_CONDITIONAL_SET.has(t)?'cond':'ok'
+  }));
+});
+const DT_STATUS = {
+  ok:  {label:'Accepted',    cls:'dt-ok'},
+  cond:{label:'Conditional', cls:'dt-cond'},
+  no:  {label:'Not accepted',cls:'dt-no'},
+};
+function dtHl(str,q){
+  if(!q) return escapeHtml(str);
+  const i=str.toLowerCase().indexOf(q.toLowerCase());
+  if(i<0) return escapeHtml(str);
+  return escapeHtml(str.slice(0,i))+'<mark>'+escapeHtml(str.slice(i,i+q.length))+'</mark>'+escapeHtml(str.slice(i+q.length));
+}
+function dtBuildPanel(panel,q,rowIdx){
+  const items=q?DT_ALL.filter(i=>i.t.toLowerCase().includes(q.toLowerCase())):DT_ALL;
+  if(!items.length){panel.innerHTML=`<div class="dt-none">No match for "${escapeHtml(q)}"</div>`;return;}
+  let html='',gi=0;
+  if(q){
+    items.forEach(item=>{const s=DT_STATUS[item.s];html+=`<div class="dt-item" data-di="${gi++}"><div><div class="dt-item-name">${dtHl(item.t,q)}</div><div class="dt-item-cat">${escapeHtml(item.cat)}</div></div><span class="dt-badge ${s.cls}">${s.label}</span></div>`;});
+  } else {
+    Object.entries(DEBT_TYPE_CATEGORIES).forEach(([cat,types])=>{
+      html+=`<div class="dt-cat">${escapeHtml(cat)}</div>`;
+      types.forEach(t=>{const item=DT_ALL.find(i=>i.t===t)||{t,cat,s:'ok'};const s=DT_STATUS[item.s];html+=`<div class="dt-item" data-di="${gi++}"><div class="dt-item-name">${escapeHtml(t)}</div><span class="dt-badge ${s.cls}">${s.label}</span></div>`;});
     });
-    if(!merged.length){
-      box.innerHTML=`<button type="button" data-manual-index="${idx}" data-manual-value="${escapeHtml(query)}" class="w-full text-left">Use "${escapeHtml(query)}" as manual entry</button>`;
-      box.style.display='block'; bindCreditorResultClicks(); return;
-    }
-    box.innerHTML=merged.slice(0,10).map(item=>{
-      const dt=isTraditionalCardCreditor(item.display_name)?'Unsecured':mapCreditorToDebtType(item);
-      const sec=item.secured===true||item.secured==='true';
-      const rule=getCreditorRule(item.display_name||'');
-      const isRejected=rule&&rule.status==='rejected';
-      const isCond=rule&&rule.status==='conditional';
-      return `<button type="button" data-pick-index="${idx}" data-pick-name="${escapeHtml(item.display_name||'')}" data-pick-debt-type="${escapeHtml(dt)}" data-pick-secured="${sec}"
-        style="background:${isRejected?'#fef2f2':isCond?'#fffbeb':'#fff'};">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-          <div style="font-weight:800;color:${isRejected?'var(--ft-red)':isCond?'#92400e':'var(--ft-dark)'};">${escapeHtml(item.display_name||'')}</div>
-          ${isRejected?`<span style="font-size:10px;font-weight:800;background:var(--ft-red);color:#fff;border-radius:999px;padding:2px 7px;white-space:nowrap;">⛔ Level excluded</span>`:''}
-          ${isCond?`<span style="font-size:10px;font-weight:800;background:var(--ft-amber);color:#fff;border-radius:999px;padding:2px 7px;white-space:nowrap;">⚠ Conditional</span>`:''}
-        </div>
-        <div style="font-size:11px;color:${isRejected?'var(--ft-red)':sec?'var(--ft-red)':'var(--ft-green-dark)'};">${escapeHtml(dt)} · ${sec?'Secured':'Unsecured'}</div>
-        ${rule?`<div style="font-size:11px;color:#64748b;margin-top:2px;font-style:italic;">${escapeHtml(rule.rule)}</div>`:''}
-      </button>`;
-    }).join('');
-    box.style.display='block'; bindCreditorResultClicks();
-  }catch(e){
-    if(local.length){
-      box.innerHTML=local.map(item=>`<button type="button" data-pick-index="${idx}" data-pick-name="${escapeHtml(item.display_name||'')}" data-pick-debt-type="Unsecured" data-pick-secured="false">
-        <div style="font-weight:700;">${escapeHtml(item.display_name||'')}</div>
-        <div style="font-size:11px;color:var(--ft-green-dark);">Unsecured</div>
-      </button>`).join('');
-      box.style.display='block'; bindCreditorResultClicks();
-    } else {box.innerHTML='';box.style.display='none';}
   }
+  panel.innerHTML=html;
+  panel.querySelectorAll('.dt-item').forEach(el=>{
+    el.addEventListener('mousedown',e=>{
+      e.preventDefault();
+      const filtered=q?DT_ALL.filter(i=>i.t.toLowerCase().includes(q.toLowerCase())):DT_ALL;
+      const item=filtered[Number(el.dataset.di)];
+      if(item) dtPick(rowIdx,item);
+    });
+  });
 }
-
-function getDebtTypeStatus(t){
-  if(DEBT_TYPE_REJECTED_SET.has(t))    return {icon:'⛔',label:'Not accepted',color:'var(--ft-red)',bg:'#fef2f2'};
-  if(DEBT_TYPE_CONDITIONAL_SET.has(t)) return {icon:'⚠',label:'Conditional',color:'#92400e',bg:'#fffbeb'};
-  return {icon:'✓',label:'Accepted',color:'var(--ft-green-dark)',bg:'rgba(15,157,138,0.05)'};
+function dtPick(rowIdx,item){
+  state.rows[rowIdx].debtType=item.t;
+  const wrap=document.querySelector(`[data-dt-wrap="${rowIdx}"]`); if(!wrap) return;
+  const inp=wrap.querySelector(`[data-dt-index="${rowIdx}"]`);
+  const panel=wrap.querySelector(`[data-dt-panel="${rowIdx}"]`);
+  const clearBtn=wrap.querySelector(`[data-dt-clear="${rowIdx}"]`);
+  if(inp){inp.value='';inp.blur();}
+  if(panel) panel.classList.remove('open');
+  if(clearBtn) clearBtn.style.display='none';
+  const sel=document.querySelector(`[data-dt-selected="${rowIdx}"]`);
+  if(sel){sel.querySelector('span').textContent=item.t;sel.className=`dt-selected dt-selected-${item.s}`;sel.style.display='inline-flex';}
+  if(item.t==='Secured Loan'||item.t==='Auto Loan (Secured)') state.rows[rowIdx].isSecured=true;
+  refreshRowVisuals(); render();
 }
+function dtBindRow(rowIdx){
+  const wrap=document.querySelector(`[data-dt-wrap="${rowIdx}"]`); if(!wrap) return;
+  const inp=wrap.querySelector(`[data-dt-index="${rowIdx}"]`);
+  const panel=wrap.querySelector(`[data-dt-panel="${rowIdx}"]`);
+  const clearBtn=wrap.querySelector(`[data-dt-clear="${rowIdx}"]`);
+  const sel=document.querySelector(`[data-dt-selected="${rowIdx}"]`);
+  if(!inp||!panel) return;
+  let activeIdx=-1;
+  const open=q=>{dtBuildPanel(panel,q,rowIdx);panel.classList.add('open');activeIdx=-1;};
+  const close=()=>{panel.classList.remove('open');activeIdx=-1;};
+  inp.addEventListener('focus',()=>open(inp.value));
+  inp.addEventListener('input',e=>{const q=e.target.value;if(clearBtn) clearBtn.style.display=q?'flex':'none';open(q);});
+  inp.addEventListener('blur',()=>setTimeout(close,160));
+  inp.addEventListener('keydown',e=>{
+    if(!panel.classList.contains('open')) return;
+    const els=panel.querySelectorAll('.dt-item');
+    if(e.key==='ArrowDown'){e.preventDefault();activeIdx=Math.min(activeIdx+1,els.length-1);}
+    else if(e.key==='ArrowUp'){e.preventDefault();activeIdx=Math.max(activeIdx-1,-1);}
+    else if(e.key==='Enter'&&activeIdx>=0){e.preventDefault();const q=inp.value;const filtered=q?DT_ALL.filter(i=>i.t.toLowerCase().includes(q.toLowerCase())):DT_ALL;if(filtered[activeIdx])dtPick(rowIdx,filtered[activeIdx]);return;}
+    else if(e.key==='Escape'){close();inp.blur();return;}
+    els.forEach((el,i)=>{el.classList.toggle('dt-active',i===activeIdx);if(i===activeIdx)el.scrollIntoView({block:'nearest'});});
+  });
+  if(clearBtn){clearBtn.addEventListener('click',()=>{inp.value='';clearBtn.style.display='none';state.rows[rowIdx].debtType='';if(sel)sel.style.display='none';inp.focus();open('');refreshRowVisuals();render();});}
+  if(sel){const csb=document.querySelector(`[data-dt-clear-sel="${rowIdx}"]`);if(csb){csb.addEventListener('click',()=>{state.rows[rowIdx].debtType='';sel.style.display='none';inp.value='';inp.focus();refreshRowVisuals();render();});}}
+}
+function bindDebtTypeSearches(){ state.rows.forEach((_,idx)=>dtBindRow(idx)); }
+function bindDebtTypeResultClicks(){ /* handled in dtBuildPanel */ }
 
-function searchDebtTypes(idx, query){
-  const box=document.querySelector(`[data-debt-results-index="${idx}"]`); if(!box) return;
-  const q=String(query||'').trim().toLowerCase();
-  const fmtBtn=(t,cat)=>{
-    const s=getDebtTypeStatus(t);
-    return `<button type="button"
-      data-debt-pick-index="${idx}"
-      data-debt-pick-value="${escapeHtml(t)}"
-      style="padding:9px 13px;border-bottom:1px solid #f1f5f9;background:${s.bg};text-align:left;width:100%;">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <span style="font-size:13px;font-weight:700;color:var(--ft-dark);">${escapeHtml(t)}</span>
-        <span style="font-size:10px;font-weight:800;color:${s.color};white-space:nowrap;">${s.icon} ${s.label}</span>
-      </div>
-      ${cat?`<div style="font-size:10px;color:#94a3b8;margin-top:2px;">${escapeHtml(cat)}</div>`:''}
-    </button>`;
+async function searchCreditors(idx, query){
+  const box=document.querySelector(`[data-results-index="${idx}"]`);
+  if(!box) return;
+  const q=String(query||'').trim();
+  if(q.length < 1){ box.innerHTML=''; box.style.display='none'; return; }
+
+  const qNorm = normalizeCreditorName(q);
+
+  // ── 1. Search CREDITOR_RULES (excluded + conditional) ──
+  const ruleMatches = [];
+  CREDITOR_RULES.forEach(rule => {
+    const matched = rule.names.some(n => {
+      const nNorm = normalizeCreditorName(n);
+      if(nNorm.includes(qNorm) || qNorm.includes(nNorm)) return true;
+      // token match
+      const tokQ = qNorm.split(' ').filter(t=>t.length>1);
+      const tokN = nNorm.split(' ').filter(t=>t.length>1);
+      return tokQ.length >= 1 && tokQ.some(t => tokN.some(nt => nt.includes(t) || t.includes(nt)));
+    });
+    if(matched) ruleMatches.push({ rule, displayName: rule.names[0] });
+  });
+
+  // ── 2. Search traditional card companies ──
+  const cardMatches = getTraditionalCreditorMatches(q);
+
+  // ── 3. Try external API ──
+  let apiResults = [];
+  try{
+    const res = await fetch(`/api/ghl-creditors?search=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    if(data.ok && Array.isArray(data.results)) apiResults = data.results;
+  } catch(e){ /* silent fail */ }
+
+  // ── 4. Merge — rule matches first, then cards, then API ──
+  const seen = new Set();
+  const merged = [];
+
+  // Rule-matched creditors (show with rejection/conditional flag)
+  ruleMatches.forEach(({rule, displayName}) => {
+    const key = normalizeCreditorName(displayName);
+    if(seen.has(key)) return; seen.add(key);
+    merged.push({
+      display_name: displayName,
+      secured: false,
+      product_type: 'flagged',
+      _rule: rule,
+    });
+  });
+
+  // Card matches (accepted)
+  cardMatches.forEach(item => {
+    const key = normalizeCreditorName(item.display_name||'');
+    if(!key||seen.has(key)) return; seen.add(key);
+    // Check if also in rules
+    const rule = getCreditorRule(item.display_name||'');
+    merged.push({...item, _rule: rule||null});
+  });
+
+  // API results (accepted unless in rules)
+  apiResults.forEach(item => {
+    const key = normalizeCreditorName(item.display_name||'');
+    if(!key||seen.has(key)) return; seen.add(key);
+    const rule = getCreditorRule(item.display_name||'');
+    merged.push({...item, _rule: rule||null});
+  });
+
+  // ── 5. If nothing found, offer manual entry ──
+  if(!merged.length){
+    // Still check if the typed name itself matches a rule
+    const typedRule = getCreditorRule(q);
+    if(typedRule){
+      merged.push({ display_name: q, secured: false, product_type: 'flagged', _rule: typedRule });
+    } else {
+      box.innerHTML = `<button type="button" data-manual-index="${idx}" data-manual-value="${escapeHtml(q)}" style="padding:10px 13px;font-size:13px;font-weight:600;color:#64748b;">Use "${escapeHtml(q)}" as manual entry</button>`;
+      box.style.display = 'block';
+      bindCreditorResultClicks();
+      return;
+    }
+  }
+
+  // ── 6. Render ──
+  const getSmartDebtType = (item) => {
+    // Check rule first
+    if(item._rule) return classifyRuleCreditor(item._rule.names[0]);
+    if(isTraditionalCardCreditor(item.display_name)) return 'Unsecured';
+    return mapCreditorToDebtType(item);
   };
 
-  if(!q){
-    // Show all categories
-    let html='';
-    Object.entries(DEBT_TYPE_CATEGORIES).forEach(([cat,types])=>{
-      html+=`<div style="padding:7px 13px 4px;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.5px;background:#f8fafc;border-bottom:1px solid #f1f5f9;">${escapeHtml(cat)}</div>`;
-      html+=types.map(t=>fmtBtn(t,'')).join('');
-    });
-    box.innerHTML=html; box.style.display='block';
-    bindDebtTypeResultClicks(); return;
-  }
+  box.innerHTML = merged.slice(0, 12).map(item => {
+    const rule = item._rule;
+    const isRejected   = rule && rule.status === 'rejected';
+    const isCond       = rule && rule.status === 'conditional';
+    const isAccepted   = !rule;
+    const secured      = item.secured === true || item.secured === 'true';
+    const debtType     = getSmartDebtType(item);
 
-  // Filter across all types
-  const results=[];
-  Object.entries(DEBT_TYPE_CATEGORIES).forEach(([cat,types])=>{
-    types.filter(t=>t.toLowerCase().includes(q)).forEach(t=>results.push({t,cat}));
-  });
-  if(!results.length){box.innerHTML='<div style="padding:10px 13px;font-size:13px;color:#94a3b8;">No match found</div>';box.style.display='block';return;}
-  box.innerHTML=results.map(({t,cat})=>fmtBtn(t,cat)).join('');
-  box.style.display='block'; bindDebtTypeResultClicks();
+    const bgColor      = isRejected ? '#fef2f2' : isCond ? '#fffbeb' : '#fff';
+    const nameColor    = isRejected ? 'var(--ft-red)' : isCond ? '#92400e' : 'var(--ft-dark)';
+
+    return `<button type="button"
+      data-pick-index="${idx}"
+      data-pick-name="${escapeHtml(item.display_name||'')}"
+      data-pick-debt-type="${escapeHtml(debtType)}"
+      data-pick-secured="${secured}"
+      style="display:block;width:100%;text-align:left;padding:10px 13px;border:none;border-bottom:1px solid #f1f5f9;background:${bgColor};cursor:pointer;">
+
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:13px;font-weight:800;color:${nameColor};">${escapeHtml(item.display_name||'')}</span>
+        <div style="display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;">
+          ${isRejected ? `<span style="font-size:10px;font-weight:800;background:var(--ft-red);color:#fff;border-radius:999px;padding:2px 8px;white-space:nowrap;">⛔ Level excluded</span>` : ''}
+          ${isCond     ? `<span style="font-size:10px;font-weight:800;background:var(--ft-amber);color:#fff;border-radius:999px;padding:2px 8px;white-space:nowrap;">⚠ Conditional</span>` : ''}
+          ${isAccepted ? `<span style="font-size:10px;font-weight:800;background:rgba(15,157,138,0.15);color:var(--ft-green-dark);border-radius:999px;padding:2px 8px;white-space:nowrap;">✓ Accepted</span>` : ''}
+          ${secured    ? `<span style="font-size:10px;font-weight:700;background:#fee2e2;color:var(--ft-red);border-radius:999px;padding:2px 8px;white-space:nowrap;">Secured</span>` : ''}
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:#64748b;margin-top:3px;font-weight:600;">${escapeHtml(debtType)}</div>
+
+      ${rule ? `<div style="font-size:11px;color:${isRejected?'#b91c1c':'#92400e'};margin-top:3px;line-height:1.45;font-style:italic;">${escapeHtml(rule.rule)}</div>` : ''}
+    </button>`;
+  }).join('');
+
+  box.style.display = 'block';
+  bindCreditorResultClicks();
 }
 
-function bindCreditorSearches(){
-  document.querySelectorAll('.creditor-search').forEach(n=>{
-    n.addEventListener('input',e=>{
-      const idx=Number(e.target.dataset.index); const q=e.target.value||'';
-      state.rows[idx].creditorName=q;
-      if(isTraditionalCardCreditor(q)){state.rows[idx].debtType='Unsecured';state.rows[idx].isSecured=false;}
-      searchCreditors(idx,q);
-    });
-    n.addEventListener('focus',e=>searchCreditors(Number(e.target.dataset.index),e.target.value||''));
-  });
-}
-
-function bindDebtTypeSearches(){
-  document.querySelectorAll('.debt-type-search').forEach(n=>{
-    n.addEventListener('input',e=>{
-      const idx=Number(e.target.dataset.index); state.rows[idx].debtType=e.target.value||'';
-      searchDebtTypes(idx,e.target.value||'');
-    });
-    // Always show on focus — empty query shows all categories
-    n.addEventListener('focus',e=>{
-      const idx=Number(e.target.dataset.index);
-      searchDebtTypes(idx,e.target.value||'');
-    });
-    // Clear the field on focus so agent can type fresh
-    n.addEventListener('mousedown',e=>{
-      if(document.activeElement===e.target) return; // already focused
-    });
-  });
-}
-
-function bindCreditorResultClicks(){
-  document.querySelectorAll('[data-pick-index]').forEach(btn=>{
-    btn.onclick=()=>{
-      const idx=Number(btn.dataset.pickIndex); const name=btn.dataset.pickName||'';
-      const dt=btn.dataset.pickDebtType||'Unsecured'; const sec=btn.dataset.pickSecured==='true';
-      state.rows[idx].creditorName=name; state.rows[idx].isSecured=sec;
-      state.rows[idx].debtType=sec?(dt==='Auto Loan (Secured)'?'Auto Loan (Secured)':'Secured Loan'):isTraditionalCardCreditor(name)?'Unsecured':(dt||'Unsecured');
-      const inp=document.querySelector(`.creditor-search[data-index="${idx}"]`);
-      const box=document.querySelector(`[data-results-index="${idx}"]`);
-      if(inp) inp.value=name; if(box){box.innerHTML='';box.style.display='none';}
-      renderRows(); render();
-    };
-  });
-  document.querySelectorAll('[data-manual-index]').forEach(btn=>{
-    btn.onclick=()=>{
-      const idx=Number(btn.dataset.manualIndex); const val=btn.dataset.manualValue||'';
-      state.rows[idx].creditorName=val; state.rows[idx].debtType='Unsecured'; state.rows[idx].isSecured=false;
-      const inp=document.querySelector(`.creditor-search[data-index="${idx}"]`);
-      const box=document.querySelector(`[data-results-index="${idx}"]`);
-      if(inp) inp.value=val; if(box){box.innerHTML='';box.style.display='none';}
-      renderRows(); render();
-    };
-  });
-}
-
-function bindDebtTypeResultClicks(){
-  document.querySelectorAll('[data-debt-pick-index]').forEach(btn=>{
-    btn.onclick=()=>{
-      const idx=Number(btn.dataset.debtPickIndex); const val=btn.dataset.debtPickValue||'';
-      state.rows[idx].debtType=val;
-      const inp=document.querySelector(`.debt-type-search[data-index="${idx}"]`);
-      const box=document.querySelector(`[data-debt-results-index="${idx}"]`);
-      if(inp) inp.value=val; if(box){box.innerHTML='';box.style.display='none';}
-      if(val==='Secured Loan'||val==='Auto Loan (Secured)') state.rows[idx].isSecured=true;
-      renderRows(); render();
-    };
-  });
-}
-
-// ─── STATE SEARCH ─────────────────────────────────────
-function searchStates(query){
-  const box=el('stateResults'); if(!box) return;
-  const q=String(query||'').trim().toLowerCase();
-  if(!q){box.innerHTML='';box.style.display='none';return;}
-  const matches=STATE_OPTIONS.filter(s=>s.abbr.toLowerCase().includes(q)||s.name.toLowerCase().includes(q)||s.label.toLowerCase().includes(q));
-  if(!matches.length){box.innerHTML='';box.style.display='none';return;}
-  box.innerHTML=matches.map(s=>`<button type="button" data-state-pick="${s.abbr}" data-state-label="${escapeHtml(s.label)}">${escapeHtml(s.label)}</button>`).join('');
-  box.style.display='block';
-  document.querySelectorAll('[data-state-pick]').forEach(btn=>{
-    btn.onclick=()=>{
-      state.selectedState=btn.dataset.statePick||'';
-      const inp=el('stateSearch'); const box2=el('stateResults');
-      if(inp) inp.value=btn.dataset.stateLabel||'';
-      if(box2){box2.innerHTML='';box2.style.display='none';}
-      render();
-    };
-  });
-}
-
-// ─── FIELD CHANGE ─────────────────────────────────────
-function onFieldChange(e){
-  const idx=Number(e.target.dataset.index); const key=e.target.dataset.key;
-  if(!Number.isInteger(idx)||!state.rows[idx]) return;
-  state.rows[idx][key]=e.target.value;
-  render();
-}
-
-function addRow(){ if(state.rows.length>=MAX_ROWS) return; state.rows.push(createEmptyRow(state.nextRowId++)); renderRows(); render(); }
-function removeRow(idx){ if(state.rows.length<=1) return; state.rows.splice(idx,1); renderRows(); render(); }
-
-// ─── MAIN RENDER ──────────────────────────────────────
-function render(){
-  const c=computeScenarioData();
-  el('totalDebt').textContent=currency(c.totalDebt);
-  refreshRowVisuals();
-  renderRoutingPanel(c);
-  renderCsProgramCard(c);
-  renderCommissionCard(c);
-  renderPricingComparison(c);
-  renderComparison(c);
-  renderBackendClock();
-  const can=!!(c.recommended&&state.selectedState&&c.totalDebt>0);
-  const pdfB=el('pdfBtn'); const sendB=el('sendEmailBtn');
-  pdfB.disabled=!can; sendB.disabled=!can;
-  pdfB.style.opacity=can?1:0.5; sendB.style.opacity=can?1:0.5;
-}
-
-// ─── PDF ──────────────────────────────────────────────
-async function generatePdfBlob(){
-  const c=computeScenarioData();
-  if(!(c.recommended&&state.selectedState&&c.totalDebt>0)) return null;
-  const firstName=el('prospectFirstName').value.trim()||'Client';
-  const lastName=el('prospectLastName').value.trim()||'';
-  const fullName=`${firstName} ${lastName}`.trim();
-  const {jsPDF}=window.jspdf; const doc=new jsPDF(); const pw=doc.internal.pageSize.getWidth(); let y=20;
-  doc.setFontSize(20); doc.setTextColor(15,157,138); doc.text('Funding Tier — Debt Resolution Summary',14,y); y+=10;
-  doc.setFontSize(11); doc.setTextColor(0,0,0); doc.text(`Prepared for: ${fullName}`,14,y); y+=7;
-  const progType=c.routeInfo.route==='LEVEL'?'Debt Settlement':c.routeInfo.route==='CONSUMER SHIELD'?'Debt Validation':'—';
-  doc.text(`State: ${state.selectedState||'—'}  |  Program Selection: ${progType}`,14,y); y+=10;
-
-  if(c.csProg&&c.routeInfo.route==='CONSUMER SHIELD'){
-    doc.setFontSize(12); doc.setTextColor(26,110,216);
-    doc.text(`Consumer Shield Program ${c.csProg.label}: ${c.csProg.range}`,14,y); y+=7;
-    doc.setFontSize(10); doc.setTextColor(71,85,105);
-    doc.text(`Monthly Payment: ${currency(c.csProg.payment)}  |  Term: ${c.csProg.term} months  |  Total: ${currency(c.csProg.term*c.csProg.payment)}`,14,y); y+=10;
-  }
-
-  const tableRows=[
-    ['Monthly Payments',currency(c.doNothing.monthlyPayment),c.shortest?currency(c.shortest.monthlyPayment):'—',c.recommended?currency(c.recommended.monthlyPayment):'—'],
-    ['Total Enrolled Debt',currency(c.totalDebt),c.shortest?currency(c.totalDebt):'—',c.recommended?currency(c.totalDebt):'—'],
-    ['Months to Payoff',`${c.doNothing.monthsToPayoff} mo`,c.shortest?`${c.shortest.term} mo`:'—',c.recommended?`${c.recommended.term} mo`:'—'],
-    ['Est. Total Payback',currency(c.doNothing.totalPayback),c.shortest?currency(c.shortest.totalCost):'—',c.recommended?currency(c.recommended.totalCost):'—'],
-    ['Est. Savings','—',c.shortest?currency(Math.max(0,c.doNothing.totalPayback-c.shortest.totalCost)):'—',c.recommended?currency(Math.max(0,c.doNothing.totalPayback-c.recommended.totalCost)):'—']
-  ];
-  const headers=['Detail','Current Situation','Fastest Payoff','Recommended'];
-  const cx=[14,64,124,162]; const rh=10;
-  doc.setFillColor(241,245,249); doc.rect(14,y,182,rh,'F');
-  doc.setFontSize(7); doc.setTextColor(51,65,85);
-  headers.forEach((h,i)=>{doc.text(doc.splitTextToSize(h,40),cx[i]+2,y+4);}); y+=14;
-  tableRows.forEach((row,idx)=>{
-    const isSav=idx===4;
-    if(isSav){doc.setFillColor(15,157,138);doc.rect(14,y,182,rh,'F');}
-    else if(idx%2===1){doc.setFillColor(248,250,252);doc.rect(14,y,182,rh,'F');}
-    row.forEach((cell,i)=>{
-      if(isSav){doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');}
-      else if(idx===3&&i===1){doc.setTextColor(239,68,68);doc.setFont(undefined,'bold');}
-      else{doc.setTextColor(15,23,42);doc.setFont(undefined,'normal');}
-      doc.setFontSize(8); doc.text(String(cell),cx[i]+2,y+6);
-    }); y+=rh;
-  });
-  return doc.output('blob');
-}
-
-async function buildPdf(){
-  const blob=await generatePdfBlob(); if(!blob) return;
-  const url=URL.createObjectURL(blob); const a=document.createElement('a');
-  a.href=url; a.download='Funding-Tier-Debt-Resolution-Summary.pdf';
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-}
 
 async function sendProspectEmail(){
   const c=computeScenarioData();
