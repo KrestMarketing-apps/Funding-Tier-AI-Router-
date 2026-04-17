@@ -1,20 +1,17 @@
-import { backendEngine } from "../services/backendEngine";
+import { backendEngine } from "@/services/backendEngine";
 
 export function dealRouter(lead) {
-  const legacy = backendEngine.evaluateLead(
-    "legacy_capital_services",
-    lead
-  );
+  const result = backendEngine.evaluateLead(lead);
 
-  if (legacy.qualified) {
+  if (result.qualified) {
     return {
       backend: "LEGACY",
-      ...legacy
+      ...result
     };
   }
 
   return {
     backend: "NO_MATCH",
-    route: "MANUAL_REVIEW"
+    ...result
   };
 }
