@@ -1,10 +1,10 @@
 export const revenue = {
   name: "Level Debt Revenue Model",
 
-  // 🔥 THIS IS WHAT YOU ACTUALLY GET PAID
+  // 🔥 What Funding Tier earns
   companyPayoutRate: 0.08, // 8%
 
-  // Program fee (for UI reference only — NOT your revenue)
+  // Program fee (client-facing, NOT your revenue)
   standardProgramFee: 0.25,
   attorneyProgramFee: 0.27,
 
@@ -32,8 +32,11 @@ export const revenue = {
     const termMonths = this.getMaxTerm(debt);
     const programFee = this.getProgramFee(state, routing);
 
-    const totalCost = (debt * 0.5) + (debt * programFee);
-    return totalCost / termMonths;
+    const estimatedSettlement = debt * 0.5;
+    const programFees = debt * programFee;
+    const totalProgramCost = estimatedSettlement + programFees;
+
+    return totalProgramCost / termMonths;
   },
 
   calculate({ totalDebt, state, routing }) {
@@ -42,15 +45,14 @@ export const revenue = {
     const programFee = this.getProgramFee(state, routing);
     const termMonths = this.getMaxTerm(debt);
 
-    // 🔹 Program economics (what client pays)
+    // 🔹 Client-facing math
     const estimatedSettlement = debt * 0.5;
     const programFees = debt * programFee;
     const totalProgramCost = estimatedSettlement + programFees;
+    const monthlyPayment = totalProgramCost / termMonths;
 
     // 🔥 YOUR ACTUAL REVENUE
     const companyRevenue = debt * this.companyPayoutRate;
-
-    const monthlyPayment = totalProgramCost / termMonths;
 
     return {
       eligible: debt >= 7000,
@@ -58,18 +60,27 @@ export const revenue = {
       totalDebt: debt,
       termMonths,
 
-      // Client-facing (UI)
+      // Client-facing values
       estimatedSettlement,
       programFees,
       totalProgramCost,
       monthlyPayment,
 
-      // 🔥 INTERNAL ONLY
+      // Internal values (DO NOT expose to agents)
       totalRevenue: companyRevenue,
       revenueRate: this.companyPayoutRate,
 
-      // helpful for comparisons
       backend: "LEVEL_DEBT"
     };
+  },
+
+  // 🔥 Revenue spread across time (used for smarter routing decisions)
+  getRevenuePerMonth(totalDebt, termMonths) {
+    const debt = Number(totalDebt || 0);
+    const months = Number(termMonths || 1);
+
+    const totalRevenue = debt * this.companyPayoutRate;
+
+    return totalRevenue / months;
   }
 };
