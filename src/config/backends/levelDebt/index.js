@@ -7,6 +7,7 @@ import { agentcommission } from "./agentcommission";
 import { objections } from "./objections";
 import { crmActions } from "./crmActions";
 import { knowledgebase } from "./knowledgebase";
+import { creditorMatcher } from "./creditorMatcher";
 
 export const levelDebtBackend = {
   id: "level_debt",
@@ -25,5 +26,6 @@ export const levelDebtBackend = {
   agentcommission,
   objections,
   crmActions,
-  knowledgebase
+  knowledgebase,
+  creditorMatcher
 };
