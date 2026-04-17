@@ -5,8 +5,8 @@ export const qualification = {
 
   isQualified(lead) {
     return (
-      Number(lead?.totalDebt || 0) > this.minDebt &&
-      Number(lead?.monthlyPayment || 0) > this.minMonthlyPayment &&
+      Number(lead?.totalDebt || 0) >= this.minDebt &&
+      Number(lead?.monthlyPayment || 0) >= this.minMonthlyPayment &&
       lead?.bankVerified === true
     );
   },
@@ -14,11 +14,11 @@ export const qualification = {
   getFailures(lead) {
     const failures = [];
 
-    if (Number(lead?.totalDebt || 0) <= this.minDebt) {
+    if (Number(lead?.totalDebt || 0) < this.minDebt) {
       failures.push("LOW_DEBT");
     }
 
-    if (Number(lead?.monthlyPayment || 0) <= this.minMonthlyPayment) {
+    if (Number(lead?.monthlyPayment || 0) < this.minMonthlyPayment) {
       failures.push("LOW_PAYMENT");
     }
 
