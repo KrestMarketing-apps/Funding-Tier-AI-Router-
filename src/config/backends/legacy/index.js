@@ -18,3 +18,16 @@ export const legacyBackend = {
   objections,
   crmActions
 };
+import logo from "@/assets/logos/legacy-logo.png";
+
+export const legacyBackend = {
+  id: "legacy_capital_services",
+  name: "Legacy Capital Services",
+
+  display: {
+    label: "Legacy Capital Services",
+    logo
+  },
+
+  // rest...
+};
