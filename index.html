@@ -566,6 +566,18 @@ function chooseRoute(total, sc, flags){
     reason: 'No available backend is serviceable in this state.'
   };
 }
+
+  function getLegacyState(c){
+  if(!c) return {status:'UNKNOWN',label:'Unknown'};
+
+  const LEGACY_BLACKOUT = new Set([
+    'AK','RI','VT','WV','OR'
+  ]);
+
+  return LEGACY_BLACKOUT.has(c)
+    ? {status:'BLACKOUT',label:'Not Serviceable'}
+    : {status:'GREEN',label:'Serviceable'};
+}
 function computeScenario(){
   const rows=app.rows.filter(r=>num(r.amount)>0);
   const total=rows.reduce((s,r)=>s+num(r.amount),0);
@@ -575,6 +587,7 @@ function computeScenario(){
   const csProg=getCsProg(total);
   const csAvail=css.status!=='BLACKOUT'&&total>=4000&&!flags.cs.some(f=>f.includes('not accepted')||f.includes('requires at least'));
   const ldAvail=lds.status!=='BLACKOUT'&&total>=7000;
+  const legacyAvail = getLegacyState(app.sel).status !== 'BLACKOUT' && total > 6000;
   const feeRate=route.route==='LEVEL'?(lds.status==='RED'?.27:.25):0;
   const dn=calcDN(total);
   let shortest=null,recommended=null;
@@ -584,8 +597,22 @@ function computeScenario(){
   if(route.route==='LEVEL')activeFlags.push(...flags.ld);
   if(route.route==='CONSUMER SHIELD'){activeFlags.push(...flags.cs);activeFlags.push('Consumer Shield support: Mon-Fri 9am-7pm EST.');activeFlags.push('Consumer Shield uses Equifax for credit pull.');}
   if(route.route==='NO OPTION')activeFlags.push(route.reason);
-  return{rows,total,route,dn,shortest,recommended,feeRate,lds,css,csProg,csAvail,ldAvail,flags:Array.from(new Set(activeFlags))};
-}
+return {
+  rows,
+  total,
+  route,
+  dn,
+  shortest,
+  recommended,
+  feeRate,
+  lds,
+  css,
+  csProg,
+  csAvail,
+  ldAvail,
+  legacyAvail,
+  flags: ...
+};
 
 // ════ ROW ALERTS ═══════════════════════════════════
 function rowAlerts(row,route){
