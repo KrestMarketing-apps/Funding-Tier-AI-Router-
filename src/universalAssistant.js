@@ -1,3 +1,4 @@
+import { backendVisibilityService } from "@/services/backendVisibilityService";
 import { backendKnowledgeService } from "@/services/backendKnowledgeService";
 import { dealRouter } from "@/tools/dealRouter";
 
@@ -5,75 +6,140 @@ function normalize(text) {
   return String(text || "").trim().toLowerCase();
 }
 
+function formatCreditorResults(results) {
+  return results.map((item) => {
+    const status = item.result?.status || "unknown";
+    const rule = item.result?.rule || "No specific rule found.";
+
+    return {
+      backendId: item.backendId,
+      backendName: item.backendName,
+      status,
+      rule
+    };
+  });
+}
+
 export const universalAssistant = {
-  answer(question, context = {}) {
+  answer(question, context = {}, permissions = { includeInternal: false }) {
     const q = normalize(question);
 
-    // backend summaries
+    // Block internal-only topics
+    if (
+      (q.includes("revenue") ||
+        q.includes("profit") ||
+        q.includes("margin") ||
+        q.includes("payout optimization") ||
+        q.includes("company profitability")) &&
+      !permissions.includeInternal
+    ) {
+      return {
+        type: "restricted",
+        answer: "That information is internal-only."
+      };
+    }
+
+    // Backend summary/info
+    if (context.backend) {
+      const backend = backendVisibilityService.getBackendView(context.backend, {
+        includeInternal: permissions.includeInternal
+      });
+
+      if (!backend) {
+        return {
+          type: "error",
+          answer: "Backend not found."
+        };
+      }
+
+      if (
+        q.includes("summary") ||
+        q.includes("tell me about") ||
+        q.includes("what is") ||
+        q.includes("knowledge base")
+      ) {
+        return {
+          type: "backend_info",
+          answer: backend.knowledgebase || backend
+        };
+      }
+    }
+
+    // Available backends
     if (q.includes("what backends") || q.includes("available backends")) {
-      const backends = backendKnowledgeService.getBackendSummaries();
       return {
-        type: "summary",
-        answer: backends.map((b) => `${b.name}: ${b.description}`).join("\n")
+        type: "backend_list",
+        answer: backendKnowledgeService.getBackendSummaries()
       };
     }
 
-    // creditor checks
-    if (q.includes("creditor") || q.includes("is ") && q.includes(" accepted")) {
-      const creditorName = context.creditorName || question;
-      const results = backendKnowledgeService.checkCreditorAcrossBackends(
-        creditorName,
-        {
-          debtType: context.debtType,
-          isSecured: context.isSecured,
-          accountType: context.accountType
-        }
-      );
-
+    // Minimums
+    if (q.includes("minimum") || q.includes("minimum debt")) {
       return {
-        type: "creditor_check",
-        answer: results
+        type: "minimums",
+        answer: backendKnowledgeService.getMinimums()
       };
     }
 
-    // objection handling
-    if (q.includes("objection") || q.includes("how do i respond")) {
-      if (context.backend && context.objectionKey) {
-        const objection = backendKnowledgeService.getObjection(
+    // Objections
+    if (
+      (q.includes("objection") || q.includes("how do i respond")) &&
+      context.backend &&
+      context.objectionKey
+    ) {
+      return {
+        type: "objection",
+        answer: backendKnowledgeService.getObjection(
           context.backend,
           context.objectionKey
-        );
-
-        return {
-          type: "objection",
-          answer: objection || "No objection response found."
-        };
-      }
-    }
-
-    // route a lead
-    if (q.includes("where should this go") || q.includes("route this lead")) {
-      const result = dealRouter(context.lead || {});
-      return {
-        type: "routing",
-        answer: result
+        )
       };
     }
 
-    // backend-specific summary
-    if (context.backend) {
-      const kb = backendKnowledgeService.getKnowledgebase(context.backend);
-      if (kb) {
-        return {
-          type: "knowledgebase",
-          answer: kb
-        };
-      }
+    // Creditor checks
+    if (
+      (q.includes("creditor") || q.includes("accepted") || q.includes("allow")) &&
+      context.creditorName
+    ) {
+      return {
+        type: "creditor_check",
+        answer: formatCreditorResults(
+          backendKnowledgeService.checkCreditorAcrossBackends(
+            context.creditorName,
+            {
+              debtType: context.debtType,
+              isSecured: context.isSecured,
+              accountType: context.accountType
+            }
+          )
+        )
+      };
+    }
+
+    // Route lead
+    if (
+      q.includes("route this lead") ||
+      q.includes("where should this go") ||
+      q.includes("which backend")
+    ) {
+      return {
+        type: "routing",
+        answer: dealRouter(context.lead || {})
+      };
+    }
+
+    // Compare backend fields
+    if (q.includes("compare") && context.fieldPath) {
+      return {
+        type: "comparison",
+        answer: backendKnowledgeService.compareBackendField(context.fieldPath)
+      };
     }
 
     return {
       type: "fallback",
-      answer: "I could not confidently answer that yet. Add more context like backend name, creditor name, debt type, or lead details."
+      answer:
+        "I need more context like a backend name, creditor name, objection key, field path, or lead details."
     };
   }
 };
