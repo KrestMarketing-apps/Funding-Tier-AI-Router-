@@ -72,6 +72,11 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 .p-r{background:#fef2f2;color:var(--rd);border:1px solid rgba(239,68,68,.3);}
 .p-a{background:#fffbeb;color:#92400e;border:1px solid rgba(245,158,11,.3);}
 .p-b{background:#eff6ff;color:var(--bl);border:1px solid rgba(26,110,216,.3);}
+.p-purple {
+  background: rgba(139,92,246,.12);
+  color: #6d28d9;
+  border: 1px solid rgba(139,92,246,.3);
+}
 .mc{background:#fff;border:1px solid var(--br);border-radius:12px;padding:13px;position:relative;overflow:hidden;}
 .mc::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--g);border-radius:12px 12px 0 0;}
 .mc-lbl{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin:5px 0 5px;}
@@ -175,68 +180,51 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 
     <div class="card">
       <div class="card-hd">Backend Routing</div>
+
       <div id="routeBadges" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;"></div>
+
       <div id="routeReason" style="font-size:13px;color:#475569;font-weight:500;line-height:1.65;background:var(--bg);border:1px solid var(--br);border-radius:10px;padding:10px 13px;margin-bottom:14px;"></div>
+
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:12px;font-weight:800;color:#334155;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;">
+          What matters most to the prospect?
+        </label>
+        <select id="featurePriority" class="fi">
+  <option value="best_fit">Best Overall Fit</option>
+  <option value="debt_validation">Debt Validation</option>
+  <option value="legal_support">Attorney-Led / Legal Support</option>
+  <option value="fixed_payment">Fixed Monthly Payment</option>
+  <option value="lowest_payment">Lowest Monthly Payment</option>
+  <option value="fastest_resolution">Fastest Resolution</option>
+</select>
+      </div>
+
       <div id="providerAvail" style="border:1px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:14px;"></div>
       <div id="clockBox" style="border:1px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:14px;"></div>
       <div id="flagsBox" style="display:grid;gap:6px;"></div>
     </div>
 
     <div class="card" id="commCard" style="display:none;">
-      <div class="card-hd" style="color:var(--am);border-color:var(--am);">Potential Commission &#8212; Based on Program Selection</div>
+      <div class="card-hd" style="color:var(--am);border-color:var(--am);">Potential Commission — Based on Program Selection</div>
       <div id="commDetail"></div>
     </div>
 
-    <!-- AI Knowledge Base Agent -->
-    <div class="card" id="aiAgentCard" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
-      <div style="background:linear-gradient(135deg,var(--dk) 0%,#0b3b50 45%,#0f766e 100%);padding:14px 18px;display:flex;align-items:center;gap:10px;">
-        <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-        </div>
-        <div>
-          <div style="font-size:14px;font-weight:900;color:#fff;letter-spacing:-.3px;">Enrollment Assistant</div>
-          <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:1px;">Ask anything about debt types, creditors, states, programs</div>
-        </div>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-          <div style="width:7px;height:7px;border-radius:50%;background:#22c55e;"></div>
-          <span style="font-size:11px;color:rgba(255,255,255,.5);font-weight:600;">Online</span>
-        </div>
-      </div>
-      <div id="chatMessages" style="flex:1;overflow-y:auto;padding:14px;display:grid;gap:10px;min-height:260px;max-height:400px;background:#f8fafc;"></div>
-      <div style="padding:10px 12px;background:#fff;border-top:1px solid var(--br);">
-        <div style="display:flex;gap:8px;align-items:flex-end;">
-          <textarea id="chatInput" placeholder="Ask about debt types, creditor rules, state eligibility, program requirements&#8230;" rows="2"
-            style="flex:1;resize:none;border:1.5px solid var(--br);border-radius:10px;padding:9px 12px;font-size:13px;font-family:inherit;color:var(--dk);outline:none;transition:border-color .15s;line-height:1.5;"
-            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
-          <button onclick="sendChat()" id="chatSendBtn"
-            style="height:36px;padding:0 16px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;">Send</button>
-        </div>
-        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
-          <button onclick="quickAsk('Is [creditor name] accepted by Level Debt?')" class="qa-btn">Creditor check</button>
-          <button onclick="quickAsk('What states is Consumer Shield not available in?')" class="qa-btn">State eligibility</button>
-          <button onclick="quickAsk('Can I enroll private student loans?')" class="qa-btn">Student loans</button>
-          <button onclick="quickAsk('What are the Level Debt debt type rules?')" class="qa-btn">Debt type rules</button>
-        </div>
-      </div>
-    </div>
-
-    </div>
-
     <div class="card" id="csProgramCard" style="display:none;">
-      <div class="card-hd"><div class="logo-sm"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png" alt="CS"/></div>Consumer Shield Program</div>
+      <div class="card-hd">
+        <div class="logo-sm"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png" alt="CS"/></div>
+        Consumer Shield Program
+      </div>
       <div id="csActiveDetail" style="margin-bottom:16px;"></div>
       <div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">All Program Tiers</div>
       <div id="csTileGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
     </div>
 
   </div>
-</div>
 
 <div class="card">
   <div class="card-hd">Program Comparison</div>
   <p style="font-size:13px;color:#64748b;margin-bottom:16px;font-weight:500;">Only currently available and eligible options are shown.</p>
-  <div id="planCards" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"></div>
-  <div id="planDiff" style="margin-top:16px;"></div>
+  <div id="planCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;"></div>  <div id="planDiff" style="margin-top:16px;"></div>
 </div>
 
 <div class="card" style="padding:0;overflow:hidden;">
@@ -246,11 +234,17 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
   </div>
   <div style="overflow-x:auto;padding:20px;">
     <table class="cmp">
-      <thead><tr>
+           <thead><tr>
         <th style="text-align:left;width:170px;">Detail</th>
         <th style="text-align:left;background:#1e293b;">Current Situation</th>
         <th style="text-align:left;">Fastest Payoff</th>
-        <th style="text-align:left;background:rgba(15,157,138,.06);color:#0b7d6e;">Recommended Program <span style="background:var(--g);color:#fff;border-radius:999px;padding:2px 8px;font-size:10px;margin-left:6px;">Best Option</span></th>
+        <th style="text-align:left;background:rgba(15,157,138,.06);color:#0b7d6e;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <img id="recommendedProgramLogo" src="" alt="" style="display:none;height:18px;width:auto;object-fit:contain;border-radius:4px;background:#fff;border:1px solid #dbe4ea;padding:2px;"/>
+            <span id="recommendedProgramHeader">Recommended Program</span>
+            <span style="background:var(--g);color:#fff;border-radius:999px;padding:2px 8px;font-size:10px;">Best Option</span>
+          </div>
+        </th>
       </tr></thead>
       <tbody id="cmpTable"></tbody>
     </table>
@@ -261,6 +255,7 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 // ════ CONSTANTS ════════════════════════════════════
 const LD_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp';
 const CS_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png';
+const LEGACY_LOGO='/assets/legacy%20capital%20logo.png';
 
 const CS_PROGS=[
   {k:'A',range:'$4,000-$4,999',   min:4000, max:4999,    pay:220,term:18,comm:{p2:150,p4:0,total:150}},
@@ -285,6 +280,7 @@ const STATE_NAMES={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'Calif
 const LD_BLACKOUT=new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
 const LD_RED=new Set(['CT','GA','LA','MN','NV','NH','NJ','ND','OH','PA','TN','WA','WY']);
 const CS_BLACKOUT=new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
+const LEGACY_BLACKOUT=new Set(['ID','ND','GA']);
 const STATE_OPTS=Object.entries(STATE_NAMES).map(([a,n])=>({a,n,l:`${a} - ${n}`})).sort((x,y)=>x.l.localeCompare(y.l));
 
 const CS_REJ=new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
@@ -407,6 +403,7 @@ function getCredRule(name){
 const isTradCard=n=>TRAD_CARDS.some(t=>normName(n).includes(normName(t)));
 const getLDState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:LD_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Black Out'}:LD_RED.has(c)?{status:'RED',label:'Attorney Model'}:{status:'GREEN',label:'Standard Model'};
 const getCSState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:CS_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Black Out'}:{status:'GREEN',label:'Serviceable'};
+const getLegacyState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:LEGACY_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Black Out'}:{status:'GREEN',label:'Available'};
 const getLDMaxTerm=d=>d<10000?24:d<12500?30:d<15000?36:d<25000?42:d<35000?48:d<50000?54:60;
 
 // ════ STATE ════════════════════════════════════════
@@ -449,19 +446,125 @@ function collectFlags(rows,total,sc){
   });
   return{cs:Array.from(new Set(csF)),ld:Array.from(new Set(ldF))};
 }
-function chooseRoute(total,sc,flags){
-  if(!sc)return{route:'',reason:'Select a state to calculate routing.'};
-  const cs=getCSState(sc),ld=getLDState(sc);
-  const csOK=cs.status!=='BLACKOUT'&&!flags.cs.some(f=>f.includes('not accepted')||f.includes('requires at least'));
-  const ldStop=flags.ld.some(f=>f.includes('not accepted')||f.includes('requires at least')||f.includes('60%')||f.includes('25%')||f.includes('CA residents')||f.includes('Discover private'));
-  const ldOK=ld.status!=='BLACKOUT'&&!ldStop;
-  if(total>0&&total<7000){
-    if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt below $7,000 - routes to Consumer Shield when the state and profile are serviceable.'};
-    return{route:'NO OPTION',reason:'Debt below $7,000 and Consumer Shield is not available for this scenario.'};
+function chooseRoute(total, sc, flags){
+  if(!sc){
+    return {
+      route: '',
+      reason: 'Select a state to calculate routing.'
+    };
   }
-  if(ldOK)return{route:'LEVEL',reason:ld.status==='RED'?'Best option is Level Debt under the attorney model in this state.':'Best option is Level Debt - serviceable standard state.'};
-  if(csOK)return{route:'CONSUMER SHIELD',reason:'Consumer Shield is available for this state and debt profile.'};
-  return{route:'NO OPTION',reason:'No available backend is serviceable in this state.'};
+
+  const pref = $('featurePriority')?.value || 'best_fit';
+  const cs = getCSState(sc);
+  const ld = getLDState(sc);
+  const legacy = getLegacyState(sc);
+
+  // Consumer Shield eligibility
+  const csOK =
+    cs.status !== 'BLACKOUT' &&
+    total >= 4000 &&
+    !flags.cs.some(f =>
+      f.includes('not accepted') ||
+      f.includes('requires at least')
+    );
+
+  // Level Debt hard-stop logic (preserved)
+  const ldStop = flags.ld.some(f =>
+    f.includes('not accepted') ||
+    f.includes('requires at least') ||
+    f.includes('60%') ||
+    f.includes('50%') ||
+    f.includes('25%') ||
+    f.includes('CA residents') ||
+    f.includes('Discover private')
+  );
+
+  const ldOK =
+    ld.status !== 'BLACKOUT' &&
+    total >= 7000 &&
+    !ldStop;
+
+  // Legacy eligibility
+  const legacyOK =
+    legacy.status !== 'BLACKOUT' &&
+    total > 6000;
+
+  // Under $4,000
+  if(total > 0 && total < 4000){
+    return {
+      route: 'NO OPTION',
+      reason: 'Debt below $4,000 - no current backend matches this scenario.'
+    };
+  }
+
+  // $4,000 to $6,000 = Consumer Shield only
+  if(total >= 4000 && total <= 6000){
+    if(csOK){
+      return {
+        route: 'CONSUMER SHIELD',
+        reason: 'Debt between $4,000 and $6,000 routes to Consumer Shield.'
+      };
+    }
+
+    return {
+      route: 'NO OPTION',
+      reason: 'Debt is in Consumer Shield range, but Consumer Shield is not available for this state or scenario.'
+    };
+  }
+
+  // Above $6,000 and prospect specifically wants debt validation
+  if(total > 6000 && pref === 'debt_validation'){
+    if(legacyOK){
+      return {
+        route: 'LEGACY',
+        reason: 'Prospect wants debt validation and Legacy Capital Services is available in this state.'
+      };
+    }
+
+    if(csOK){
+      return {
+        route: 'CONSUMER SHIELD',
+        reason: 'Prospect wants debt validation, and Legacy cannot service this state, so Consumer Shield is the fallback.'
+      };
+    }
+
+    return {
+      route: 'NO OPTION',
+      reason: 'Prospect wants debt validation, but neither Legacy nor Consumer Shield is available for this state/scenario.'
+    };
+  }
+
+  // Above $6,000 normal routing:
+  // 1) Level Debt first if it fully qualifies
+  if(ldOK){
+    return {
+      route: 'LEVEL',
+      reason: ld.status === 'RED'
+        ? 'Best option is Level Debt under the attorney model in this state.'
+        : 'Best option is Level Debt in a serviceable standard state.'
+    };
+  }
+
+  // 2) Then Legacy
+  if(legacyOK){
+    return {
+      route: 'LEGACY',
+      reason: 'Level Debt is not a fit under current routing rules, so Legacy Capital Services is the next best available option.'
+    };
+  }
+
+  // 3) Then Consumer Shield
+  if(csOK){
+    return {
+      route: 'CONSUMER SHIELD',
+      reason: 'Level Debt is not available for this scenario, so Consumer Shield is the fallback option.'
+    };
+  }
+
+  return {
+    route: 'NO OPTION',
+    reason: 'No available backend is serviceable in this state.'
+  };
 }
 function computeScenario(){
   const rows=app.rows.filter(r=>num(r.amount)>0);
