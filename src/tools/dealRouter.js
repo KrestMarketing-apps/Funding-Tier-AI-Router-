@@ -11,7 +11,6 @@ function getTermMonths(lead, totalDebt) {
 
   if (requested > 0) return requested;
 
-  // sensible defaults
   if (totalDebt <= 6000) return 24;
   if (totalDebt <= 15000) return 36;
   return 48;
@@ -20,11 +19,12 @@ function getTermMonths(lead, totalDebt) {
 function evaluateLegacy(lead) {
   const totalDebt = Number(lead?.totalDebt || 0);
   const termMonths = getTermMonths(lead, totalDebt);
+  const monthlyPayment = legacyBackend.revenue.getMonthlyPayment(totalDebt, termMonths);
 
   const qualifies = legacyBackend.routing.shouldRoute(
     {
       ...lead,
-      monthlyPayment: legacyBackend.revenue.getMonthlyPayment(totalDebt, termMonths)
+      monthlyPayment
     },
     legacyBackend
   );
@@ -35,8 +35,10 @@ function evaluateLegacy(lead) {
       name: "Legacy Capital Services",
       qualified: false,
       score: 0,
+      scoreLabel: "LOW_FIT",
       route: "DISQUALIFY",
-      revenue: 0
+      revenue: 0,
+      revenueDetail: null
     };
   }
 
@@ -50,7 +52,7 @@ function evaluateLegacy(lead) {
   const score = legacyBackend.scoring.score(
     {
       ...lead,
-      monthlyPayment: revenueResult.monthlyPayment
+      monthlyPayment
     },
     legacyBackend
   );
@@ -64,7 +66,8 @@ function evaluateLegacy(lead) {
     route: legacyBackend.scoring.route(score),
     revenue: revenueResult?.totalRevenue || 0,
     revenueDetail: revenueResult,
-    termMonths
+    termMonths,
+    monthlyPayment
   };
 }
 
@@ -85,16 +88,19 @@ function evaluateConsumerShield(lead) {
       name: "Consumer Shield",
       qualified: false,
       score: 0,
+      scoreLabel: "LOW_FIT",
       route: "DISQUALIFY",
-      revenue: 0
+      revenue: 0,
+      revenueDetail: null
     };
   }
 
   const score = consumerShieldBackend.scoring.score(lead, consumerShieldBackend);
 
-  const revenueResult = consumerShieldBackend.revenue?.getProjectedRevenue
-    ? consumerShieldBackend.revenue.getProjectedRevenue(totalDebt)
-    : null;
+  const revenueResult =
+    consumerShieldBackend.revenue?.getProjectedRevenue
+      ? consumerShieldBackend.revenue.getProjectedRevenue(totalDebt)
+      : null;
 
   return {
     id: "consumer_shield",
@@ -110,7 +116,6 @@ function evaluateConsumerShield(lead) {
 
 function evaluateLevelDebt(lead) {
   const totalDebt = Number(lead?.totalDebt || 0);
-  const termMonths = getTermMonths(lead, totalDebt);
 
   const qualifies = levelDebtBackend.routing.shouldRoute(lead, levelDebtBackend);
 
@@ -120,8 +125,10 @@ function evaluateLevelDebt(lead) {
       name: "Level Debt",
       qualified: false,
       score: 0,
+      scoreLabel: "LOW_FIT",
       route: "DISQUALIFY",
-      revenue: 0
+      revenue: 0,
+      revenueDetail: null
     };
   }
 
@@ -130,7 +137,8 @@ function evaluateLevelDebt(lead) {
   const revenueResult = levelDebtBackend.revenue?.calculate
     ? levelDebtBackend.revenue.calculate({
         totalDebt,
-        termMonths
+        state: lead?.state,
+        routing: levelDebtBackend.routing
       })
     : null;
 
@@ -143,7 +151,8 @@ function evaluateLevelDebt(lead) {
     route: levelDebtBackend.scoring.route(score),
     revenue: revenueResult?.totalRevenue || 0,
     revenueDetail: revenueResult,
-    termMonths
+    termMonths: revenueResult?.termMonths || null,
+    monthlyPayment: revenueResult?.monthlyPayment || null
   };
 }
 
@@ -155,7 +164,6 @@ export function dealRouter(lead) {
   const consumerShield = evaluateConsumerShield(lead);
   const levelDebt = evaluateLevelDebt(lead);
 
-  // Rule 1: under $4k = no option
   if (totalDebt < 4000) {
     return {
       backend: "NO_MATCH",
@@ -164,11 +172,11 @@ export function dealRouter(lead) {
       qualified: false,
       score: 0,
       route: "NO_OPTION",
-      reason: "Debt below $4,000."
+      reason: "Debt below $4,000.",
+      options: { legacy, consumerShield, levelDebt }
     };
   }
 
-  // Rule 2: $4k–$6k = Consumer Shield only
   if (totalDebt >= 4000 && totalDebt <= 6000) {
     if (consumerShield.qualified) {
       return {
@@ -176,7 +184,8 @@ export function dealRouter(lead) {
         selectedBackendId: consumerShield.id,
         selectedBackendName: consumerShield.name,
         ...consumerShield,
-        reason: "Debt between $4,000 and $6,000 routes to Consumer Shield."
+        reason: "Debt between $4,000 and $6,000 routes to Consumer Shield.",
+        options: { legacy, consumerShield, levelDebt }
       };
     }
 
@@ -187,11 +196,11 @@ export function dealRouter(lead) {
       qualified: false,
       score: 0,
       route: "NO_OPTION",
-      reason: "Debt is in Consumer Shield range, but Consumer Shield is not available."
+      reason: "Debt is in Consumer Shield range, but Consumer Shield is not available.",
+      options: { legacy, consumerShield, levelDebt }
     };
   }
 
-  // Rule 3: debt validation preference above $6k
   if (totalDebt > 6000 && preference === "debt_validation") {
     if (legacy.qualified) {
       return {
@@ -199,7 +208,8 @@ export function dealRouter(lead) {
         selectedBackendId: legacy.id,
         selectedBackendName: legacy.name,
         ...legacy,
-        reason: "Debt validation preference routes to Legacy first when available."
+        reason: "Debt validation preference routes to Legacy first when available.",
+        options: { legacy, consumerShield, levelDebt }
       };
     }
 
@@ -209,19 +219,20 @@ export function dealRouter(lead) {
         selectedBackendId: consumerShield.id,
         selectedBackendName: consumerShield.name,
         ...consumerShield,
-        reason: "Legacy unavailable, so Consumer Shield is the debt-validation fallback."
+        reason: "Legacy unavailable, so Consumer Shield is the debt-validation fallback.",
+        options: { legacy, consumerShield, levelDebt }
       };
     }
   }
 
-  // Rule 4: best fit / normal routing above $6k
   if (levelDebt.qualified) {
     return {
       backend: "LEVEL",
       selectedBackendId: levelDebt.id,
       selectedBackendName: levelDebt.name,
       ...levelDebt,
-      reason: "Level Debt is eligible and remains the primary settlement route."
+      reason: "Level Debt is eligible and remains the primary settlement route.",
+      options: { legacy, consumerShield, levelDebt }
     };
   }
 
@@ -231,7 +242,8 @@ export function dealRouter(lead) {
       selectedBackendId: legacy.id,
       selectedBackendName: legacy.name,
       ...legacy,
-      reason: "Level Debt is not a fit, so Legacy is the next best route."
+      reason: "Level Debt is not a fit, so Legacy is the next best route.",
+      options: { legacy, consumerShield, levelDebt }
     };
   }
 
@@ -241,7 +253,8 @@ export function dealRouter(lead) {
       selectedBackendId: consumerShield.id,
       selectedBackendName: consumerShield.name,
       ...consumerShield,
-      reason: "Consumer Shield is the remaining eligible fallback."
+      reason: "Consumer Shield is the remaining eligible fallback.",
+      options: { legacy, consumerShield, levelDebt }
     };
   }
 
@@ -252,6 +265,7 @@ export function dealRouter(lead) {
     qualified: false,
     score: 0,
     route: "NO_OPTION",
-    reason: "No backend matched this scenario."
+    reason: "No backend matched this scenario.",
+    options: { legacy, consumerShield, levelDebt }
   };
 }
