@@ -2,9 +2,10 @@ import { qualification } from "./qualification";
 import { routing } from "./routing";
 import { scoring } from "./scoring";
 import { compliance } from "./compliance";
-import { commission } from "./commission";
+import { revenue } from "./revenue";
 import { objections } from "./objections";
 import { crmActions } from "./crmActions";
+import { agentcommission } from "./agentcommission";
 
 export const legacyBackend = {
   id: "legacy_capital_services",
