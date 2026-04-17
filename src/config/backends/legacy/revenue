@@ -1,0 +1,165 @@
+export const revenue = {
+  name: "Legacy Capital Services Revenue Model",
+
+  // 📊 Core rules
+  minDebt: 6000,
+  minMonthlyPayment: 250,
+  maxTerm: 48,
+
+  // 💰 Payout models
+  payoutModels: {
+    billable: {
+      tier1Rate: 0.60,
+      tier2Rate: 0.65,
+      maxMonths: 48
+    },
+    accelerated: {
+      minTerm: 18,
+      firstWindowRate: 0.90, // months 1–7
+      secondWindowRate: 0.25, // months 8–24
+      maxMonths: 24
+    }
+  },
+
+  // 🧠 Calculate monthly payment
+  getMonthlyPayment(totalDebt, termMonths) {
+    const debt = Number(totalDebt || 0);
+    const term = Number(termMonths || 0);
+    if (!debt || !term) return 0;
+
+    return debt / term;
+  },
+
+  // 🔒 Enforce Legacy constraints
+  isValidScenario(totalDebt, termMonths) {
+    const monthly = this.getMonthlyPayment(totalDebt, termMonths);
+
+    return (
+      Number(totalDebt || 0) >= this.minDebt &&
+      termMonths > 0 &&
+      termMonths <= this.maxTerm &&
+      monthly >= this.minMonthlyPayment
+    );
+  },
+
+  // 🎯 Get max allowed term based on $250 rule
+  getMaxAllowedTerm(totalDebt) {
+    const debt = Number(totalDebt || 0);
+
+    if (debt < this.minDebt) return 0;
+
+    return Math.min(
+      this.maxTerm,
+      Math.floor(debt / this.minMonthlyPayment)
+    );
+  },
+
+  // 📊 Tier logic (volume-based)
+  getTierRate(monthlyFiles = 1) {
+    return Number(monthlyFiles || 0) >= 100
+      ? this.payoutModels.billable.tier2Rate
+      : this.payoutModels.billable.tier1Rate;
+  },
+
+  // 💰 BILLABLE MODEL (most common)
+  calculateBillable({
+    totalDebt,
+    termMonths,
+    monthlyFiles = 1
+  }) {
+    const monthlyPayment = this.getMonthlyPayment(totalDebt, termMonths);
+
+    if (!this.isValidScenario(totalDebt, termMonths)) {
+      return {
+        eligible: false,
+        reason: "Does not meet Legacy requirements (min debt, payment, or term)"
+      };
+    }
+
+    const tierRate = this.getTierRate(monthlyFiles);
+    const eligibleMonths = Math.min(termMonths, this.payoutModels.billable.maxMonths);
+
+    const monthlyRevenue = monthlyPayment * tierRate;
+    const totalRevenue = monthlyRevenue * eligibleMonths;
+
+    return {
+      model: "billable",
+      eligible: true,
+      monthlyPayment,
+      tierRate,
+      eligibleMonths,
+      monthlyRevenue,
+      totalRevenue
+    };
+  },
+
+  // 🚀 ACCELERATED MODEL (high-front payout)
+  calculateAccelerated({
+    totalDebt,
+    termMonths
+  }) {
+    const monthlyPayment = this.getMonthlyPayment(totalDebt, termMonths);
+
+    if (!this.isValidScenario(totalDebt, termMonths)) {
+      return {
+        eligible: false,
+        reason: "Does not meet Legacy requirements"
+      };
+    }
+
+    if (termMonths < this.payoutModels.accelerated.minTerm) {
+      return {
+        eligible: false,
+        reason: "Accelerated model requires minimum 18-month term"
+      };
+    }
+
+    const firstMonths = Math.min(termMonths, 7);
+    const secondMonths = Math.max(
+      0,
+      Math.min(termMonths, this.payoutModels.accelerated.maxMonths) - 7
+    );
+
+    const firstRevenue =
+      monthlyPayment *
+      this.payoutModels.accelerated.firstWindowRate *
+      firstMonths;
+
+    const secondRevenue =
+      monthlyPayment *
+      this.payoutModels.accelerated.secondWindowRate *
+      secondMonths;
+
+    return {
+      model: "accelerated",
+      eligible: true,
+      monthlyPayment,
+      firstMonths,
+      secondMonths,
+      firstRevenue,
+      secondRevenue,
+      totalRevenue: firstRevenue + secondRevenue
+    };
+  },
+
+  // 🧠 MASTER CALCULATOR
+  calculate({
+    totalDebt,
+    termMonths,
+    payoutModel = "billable",
+    monthlyFiles = 1
+  }) {
+    if (payoutModel === "accelerated") {
+      return this.calculateAccelerated({
+        totalDebt,
+        termMonths
+      });
+    }
+
+    return this.calculateBillable({
+      totalDebt,
+      termMonths,
+      monthlyFiles
+    });
+  }
+};
