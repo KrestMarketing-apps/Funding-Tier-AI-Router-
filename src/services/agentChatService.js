@@ -1,7 +1,18 @@
 import { universalAssistant } from "@/ai/universalAssistant";
 
 export const agentChatService = {
-  ask({ question, backend = null, lead = null, creditorName = null, debtType = null, isSecured = false, accountType = null, objectionKey = null, includeInternal = false }) {
+  ask({
+    question,
+    backend = null,
+    lead = null,
+    creditorName = null,
+    debtType = null,
+    isSecured = false,
+    accountType = null,
+    objectionKey = null,
+    fieldPath = null,
+    includeInternal = false
+  }) {
     return universalAssistant.answer(
       question,
       {
@@ -11,7 +22,8 @@ export const agentChatService = {
         debtType,
         isSecured,
         accountType,
-        objectionKey
+        objectionKey,
+        fieldPath
       },
       {
         includeInternal
