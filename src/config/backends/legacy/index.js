@@ -10,7 +10,6 @@ export const legacyBackend = {
   id: "legacy_capital_services",
   name: "Legacy Capital Services",
   type: "attorney_model_creditor_resolution",
-
   qualification,
   routing,
   scoring,
