@@ -72,6 +72,8 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 .p-r{background:#fef2f2;color:var(--rd);border:1px solid rgba(239,68,68,.3);}
 .p-a{background:#fffbeb;color:#92400e;border:1px solid rgba(245,158,11,.3);}
 .p-b{background:#eff6ff;color:var(--bl);border:1px solid rgba(26,110,216,.3);}
+.p-p{background:rgba(109,40,217,.12);color:#6d28d9;border:1px solid rgba(109,40,217,.3);}
+.rb-lg{background:rgba(109,40,217,.12);color:#6d28d9;border:1.5px solid rgba(109,40,217,.35);}
 .p-purple {
   background: rgba(139,92,246,.12);
   color: #6d28d9;
@@ -664,15 +666,36 @@ function renderClocks(){
 
 // ════ RENDER PANEL ══════════════════════════════════
 function renderPanel(c){
-  const bc=c.route.route==='LEVEL'?'rb-ld':c.route.route==='CONSUMER SHIELD'?'rb-cs':'rb-no';
-  const rl=c.route.route==='LEVEL'?'Route: Level Debt':c.route.route==='CONSUMER SHIELD'?'Route: Consumer Shield':'No Available Route';
-  const logo=c.route.route==='LEVEL'?LD_LOGO:c.route.route==='CONSUMER SHIELD'?CS_LOGO:'';
-  $('routeBadges').innerHTML=`${logo?`<div class="logo-sm"><img src="${logo}" alt=""/></div>`:''}<span class="rb ${bc}">${rl}</span><span class="pill ${c.lds.status==='BLACKOUT'?'p-r':c.lds.status==='RED'?'p-a':'p-g'}">LD: ${c.lds.label}</span><span class="pill ${c.css.status==='BLACKOUT'?'p-r':'p-g'}">CS: ${c.css.label}</span>`;
+  const bc=
+    c.route.route==='LEVEL'?'rb-ld':
+    c.route.route==='CONSUMER SHIELD'?'rb-cs':
+    c.route.route==='LEGACY'?'rb-lg':'rb-no';
+
+  const rl=
+    c.route.route==='LEVEL'?'Route: Level Debt':
+    c.route.route==='CONSUMER SHIELD'?'Route: Consumer Shield':
+    c.route.route==='LEGACY'?'Route: Legacy Capital Services':
+    'No Available Route';
+
+  const logo=
+    c.route.route==='LEVEL'?LD_LOGO:
+    c.route.route==='CONSUMER SHIELD'?CS_LOGO:
+    c.route.route==='LEGACY'?LEGACY_LOGO:'';
+
+  $('routeBadges').innerHTML=`${logo?`<div class="logo-sm"><img src="${logo}" alt=""/></div>`:''}
+    <span class="rb ${bc}">${rl}</span>
+    <span class="pill ${c.lds.status==='BLACKOUT'?'p-r':c.lds.status==='RED'?'p-a':'p-g'}">LD: ${c.lds.label}</span>
+    <span class="pill ${c.css.status==='BLACKOUT'?'p-r':'p-g'}">CS: ${c.css.label}</span>
+    <span class="pill ${c.lgs.status==='BLACKOUT'?'p-r':'p-p'}">Legacy: ${c.lgs.label}</span>`;
+
   $('routeReason').textContent=c.route.reason||'Enter debts to calculate routing.';
+
   $('providerAvail').innerHTML=[
     {name:'Level Debt',avail:c.ldAvail,best:c.route.route==='LEVEL',model:c.lds.label,logo:LD_LOGO},
     {name:'Consumer Shield',avail:c.csAvail,best:c.route.route==='CONSUMER SHIELD',model:c.css.label,logo:CS_LOGO},
+    {name:'Legacy Capital Services',avail:c.legacyAvail,best:c.route.route==='LEGACY',model:c.lgs.label,logo:LEGACY_LOGO},
   ].map(p=>`<div class="snap-row"><div class="logo-sm"><img src="${p.logo}" alt="${p.name}"/></div><div><div class="snap-name">${p.name}</div><div class="snap-time">${p.model}</div></div><span class="pill ${p.best?'p-g':p.avail?'p-b':'p-r'}" style="font-size:10px;">${p.best?'Best Option':p.avail?'Available':'Not Serviceable'}</span></div>`).join('');
+
   $('flagsBox').innerHTML=c.flags.map(f=>`<div class="flag flag-a"><span>&#9888;</span><span>${esc(f)}</span></div>`).join('');
 }
 
@@ -700,27 +723,91 @@ function renderCSCard(c){
 
 function renderPlanCards(c){
   const cards=[];
+
   if(c.csAvail&&c.csProg){
     const p=c.csProg,isRec=c.route.route==='CONSUMER SHIELD';
-    cards.push(`<div class="plan-card${isRec?' rec':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${CS_LOGO}" alt="CS"/></div><div style="font-size:14px;font-weight:900;">Consumer Shield</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-b">Program ${p.k}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-b">Available</span>'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div class="mc" style="--g:var(--bl);"><div class="mc-lbl">Monthly Payment</div><div class="mc-val" style="color:var(--bl);">${fmt(p.pay)}</div><div class="mc-sub">Fixed ${p.term} months</div></div><div class="mc" style="--g:var(--bl);"><div class="mc-lbl">Program Length</div><div class="mc-val" style="color:var(--bl);">${p.term} mo</div><div class="mc-sub">Total: ${fmt(p.term*p.pay)}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">${['Fixed monthly plan','Debt validation process','Credit monitoring','No settlement fee'].map(b=>`<div style="font-size:13px;color:#334155;padding:7px 10px;border:1px solid #dce8f5;border-radius:10px;">&middot; ${b}</div>`).join('')}</div><div style="background:rgba(26,110,216,.06);border:1px solid rgba(26,110,216,.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#1e40af;font-weight:600;line-height:1.6;"><strong>Debt Validation</strong> &mdash; Fixed monthly payment. Debts challenged through legal process. ${p.range} range.</div></div>`);
+    cards.push(`<div class="plan-card${isRec?' rec':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${CS_LOGO}" alt="CS"/></div><div style="font-size:14px;font-weight:900;">Consumer Shield</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-b">Program ${p.k}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-b">Available</span>'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div class="mc" style="--g:var(--bl);"><div class="mc-lbl">Monthly Payment</div><div class="mc-val" style="color:var(--bl);">${fmt(p.pay)}</div><div class="mc-sub">Fixed ${p.term} months</div></div><div class="mc" style="--g:var(--bl);"><div class="mc-lbl">Program Length</div><div class="mc-val" style="color:var(--bl);">${p.term} mo</div><div class="mc-sub">Total: ${fmt(p.term*p.pay)}</div></div></div><div style="background:rgba(26,110,216,.06);border:1px solid rgba(26,110,216,.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#1e40af;font-weight:600;line-height:1.6;"><strong>Debt Validation</strong> — Fixed monthly payment. Debts challenged through legal process.</div></div>`);
   }
+
   if(c.ldAvail){
-    const mt=getLDMaxTerm(c.total),mp=Math.round((c.total*.5+c.total*c.feeRate)/mt);const isRec=c.route.route==='LEVEL';
-    cards.push(`<div class="plan-card${isRec?' rec':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${LD_LOGO}" alt="LD"/></div><div style="font-size:14px;font-weight:900;">Level Debt</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill ${c.lds.status==='RED'?'p-a':'p-g'}">${c.lds.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-g">Available</span>'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div class="mc"><div class="mc-lbl">Est. Monthly Payment</div><div class="mc-val">${fmt(mp)}</div><div class="mc-sub">Over ${mt} months</div></div><div class="mc"><div class="mc-lbl">Program Length</div><div class="mc-val">${mt} mo</div><div class="mc-sub">Est. total: ${fmt(mp*mt)}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">${['Longer-term flexibility','Affordability-focused','Lower monthly burden','Budget breathing room'].map(b=>`<div style="font-size:13px;color:#334155;padding:7px 10px;border:1px solid #dcefed;border-radius:10px;">&middot; ${b}</div>`).join('')}</div><div style="background:rgba(15,157,138,.06);border:1px solid rgba(15,157,138,.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#0b7d6e;font-weight:600;line-height:1.6;"><strong>Debt Settlement</strong> &mdash; Negotiates with creditors. Program fee applies. $7,000 minimum. ${c.lds.status==='RED'?'Attorney model in this state.':'Standard model in this state.'}</div></div>`);
+    const mt=getLDMaxTerm(c.total),mp=Math.round((c.total*.5+c.total*c.feeRate)/mt),isRec=c.route.route==='LEVEL';
+    cards.push(`<div class="plan-card${isRec?' rec':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${LD_LOGO}" alt="LD"/></div><div style="font-size:14px;font-weight:900;">Level Debt</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill ${c.lds.status==='RED'?'p-a':'p-g'}">${c.lds.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-g">Available</span>'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div class="mc"><div class="mc-lbl">Est. Monthly Payment</div><div class="mc-val">${fmt(mp)}</div><div class="mc-sub">Over ${mt} months</div></div><div class="mc"><div class="mc-lbl">Program Length</div><div class="mc-val">${mt} mo</div><div class="mc-sub">Est. total: ${fmt(mp*mt)}</div></div></div><div style="background:rgba(15,157,138,.06);border:1px solid rgba(15,157,138,.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#0b7d6e;font-weight:600;line-height:1.6;"><strong>Debt Settlement</strong> — Negotiates with creditors. Program fee applies.</div></div>`);
   }
+
+  if(c.legacyAvail){
+    const isRec=c.route.route==='LEGACY';
+    cards.push(`<div class="plan-card${isRec?' rec':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${LEGACY_LOGO}" alt="Legacy"/></div><div style="font-size:14px;font-weight:900;">Legacy Capital Services</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-p">${c.lgs.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-p">Available</span>'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div class="mc" style="--g:#6d28d9;"><div class="mc-lbl">Program Type</div><div class="mc-val" style="color:#6d28d9;font-size:18px;">Attorney-Led</div><div class="mc-sub">Legal-support-focused</div></div><div class="mc" style="--g:#6d28d9;"><div class="mc-lbl">Routing Fit</div><div class="mc-val" style="color:#6d28d9;font-size:18px;">Above $6K</div><div class="mc-sub">Best when legal support matters most</div></div></div><div style="background:#faf5ff;border:1px solid rgba(109,40,217,.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#5b21b6;font-weight:600;line-height:1.6;"><strong>Attorney-Led Resolution Path</strong> — Best when the prospect values legal support and attorney-model positioning over pure payment comparison.</div></div>`);
+  }
+
   $('planCards').innerHTML=cards.length?cards.join(''):`<div style="grid-column:1/-1;border:1px solid rgba(239,68,68,.3);background:#fef2f2;color:#b91c1c;border-radius:12px;padding:14px;font-weight:700;">No program options available for this state and debt scenario.</div>`;
-  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:14px;overflow:hidden;"><div style="background:var(--dk);padding:12px 16px;font-size:14px;font-weight:800;color:#fff;">How the Programs Differ</div><table style="width:100%;border-collapse:collapse;font-size:13px;min-width:500px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Payment Structure</td><td style="padding:10px 14px;">Fixed tier-based monthly payment</td><td style="padding:10px 14px;">Flexible term, monthly savings deposits</td></tr></tbody></table></div>`;
+
+  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:14px;overflow:hidden;"><div style="background:var(--dk);padding:12px 16px;font-size:14px;font-weight:800;color:#fff;">How the Programs Differ</div><table style="width:100%;border-collapse:collapse;font-size:13px;min-width:700px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Legacy</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Above $6,000</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Best Fit</td><td style="padding:10px 14px;">Fixed validation plan</td><td style="padding:10px 14px;">Settlement-focused</td><td style="padding:10px 14px;">Prospect values legal support most</td></tr></tbody></table></div>`;
 }
 
 function renderCmpTable(c){
+  const hdrLogo=$('recommendedProgramLogo');
+  const hdrText=$('recommendedProgramHeader');
+
+  const recName=c.route.route==='LEVEL'?'Level Debt':
+                c.route.route==='CONSUMER SHIELD'?'Consumer Shield':
+                c.route.route==='LEGACY'?'Legacy Capital Services':
+                'Recommended Program';
+
+  const recLogo=c.route.route==='LEVEL'?LD_LOGO:
+                c.route.route==='CONSUMER SHIELD'?CS_LOGO:
+                c.route.route==='LEGACY'?LEGACY_LOGO:'';
+
+  if(hdrText)hdrText.textContent=recName;
+  if(hdrLogo){
+    if(recLogo){
+      hdrLogo.src=recLogo;
+      hdrLogo.alt=recName;
+      hdrLogo.style.display='inline-block';
+    } else {
+      hdrLogo.style.display='none';
+      hdrLogo.src='';
+      hdrLogo.alt='';
+    }
+  }
+
+  let recommendedMonthly='—';
+  let recommendedDebt=fmt(c.total);
+  let recommendedMonths='—';
+  let recommendedTotal='—';
+  let recommendedSavings='—';
+
+  if(c.route.route==='LEVEL'&&c.recommended){
+    recommendedMonthly=fmt(c.recommended.mp);
+    recommendedMonths=`${c.recommended.term} months`;
+    recommendedTotal=fmt(c.recommended.tc);
+    recommendedSavings=`<strong style="font-size:15px;">${fmt(Math.max(0,c.dn.total-c.recommended.tc))}</strong>`;
+  } else if(c.route.route==='CONSUMER SHIELD'&&c.recommended){
+    recommendedMonthly=fmt(c.recommended.mp);
+    recommendedMonths=`${c.recommended.term} months`;
+    recommendedTotal=fmt(c.recommended.tc);
+    recommendedSavings=`<strong style="font-size:15px;">${fmt(Math.max(0,c.dn.total-c.recommended.tc))}</strong>`;
+  } else if(c.route.route==='LEGACY'){
+    recommendedMonthly='Custom after review';
+    recommendedMonths='Case-by-case';
+    recommendedTotal='Custom structure';
+    recommendedSavings='<strong>Varies by file</strong>';
+  }
+
+  const fastestMonthly=c.shortest?fmt(c.shortest.mp):'—';
+  const fastestDebt=c.shortest?fmt(c.total):'—';
+  const fastestMonths=c.shortest?`${c.shortest.term} months`:'—';
+  const fastestTotal=c.shortest?fmt(c.shortest.tc):'—';
+  const fastestSavings=c.shortest?`<strong>${fmt(Math.max(0,c.dn.total-c.shortest.tc))}</strong>`:'—';
+
   const rows=[
-    ['Monthly Payments',fmt(c.dn.mp),c.shortest?fmt(c.shortest.mp):'&mdash;',c.recommended?fmt(c.recommended.mp):'&mdash;'],
-    ['Total Enrolled Debt',fmt(c.total),c.shortest?fmt(c.total):'&mdash;',c.recommended?fmt(c.total):'&mdash;'],
-    ['Months to Payoff',`${c.dn.months} months`,c.shortest?`${c.shortest.term} months`:'&mdash;',c.recommended?`${c.recommended.term} months`:'&mdash;'],
-    ['Est. Interest Rate',`${(c.dn.apr*100).toFixed(0)}% APR`,c.shortest?'0%':'&mdash;',c.recommended?'0%':'&mdash;'],
-    ['Est. Total Payback',`<span style="color:var(--rd);font-weight:900;">${fmt(c.dn.total)}</span>`,c.shortest?fmt(c.shortest.tc):'&mdash;',c.recommended?fmt(c.recommended.tc):'&mdash;'],
-    ['Est. Savings vs Min Pay','&mdash;',c.shortest?`<strong>${fmt(Math.max(0,c.dn.total-c.shortest.tc))}</strong>`:'&mdash;',c.recommended?`<strong style="font-size:15px;">${fmt(Math.max(0,c.dn.total-c.recommended.tc))}</strong>`:'&mdash;'],
+    ['Monthly Payments',fmt(c.dn.mp),fastestMonthly,recommendedMonthly],
+    ['Total Enrolled Debt',fmt(c.total),fastestDebt,recommendedDebt],
+    ['Months to Payoff',`${c.dn.months} months`,fastestMonths,recommendedMonths],
+    ['Est. Interest Rate',`${(c.dn.apr*100).toFixed(0)}% APR`,c.shortest?'0%':'—',c.route.route==='LEGACY'?'N/A':(recommendedTotal!=='—'?'0%':'—')],
+    ['Est. Total Payback',`<span style="color:var(--rd);font-weight:900;">${fmt(c.dn.total)}</span>`,fastestTotal,recommendedTotal],
+    ['Est. Savings vs Min Pay','—',fastestSavings,recommendedSavings],
   ];
+
   $('cmpTable').innerHTML=rows.map((r,i)=>`<tr class="${i===5?'sv':''}">${r.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('');
 }
 
@@ -1071,247 +1158,6 @@ async function sendEmail(){
     if(rb&&pl){pl.onclick=()=>window.open(data.pageUrl,'_blank');rb.style.display='block';rb.scrollIntoView({behavior:'smooth',block:'center'});}
   }catch(e){alert(e.message||'Failed to generate plan.');}
   finally{btn.disabled=false;btn.textContent=orig;}
-}
-
-// ════ AI CHAT AGENT ════════════════════════════════
-const SYSTEM_PROMPT = `You are the Funding Tier Enrollment Assistant — an expert AI agent for sales and enrollment agents at Funding Tier LLC. You help agents determine eligibility, understand program rules, check creditor and debt type acceptance, and navigate state restrictions.
-
-You are knowledgeable, concise, and direct. Always answer clearly. Use plain language. Bold key terms when helpful. If something is not accepted, say so clearly and explain why or what the alternative is.
-
-IMPORTANT: Never reveal or discuss what Funding Tier earns, company revenue splits, profit margins, or servicing fee structures. If asked about company revenue, pricing to the company, or what Funding Tier gets paid, politely say that information is confidential and redirect to what matters for the enrollment.
-
-== PROGRAMS ==
-
-LEVEL DEBT (Debt Settlement)
-- Partner for debt SETTLEMENT
-- Minimum: $7,000 total enrolled debt
-- Pays agent commission based on enrolled volume tier (this is agent-facing — you can discuss agent commissions)
-- Attorney model states: CT, GA, LA, MN, NV, NH, NJ, ND, OH, PA, TN, WA, WY
-- Blackout states (Level not available): AK, RI, VT, WV, OR, GU, HI, ME, MT, PR, SC, SD, UT, WI
-- All other states: Standard model
-
-CONSUMER SHIELD (Debt Validation)
-- Partner for debt VALIDATION (legal challenge process — NOT settlement)
-- Minimum: $4,000 total enrolled debt
-- Fixed monthly payments by program tier (A through I)
-- Blackout states (CS not available): NC, PA, CO, WA, CT, NJ, OR, TX
-- Support hours: Monday–Friday 9am–7pm EST
-- Uses Equifax for credit pull
-- Program tiers:
-  A: $4,000–$4,999 | $220/mo | 18 months
-  B: $5,000–$8,799 | $220/mo | 24 months
-  C: $8,800–$9,999 | $220/mo | 36 months
-  D: $10,000–$14,999 | $270/mo | 36 months
-  E: $15,000–$19,999 | $320/mo | 36 months
-  F: $20,000–$24,999 | $370/mo | 36 months
-  G: $25,000–$29,999 | $420/mo | 36 months
-  H: $30,000–$49,999 | $520/mo | 36 months
-  I: $50,000+ | $620/mo | 36 months
-
-== LEVEL DEBT ACCEPTED DEBT TYPES ==
-
-ACCEPTED:
-- Unsecured debt (credit cards, personal loans) — always accepted
-- Payday loans and tribal loans — accepted
-- Repossession deficiency / auto repo deficiency — accepted if client NO LONGER has the vehicle; must be less than 50% of total enrolled debt combined with medical and back rent
-- Medical bills — accepted; combined with back rent and repo must stay under 50% of total enrolled
-- Back rent / apartment back rent in collections — accepted; same 50% rule applies
-- Private student loans — accepted WITH conditions:
-    * Must not exceed 25% of total enrolled debt
-    * Client must no longer be enrolled at the originating school
-    * If there is a co-signer, they MUST also enroll in the program
-    * Proof that the loan is private is required (not federal)
-    * EXCEPTION: Discover private student loans are NOT accepted
-    * EXCEPTION: Not accepted AT ALL for California residents
-- Business debt — accepted IF:
-    * The business is no longer operational, OR
-    * The business is active but client states ON A RECORDED CALL it is not profitable
-- Discover credit cards/loans — accepted but must not exceed 60% of total enrolled debt
-    * Payment formula: ($Discover balance × 70%) ÷ 24
-- Accounts in active or pending litigation — case by case; must be reviewed by the legal team before routing
-- Secured accounts from specific creditors — accepted ONLY if client agrees on recorded call they are willing to lose the collateral:
-    * Republic Finance (unsecured OK, secured requires consent)
-    * Mariner Finance (unsecured OK, secured requires consent)
-    * Regional Finance (unsecured OK, secured requires consent)
-    * OneMain Financial (unsecured OK, secured requires consent)
-    * Lendmark Financial (unsecured OK, secured requires consent)
-
-NOT ACCEPTED BY LEVEL DEBT:
-- Federal student loans
-- Navient student loans
-- SBA loans
-- Timeshares
-- IRS tax debt
-- Alimony / child support
-- Casino debt
-- Cash Call
-- Overdraft accounts
-- Employer debt
-- Mortgages
-- Auto loans (secured — unless one of the five approved creditors above)
-- Cross-collateralized accounts
-- Furniture store financing
-- Credit union loans (most — see excluded creditors list)
-- Military accounts (MILITARY STAR, AFES)
-- AFES accounts
-
-== CONSUMER SHIELD ACCEPTED DEBT TYPES ==
-
-ACCEPTED:
-- Unsecured debt (credit cards, personal loans)
-- Medical bills
-- Payday loans
-- Back rent (if in collections)
-- USAA (conditional)
-- Deficiency balances (conditional)
-- Tribal loans (conditional)
-- Business debt (conditional)
-- Judgments (conditional)
-
-NOT ACCEPTED BY CONSUMER SHIELD:
-- Timeshares
-- Mortgages
-- Federal student loans
-- IRS tax debt
-- Cross-collateralized accounts
-- Furniture store financing / direct furniture store loans
-- Loans from individuals
-- Installment sales contracts
-- Credit union loans
-- Military accounts
-- AFES accounts
-
-== EXCLUDED CREDITORS (LEVEL DEBT) ==
-
-The following creditors are NOT accepted by Level Debt:
-Alleviate Tax LLC, Acceptance Now / ACIMA, Advance Financial, AGCO Finance, Aqua Finance, Bell Finance, BHG Financial / BHG Money (all BHG entities), Bob's Discount Furniture / Bob's Finance / Bob's Furniture, Concord Servicing, Cornerstone Financial, Credit Central, Credologi LLC, DR Bank, EMPOWER FCU, Enerbank / EnerBank USA, ESL Credit Union, Farmers Furniture (FRMRS FURN), FCRP Capital LLC, Fort Worth Credit Union (all variants), Fortera Credit Union, Garden Federal Credit Union, Golden One / Golden 1 Credit Union, Goldman Sachs credit cards (NOTE: Apple Cards and GS personal loans ARE accepted — verify account type), GoodLeap / Loan Pal / LoanPal, Hawaii Credit Union (all variants), HC ROYA / HYCITE / Royal Prestige, Heights Financial, Island Finance (Puerto Rico), ISPC, Kabbage Loans, KIKOFF, Koalafi, LHPCC Trust I, Local Government Federal Credit Union (LGFCU), Matco Tools Financing, Military Star / Exchange Credit Program, Nebraska Furniture Mart, Omni Loans / Omni Financial, Opensky, Pinnacle Financial Group, Pioneer Loans, Popular Bank / Banco Popular (Puerto Rico), PowerPay, Preferred Loans, Quick Help Loans, Red River Credit (REDRIVERCR), REDSTONE Credit Union, RENT-A-CENTER, RFFC Financial, Robinhood, Security Finance, ALL State Employees Credit Union variants (SECU, STATEEMP, STATE EMPLOYEES C U — all state variants), Service Finance Company (SVCFIN / SRVFINCO), Snap-On Credit, Solar Mosaic, Southern Finance, Sunset Financial, Toledo Finance, Tower Loans, West Creek Financial, WSECU (Washington State Employees Credit Union), Yendo
-
-CONDITIONAL CREDITORS (Unsecured OK, Secured NOT accepted unless recorded consent):
-- Lendmark / Lendmark Financial
-- Mariner Finance
-- OneMain / OneMain Financial
-- Regional Finance
-- Republic Finance
-
-== ROUTING LOGIC ==
-
-If total debt < $7,000: Route to Consumer Shield (if state eligible and CS accepts debt types)
-If total debt >= $7,000: Prefer Level Debt (if state eligible and debt types qualify)
-If Level Debt is not available (blackout state or hard stops): Fall back to Consumer Shield if eligible
-If neither is available: No option — agent needs to advise client accordingly
-
-Hard stops that prevent Level Debt routing:
-- Discover debt > 60% of total enrolled
-- Private student loans > 25% of total enrolled
-- Medical/back rent/repo > 50% of total enrolled
-- California resident with private student loans
-- Discover private student loans in the deal
-- Any excluded creditor in the deal (rejected — not just conditional)
-
-== AGENT COMMISSION RULES (OK to discuss) ==
-
-Level Debt agent commissions:
-- Tier 1: $0–$999,999/mo enrolled = 1.00% of enrolled debt
-- Tier 2: $1M–$1.99M/mo enrolled = 1.15% of enrolled debt
-- Tier 3: $2M+/mo enrolled = 1.30% of enrolled debt
-- Paid: 20th of Month 3 after 2 program payments clear
-- Tier is based on the AGENT'S OWN monthly enrolled volume (not the team's)
-- Chargeback/clawback applies if client cancels before 3 payments
-
-Consumer Shield agent commissions (flat by program):
-- Program A/B/C: $150 total, paid at Payment 2 (20th Month 3)
-- Program D: $175 at P2 + $50 at P4 = $225
-- Program E: $200 at P2 + $75 at P4 = $275
-- Program F: $250 at P2 + $100 at P4 = $350
-- Program G: $300 at P2 + $100 at P4 = $400
-- Program H: $375 at P2 + $125 at P4 = $500
-- Program I: $450 at P2 + $150 at P4 = $600
-- Payment 2 paid 20th Month 3; Payment 4 paid 20th Month 5
-- Programs D–I: P2 commission clawed back if deal cancels before P4 within 60 days
-
-Daily Hustle Bonus (CS only): 3+ CS deals/day = +$50/deal; 5+ deals/day = +$75/deal
-Monthly Volume Bonus (CS, P2 cleared): 8–11=$300 | 12–16=$600 | 17–22=$1,000 | 23–29=$1,500 | 30+=$2,250
-Balanced Book Bonus (monthly, LD+CS mix, min 5 total deals): 30%+ balance=$100 | 50%+ balance=$250 | 70%+ (35/65 mix)=$500
-
-== GENERAL ENROLLMENT RULES ==
-
-- Minimum $200 per account for Level Debt (unless already in collections or charged off)
-- Client must have made at least one payment on each account before Level enrollment
-- Apartment back rent only accepted by Consumer Shield if it is already in collections
-- Business debt on Level requires client to state on a recorded call that business is closed or unprofitable
-- Private student loan co-signers must also enroll in the Level Debt program
-- Secured accounts from the 5 approved creditors (Lendmark, Mariner, Regional, OneMain, Republic) require client consent on a recorded call to lose the collateral
-
-Always be helpful, concise, and accurate. If you are unsure about something very specific, say so and recommend the agent verify with their manager or the Level/CS partner portal.`;
-
-const chatHistory = [];
-
-function renderChatMessage(role, text, thinking=false) {
-  const box = document.getElementById('chatMessages');
-  if (!box) return;
-  const isBot = role === 'assistant';
-  const div = document.createElement('div');
-  div.className = 'chat-msg ' + (isBot ? 'bot-msg' : 'user');
-  const initials = isBot ? 'AI' : 'ME';
-  // Convert markdown-ish to HTML
-  let html = text
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/^- (.+)$/gm,'<li>$1</li>')
-    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
-    .replace(/\n/g,'<br/>');
-  div.innerHTML = `
-    <div class="chat-avatar ${isBot?'bot':'user'}">${initials}</div>
-    <div class="chat-bubble ${isBot?'bot':'user'}${thinking?' thinking':''}">${thinking?text:html}</div>`;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
-  return div;
-}
-
-async function sendChat() {
-  const inp = document.getElementById('chatInput');
-  const btn = document.getElementById('chatSendBtn');
-  if (!inp || !btn) return;
-  const text = inp.value.trim();
-  if (!text) return;
-  inp.value = '';
-  btn.disabled = true;
-
-  renderChatMessage('user', text);
-  chatHistory.push({ role: 'user', content: text });
-
-  const thinkDiv = renderChatMessage('assistant', 'Thinking…', true);
-
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: SYSTEM_PROMPT,
-        messages: chatHistory,
-      }),
-    });
-    const data = await response.json();
-    const reply = data.content && data.content[0] && data.content[0].text
-      ? data.content[0].text
-      : 'Sorry, I could not get a response. Please try again.';
-
-    if (thinkDiv) thinkDiv.remove();
-    renderChatMessage('assistant', reply);
-    chatHistory.push({ role: 'assistant', content: reply });
-  } catch (e) {
-    if (thinkDiv) thinkDiv.remove();
-    renderChatMessage('assistant', 'Connection error. Please check your network and try again.');
-  }
-  btn.disabled = false;
-  inp.focus();
-}
-
-function quickAsk(text) {
-  const inp = document.getElementById('chatInput');
-  if (inp) { inp.value = text; inp.focus(); }
 }
 
 
