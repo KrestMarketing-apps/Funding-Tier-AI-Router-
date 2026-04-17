@@ -4,20 +4,17 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Funding Tier — AI Deal Router</title>
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{--g:#0f9d8a;--gd:#0b7d6e;--dk:#0f172a;--bl:#1a6ed8;--am:#f59e0b;--rd:#ef4444;--br:#e2e8f0;--bg:#f8fafc;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--dk);min-height:100vh;}
 .topbar{position:sticky;top:0;z-index:80;background:linear-gradient(135deg,var(--dk) 0%,#0b3b50 45%,#0f766e 100%);box-shadow:0 4px 24px rgba(15,23,42,.22);}
-.workspace{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,420px);gap:20px;align-items:start;}
+.workspace{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,400px);gap:20px;align-items:start;}
 .workspace-full{grid-column:1/-1;}
-.sticky-panel{position:sticky;top:88px;}
-@media(max-width:1100px){.workspace{grid-template-columns:1fr;}.sticky-panel{position:static;}.workspace-full{grid-column:1;}}
-.card{background:#fff;border:1px solid var(--br);border-radius:16px;padding:20px;box-shadow:0 3px 12px rgba(15,23,42,.05);}
-.card-hd{font-size:16px;font-weight:900;color:var(--dk);margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--g);display:flex;align-items:center;gap:10px;}
-.card-hd img{height:24px;width:auto;object-fit:contain;}
+@media(max-width:1100px){.workspace{grid-template-columns:1fr;}.workspace-full{grid-column:1;}}
+.card{background:#fff;border:1px solid var(--br);border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(15,23,42,.05);}
+.card-hd{font-size:15px;font-weight:900;color:var(--dk);margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--g);display:flex;align-items:center;gap:10px;}
 .fi{width:100%;padding:10px 13px;border:1.5px solid var(--br);border-radius:10px;font-size:14px;font-weight:600;color:var(--dk);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s;font-family:inherit;}
 .fi:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(15,157,138,.1);}
 .fi::placeholder{color:#94a3b8;font-weight:400;}
@@ -29,7 +26,7 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 .btn-dk:hover{background:#1e293b;}
 .btn-dk:disabled{opacity:.5;cursor:not-allowed;}
 .btn-add{width:100%;min-height:46px;border:2px dashed var(--g);background:rgba(15,157,138,.04);color:var(--gd);border-radius:12px;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .15s;font-family:inherit;}
-.btn-add:hover{background:rgba(15,157,138,.09);transform:translateY(-1px);}
+.btn-add:hover{background:rgba(15,157,138,.09);}
 .row-hdr{display:grid;grid-template-columns:1.6fr .65fr 1fr 34px;gap:10px;background:var(--dk);padding:10px 14px;border-radius:12px 12px 0 0;font-size:11px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;}
 .row-card{border:1.5px solid var(--br);border-radius:12px;padding:11px;background:#fff;transition:border-color .15s,background .15s;}
 .row-card.fr{border-color:var(--rd);background:#fef2f2;}
@@ -42,7 +39,7 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 .drop button:last-child{border-bottom:none;}
 .drop button:hover,.drop button.act{background:rgba(15,157,138,.06);}
 .dt-wrap{position:relative;}
-.dt-inp{width:100%;padding:10px 34px 10px 34px;border:1.5px solid var(--br);border-radius:10px;font-size:14px;font-weight:600;color:var(--dk);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s;cursor:text;font-family:inherit;}
+.dt-inp{width:100%;padding:10px 34px 10px 34px;border:1.5px solid var(--br);border-radius:10px;font-size:14px;font-weight:600;color:var(--dk);background:#fff;outline:none;transition:border-color .15s;cursor:text;font-family:inherit;}
 .dt-inp:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(26,110,216,.1);}
 .dt-inp::placeholder{color:#94a3b8;font-weight:400;}
 .dt-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;}
@@ -74,31 +71,29 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 .p-a{background:#fffbeb;color:#92400e;border:1px solid rgba(245,158,11,.3);}
 .p-b{background:#eff6ff;color:var(--bl);border:1px solid rgba(26,110,216,.3);}
 .p-p{background:rgba(109,40,217,.12);color:#6d28d9;border:1px solid rgba(109,40,217,.3);}
-.rb-lg{background:rgba(109,40,217,.12);color:#6d28d9;border:1.5px solid rgba(109,40,217,.35);}
-.p-purple{background:rgba(139,92,246,.12);color:#6d28d9;border:1px solid rgba(139,92,246,.3);}
 .mc{background:#fff;border:1px solid var(--br);border-radius:12px;padding:13px;position:relative;overflow:hidden;}
 .mc::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--g);border-radius:12px 12px 0 0;}
-.mc-lbl{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin:5px 0 5px;}
+.mc-lbl{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin:4px 0;}
 .mc-val{font-size:20px;font-weight:900;color:var(--dk);line-height:1.1;}
-.mc-sub{font-size:12px;color:#64748b;margin-top:5px;font-weight:500;line-height:1.5;}
-.snap-row{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:10px 13px;border-bottom:1px solid var(--br);}
+.mc-sub{font-size:12px;color:#64748b;margin-top:4px;font-weight:500;}
+.snap-row{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--br);}
 .snap-row:last-child{border-bottom:none;}
 .snap-name{font-size:13px;font-weight:800;color:var(--dk);}
-.snap-time{font-size:11px;color:#64748b;margin-top:1px;}
-.logo-sm{width:44px;height:22px;display:flex;align-items:center;justify-content:center;border:1px solid var(--br);border-radius:7px;background:#fff;padding:2px;flex-shrink:0;}
-.logo-sm img{max-width:38px;max-height:14px;width:auto;height:auto;object-fit:contain;}
+.snap-time{font-size:10px;color:#64748b;margin-top:1px;}
+.logo-sm{width:42px;height:22px;display:flex;align-items:center;justify-content:center;border:1px solid var(--br);border-radius:6px;background:#fff;padding:2px;flex-shrink:0;overflow:hidden;}
+.logo-sm img{max-width:38px;max-height:16px;width:auto;height:auto;object-fit:contain;display:block;}
 .clk-open{background:#dcfce7;color:#166534;border:1px solid #86efac;}
 .clk-closed{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
 .clk-soon{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;}
-.rb{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:900;}
+.rb{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:900;}
 .rb-ld{background:rgba(15,157,138,.12);color:#0b7d6e;border:1.5px solid var(--g);}
 .rb-cs{background:rgba(26,110,216,.12);color:var(--bl);border:1.5px solid var(--bl);}
+.rb-lg{background:rgba(109,40,217,.12);color:#6d28d9;border:1.5px solid rgba(109,40,217,.5);}
 .rb-no{background:#fef2f2;color:var(--rd);border:1.5px solid var(--rd);}
-.flag{display:flex;gap:8px;align-items:flex-start;border-radius:10px;padding:9px 13px;font-size:13px;font-weight:600;line-height:1.6;}
+.flag{display:flex;gap:8px;align-items:flex-start;border-radius:10px;padding:9px 13px;font-size:12px;font-weight:600;line-height:1.6;}
 .flag-a{background:#fffbeb;border:1px solid rgba(245,158,11,.3);color:#92400e;}
-.flag-r{background:#fef2f2;border:1px solid rgba(239,68,68,.3);color:#b91c1c;}
 .cmp{width:100%;border-collapse:collapse;}
-.cmp th,.cmp td{padding:12px 14px;border:1px solid var(--br);font-size:13px;vertical-align:middle;}
+.cmp th,.cmp td{padding:11px 14px;border:1px solid var(--br);font-size:13px;vertical-align:middle;}
 .cmp thead th{font-weight:800;background:var(--dk);color:#fff;}
 .cmp tbody tr:nth-child(even) td{background:var(--bg);}
 .cmp .sv td{font-weight:800;}
@@ -106,20 +101,28 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 .cmp .sv td:nth-child(2){background:#fef2f2;color:var(--rd);}
 .cmp .sv td:nth-child(3){background:#eff6ff;color:var(--bl);}
 .cmp .sv td:nth-child(4){background:rgba(15,157,138,.1);color:#0b7d6e;font-size:15px;}
-.plan-card{border:1.5px solid var(--br);border-radius:16px;padding:20px;background:#fff;transition:all .15s;}
-.plan-card:hover{box-shadow:0 8px 24px rgba(15,23,42,.08);transform:translateY(-1px);}
+.plan-card{border:1.5px solid var(--br);border-radius:14px;padding:18px;background:#fff;transition:all .15s;}
+.plan-card:hover{box-shadow:0 6px 20px rgba(15,23,42,.08);}
 .plan-card.rec{border:2px solid var(--g);}
 .cs-tile{border:1.5px solid var(--br);border-radius:10px;padding:10px;background:#fff;text-align:center;}
 .cs-tile.act{border:2px solid var(--bl);background:rgba(26,110,216,.05);}
-.acc-hd{width:100%;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border:none;background:#fff;cursor:pointer;text-align:left;font-family:inherit;border-radius:16px;}
-.acc-hd:hover{background:#f8fafc;}
+/* Accordion */
+.acc-btn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border:none;background:var(--bg);border-radius:10px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--dk);text-align:left;transition:background .12s;}
+.acc-btn:hover{background:#eef2f7;}
+.acc-chevron{font-size:16px;transition:transform .2s;color:#64748b;flex-shrink:0;}
+.acc-btn.open .acc-chevron{transform:rotate(180deg);}
+.acc-body{display:none;}
+.acc-body.open{display:block;}
+/* Commission inside program comparison */
+.comm-section{border-top:1.5px solid var(--br);margin-top:20px;padding-top:20px;}
+.comm-title{font-size:14px;font-weight:900;color:var(--am);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 #planResultBox{display:none;margin-top:10px;padding:12px;border-radius:12px;border:1px solid var(--g);background:rgba(15,157,138,.08);}
 </style>
 </head>
 <body>
 
 <header class="topbar">
-<div style="max-width:1380px;margin:0 auto;padding:12px 20px;">
+<div style="max-width:1420px;margin:0 auto;padding:12px 20px;">
   <div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;">
     <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
       <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" style="height:30px;width:auto;" alt="Funding Tier"/>
@@ -131,25 +134,19 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
     <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px;">
       <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Prospect Delivery</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto auto;gap:10px;align-items:end;">
-        <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">First Name</label>
-          <input id="fName" class="fi" style="font-size:13px;padding:8px 11px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="text" placeholder="John"/></div>
-        <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Last Name</label>
-          <input id="lName" class="fi" style="font-size:13px;padding:8px 11px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="text" placeholder="Smith"/></div>
-        <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Email</label>
-          <input id="pEmail" class="fi" style="font-size:13px;padding:8px 11px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="email" placeholder="prospect@email.com"/></div>
+        <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">First Name</label><input id="fName" class="fi" style="font-size:13px;padding:8px 11px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="text" placeholder="John"/></div>
+        <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Last Name</label><input id="lName" class="fi" style="font-size:13px;padding:8px 11px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="text" placeholder="Smith"/></div>
+        <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Email</label><input id="pEmail" class="fi" style="font-size:13px;padding:8px 11px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="email" placeholder="prospect@email.com"/></div>
         <button id="pdfBtn" class="btn btn-g" style="height:36px;font-size:12px;padding:0 14px;">&#8595; PDF</button>
         <button id="sendBtn" class="btn btn-dk" style="height:36px;font-size:12px;padding:0 14px;">Generate + Send</button>
       </div>
-      <div id="planResultBox">
-        <div style="font-weight:700;color:var(--dk);margin-bottom:8px;font-size:13px;">Plan Created</div>
-        <button id="planLink" class="btn btn-g" style="font-size:12px;">&#10003; View Personalized Plan</button>
-      </div>
+      <div id="planResultBox"><div style="font-weight:700;color:var(--dk);margin-bottom:8px;font-size:13px;">&#10003; Plan Created Successfully</div><button id="planLink" class="btn btn-g" style="font-size:12px;">View Personalized Plan</button></div>
     </div>
   </div>
 </div>
 </header>
 
-<main style="max-width:1380px;margin:0 auto;padding:20px 20px 60px;display:grid;gap:20px;">
+<main style="max-width:1420px;margin:0 auto;padding:20px 20px 60px;display:grid;gap:20px;">
 <div class="workspace">
 
   <!-- LEFT: inputs -->
@@ -174,9 +171,8 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
     </div>
   </div>
 
-  <!-- RIGHT: routing panel -->
-  <div class="sticky-panel" style="display:grid;gap:14px;">
-
+  <!-- RIGHT: routing panel - NOT sticky -->
+  <div style="display:grid;gap:14px;">
     <div class="card">
       <div class="card-hd">Backend Routing</div>
       <div id="routeBadges" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;"></div>
@@ -192,34 +188,32 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
           <option value="fastest_resolution">Fastest Resolution</option>
         </select>
       </div>
-      <div id="providerAvail" style="border:1px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:14px;"></div>
-      <div id="clockBox" style="border:1px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:14px;"></div>
+      <div id="providerAvail" style="border:1px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:10px;"></div>
+      <!-- Support Hours - single collapsible accordion -->
+      <div style="border:1px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:14px;">
+        <button class="acc-btn" id="hoursBtn" onclick="toggleAcc('hoursBody','hoursBtn')">
+          <span style="display:flex;align-items:center;gap:8px;"><span>&#128336;</span><span>Support Hours &amp; Status</span></span>
+          <span class="acc-chevron">&#8964;</span>
+        </button>
+        <div class="acc-body" id="hoursBody" style="border-top:1px solid var(--br);">
+          <div id="clockBox"></div>
+        </div>
+      </div>
       <div id="flagsBox" style="display:grid;gap:6px;"></div>
     </div>
-
-    <div class="card" id="commCard" style="display:none;">
-      <div class="card-hd" style="color:var(--am);border-color:var(--am);">Potential Commission — Based on Program Selection</div>
-      <div id="commDetail"></div>
-    </div>
-
-    <div class="card" id="csProgramCard" style="display:none;">
-      <div class="card-hd">
-        <div class="logo-sm"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png" alt="CS"/></div>
-        Consumer Shield Program
-      </div>
-      <div id="csActiveDetail" style="margin-bottom:16px;"></div>
-      <div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">All Program Tiers</div>
-      <div id="csTileGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
-    </div>
-
   </div>
 
-  <!-- FULL WIDTH: Program Comparison -->
+  <!-- FULL WIDTH: Program Comparison + Commission merged in -->
   <div class="card workspace-full">
     <div class="card-hd">Program Comparison</div>
     <p style="font-size:13px;color:#64748b;margin-bottom:16px;font-weight:500;">Only currently available and eligible options are shown.</p>
     <div id="planCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;"></div>
     <div id="planDiff" style="margin-top:16px;overflow-x:auto;"></div>
+    <!-- Commission merged here, not in right panel -->
+    <div id="commSection" class="comm-section" style="display:none;">
+      <div class="comm-title">&#9733; Potential Commission &mdash; Based on Program Selection</div>
+      <div id="commDetail"></div>
+    </div>
   </div>
 
   <!-- FULL WIDTH: Comparison Table -->
@@ -231,14 +225,14 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
     <div style="padding:20px;overflow-x:auto;">
       <table class="cmp">
         <thead><tr>
-          <th style="text-align:left;width:200px;">Detail</th>
-          <th style="text-align:left;background:#1e293b;">Current Situation</th>
-          <th style="text-align:left;">Fastest Payoff</th>
-          <th style="text-align:left;background:rgba(15,157,138,.06);color:#0b7d6e;">
+          <th style="text-align:left;min-width:180px;">Detail</th>
+          <th style="text-align:left;background:#1e293b;min-width:160px;">Current Situation</th>
+          <th style="text-align:left;min-width:160px;">Fastest Payoff</th>
+          <th style="text-align:left;background:rgba(15,157,138,.06);color:#0b7d6e;min-width:200px;">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-              <img id="recommendedProgramLogo" src="" alt="" style="display:none;height:18px;width:auto;object-fit:contain;border-radius:4px;background:#fff;border:1px solid #dbe4ea;padding:2px;"/>
+              <img id="recommendedProgramLogo" src="" alt="" style="display:none;height:16px;width:auto;max-width:70px;object-fit:contain;border-radius:4px;background:#fff;border:1px solid #dbe4ea;padding:2px 5px;"/>
               <span id="recommendedProgramHeader">Recommended Program</span>
-              <span style="background:var(--g);color:#fff;border-radius:999px;padding:2px 8px;font-size:10px;">Best Option</span>
+              <span style="background:var(--g);color:#fff;border-radius:999px;padding:2px 8px;font-size:10px;white-space:nowrap;">Best Option</span>
             </div>
           </th>
         </tr></thead>
@@ -247,14 +241,28 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
     </div>
   </div>
 
+  <!-- FULL WIDTH: Consumer Shield Programs - collapsible accordion -->
+  <div class="card workspace-full" id="csProgramCard" style="display:none;padding:0;overflow:hidden;">
+    <button class="acc-btn" id="csBtn" onclick="toggleAcc('csBody','csBtn')" style="padding:18px 20px;font-size:15px;font-weight:900;border-radius:16px;background:#fff;">
+      <span style="display:flex;align-items:center;gap:10px;">
+        <div class="logo-sm" style="width:50px;height:26px;"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png" alt="CS"/></div>
+        <span>Consumer Shield Programs</span>
+      </span>
+      <span class="acc-chevron">&#8964;</span>
+    </button>
+    <div class="acc-body" id="csBody" style="border-top:1px solid var(--br);padding:20px;">
+      <div id="csActiveDetail" style="margin-bottom:20px;"></div>
+      <div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px;">All Program Tiers</div>
+      <div id="csTileGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;"></div>
+    </div>
+  </div>
+
 </div>
 </main>
-
 <script>
-// ════ CONSTANTS ════════════════════════════════════
 const LD_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp';
 const CS_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png';
-const LEGACY_LOGO='/assets/legacy%20capital%20logo.png';
+const LEGACY_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69e1c95dc56ad279084b3141.png';
 
 const CS_PROGS=[
   {k:'A',range:'$4,000-$4,999',   min:4000, max:4999,    pay:220,term:18,comm:{p2:150,p4:0,total:150}},
@@ -268,87 +276,61 @@ const CS_PROGS=[
   {k:'I',range:'$50,000+',        min:50000,max:Infinity,pay:620,term:36,comm:{p2:450,p4:150,total:600}},
 ];
 const getCsProg=d=>CS_PROGS.find(p=>d>=p.min&&d<=p.max)||null;
-
 const LD_TIERS=[
   {id:1,label:'Tier 1',range:'$0-$999k/mo',  rate:0.010,rl:'1.00%'},
   {id:2,label:'Tier 2',range:'$1M-$1.99M/mo',rate:0.0115,rl:'1.15%'},
   {id:3,label:'Tier 3',range:'$2M+/mo',      rate:0.013, rl:'1.30%'},
 ];
-
 const STATE_NAMES={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',GU:'Guam',PR:'Puerto Rico'};
 const LD_BLACKOUT=new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
 const LD_RED=new Set(['CT','GA','LA','MN','NV','NH','NJ','ND','OH','PA','TN','WA','WY']);
 const CS_BLACKOUT=new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
 const LEGACY_BLACKOUT=new Set(['AK','RI','VT','WV','OR']);
 const STATE_OPTS=Object.entries(STATE_NAMES).map(([a,n])=>({a,n,l:`${a} - ${n}`})).sort((x,y)=>x.l.localeCompare(y.l));
-
 const CS_REJ=new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
 const CS_COND=new Set(['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt']);
 const LD_REJ=new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt']);
-
 const CRED_RULES=[
   {n:['Alleviate Tax','Alleviate Tax LLC'],s:'rej',r:'Tax relief firm - not accepted.'},
   {n:['Acceptance Now','AcceptanceNow'],s:'rej',r:'Rent-to-own - not accepted.'},
   {n:['ACIMA','Acima Credit'],s:'rej',r:'Lease-to-own financing - not accepted.'},
   {n:['Advance Financial','AF247'],s:'rej',r:'Payday lender - not accepted.'},
-  {n:['AGCO Finance','AGCO Financial'],s:'rej',r:'Agricultural equipment financing - not accepted.'},
   {n:['Aqua Finance'],s:'rej',r:'Home improvement / HVAC financing - not accepted.'},
   {n:['Bell Finance','Bell Financial'],s:'rej',r:'Consumer installment lender - not accepted.'},
   {n:['BHG Financial','BHG Money','BHG','Bankers Healthcare Group'],s:'rej',r:'All BHG entities not accepted.'},
-  {n:["Bob's Discount Furniture","Bobs Discount Furniture","Bob's Finance","Bobs Finance","Bobs Furniture"],s:'rej',r:'Retail furniture / in-house financing - not accepted.'},
+  {n:["Bob's Discount Furniture","Bobs Discount Furniture","Bob's Finance","Bobs Finance"],s:'rej',r:'Retail furniture / in-house financing - not accepted.'},
   {n:['Concord Servicing'],s:'rej',r:'Loan servicer - not accepted.'},
   {n:['Cornerstone Financial','Cornerstone Finance'],s:'rej',r:'Consumer installment lender - not accepted.'},
   {n:['Credit Central','CreditCentral'],s:'rej',r:'Consumer installment lender - not accepted.'},
   {n:['Credologi','Credologi LLC'],s:'rej',r:'Debt relief / personal lender - not accepted.'},
-  {n:['DR Bank'],s:'rej',r:'Community bank - not accepted.'},
   {n:['EMPOWER FCU','Empower Federal Credit Union'],s:'rej',r:'Federal credit union - not accepted.'},
   {n:['Enerbank','EnerBank USA'],s:'rej',r:'Home improvement financing - not accepted.'},
   {n:['ESL Credit Union','ESL FCU'],s:'rej',r:'Credit union - not accepted.'},
   {n:['Farmers Furniture','FRMRS FURN'],s:'rej',r:'Rent-to-own furniture - not accepted.'},
-  {n:['FCRP Capital','FCRP Capital LLC'],s:'rej',r:'Specialty finance - not accepted.'},
-  {n:['Fort Worth Credit Union','Fort Worth CU','Forth Worth CU'],s:'rej',r:'Federal credit union - not accepted.'},
-  {n:['Fortera Credit Union','Fortera CU'],s:'rej',r:'Federal credit union - not accepted.'},
-  {n:['Garden Federal Credit Union','Garden FCU'],s:'rej',r:'Federal credit union - not accepted.'},
-  {n:['Golden One Credit Union','Golden 1 Credit Union','Golden1'],s:'rej',r:'State credit union - not accepted.'},
-  {n:['Goldman Sachs','Goldman Sachs Credit Card','Marcus Credit Card'],s:'rej',r:'GS credit cards excluded. Apple Cards and GS personal loans ARE accepted - verify account type.'},
+  {n:['Goldman Sachs','Goldman Sachs Credit Card','Marcus Credit Card'],s:'rej',r:'GS credit cards excluded. Apple Cards and GS personal loans ARE accepted.'},
   {n:['GoodLeap','Good Leap','Loan Pal','LoanPal'],s:'rej',r:'Solar / home improvement financing - not accepted.'},
-  {n:['Hawaii CU','Hawaii Credit Union','Hawaii USA Federal Credit Union'],s:'rej',r:'Federal credit union - not accepted.'},
   {n:['HC ROYA','HYCITE','HyCite','Royal Prestige'],s:'rej',r:'Direct sales / MLM cookware - not accepted.'},
-  {n:['Heights Financial','Heights Finance'],s:'rej',r:'Consumer installment lender - not accepted.'},
   {n:['Island Finance'],s:'rej',r:'Puerto Rico consumer finance - not accepted.'},
-  {n:['ISPC'],s:'rej',r:'Service contract financing - not accepted.'},
   {n:['Kabbage','Kabbage Loans'],s:'rej',r:'Small business lending - not accepted.'},
   {n:['KIKOFF','Kikoff'],s:'rej',r:'Credit builder lender - not accepted.'},
   {n:['Koalafi'],s:'rej',r:'Lease-to-own / POS financing - not accepted.'},
-  {n:['LHPCC Trust','LHPCC Trust I','LHPCC'],s:'rej',r:'Structured trust - not accepted.'},
-  {n:['Local Government Federal Credit Union','LGFCU'],s:'rej',r:'Federal credit union - not accepted.'},
-  {n:['Matco Tools Financing','Matco Fin','Matco Tools'],s:'rej',r:'Tool franchise financing - not accepted.'},
   {n:['Military Star','Exchange Credit Program'],s:'rej',r:'DoD retail credit card - not accepted.'},
   {n:['Nebraska Furniture','Nebraska Furniture Mart'],s:'rej',r:'Retail furniture - not accepted.'},
-  {n:['Omni Loans','Omni Financial','Omni Military Loans'],s:'rej',r:'Consumer personal loans - not accepted.'},
   {n:['Opensky','OpenSky'],s:'rej',r:'Secured credit card - not accepted.'},
   {n:['PINNACLE FINANCIAL GROUP','Pinnacle Financial'],s:'rej',r:'Consumer finance - not accepted.'},
-  {n:['Pioneer Loans','Pioneer Finance'],s:'rej',r:'Consumer installment lender - not accepted.'},
   {n:['Popular Bank','Banco Popular'],s:'rej',r:'Puerto Rico commercial bank - not accepted.'},
   {n:['PowerPay','Power Pay'],s:'rej',r:'Home improvement financing - not accepted.'},
-  {n:['Preferred Loans','Preferred Finance'],s:'rej',r:'Consumer installment lender - not accepted.'},
-  {n:['Quick Help Loans','Quick Help'],s:'rej',r:'Short-term lender - not accepted.'},
-  {n:['Red River Credit','REDRIVERCR','Red River CU'],s:'rej',r:'Federal credit union - not accepted.'},
-  {n:['REDSTONE Credit Union','Redstone FCU'],s:'rej',r:'Federal credit union - not accepted.'},
   {n:['RENT-A-CENTER','Rent-A-Center','Rent A Center','RAC'],s:'rej',r:'Rent-to-own retailer - not accepted.'},
-  {n:['RFFC Financial','RFFC'],s:'rej',r:'Consumer finance - not accepted.'},
   {n:['Robinhood','Robinhood Financial'],s:'rej',r:'Investment / brokerage - not accepted.'},
   {n:['Security Finance','Security Finance Corp'],s:'rej',r:'Consumer installment lender - not accepted.'},
-  {n:['State Employees Credit Union','SECU','STATE EMPLOYEES C U','STATEEMP','State Employee Credit Union'],s:'rej',r:'State employee credit union - ALL state variants not accepted.'},
-  {n:['Service Finance Company','SVCFIN','SRVFINCO'],s:'rej',r:'Home improvement / HVAC financing - not accepted.'},
+  {n:['State Employees Credit Union','SECU','STATE EMPLOYEES C U','STATEEMP'],s:'rej',r:'State employee credit union - ALL state variants not accepted.'},
+  {n:['Service Finance Company','SVCFIN'],s:'rej',r:'Home improvement / HVAC financing - not accepted.'},
   {n:['Snap-On Credit','Snap On Credit','Snapon Credit'],s:'rej',r:'Tool dealer financing - not accepted.'},
   {n:['Solar Mosaic','SOLAR MOSAIC','Mosaic Solar'],s:'rej',r:'Solar energy financing - not accepted.'},
   {n:['Southern Finance','Southern Finance Corp'],s:'rej',r:'Consumer installment lender - not accepted.'},
-  {n:['Sunset Financial','Sunset Finance'],s:'rej',r:'Consumer installment lender - not accepted.'},
   {n:['Toledo Finance'],s:'rej',r:'Auto / subprime financing - not accepted.'},
   {n:['Tower Loans','Tower Finance','Tower Loan'],s:'rej',r:'Consumer installment lender - not accepted.'},
   {n:['West Creek Financial','West Creek Finance'],s:'rej',r:'Subprime consumer financing - not accepted.'},
-  {n:['WSECU','Washington State Employees Credit Union'],s:'rej',r:'WA state employees credit union - not accepted.'},
   {n:['Yendo'],s:'rej',r:'Vehicle-equity credit card - not accepted.'},
   {n:['Lendmark','Lendmark Financial'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
   {n:['Mariner Finance','Mariner'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
@@ -356,68 +338,32 @@ const CRED_RULES=[
   {n:['Regional Finance','Regional Finance Corp'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
   {n:['Republic Finance'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
 ];
-
 const TRAD_CARDS=['American Express','Amex','Bank of America','Capital One','Chase','Citi','Citibank','Discover','Wells Fargo','Synchrony','Barclays','Barclaycard','Comenity Bank','Bread Financial','HSBC','Merrick Bank','Mission Lane','First Premier Bank','Credit One','Milestone','Upgrade','Avant','Best Egg','LendingClub','SoFi','Upstart','Prosper','Marcus','PayPal Credit','Apple Card','Navy Federal','USAA','PNC','TD Bank','U.S. Bank','US Bank','Regions Bank','Fifth Third Bank','Truist','SunTrust','BB&T','M&T Bank','KeyBank','Citizens Bank','Santander','Nordstrom Card',"Macy's Card","JCPenney Card","Kohl's Card",'Best Buy Card','Home Depot Card',"Lowe's Card",'Walmart Card','Target RedCard','Amazon Store Card','CareCredit',"Sam's Club Card",'Costco Card','Dell Financial'];
-
-const DT_CATS={
-  'Credit cards & loans':['Unsecured','Unsecured Personal Loan','Unsecured Line of Credit','Medical Bill','Payday Loan','Tribal Loan','Cell Phone Bill'],
-  'Auto & vehicle':['Repossession Deficiency','Auto Repo Deficiency','Deficiency','Auto Loan (Secured)'],
-  'Student loans':['Private Student Loan','Federal Student Loan','Navient Student Loan'],
-  'Housing & utilities':['Back Rent','Apartment Back Rent (Collections)','Utility Bill','Mortgage'],
-  'Business':['Business Debt','SBA Loan'],
-  'Tax & government':['IRS Tax Debt','Alimony / Child Support'],
-  'Other':['Judgment','Peer-to-Peer Loan','USAA','Secured Loan','Cross Collateralized Account','Installment Sales Contract','Furniture Store Financing','Direct Furniture Store Loan','Credit Union Loan','Timeshare','Military Account','AFES Account','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Loan from Individual','Other'],
-};
+const DT_CATS={'Credit cards & loans':['Unsecured','Unsecured Personal Loan','Unsecured Line of Credit','Medical Bill','Payday Loan','Tribal Loan','Cell Phone Bill'],'Auto & vehicle':['Repossession Deficiency','Auto Repo Deficiency','Deficiency','Auto Loan (Secured)'],'Student loans':['Private Student Loan','Federal Student Loan','Navient Student Loan'],'Housing & utilities':['Back Rent','Apartment Back Rent (Collections)','Utility Bill','Mortgage'],'Business':['Business Debt','SBA Loan'],'Tax & government':['IRS Tax Debt','Alimony / Child Support'],'Other':['Judgment','Peer-to-Peer Loan','USAA','Secured Loan','Cross Collateralized Account','Installment Sales Contract','Furniture Store Financing','Direct Furniture Store Loan','Credit Union Loan','Timeshare','Military Account','AFES Account','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Loan from Individual','Other']};
 const DT_REJ=new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Mortgage','Auto Loan (Secured)','Cross Collateralized Account','Furniture Store Financing','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','Secured Loan','Installment Sales Contract']);
 const DT_COND=new Set(['Private Student Loan','Medical Bill','Back Rent','Apartment Back Rent (Collections)','Repossession Deficiency','Auto Repo Deficiency','Business Debt','Judgment','USAA','Deficiency','Tribal Loan']);
 const DT_ALL=[];
 Object.entries(DT_CATS).forEach(([cat,types])=>types.forEach(t=>DT_ALL.push({t,cat,s:DT_REJ.has(t)?'no':DT_COND.has(t)?'cond':'ok'})));
 const DT_ST={ok:{label:'Accepted',cls:'b-ok'},cond:{label:'Conditional',cls:'b-cond'},no:{label:'Not accepted',cls:'b-no'}};
-
-const CLOCKS=[
-  {key:'LEVEL',label:'Level Debt',tz:'America/New_York',days:[1,2,3,4,5],oh:9,om:0,ch:18,cm:0},
-  {key:'CS',label:'Consumer Shield',tz:'America/New_York',days:[1,2,3,4,5],oh:9,om:0,ch:19,cm:0},
-];
+const CLOCKS=[{key:'LEVEL',label:'Level Debt',tz:'America/New_York',days:[1,2,3,4,5],oh:9,om:0,ch:18,cm:0},{key:'CS',label:'Consumer Shield',tz:'America/New_York',days:[1,2,3,4,5],oh:9,om:0,ch:19,cm:0}];
 const MAX_ROWS=10;
-
-// ════ HELPERS ══════════════════════════════════════
 const $=id=>document.getElementById(id);
 const fmt=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n||0);
 const num=v=>{const n=parseFloat(String(v).replace(/[^0-9.]/g,''));return Number.isFinite(n)?n:0;};
 const esc=v=>String(v||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const pct=v=>`${(v||0).toFixed(1)}%`;
-
 function normName(v){return String(v||'').toUpperCase().replace(/&/g,' AND ').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();}
-function getCredRule(name){
-  if(!name)return null;
-  const a=normName(name);
-  return CRED_RULES.find(r=>r.n.some(n=>{
-    const b=normName(n);
-    if(a===b||a.includes(b)||b.includes(a))return true;
-    const ta=a.split(' '),tb=b.split(' ');
-    const[sh,lo]=ta.length<=tb.length?[ta,tb]:[tb,ta];
-    return sh.length>=2&&sh.every(t=>t.length>2&&lo.includes(t));
-  }))||null;
-}
+function getCredRule(name){if(!name)return null;const a=normName(name);return CRED_RULES.find(r=>r.n.some(n=>{const b=normName(n);if(a===b||a.includes(b)||b.includes(a))return true;const ta=a.split(' '),tb=b.split(' ');const[sh,lo]=ta.length<=tb.length?[ta,tb]:[tb,ta];return sh.length>=2&&sh.every(t=>t.length>2&&lo.includes(t));}))||null;}
 const isTradCard=n=>TRAD_CARDS.some(t=>normName(n).includes(normName(t)));
 const getLDState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:LD_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Black Out'}:LD_RED.has(c)?{status:'RED',label:'Attorney Model'}:{status:'GREEN',label:'Standard Model'};
 const getCSState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:CS_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Black Out'}:{status:'GREEN',label:'Serviceable'};
 const getLegacyState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:LEGACY_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Not Serviceable'}:{status:'GREEN',label:'Serviceable'};
 const getLDMaxTerm=d=>d<10000?24:d<12500?30:d<15000?36:d<25000?42:d<35000?48:d<50000?54:60;
-
-// ════ STATE ════════════════════════════════════════
+function toggleAcc(bodyId,btnId){const b=$(bodyId),btn=$(btnId);if(!b||!btn)return;const open=b.classList.contains('open');b.classList.toggle('open',!open);btn.classList.toggle('open',!open);}
 let nextId=2;
 const app={sel:'',rows:[newRow(1)]};
 function newRow(id){return{id,cred:'',amount:'',dt:'Unsecured',secured:false,collections:false,litigation:false,paid:true,bizUnprof:false};}
-
-// ════ ROUTING ══════════════════════════════════════
-function calcDN(d,apr=.24){
-  const mp=d*.025,mr=apr/12;
-  if(d<=0||mp<=d*mr)return{mp:0,months:0,apr,total:0};
-  const months=Math.max(1,Math.round(Math.log(mp/(mp-d*mr))/Math.log(1+mr)));
-  return{mp,months,apr,total:mp*months};
-}
-
+function calcDN(d,apr=.24){const mp=d*.025,mr=apr/12;if(d<=0||mp<=d*mr)return{mp:0,months:0,apr,total:0};const months=Math.max(1,Math.round(Math.log(mp/(mp-d*mr))/Math.log(1+mr)));return{mp,months,apr,total:mp*months};}
 function collectFlags(rows,total,sc){
   const csF=[],ldF=[];
   if(total>0&&total<4000)csF.push('Consumer Shield requires at least $4,000 total enrolled debt.');
@@ -446,7 +392,6 @@ function collectFlags(rows,total,sc){
   });
   return{cs:Array.from(new Set(csF)),ld:Array.from(new Set(ldF))};
 }
-
 function chooseRoute(total,sc,flags){
   if(!sc)return{route:'',reason:'Select a state to calculate routing.'};
   const pref=$('featurePriority')?.value||'best_fit';
@@ -456,21 +401,13 @@ function chooseRoute(total,sc,flags){
   const ldOK=ld.status!=='BLACKOUT'&&total>=7000&&!ldStop;
   const legacyOK=legacy.status!=='BLACKOUT'&&total>6000;
   if(total>0&&total<4000)return{route:'NO OPTION',reason:'Debt below $4,000 - no current backend matches this scenario.'};
-  if(total>=4000&&total<=6000){
-    if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt between $4,000 and $6,000 routes to Consumer Shield.'};
-    return{route:'NO OPTION',reason:'Debt is in Consumer Shield range, but Consumer Shield is not available for this state or scenario.'};
-  }
-  if(total>6000&&pref==='debt_validation'){
-    if(legacyOK)return{route:'LEGACY',reason:'Prospect wants debt validation and Legacy Capital Services is available in this state.'};
-    if(csOK)return{route:'CONSUMER SHIELD',reason:'Prospect wants debt validation, and Legacy cannot service this state, so Consumer Shield is the fallback.'};
-    return{route:'NO OPTION',reason:'Prospect wants debt validation, but neither Legacy nor Consumer Shield is available for this state/scenario.'};
-  }
+  if(total>=4000&&total<=6000){if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt between $4,000 and $6,000 routes to Consumer Shield.'};return{route:'NO OPTION',reason:'Debt in CS range but CS not available for this state/scenario.'};}
+  if(total>6000&&pref==='debt_validation'){if(legacyOK)return{route:'LEGACY',reason:'Prospect wants debt validation - Legacy Capital Services is available in this state.'};if(csOK)return{route:'CONSUMER SHIELD',reason:'Prospect wants debt validation - Legacy unavailable, routing to Consumer Shield.'};return{route:'NO OPTION',reason:'Prospect wants debt validation but neither Legacy nor Consumer Shield is available.'};}
   if(ldOK)return{route:'LEVEL',reason:ld.status==='RED'?'Best option is Level Debt under the attorney model in this state.':'Best option is Level Debt in a serviceable standard state.'};
-  if(legacyOK)return{route:'LEGACY',reason:'Level Debt is not a fit under current routing rules, so Legacy Capital Services is the next best available option.'};
-  if(csOK)return{route:'CONSUMER SHIELD',reason:'Level Debt is not available for this scenario, so Consumer Shield is the fallback option.'};
+  if(legacyOK)return{route:'LEGACY',reason:'Level Debt not available under current routing rules - Legacy Capital Services is the next best option.'};
+  if(csOK)return{route:'CONSUMER SHIELD',reason:'Level Debt not available for this scenario - Consumer Shield is the fallback option.'};
   return{route:'NO OPTION',reason:'No available backend is serviceable in this state.'};
 }
-
 function computeScenario(){
   const rows=app.rows.filter(r=>num(r.amount)>0);
   const total=rows.reduce((s,r)=>s+num(r.amount),0);
@@ -484,81 +421,35 @@ function computeScenario(){
   const feeRate=route.route==='LEVEL'?(lds.status==='RED'?.27:.25):0;
   const dn=calcDN(total);
   let shortest=null,recommended=null;
-  if(route.route==='LEVEL'){
-    const tc=total*.5+total*feeRate;
-    shortest={term:12,tc,mp:tc/12};
-    const mt=getLDMaxTerm(total);
-    recommended={term:mt,tc,mp:tc/mt};
-  } else if(route.route==='CONSUMER SHIELD'&&csProg){
-    const tc=csProg.term*csProg.pay;
-    shortest={term:csProg.term,tc,mp:csProg.pay};
-    recommended=shortest;
-  }
+  if(route.route==='LEVEL'){const tc=total*.5+total*feeRate;shortest={term:12,tc,mp:tc/12};const mt=getLDMaxTerm(total);recommended={term:mt,tc,mp:tc/mt};}
+  else if(route.route==='CONSUMER SHIELD'&&csProg){const tc=csProg.term*csProg.pay;shortest={term:csProg.term,tc,mp:csProg.pay};recommended=shortest;}
   const activeFlags=[];
   if(route.route==='LEVEL')activeFlags.push(...flags.ld);
-  if(route.route==='CONSUMER SHIELD'){
-    activeFlags.push(...flags.cs);
-    activeFlags.push('Consumer Shield support: Mon-Fri 9am-7pm EST.');
-    activeFlags.push('Consumer Shield uses Equifax for credit pull.');
-  }
+  if(route.route==='CONSUMER SHIELD'){activeFlags.push(...flags.cs);activeFlags.push('Consumer Shield support: Mon-Fri 9am-7pm EST.');activeFlags.push('Consumer Shield uses Equifax for credit pull.');}
   if(route.route==='NO OPTION')activeFlags.push(route.reason);
   return{rows,total,route,dn,shortest,recommended,feeRate,lds,css,lgs,csProg,csAvail,ldAvail,legacyAvail,flags:activeFlags};
 }
-
-// ════ ROW ALERTS ═══════════════════════════════════
 function rowAlerts(row,route){
   const alerts=[];
-  if(route==='LEVEL'){
-    const rule=getCredRule(row.cred);
-    if(rule){if(rule.s==='rej')alerts.push({label:'Not accepted by Level',tone:'r',detail:rule.r});else if(rule.s==='cond')alerts.push({label:row.secured?'Secured - not eligible':'Conditional - unsecured only',tone:row.secured?'r':'a',detail:rule.r});}
-    if(LD_REJ.has(row.dt))alerts.push({label:'Debt type not accepted',tone:'r',detail:row.dt+' not accepted by Level.'});
-  }
-  if(route==='CONSUMER SHIELD'){
-    if(CS_REJ.has(row.dt))alerts.push({label:'Not accepted by CS',tone:'r',detail:row.dt+' not accepted by Consumer Shield.'});
-    if(CS_COND.has(row.dt))alerts.push({label:'Conditional - docs needed',tone:'a',detail:row.dt+' requires additional documentation.'});
-  }
-  if(!route||route==='NO OPTION'){
-    const rule=getCredRule(row.cred);
-    if(rule&&rule.s==='rej')alerts.push({label:'Level excluded creditor',tone:'r',detail:rule.r});
-    if(rule&&rule.s==='cond')alerts.push({label:'Conditional creditor',tone:'a',detail:rule.r});
-  }
+  if(route==='LEVEL'){const rule=getCredRule(row.cred);if(rule){if(rule.s==='rej')alerts.push({label:'Not accepted by Level',tone:'r',detail:rule.r});else if(rule.s==='cond')alerts.push({label:row.secured?'Secured - not eligible':'Conditional - unsecured only',tone:row.secured?'r':'a',detail:rule.r});}if(LD_REJ.has(row.dt))alerts.push({label:'Debt type not accepted',tone:'r',detail:row.dt+' not accepted by Level.'});}
+  if(route==='CONSUMER SHIELD'){if(CS_REJ.has(row.dt))alerts.push({label:'Not accepted by CS',tone:'r',detail:row.dt+' not accepted by Consumer Shield.'});if(CS_COND.has(row.dt))alerts.push({label:'Conditional - docs needed',tone:'a',detail:row.dt+' requires additional documentation.'});}
+  if(!route||route==='NO OPTION'){const rule=getCredRule(row.cred);if(rule&&rule.s==='rej')alerts.push({label:'Level excluded creditor',tone:'r',detail:rule.r});if(rule&&rule.s==='cond')alerts.push({label:'Conditional creditor',tone:'a',detail:rule.r});}
   return alerts;
 }
-
-// ════ CLOCK ════════════════════════════════════════
-function clockParts(tz){
-  const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());
-  const m={};p.forEach(x=>{if(x.type!=='literal')m[x.type]=x.value;});
-  const wd={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
-  return{h:Number(m.hour),min:Number(m.minute),wd:wd[m.weekday]};
-}
+function clockParts(tz){const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());const m={};p.forEach(x=>{if(x.type!=='literal')m[x.type]=x.value;});const wd={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};return{h:Number(m.hour),min:Number(m.minute),wd:wd[m.weekday]};}
 function fmtTime(tz){return new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date());}
-function clockStatus(c){
-  const{h,min,wd}=clockParts(c.tz);
-  const cur=h*60+min,op=c.oh*60+c.om,cl=c.ch*60+c.cm;
-  const isDay=c.days.includes(wd),isOpen=isDay&&cur>=op&&cur<cl,toClose=cl-cur;
-  if(isOpen)return{cls:toClose<=60?'clk-soon':'clk-open',txt:toClose<=60?`Open - Closes in ${toClose} min`:'Open - Safe to push',now:fmtTime(c.tz)};
-  if(isDay&&cur<op)return{cls:'clk-closed',txt:`Closed - Opens in ${op-cur} min`,now:fmtTime(c.tz)};
-  return{cls:'clk-closed',txt:'Closed today',now:fmtTime(c.tz)};
-}
+function clockStatus(c){const{h,min,wd}=clockParts(c.tz);const cur=h*60+min,op=c.oh*60+c.om,cl=c.ch*60+c.cm;const isDay=c.days.includes(wd),isOpen=isDay&&cur>=op&&cur<cl,toClose=cl-cur;if(isOpen)return{cls:toClose<=60?'clk-soon':'clk-open',txt:toClose<=60?`Open - Closes in ${toClose} min`:'Open - Safe to push',now:fmtTime(c.tz)};if(isDay&&cur<op)return{cls:'clk-closed',txt:`Closed - Opens in ${op-cur} min`,now:fmtTime(c.tz)};return{cls:'clk-closed',txt:'Closed today',now:fmtTime(c.tz)};}
 function renderClocks(){
   const box=$('clockBox');if(!box)return;
-  const support={
-    LEVEL:`<a href="https://funding-tier.slack.com/archives/C0AMBM9EBNV" target="_blank" style="font-size:11px;font-weight:700;color:#6d28d9;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:4px 8px;text-decoration:none;">Slack Support</a>`,
-    CS:`<a href="https://teams.live.com/l/invite/FBA2mu0C9EQERh1bQ8" target="_blank" style="font-size:11px;font-weight:700;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:4px 8px;text-decoration:none;">Teams Support</a>`,
-  };
-  box.innerHTML=CLOCKS.map(c=>{
-    const s=clockStatus(c);const logo=c.key==='LEVEL'?LD_LOGO:CS_LOGO;
-    return `<div class="snap-row"><div class="logo-sm"><img src="${logo}" alt="${c.label}"/></div><div><div class="snap-name">${c.label}</div><div class="snap-time">${s.now}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;"><span class="pill ${s.cls}" style="font-size:10px;padding:3px 8px;">${s.txt}</span>${support[c.key]||''}</div></div>`;
-  }).join('');
+  const support={LEVEL:`<a href="https://funding-tier.slack.com/archives/C0AMBM9EBNV" target="_blank" style="font-size:11px;font-weight:700;color:#6d28d9;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:3px 8px;text-decoration:none;">Slack</a>`,CS:`<a href="https://teams.live.com/l/invite/FBA2mu0C9EQERh1bQ8" target="_blank" style="font-size:11px;font-weight:700;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:3px 8px;text-decoration:none;">Teams</a>`};
+  box.innerHTML=CLOCKS.map(c=>{const s=clockStatus(c);const logo=c.key==='LEVEL'?LD_LOGO:CS_LOGO;return `<div class="snap-row"><div class="logo-sm"><img src="${logo}" alt="${c.label}"/></div><div><div class="snap-name">${c.label}</div><div class="snap-time">${s.now}</div></div><div style="display:flex;align-items:center;gap:6px;"><span class="pill ${s.cls}" style="font-size:10px;padding:3px 8px;">${s.txt}</span>${support[c.key]||''}</div></div>`;}).join('');
 }
-
-// ════ RENDER PANEL ══════════════════════════════════
+function logoBox(url,name){const init=name.split(' ').map(w=>w[0]).join('').slice(0,3);return `<div class="logo-sm"><img src="${url}" alt="${name}" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:8px;font-weight:800;color:#64748b;\\'>${init}</span>';"/></div>`;}
 function renderPanel(c){
   const bc=c.route.route==='LEVEL'?'rb-ld':c.route.route==='CONSUMER SHIELD'?'rb-cs':c.route.route==='LEGACY'?'rb-lg':'rb-no';
   const rl=c.route.route==='LEVEL'?'Route: Level Debt':c.route.route==='CONSUMER SHIELD'?'Route: Consumer Shield':c.route.route==='LEGACY'?'Route: Legacy Capital Services':'No Available Route';
-  const logo=c.route.route==='LEVEL'?LD_LOGO:c.route.route==='CONSUMER SHIELD'?CS_LOGO:c.route.route==='LEGACY'?LEGACY_LOGO:'';
-  $('routeBadges').innerHTML=`${logo?`<div class="logo-sm"><img src="${logo}" alt=""/></div>`:''}
+  const rLogo=c.route.route==='LEVEL'?LD_LOGO:c.route.route==='CONSUMER SHIELD'?CS_LOGO:c.route.route==='LEGACY'?LEGACY_LOGO:'';
+  $('routeBadges').innerHTML=`${rLogo?`<div class="logo-sm" style="width:52px;height:26px;"><img src="${rLogo}" alt="" style="max-width:48px;max-height:20px;" onerror="this.style.display='none';"/></div>`:''}
     <span class="rb ${bc}">${rl}</span>
     <span class="pill ${c.lds.status==='BLACKOUT'?'p-r':c.lds.status==='RED'?'p-a':'p-g'}">LD: ${c.lds.label}</span>
     <span class="pill ${c.css.status==='BLACKOUT'?'p-r':'p-g'}">CS: ${c.css.label}</span>
@@ -568,396 +459,104 @@ function renderPanel(c){
     {name:'Level Debt',avail:c.ldAvail,best:c.route.route==='LEVEL',model:c.lds.label,logo:LD_LOGO},
     {name:'Consumer Shield',avail:c.csAvail,best:c.route.route==='CONSUMER SHIELD',model:c.css.label,logo:CS_LOGO},
     {name:'Legacy Capital Services',avail:c.legacyAvail,best:c.route.route==='LEGACY',model:c.lgs.label,logo:LEGACY_LOGO},
-  ].map(p=>`<div class="snap-row"><div class="logo-sm"><img src="${p.logo}" alt="${p.name}"/></div><div><div class="snap-name">${p.name}</div><div class="snap-time">${p.model}</div></div><span class="pill ${p.best?'p-g':p.avail?'p-b':'p-r'}" style="font-size:10px;">${p.best?'Best Option':p.avail?'Available':'Not Serviceable'}</span></div>`).join('');
+  ].map(p=>`<div class="snap-row">${logoBox(p.logo,p.name)}<div><div class="snap-name">${p.name}</div><div class="snap-time">${p.model}</div></div><span class="pill ${p.best?'p-g':p.avail?'p-b':'p-r'}" style="font-size:10px;">${p.best?'&#10003; Best':p.avail?'Available':'Not Available'}</span></div>`).join('');
   $('flagsBox').innerHTML=c.flags.map(f=>`<div class="flag flag-a"><span>&#9888;</span><span>${esc(f)}</span></div>`).join('');
 }
-
-function renderCommCard(c){
-  const card=$('commCard');
-  if(!c.total||!app.sel||!c.route.route||c.route.route==='NO OPTION'){card.style.display='none';return;}
-  card.style.display='block';
+function renderCommSection(c){
+  const sec=$('commSection');
+  if(!c.total||!app.sel||!c.route.route||c.route.route==='NO OPTION'||c.route.route==='LEGACY'){sec.style.display='none';return;}
+  sec.style.display='block';
   const d=$('commDetail');
   if(c.route.route==='LEVEL'){
-    d.innerHTML=`<div style="font-size:13px;color:#475569;margin-bottom:14px;line-height:1.65;">Commission based on your monthly enrolled debt volume tier. Check with your manager for your current tier.</div><div style="display:grid;gap:8px;margin-bottom:14px;">${LD_TIERS.map(t=>`<div style="display:grid;grid-template-columns:56px 1fr auto auto;gap:10px;align-items:center;padding:12px 14px;border-radius:10px;border:1.5px solid var(--br);"><span style="font-size:13px;font-weight:800;">${t.label}</span><span style="font-size:12px;color:#64748b;">${t.range}</span><span style="font-size:12px;color:#64748b;">${t.rl} of ${fmt(c.total)}</span><span style="font-size:19px;font-weight:900;color:#0b7d6e;">${fmt(Math.round(c.total*t.rate))}</span></div>`).join('')}</div><div style="background:rgba(15,157,138,.08);border:1px solid rgba(15,157,138,.25);border-radius:10px;padding:11px 14px;font-size:13px;color:#0b7d6e;font-weight:600;">Paid on the <strong>20th of Month 3</strong> after 2 program payments clear.</div>`;
+    d.innerHTML=`<p style="font-size:13px;color:#475569;margin-bottom:14px;line-height:1.65;">Commission based on your monthly enrolled debt volume tier. Check with your manager for your current tier.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px;">
+    ${LD_TIERS.map(t=>`<div style="padding:14px;border-radius:10px;border:1.5px solid var(--br);background:#fff;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:13px;font-weight:800;">${t.label}</span><span style="font-size:20px;font-weight:900;color:#0b7d6e;">${fmt(Math.round(c.total*t.rate))}</span></div><div style="font-size:11px;color:#64748b;">${t.range} &middot; ${t.rl} of ${fmt(c.total)}</div></div>`).join('')}
+    </div>
+    <div style="background:rgba(15,157,138,.08);border:1px solid rgba(15,157,138,.25);border-radius:10px;padding:11px 14px;font-size:13px;color:#0b7d6e;font-weight:600;">Paid on the <strong>20th of Month 3</strong> after 2 program payments clear.</div>`;
   } else if(c.route.route==='CONSUMER SHIELD'&&c.csProg){
     const p=c.csProg,cm=p.comm,sp=cm.p4>0;
-    d.innerHTML=`<div style="font-size:13px;color:#475569;margin-bottom:14px;line-height:1.65;">Flat rate commission based on program tier. This deal is <strong style="color:var(--bl);">Program ${p.k}</strong> (${p.range}).</div><div style="background:rgba(26,110,216,.06);border:2px solid var(--bl);border-radius:12px;padding:16px;margin-bottom:12px;"><div style="display:grid;grid-template-columns:${sp?'1fr 1fr 1fr':'1fr 1fr'};gap:12px;">${[['Paid at Payment 2',fmt(cm.p2),'20th of Month 3'],sp?['Paid at Payment 4',fmt(cm.p4),'20th of Month 5']:null,['Total Commission',fmt(cm.total),'Full amount']].filter(Boolean).map(([lb,vl,sb])=>`<div style="text-align:center;"><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">${lb}</div><div style="font-size:24px;font-weight:900;color:var(--bl);">${vl}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${sb}</div></div>`).join('')}</div></div><div style="background:rgba(26,110,216,.06);border:1px solid rgba(26,110,216,.2);border-radius:10px;padding:11px 14px;font-size:13px;color:#1e40af;font-weight:600;line-height:1.65;">${sp?`<strong>${fmt(cm.p2)}</strong> paid 20th Month 3 &middot; <strong>${fmt(cm.p4)}</strong> paid 20th Month 5. P2 subject to clawback if deal cancels before P4 within 60 days.`:`Full <strong>${fmt(cm.total)}</strong> paid 20th of Month 3. No split on Programs A&ndash;C.`}</div>`;
+    d.innerHTML=`<p style="font-size:13px;color:#475569;margin-bottom:14px;line-height:1.65;">Flat rate commission - this deal is <strong style="color:var(--bl);">Program ${p.k}</strong> (${p.range}).</p>
+    <div style="background:rgba(26,110,216,.06);border:2px solid var(--bl);border-radius:12px;padding:16px;margin-bottom:12px;">
+      <div style="display:grid;grid-template-columns:${sp?'1fr 1fr 1fr':'1fr 1fr'};gap:16px;text-align:center;">
+        ${[['Paid at Payment 2',fmt(cm.p2),'20th of Month 3'],sp?['Paid at Payment 4',fmt(cm.p4),'20th of Month 5']:null,['Total Commission',fmt(cm.total),'Full amount']].filter(Boolean).map(([lb,vl,sb])=>`<div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">${lb}</div><div style="font-size:26px;font-weight:900;color:var(--bl);">${vl}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${sb}</div></div>`).join('')}
+      </div>
+    </div>
+    <div style="background:rgba(26,110,216,.06);border:1px solid rgba(26,110,216,.2);border-radius:10px;padding:11px 14px;font-size:13px;color:#1e40af;font-weight:600;line-height:1.65;">${sp?`<strong>${fmt(cm.p2)}</strong> paid 20th Month 3 &middot; <strong>${fmt(cm.p4)}</strong> paid 20th Month 5. P2 subject to clawback if deal cancels before P4 within 60 days.`:`Full <strong>${fmt(cm.total)}</strong> paid 20th of Month 3. No split on Programs A-C.`}</div>`;
   }
 }
-
 function renderCSCard(c){
   const card=$('csProgramCard');
   if(!c.csAvail||!c.csProg){card.style.display='none';return;}
   card.style.display='block';
   const p=c.csProg;
-  $('csActiveDetail').innerHTML=`<div style="background:rgba(26,110,216,.06);border:2px solid var(--bl);border-radius:12px;padding:14px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:14px;font-weight:900;color:var(--bl);">CS Program ${p.k}</span><span style="font-size:12px;color:#64748b;margin-left:8px;">${p.range}</span></div><span class="pill p-b">Active Program</span></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">${[['Monthly Payment',fmt(p.pay),'per month'],['Program Length',`${p.term} mo`,'total term'],['Total Cost',fmt(p.term*p.pay),`${fmt(p.pay)} x ${p.term}`]].map(([l,v,s])=>`<div style="text-align:center;"><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">${l}</div><div style="font-size:20px;font-weight:900;color:var(--bl);margin-top:4px;">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${s}</div></div>`).join('')}</div></div>`;
-  $('csTileGrid').innerHTML=CS_PROGS.map(pr=>`<div class="cs-tile${pr.k===p.k?' act':''}"><div style="font-size:12px;font-weight:800;color:${pr.k===p.k?'var(--bl)':'#64748b'};">Prog ${pr.k}</div><div style="font-size:9px;color:#94a3b8;margin-top:1px;">${pr.range}</div><div style="font-size:17px;font-weight:900;color:${pr.k===p.k?'var(--bl)':'var(--dk)'};margin-top:5px;">${fmt(pr.pay)}</div><div style="font-size:11px;color:#64748b;margin-top:1px;">${pr.term} mo</div></div>`).join('');
+  $('csActiveDetail').innerHTML=`<div style="background:rgba(26,110,216,.06);border:2px solid var(--bl);border-radius:12px;padding:16px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:var(--bl);">CS Program ${p.k}</span><span style="font-size:12px;color:#64748b;margin-left:10px;">${p.range}</span></div><span class="pill p-b">Active Program</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;text-align:center;">${[['Monthly Payment',fmt(p.pay),'per month'],['Program Length',`${p.term} mo`,'total term'],['Total Cost',fmt(p.term*p.pay),`${fmt(p.pay)} x ${p.term}`]].map(([l,v,s])=>`<div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">${l}</div><div style="font-size:22px;font-weight:900;color:var(--bl);margin-top:4px;">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${s}</div></div>`).join('')}</div></div>`;
+  $('csTileGrid').innerHTML=CS_PROGS.map(pr=>`<div class="cs-tile${pr.k===p.k?' act':''}"><div style="font-size:12px;font-weight:800;color:${pr.k===p.k?'var(--bl)':'#64748b'};">Prog ${pr.k}</div><div style="font-size:9px;color:#94a3b8;margin-top:1px;">${pr.range}</div><div style="font-size:18px;font-weight:900;color:${pr.k===p.k?'var(--bl)':'var(--dk)'};margin-top:5px;">${fmt(pr.pay)}</div><div style="font-size:11px;color:#64748b;margin-top:1px;">${pr.term} mo</div></div>`).join('');
 }
-
 function renderPlanCards(c){
   const cards=[];
-  if(c.csAvail&&c.csProg){
-    const p=c.csProg,isRec=c.route.route==='CONSUMER SHIELD';
-    cards.push(`<div class="plan-card${isRec?' rec':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${CS_LOGO}" alt="CS"/></div><div style="font-size:14px;font-weight:900;">Consumer Shield</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-b">Program ${p.k}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-b">Available</span>'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div class="mc" style="--g:var(--bl);"><div class="mc-lbl">Monthly Payment</div><div class="mc-val" style="color:var(--bl);">${fmt(p.pay)}</div><div class="mc-sub">Fixed ${p.term} months</div></div><div class="mc" style="--g:var(--bl);"><div class="mc-lbl">Program Length</div><div class="mc-val" style="color:var(--bl);">${p.term} mo</div><div class="mc-sub">Total: ${fmt(p.term*p.pay)}</div></div></div><div style="background:rgba(26,110,216,.06);border:1px solid rgba(26,110,216,.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#1e40af;font-weight:600;line-height:1.6;"><strong>Debt Validation</strong> — Fixed monthly payment. Debts challenged through legal process.</div></div>`);
-  }
-  if(c.ldAvail){
-    const mt=getLDMaxTerm(c.total),mp=Math.round((c.total*.5+c.total*c.feeRate)/mt),isRec=c.route.route==='LEVEL';
-    cards.push(`<div class="plan-card${isRec?' rec':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${LD_LOGO}" alt="LD"/></div><div style="font-size:14px;font-weight:900;">Level Debt</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill ${c.lds.status==='RED'?'p-a':'p-g'}">${c.lds.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-g">Available</span>'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div class="mc"><div class="mc-lbl">Est. Monthly Payment</div><div class="mc-val">${fmt(mp)}</div><div class="mc-sub">Over ${mt} months</div></div><div class="mc"><div class="mc-lbl">Program Length</div><div class="mc-val">${mt} mo</div><div class="mc-sub">Est. total: ${fmt(mp*mt)}</div></div></div><div style="background:rgba(15,157,138,.06);border:1px solid rgba(15,157,138,.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#0b7d6e;font-weight:600;line-height:1.6;"><strong>Debt Settlement</strong> — Negotiates with creditors. Program fee applies.</div></div>`);
-  }
-  if(c.legacyAvail){
-    const isRec=c.route.route==='LEGACY';
-    cards.push(`<div class="plan-card${isRec?' rec':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${LEGACY_LOGO}" alt="Legacy"/></div><div style="font-size:14px;font-weight:900;">Legacy Capital Services</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-p">${c.lgs.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-p">Available</span>'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div class="mc" style="--g:#6d28d9;"><div class="mc-lbl">Program Type</div><div class="mc-val" style="color:#6d28d9;font-size:18px;">Attorney-Led</div><div class="mc-sub">Legal-support-focused</div></div><div class="mc" style="--g:#6d28d9;"><div class="mc-lbl">Routing Fit</div><div class="mc-val" style="color:#6d28d9;font-size:18px;">Above $6K</div><div class="mc-sub">Best when legal support matters most</div></div></div><div style="background:#faf5ff;border:1px solid rgba(109,40,217,.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#5b21b6;font-weight:600;line-height:1.6;"><strong>Attorney-Led Resolution Path</strong> — Best when the prospect values legal support and attorney-model positioning over pure payment comparison.</div></div>`);
-  }
+  if(c.csAvail&&c.csProg){const p=c.csProg,isRec=c.route.route==='CONSUMER SHIELD';cards.push(`<div class="plan-card${isRec?' rec':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${CS_LOGO}" alt="CS"/></div><div style="font-size:14px;font-weight:900;">Consumer Shield</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-b">Program ${p.k}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-b">Available</span>'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;"><div class="mc"><div class="mc-lbl">Monthly Payment</div><div class="mc-val" style="color:var(--bl);">${fmt(p.pay)}</div><div class="mc-sub">Fixed ${p.term} months</div></div><div class="mc"><div class="mc-lbl">Program Length</div><div class="mc-val" style="color:var(--bl);">${p.term} mo</div><div class="mc-sub">Total: ${fmt(p.term*p.pay)}</div></div></div><div style="background:rgba(26,110,216,.06);border:1px solid rgba(26,110,216,.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#1e40af;font-weight:600;line-height:1.6;"><strong>Debt Validation</strong> &mdash; Fixed monthly payment. Debts challenged through legal process.</div></div>`);}
+  if(c.ldAvail){const mt=getLDMaxTerm(c.total),mp=Math.round((c.total*.5+c.total*c.feeRate)/mt),isRec=c.route.route==='LEVEL';cards.push(`<div class="plan-card${isRec?' rec':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${LD_LOGO}" alt="LD"/></div><div style="font-size:14px;font-weight:900;">Level Debt</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill ${c.lds.status==='RED'?'p-a':'p-g'}">${c.lds.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-g">Available</span>'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;"><div class="mc"><div class="mc-lbl">Est. Monthly Payment</div><div class="mc-val">${fmt(mp)}</div><div class="mc-sub">Over ${mt} months</div></div><div class="mc"><div class="mc-lbl">Program Length</div><div class="mc-val">${mt} mo</div><div class="mc-sub">Est. total: ${fmt(mp*mt)}</div></div></div><div style="background:rgba(15,157,138,.06);border:1px solid rgba(15,157,138,.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#0b7d6e;font-weight:600;line-height:1.6;"><strong>Debt Settlement</strong> &mdash; Negotiates with creditors. Program fee applies.</div></div>`);}
+  if(c.legacyAvail){const isRec=c.route.route==='LEGACY';cards.push(`<div class="plan-card${isRec?' rec':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${LEGACY_LOGO}" alt="Legacy" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:8px;font-weight:800;color:#6d28d9;\\'>LCS</span>';"/></div><div style="font-size:14px;font-weight:900;">Legacy Capital Services</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-p">${c.lgs.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-p">Available</span>'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;"><div class="mc" style="--g:#6d28d9;"><div class="mc-lbl">Program Type</div><div class="mc-val" style="color:#6d28d9;font-size:17px;">Attorney-Led</div><div class="mc-sub">Legal-support-focused</div></div><div class="mc" style="--g:#6d28d9;"><div class="mc-lbl">Routing Fit</div><div class="mc-val" style="color:#6d28d9;font-size:17px;">Above $6K</div><div class="mc-sub">Best for legal-support prospect</div></div></div><div style="background:#faf5ff;border:1px solid rgba(109,40,217,.2);border-radius:10px;padding:10px 13px;font-size:12px;color:#5b21b6;font-weight:600;line-height:1.6;"><strong>Attorney-Led Resolution</strong> &mdash; Best when prospect values legal support and attorney-model positioning.</div></div>`);}
   $('planCards').innerHTML=cards.length?cards.join(''):`<div style="grid-column:1/-1;border:1px solid rgba(239,68,68,.3);background:#fef2f2;color:#b91c1c;border-radius:12px;padding:14px;font-weight:700;">No program options available for this state and debt scenario.</div>`;
-  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:14px;overflow:hidden;"><div style="background:var(--dk);padding:12px 16px;font-size:14px;font-weight:800;color:#fff;">How the Programs Differ</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Legacy</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Above $6,000</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Best Fit</td><td style="padding:10px 14px;">Fixed validation plan</td><td style="padding:10px 14px;">Settlement-focused</td><td style="padding:10px 14px;">Prospect values legal support most</td></tr></tbody></table></div></div>`;
+  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:12px;overflow:hidden;"><div style="background:var(--dk);padding:11px 16px;font-size:13px;font-weight:800;color:#fff;">How the Programs Differ</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Legacy</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Above $6,000</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Best Fit</td><td style="padding:10px 14px;">Fixed validation plan</td><td style="padding:10px 14px;">Settlement-focused</td><td style="padding:10px 14px;">Prospect values legal support most</td></tr></tbody></table></div></div>`;
 }
-
 function renderCmpTable(c){
   const hdrLogo=$('recommendedProgramLogo'),hdrText=$('recommendedProgramHeader');
   const recName=c.route.route==='LEVEL'?'Level Debt':c.route.route==='CONSUMER SHIELD'?'Consumer Shield':c.route.route==='LEGACY'?'Legacy Capital Services':'Recommended Program';
   const recLogo=c.route.route==='LEVEL'?LD_LOGO:c.route.route==='CONSUMER SHIELD'?CS_LOGO:c.route.route==='LEGACY'?LEGACY_LOGO:'';
   if(hdrText)hdrText.textContent=recName;
-  if(hdrLogo){if(recLogo){hdrLogo.src=recLogo;hdrLogo.alt=recName;hdrLogo.style.display='inline-block';}else{hdrLogo.style.display='none';hdrLogo.src='';hdrLogo.alt='';}}
-  let recommendedMonthly='—',recommendedMonths='—',recommendedTotal='—',recommendedSavings='—';
-  if((c.route.route==='LEVEL'||c.route.route==='CONSUMER SHIELD')&&c.recommended){
-    recommendedMonthly=fmt(c.recommended.mp);recommendedMonths=`${c.recommended.term} months`;recommendedTotal=fmt(c.recommended.tc);
-    recommendedSavings=`<strong style="font-size:15px;">${fmt(Math.max(0,c.dn.total-c.recommended.tc))}</strong>`;
-  } else if(c.route.route==='LEGACY'){
-    recommendedMonthly='Custom after review';recommendedMonths='Case-by-case';recommendedTotal='Custom structure';recommendedSavings='<strong>Varies by file</strong>';
-  }
-  const fastestMonthly=c.shortest?fmt(c.shortest.mp):'—';
-  const fastestMonths=c.shortest?`${c.shortest.term} months`:'—';
-  const fastestTotal=c.shortest?fmt(c.shortest.tc):'—';
-  const fastestSavings=c.shortest?`<strong>${fmt(Math.max(0,c.dn.total-c.shortest.tc))}</strong>`:'—';
-  const rows=[
-    ['Monthly Payments',fmt(c.dn.mp),fastestMonthly,recommendedMonthly],
-    ['Total Enrolled Debt',fmt(c.total),fmt(c.total),fmt(c.total)],
-    ['Months to Payoff',`${c.dn.months} months`,fastestMonths,recommendedMonths],
-    ['Est. Interest Rate',`${(c.dn.apr*100).toFixed(0)}% APR`,c.shortest?'0%':'—',c.route.route==='LEGACY'?'N/A':(recommendedTotal!=='—'?'0%':'—')],
-    ['Est. Total Payback',`<span style="color:var(--rd);font-weight:900;">${fmt(c.dn.total)}</span>`,fastestTotal,recommendedTotal],
-    ['Est. Savings vs Min Pay','—',fastestSavings,recommendedSavings],
-  ];
+  if(hdrLogo){if(recLogo){hdrLogo.src=recLogo;hdrLogo.alt=recName;hdrLogo.style.display='inline-block';hdrLogo.onerror=()=>{hdrLogo.style.display='none';};}else{hdrLogo.style.display='none';}}
+  let recMonthly='&mdash;',recMonths='&mdash;',recTotal='&mdash;',recSavings='&mdash;';
+  if((c.route.route==='LEVEL'||c.route.route==='CONSUMER SHIELD')&&c.recommended){recMonthly=fmt(c.recommended.mp);recMonths=`${c.recommended.term} months`;recTotal=fmt(c.recommended.tc);recSavings=`<strong style="font-size:15px;color:#0b7d6e;">${fmt(Math.max(0,c.dn.total-c.recommended.tc))}</strong>`;}
+  else if(c.route.route==='LEGACY'){recMonthly='Custom after review';recMonths='Case-by-case';recTotal='Custom structure';recSavings='<strong>Varies by file</strong>';}
+  const fM=c.shortest?fmt(c.shortest.mp):'&mdash;';const fMo=c.shortest?`${c.shortest.term} months`:'&mdash;';const fT=c.shortest?fmt(c.shortest.tc):'&mdash;';const fS=c.shortest?`<strong>${fmt(Math.max(0,c.dn.total-c.shortest.tc))}</strong>`:'&mdash;';
+  const rows=[['Monthly Payments',fmt(c.dn.mp),fM,recMonthly],['Total Enrolled Debt',fmt(c.total),fmt(c.total),fmt(c.total)],['Months to Payoff',`${c.dn.months} months`,fMo,recMonths],['Est. Interest Rate',`${(c.dn.apr*100).toFixed(0)}% APR`,c.shortest?'0%':'&mdash;',c.route.route==='LEGACY'?'N/A':(recTotal!=='&mdash;'?'0%':'&mdash;')],['Est. Total Payback',`<span style="color:var(--rd);font-weight:900;">${fmt(c.dn.total)}</span>`,fT,recTotal],['Est. Savings vs Min Pay','&mdash;',fS,recSavings]];
   $('cmpTable').innerHTML=rows.map((r,i)=>`<tr class="${i===5?'sv':''}">${r.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('');
 }
-
-// ════ ROW RENDERING ════════════════════════════════
-function refreshRowVisuals(){
-  const c=computeScenario();
-  app.rows.forEach((row,i)=>{
-    const card=document.querySelector(`[data-row="${i}"]`);if(!card)return;
-    const alerts=rowAlerts(row,c.route.route);
-    card.className='row-card'+(row.secured?' fr':alerts.some(a=>a.tone==='r')?' fr':alerts.some(a=>a.tone==='a')?' fa':'');
-    const wrap=card.querySelector('.aw');
-    if(wrap)wrap.innerHTML=alerts.map(a=>`<span class="pill b-${a.tone==='r'?'no':'cond'}" style="font-size:10px;cursor:help;" title="${esc(a.detail||a.label)}">${a.label}</span>`).join('');
-  });
-}
-
+function refreshRowVisuals(){const c=computeScenario();app.rows.forEach((row,i)=>{const card=document.querySelector(`[data-row="${i}"]`);if(!card)return;const alerts=rowAlerts(row,c.route.route);card.className='row-card'+(row.secured?' fr':alerts.some(a=>a.tone==='r')?' fr':alerts.some(a=>a.tone==='a')?' fa':'');const wrap=card.querySelector('.aw');if(wrap)wrap.innerHTML=alerts.map(a=>`<span class="pill b-${a.tone==='r'?'no':'cond'}" style="font-size:10px;cursor:help;" title="${esc(a.detail||a.label)}">${a.label}</span>`).join('');});}
 function renderRows(){
   const total=app.rows.reduce((s,r)=>s+num(r.amount),0);
-  $('rows').innerHTML=app.rows.map((row,i)=>`
-    <div class="row-card" data-row="${i}">
-      <div class="row-inner">
-        <div style="position:relative;">
-          <input class="fi ci" data-i="${i}" placeholder="Type creditor name&#8230;" value="${esc(row.cred||'')}" autocomplete="off"/>
-          <div class="drop" data-cr="${i}"></div>
-          <div class="aw" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div>
-        </div>
-        <div>
-          <input class="fi" data-i="${i}" data-k="amount" placeholder="$0" value="${row.amount||''}"/>
-          ${total>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${((num(row.amount)/total)*100).toFixed(1)}%</div>`:''}
-        </div>
-        <div>
-          <div class="dt-wrap" data-dw="${i}">
-            <svg class="dt-icon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg>
-            <input class="dt-inp" data-di="${i}" placeholder="Search debt type&#8230;" autocomplete="off"/>
-            <button class="dt-x" data-dx="${i}">&#10005;</button>
-            <div class="dt-panel" data-dp="${i}"></div>
-          </div>
-          <div class="dt-sel" data-ds="${i}"><span></span><button data-dsc="${i}">&#10005;</button></div>
-        </div>
-        <div>${app.rows.length>1?`<button type="button" data-rem="${i}" style="width:30px;height:30px;border:1.5px solid rgba(239,68,68,.4);border-radius:8px;background:#fef2f2;color:var(--rd);font-weight:900;font-size:16px;cursor:pointer;margin-top:5px;font-family:inherit;">&#8722;</button>`:'<div></div>'}</div>
-      </div>
-    </div>`).join('');
-  app.rows.forEach((row,i)=>{
-    if(row.dt){
-      const sel=document.querySelector(`[data-ds="${i}"]`);
-      if(sel){const s=DT_REJ.has(row.dt)?'no':DT_COND.has(row.dt)?'cond':'ok';sel.querySelector('span').textContent=row.dt;sel.className=`dt-sel s-${s}`;}
-    }
-  });
+  $('rows').innerHTML=app.rows.map((row,i)=>`<div class="row-card" data-row="${i}"><div class="row-inner"><div style="position:relative;"><input class="fi ci" data-i="${i}" placeholder="Type creditor name&#8230;" value="${esc(row.cred||'')}" autocomplete="off"/><div class="drop" data-cr="${i}"></div><div class="aw" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div></div><div><input class="fi" data-i="${i}" data-k="amount" placeholder="$0" value="${row.amount||''}"/>${total>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${((num(row.amount)/total)*100).toFixed(1)}%</div>`:''}</div><div><div class="dt-wrap" data-dw="${i}"><svg class="dt-icon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg><input class="dt-inp" data-di="${i}" placeholder="Search debt type&#8230;" autocomplete="off"/><button class="dt-x" data-dx="${i}">&#10005;</button><div class="dt-panel" data-dp="${i}"></div></div><div class="dt-sel" data-ds="${i}"><span></span><button data-dsc="${i}">&#10005;</button></div></div><div>${app.rows.length>1?`<button type="button" data-rem="${i}" style="width:30px;height:30px;border:1.5px solid rgba(239,68,68,.4);border-radius:8px;background:#fef2f2;color:var(--rd);font-weight:900;font-size:16px;cursor:pointer;margin-top:5px;font-family:inherit;">&#8722;</button>`:'<div></div>'}</div></div></div>`).join('');
+  app.rows.forEach((row,i)=>{if(row.dt){const sel=document.querySelector(`[data-ds="${i}"]`);if(sel){const s=DT_REJ.has(row.dt)?'no':DT_COND.has(row.dt)?'cond':'ok';sel.querySelector('span').textContent=row.dt;sel.className=`dt-sel s-${s}`;}}});
   $('addBtn').style.display=app.rows.length<MAX_ROWS?'flex':'none';
   document.querySelectorAll('[data-k="amount"]').forEach(n=>{n.addEventListener('input',onAmtChange);});
   document.querySelectorAll('[data-rem]').forEach(b=>b.addEventListener('click',()=>removeRow(Number(b.dataset.rem))));
-  bindCredSearches();
-  bindDTRows();
-  refreshRowVisuals();
+  bindCredSearches();bindDTRows();refreshRowVisuals();
 }
-
-// ════ CREDITOR SEARCH ══════════════════════════════
-function getTradMatches(q){
-  const lq=q.trim().toLowerCase();if(!lq)return[];
-  return TRAD_CARDS.filter(n=>n.toLowerCase().includes(lq)).slice(0,8).map(n=>({display_name:n,secured:false,product_type:'credit card'}));
-}
+function getTradMatches(q){const lq=q.trim().toLowerCase();if(!lq)return[];return TRAD_CARDS.filter(n=>n.toLowerCase().includes(lq)).slice(0,8).map(n=>({display_name:n,secured:false,product_type:'credit card'}));}
 async function searchCred(i,query){
   const box=document.querySelector(`[data-cr="${i}"]`);if(!box)return;
   if(!query.trim()){box.innerHTML='';box.className='drop';return;}
   const local=getTradMatches(query);let merged=[...local];
-  try{
-    const res=await fetch(`/api/ghl-creditors?search=${encodeURIComponent(query)}`);
-    const data=await res.json();
-    if(data.ok&&Array.isArray(data.results)){data.results.forEach(item=>{const nm=String(item.display_name||'').trim();if(nm&&!merged.some(x=>normName(x.display_name)===normName(nm)))merged.push(item);});}
-  }catch(e){}
+  try{const res=await fetch(`/api/ghl-creditors?search=${encodeURIComponent(query)}`);const data=await res.json();if(data.ok&&Array.isArray(data.results)){data.results.forEach(item=>{const nm=String(item.display_name||'').trim();if(nm&&!merged.some(x=>normName(x.display_name)===normName(nm)))merged.push(item);});}}catch(e){}
   if(!merged.length){box.innerHTML=`<button type="button" data-mv="${i}" data-mq="${esc(query)}">Use "${esc(query)}" as manual entry</button>`;box.className='drop open';bindCredClicks();return;}
-  box.innerHTML=merged.slice(0,10).map(item=>{
-    const sec=item.secured===true||item.secured==='true';
-    const rule=getCredRule(item.display_name||'');
-    const isRej=rule&&rule.s==='rej',isCond=rule&&rule.s==='cond';
-    const dt=isTradCard(item.display_name||'')?'Unsecured':sec?'Secured Loan':'Unsecured';
-    return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="${esc(dt)}" data-ps="${sec}" style="background:${isRej?'#fef2f2':isCond?'#fffbeb':'#fff'};">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-        <span style="font-weight:800;color:${isRej?'var(--rd)':isCond?'#92400e':'var(--dk)'};">${esc(item.display_name||'')}</span>
-        ${isRej?`<span style="font-size:10px;font-weight:800;background:var(--rd);color:#fff;border-radius:999px;padding:2px 7px;">Level excluded</span>`:''}
-        ${isCond?`<span style="font-size:10px;font-weight:800;background:var(--am);color:#fff;border-radius:999px;padding:2px 7px;">Conditional</span>`:''}
-      </div>
-      <div style="font-size:11px;color:${sec?'var(--rd)':'#0b7d6e'};margin-top:2px;">${esc(dt)} &middot; ${sec?'Secured':'Unsecured'}</div>
-      ${rule?`<div style="font-size:11px;color:#64748b;margin-top:2px;font-style:italic;">${esc(rule.r)}</div>`:''}
-    </button>`;
-  }).join('');
+  box.innerHTML=merged.slice(0,10).map(item=>{const sec=item.secured===true||item.secured==='true';const rule=getCredRule(item.display_name||'');const isRej=rule&&rule.s==='rej',isCond=rule&&rule.s==='cond';const dt=isTradCard(item.display_name||'')?'Unsecured':sec?'Secured Loan':'Unsecured';return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="${esc(dt)}" data-ps="${sec}" style="background:${isRej?'#fef2f2':isCond?'#fffbeb':'#fff'};"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;"><span style="font-weight:800;color:${isRej?'var(--rd)':isCond?'#92400e':'var(--dk)'};">${esc(item.display_name||'')}</span>${isRej?`<span style="font-size:10px;font-weight:800;background:var(--rd);color:#fff;border-radius:999px;padding:2px 7px;">Level excluded</span>`:''}${isCond?`<span style="font-size:10px;font-weight:800;background:var(--am);color:#fff;border-radius:999px;padding:2px 7px;">Conditional</span>`:''}</div><div style="font-size:11px;color:${sec?'var(--rd)':'#0b7d6e'};margin-top:2px;">${esc(dt)} &middot; ${sec?'Secured':'Unsecured'}</div>${rule?`<div style="font-size:11px;color:#64748b;margin-top:2px;font-style:italic;">${esc(rule.r)}</div>`:''}</button>`;}).join('');
   box.className='drop open';bindCredClicks();
 }
-function bindCredSearches(){
-  document.querySelectorAll('.ci').forEach(n=>{
-    n.addEventListener('input',e=>{
-      const i=Number(e.target.dataset.i);app.rows[i].cred=e.target.value||'';
-      if(isTradCard(e.target.value||'')){app.rows[i].dt='Unsecured';app.rows[i].secured=false;}
-      searchCred(i,e.target.value||'');
-    });
-    n.addEventListener('focus',e=>searchCred(Number(e.target.dataset.i),e.target.value||''));
-  });
-}
+function bindCredSearches(){document.querySelectorAll('.ci').forEach(n=>{n.addEventListener('input',e=>{const i=Number(e.target.dataset.i);app.rows[i].cred=e.target.value||'';if(isTradCard(e.target.value||'')){app.rows[i].dt='Unsecured';app.rows[i].secured=false;}searchCred(i,e.target.value||'');});n.addEventListener('focus',e=>searchCred(Number(e.target.dataset.i),e.target.value||''));});}
 function bindCredClicks(){
-  document.querySelectorAll('[data-pi]').forEach(b=>{
-    b.onclick=()=>{
-      const i=Number(b.dataset.pi),nm=b.dataset.pn||'',dt=b.dataset.pt||'Unsecured',sec=b.dataset.ps==='true';
-      app.rows[i].cred=nm;app.rows[i].secured=sec;app.rows[i].dt=sec?'Secured Loan':isTradCard(nm)?'Unsecured':dt;
-      const inp=document.querySelector(`.ci[data-i="${i}"]`);const box=document.querySelector(`[data-cr="${i}"]`);
-      if(inp)inp.value=nm;if(box){box.innerHTML='';box.className='drop';}
-      dtSetValue(i,app.rows[i].dt);renderRows();render();
-    };
-  });
-  document.querySelectorAll('[data-mv]').forEach(b=>{
-    b.onclick=()=>{
-      const i=Number(b.dataset.mv),val=b.dataset.mq||'';
-      app.rows[i].cred=val;app.rows[i].dt='Unsecured';app.rows[i].secured=false;
-      const inp=document.querySelector(`.ci[data-i="${i}"]`);const box=document.querySelector(`[data-cr="${i}"]`);
-      if(inp)inp.value=val;if(box){box.innerHTML='';box.className='drop';}
-      renderRows();render();
-    };
-  });
+  document.querySelectorAll('[data-pi]').forEach(b=>{b.onclick=()=>{const i=Number(b.dataset.pi),nm=b.dataset.pn||'',dt=b.dataset.pt||'Unsecured',sec=b.dataset.ps==='true';app.rows[i].cred=nm;app.rows[i].secured=sec;app.rows[i].dt=sec?'Secured Loan':isTradCard(nm)?'Unsecured':dt;const inp=document.querySelector(`.ci[data-i="${i}"]`);const box=document.querySelector(`[data-cr="${i}"]`);if(inp)inp.value=nm;if(box){box.innerHTML='';box.className='drop';}dtSetValue(i,app.rows[i].dt);renderRows();render();};});
+  document.querySelectorAll('[data-mv]').forEach(b=>{b.onclick=()=>{const i=Number(b.dataset.mv),val=b.dataset.mq||'';app.rows[i].cred=val;app.rows[i].dt='Unsecured';app.rows[i].secured=false;const inp=document.querySelector(`.ci[data-i="${i}"]`);const box=document.querySelector(`[data-cr="${i}"]`);if(inp)inp.value=val;if(box){box.innerHTML='';box.className='drop';}renderRows();render();};});
 }
-
-// ════ DT AUTOCOMPLETE ══════════════════════════════
-function dtHl(str,q){
-  if(!q)return esc(str);
-  const i=str.toLowerCase().indexOf(q.toLowerCase());
-  if(i<0)return esc(str);
-  return esc(str.slice(0,i))+'<mark>'+esc(str.slice(i,i+q.length))+'</mark>'+esc(str.slice(i+q.length));
-}
-function dtBuildPanel(panel,q,idx){
-  const items=q?DT_ALL.filter(x=>x.t.toLowerCase().includes(q.toLowerCase())):null;
-  if(q&&(!items||!items.length)){panel.innerHTML=`<div class="dt-none">No match for "${esc(q)}"</div>`;return;}
-  let html='',gi=0;
-  if(q){items.forEach(item=>{const s=DT_ST[item.s];html+=`<div class="dt-item" data-di="${gi++}"><div><div class="dt-name">${dtHl(item.t,q)}</div><div class="dt-sub2">${esc(item.cat)}</div></div><span class="dt-badge ${s.cls}">${s.label}</span></div>`;});}
-  else{Object.entries(DT_CATS).forEach(([cat,types])=>{html+=`<div class="dt-cat">${esc(cat)}</div>`;types.forEach(t=>{const item=DT_ALL.find(x=>x.t===t)||{t,cat,s:'ok'};const s=DT_ST[item.s];html+=`<div class="dt-item" data-di="${gi++}"><div class="dt-name">${esc(t)}</div><span class="dt-badge ${s.cls}">${s.label}</span></div>`;});});}
-  panel.innerHTML=html;
-  panel.querySelectorAll('.dt-item').forEach(el=>{
-    el.addEventListener('mousedown',e=>{
-      e.preventDefault();
-      const filtered=q?DT_ALL.filter(x=>x.t.toLowerCase().includes(q.toLowerCase())):DT_ALL;
-      const item=filtered[Number(el.dataset.di)];
-      if(item)dtPick(idx,item);
-    });
-  });
-}
-function dtPick(idx,item){
-  app.rows[idx].dt=item.t;
-  if(item.t==='Secured Loan'||item.t==='Auto Loan (Secured)')app.rows[idx].secured=true;
-  const wrap=document.querySelector(`[data-dw="${idx}"]`);if(!wrap)return;
-  const inp=wrap.querySelector(`[data-di="${idx}"]`);
-  const panel=wrap.querySelector(`[data-dp="${idx}"]`);
-  const xbtn=wrap.querySelector(`[data-dx="${idx}"]`);
-  if(inp){inp.value='';inp.placeholder=item.t;}
-  if(panel)panel.className='dt-panel';
-  if(xbtn)xbtn.style.display='none';
-  const sel=document.querySelector(`[data-ds="${idx}"]`);
-  if(sel){const s=DT_ST[item.s];sel.querySelector('span').textContent=item.t;sel.className=`dt-sel s-${item.s}`;}
-  refreshRowVisuals();render();
-}
-function dtSetValue(idx,val){
-  if(!val)return;
-  const wrap=document.querySelector(`[data-dw="${idx}"]`);if(!wrap)return;
-  const inp=wrap.querySelector(`[data-di="${idx}"]`);if(inp)inp.placeholder=val;
-  const sel=document.querySelector(`[data-ds="${idx}"]`);
-  if(sel){const s=DT_REJ.has(val)?'no':DT_COND.has(val)?'cond':'ok';sel.querySelector('span').textContent=val;sel.className=`dt-sel s-${s}`;}
-}
-function bindDTRows(){
-  app.rows.forEach((_,idx)=>{
-    const wrap=document.querySelector(`[data-dw="${idx}"]`);if(!wrap)return;
-    const inp=wrap.querySelector(`[data-di="${idx}"]`);
-    const panel=wrap.querySelector(`[data-dp="${idx}"]`);
-    const xbtn=wrap.querySelector(`[data-dx="${idx}"]`);
-    const sel=document.querySelector(`[data-ds="${idx}"]`);
-    if(!inp||!panel)return;
-    let ai=-1;
-    const open=q=>{dtBuildPanel(panel,q,idx);panel.className='dt-panel open';ai=-1;};
-    const close=()=>{panel.className='dt-panel';ai=-1;};
-    inp.addEventListener('focus',()=>open(inp.value));
-    inp.addEventListener('input',e=>{const q=e.target.value;if(xbtn)xbtn.style.display=q?'flex':'none';open(q);});
-    inp.addEventListener('blur',()=>setTimeout(close,160));
-    inp.addEventListener('keydown',e=>{
-      if(!panel.classList.contains('open'))return;
-      const els=panel.querySelectorAll('.dt-item');
-      if(e.key==='ArrowDown'){e.preventDefault();ai=Math.min(ai+1,els.length-1);}
-      else if(e.key==='ArrowUp'){e.preventDefault();ai=Math.max(ai-1,-1);}
-      else if(e.key==='Enter'&&ai>=0){e.preventDefault();const q=inp.value;const fl=q?DT_ALL.filter(x=>x.t.toLowerCase().includes(q.toLowerCase())):DT_ALL;if(fl[ai])dtPick(idx,fl[ai]);return;}
-      else if(e.key==='Escape'){close();inp.blur();return;}
-      els.forEach((el,j)=>{el.classList.toggle('dt-act',j===ai);if(j===ai)el.scrollIntoView({block:'nearest'});});
-    });
-    if(xbtn){xbtn.addEventListener('click',()=>{inp.value='';inp.placeholder='Search debt type\u2026';xbtn.style.display='none';app.rows[idx].dt='Unsecured';if(sel)sel.className='dt-sel';inp.focus();open('');refreshRowVisuals();render();});}
-    if(sel){const scb=document.querySelector(`[data-dsc="${idx}"]`);if(scb){scb.addEventListener('click',()=>{app.rows[idx].dt='Unsecured';sel.className='dt-sel';inp.placeholder='Search debt type\u2026';inp.focus();refreshRowVisuals();render();});}}
-  });
-}
-
-// ════ STATE SEARCH ══════════════════════════════════
-function searchStates(q){
-  const box=$('stateResults');if(!box)return;
-  if(!q.trim()){box.innerHTML='';box.className='drop';return;}
-  const lq=q.toLowerCase();
-  const matches=STATE_OPTS.filter(s=>s.a.toLowerCase().includes(lq)||s.n.toLowerCase().includes(lq));
-  if(!matches.length){box.innerHTML='';box.className='drop';return;}
-  box.innerHTML=matches.map(s=>`<button type="button" data-sa="${s.a}" data-sl="${esc(s.l)}">${esc(s.l)}</button>`).join('');
-  box.className='drop open';
-  box.querySelectorAll('[data-sa]').forEach(b=>{
-    b.onclick=()=>{
-      app.sel=b.dataset.sa;
-      const inp=$('stateSearch');const bx=$('stateResults');
-      if(inp)inp.value=b.dataset.sl||'';
-      if(bx){bx.innerHTML='';bx.className='drop';}
-      render();
-    };
-  });
-}
-
-// ════ FIELD CHANGE ══════════════════════════════════
+function dtHl(str,q){if(!q)return esc(str);const i=str.toLowerCase().indexOf(q.toLowerCase());if(i<0)return esc(str);return esc(str.slice(0,i))+'<mark>'+esc(str.slice(i,i+q.length))+'</mark>'+esc(str.slice(i+q.length));}
+function dtBuildPanel(panel,q,idx){const items=q?DT_ALL.filter(x=>x.t.toLowerCase().includes(q.toLowerCase())):null;if(q&&(!items||!items.length)){panel.innerHTML=`<div class="dt-none">No match for "${esc(q)}"</div>`;return;}let html='',gi=0;if(q){items.forEach(item=>{const s=DT_ST[item.s];html+=`<div class="dt-item" data-di="${gi++}"><div><div class="dt-name">${dtHl(item.t,q)}</div><div class="dt-sub2">${esc(item.cat)}</div></div><span class="dt-badge ${s.cls}">${s.label}</span></div>`;});}else{Object.entries(DT_CATS).forEach(([cat,types])=>{html+=`<div class="dt-cat">${esc(cat)}</div>`;types.forEach(t=>{const item=DT_ALL.find(x=>x.t===t)||{t,cat,s:'ok'};const s=DT_ST[item.s];html+=`<div class="dt-item" data-di="${gi++}"><div class="dt-name">${esc(t)}</div><span class="dt-badge ${s.cls}">${s.label}</span></div>`;});});}panel.innerHTML=html;panel.querySelectorAll('.dt-item').forEach(el=>{el.addEventListener('mousedown',e=>{e.preventDefault();const filtered=q?DT_ALL.filter(x=>x.t.toLowerCase().includes(q.toLowerCase())):DT_ALL;const item=filtered[Number(el.dataset.di)];if(item)dtPick(idx,item);});});}
+function dtPick(idx,item){app.rows[idx].dt=item.t;if(item.t==='Secured Loan'||item.t==='Auto Loan (Secured)')app.rows[idx].secured=true;const wrap=document.querySelector(`[data-dw="${idx}"]`);if(!wrap)return;const inp=wrap.querySelector(`[data-di="${idx}"]`);const panel=wrap.querySelector(`[data-dp="${idx}"]`);const xbtn=wrap.querySelector(`[data-dx="${idx}"]`);if(inp){inp.value='';inp.placeholder=item.t;}if(panel)panel.className='dt-panel';if(xbtn)xbtn.style.display='none';const sel=document.querySelector(`[data-ds="${idx}"]`);if(sel){const s=DT_ST[item.s];sel.querySelector('span').textContent=item.t;sel.className=`dt-sel s-${item.s}`;}refreshRowVisuals();render();}
+function dtSetValue(idx,val){if(!val)return;const wrap=document.querySelector(`[data-dw="${idx}"]`);if(!wrap)return;const inp=wrap.querySelector(`[data-di="${idx}"]`);if(inp)inp.placeholder=val;const sel=document.querySelector(`[data-ds="${idx}"]`);if(sel){const s=DT_REJ.has(val)?'no':DT_COND.has(val)?'cond':'ok';sel.querySelector('span').textContent=val;sel.className=`dt-sel s-${s}`;}}
+function bindDTRows(){app.rows.forEach((_,idx)=>{const wrap=document.querySelector(`[data-dw="${idx}"]`);if(!wrap)return;const inp=wrap.querySelector(`[data-di="${idx}"]`);const panel=wrap.querySelector(`[data-dp="${idx}"]`);const xbtn=wrap.querySelector(`[data-dx="${idx}"]`);const sel=document.querySelector(`[data-ds="${idx}"]`);if(!inp||!panel)return;let ai=-1;const open=q=>{dtBuildPanel(panel,q,idx);panel.className='dt-panel open';ai=-1;};const close=()=>{panel.className='dt-panel';ai=-1;};inp.addEventListener('focus',()=>open(inp.value));inp.addEventListener('input',e=>{const q=e.target.value;if(xbtn)xbtn.style.display=q?'flex':'none';open(q);});inp.addEventListener('blur',()=>setTimeout(close,160));inp.addEventListener('keydown',e=>{if(!panel.classList.contains('open'))return;const els=panel.querySelectorAll('.dt-item');if(e.key==='ArrowDown'){e.preventDefault();ai=Math.min(ai+1,els.length-1);}else if(e.key==='ArrowUp'){e.preventDefault();ai=Math.max(ai-1,-1);}else if(e.key==='Enter'&&ai>=0){e.preventDefault();const q=inp.value;const fl=q?DT_ALL.filter(x=>x.t.toLowerCase().includes(q.toLowerCase())):DT_ALL;if(fl[ai])dtPick(idx,fl[ai]);return;}else if(e.key==='Escape'){close();inp.blur();return;}els.forEach((el,j)=>{el.classList.toggle('dt-act',j===ai);if(j===ai)el.scrollIntoView({block:'nearest'});});});if(xbtn){xbtn.addEventListener('click',()=>{inp.value='';inp.placeholder='Search debt type\u2026';xbtn.style.display='none';app.rows[idx].dt='Unsecured';if(sel)sel.className='dt-sel';inp.focus();open('');refreshRowVisuals();render();});}if(sel){const scb=document.querySelector(`[data-dsc="${idx}"]`);if(scb){scb.addEventListener('click',()=>{app.rows[idx].dt='Unsecured';sel.className='dt-sel';inp.placeholder='Search debt type\u2026';inp.focus();refreshRowVisuals();render();});}}});}
+function searchStates(q){const box=$('stateResults');if(!box)return;if(!q.trim()){box.innerHTML='';box.className='drop';return;}const lq=q.toLowerCase();const matches=STATE_OPTS.filter(s=>s.a.toLowerCase().includes(lq)||s.n.toLowerCase().includes(lq));if(!matches.length){box.innerHTML='';box.className='drop';return;}box.innerHTML=matches.map(s=>`<button type="button" data-sa="${s.a}" data-sl="${esc(s.l)}">${esc(s.l)}</button>`).join('');box.className='drop open';box.querySelectorAll('[data-sa]').forEach(b=>{b.onclick=()=>{app.sel=b.dataset.sa;const inp=$('stateSearch');const bx=$('stateResults');if(inp)inp.value=b.dataset.sl||'';if(bx){bx.innerHTML='';bx.className='drop';}render();};});}
 function onAmtChange(e){const i=Number(e.target.dataset.i);if(!app.rows[i])return;app.rows[i].amount=e.target.value;render();}
 function addRow(){if(app.rows.length>=MAX_ROWS)return;app.rows.push(newRow(nextId++));renderRows();render();}
 function removeRow(i){if(app.rows.length<=1)return;app.rows.splice(i,1);renderRows();render();}
-
-// ════ MAIN RENDER ════════════════════════════════════
-function render(){
-  const c=computeScenario();
-  $('totalDebt').textContent=fmt(c.total);
-  refreshRowVisuals();
-  renderPanel(c);
-  renderCommCard(c);
-  renderCSCard(c);
-  renderPlanCards(c);
-  renderCmpTable(c);
-  renderClocks();
-  const can=!!(c.recommended&&app.sel&&c.total>0);
-  ['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});
-}
-
-// ════ PDF ═════════════════════════════════════════
-async function buildPdf(){
-  const c=computeScenario();
-  if(!(c.recommended&&app.sel&&c.total>0))return;
-  const fn=$('fName').value.trim()||'Client',ln=$('lName').value.trim()||'';
-  const fullName=`${fn} ${ln}`.trim();
-  const{jsPDF}=window.jspdf;const doc=new jsPDF();const pw=doc.internal.pageSize.getWidth();let y=20;
-  doc.setFontSize(20);doc.setTextColor(15,157,138);doc.text('Funding Tier - Debt Resolution Summary',14,y);y+=10;
-  doc.setFontSize(11);doc.setTextColor(0,0,0);
-  doc.text(`Prepared for: ${fullName}`,14,y);y+=7;
-  const progType=c.route.route==='LEVEL'?'Debt Settlement':c.route.route==='CONSUMER SHIELD'?'Debt Validation':'Unknown';
-  doc.text(`State: ${app.sel}  |  Program Selection: ${progType}`,14,y);y+=10;
-  if(c.csProg&&c.route.route==='CONSUMER SHIELD'){
-    doc.setFontSize(12);doc.setTextColor(26,110,216);
-    doc.text(`Consumer Shield Program ${c.csProg.k}: ${c.csProg.range}`,14,y);y+=7;
-    doc.setFontSize(10);doc.setTextColor(71,85,105);
-    doc.text(`Monthly Payment: ${fmt(c.csProg.pay)}  |  Term: ${c.csProg.term} months  |  Total: ${fmt(c.csProg.term*c.csProg.pay)}`,14,y);y+=10;
-  }
-  const tRows=[
-    ['Monthly Payments',fmt(c.dn.mp),c.shortest?fmt(c.shortest.mp):'--',c.recommended?fmt(c.recommended.mp):'--'],
-    ['Total Enrolled Debt',fmt(c.total),fmt(c.total),fmt(c.total)],
-    ['Months to Payoff',`${c.dn.months} mo`,c.shortest?`${c.shortest.term} mo`:'--',c.recommended?`${c.recommended.term} mo`:'--'],
-    ['Est. Total Payback',fmt(c.dn.total),c.shortest?fmt(c.shortest.tc):'--',c.recommended?fmt(c.recommended.tc):'--'],
-    ['Est. Savings','--',c.shortest?fmt(Math.max(0,c.dn.total-c.shortest.tc)):'--',c.recommended?fmt(Math.max(0,c.dn.total-c.recommended.tc)):'--'],
-  ];
-  const hdrs=['Detail','Current Situation','Fastest Payoff','Recommended'];
-  const cx=[14,64,124,162];const rh=10;
-  doc.setFillColor(241,245,249);doc.rect(14,y,182,rh,'F');
-  doc.setFontSize(7);doc.setTextColor(51,65,85);
-  hdrs.forEach((h,i)=>doc.text(doc.splitTextToSize(h,38),cx[i]+2,y+4));y+=14;
-  tRows.forEach((row,ri)=>{
-    const isSav=ri===4;
-    if(isSav){doc.setFillColor(15,157,138);doc.rect(14,y,182,rh,'F');}
-    else if(ri%2===1){doc.setFillColor(248,250,252);doc.rect(14,y,182,rh,'F');}
-    row.forEach((cell,ci)=>{
-      if(isSav){doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');}
-      else if(ri===3&&ci===1){doc.setTextColor(239,68,68);doc.setFont(undefined,'bold');}
-      else{doc.setTextColor(15,23,42);doc.setFont(undefined,'normal');}
-      doc.setFontSize(8);doc.text(String(cell),cx[ci]+2,y+6);
-    });y+=rh;
-  });
-  const blob=doc.output('blob');
-  const url=URL.createObjectURL(blob);const a=document.createElement('a');
-  a.href=url;a.download='Funding-Tier-Debt-Resolution.pdf';
-  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
-}
-
-// ════ SEND EMAIL ══════════════════════════════════
-async function sendEmail(){
-  const c=computeScenario();
-  const email=$('pEmail').value.trim();
-  if(!email){
-    $('pEmail').style.borderColor='var(--rd)';$('pEmail').placeholder='Email required!';
-    setTimeout(()=>{$('pEmail').style.borderColor='';$('pEmail').placeholder='prospect@email.com';},3000);return;
-  }
-  if(!(c.recommended&&app.sel&&c.total>0)){alert('Complete the scenario first - add debts and select a state.');return;}
-  const btn=$('sendBtn');const orig=btn.textContent;
-  btn.disabled=true;btn.textContent='Generating...';
-  try{
-    const payload={
-      firstName:$('fName').value.trim()||'Prospect',lastName:$('lName').value.trim()||'',
-      email,state:app.sel,totalDebt:Math.round(c.total),
-      doNothing:{monthlyPayment:Math.round(c.dn.mp),monthsToPayoff:Math.round(c.dn.months),totalPayback:Math.round(c.dn.total),apr:c.dn.apr},
-      shortest:c.shortest?{term:c.shortest.term,monthlyPayment:Math.round(c.shortest.mp),totalCost:Math.round(c.shortest.tc)}:{},
-      recommended:{term:c.recommended.term,monthlyPayment:Math.round(c.recommended.mp),totalCost:Math.round(c.recommended.tc)},
-      route:c.route.route,routeReason:c.route.reason,
-      csProgramLabel:c.csProg?`Program ${c.csProg.k}`:'',
-      rows:app.rows.filter(r=>num(r.amount)>0).map(r=>({creditorName:r.cred,amount:Math.round(num(r.amount)),debtType:r.dt,isSecured:!!r.secured,inCollections:!!r.collections,inLitigation:!!r.litigation,paymentMade:!!r.paid,businessUnprofitable:!!r.bizUnprof}))
-    };
-    const res=await fetch('/api/generate-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    const data=await res.json();
-    if(!res.ok||!data.ok)throw new Error(data.error||'Failed to generate plan.');
-    const rb=$('planResultBox');const pl=$('planLink');
-    if(rb&&pl){pl.onclick=()=>window.open(data.pageUrl,'_blank');rb.style.display='block';rb.scrollIntoView({behavior:'smooth',block:'center'});}
-  }catch(e){alert(e.message||'Failed to generate plan.');}
-  finally{btn.disabled=false;btn.textContent=orig;}
-}
-
-// ════ INIT ════════════════════════════════════════
+function render(){const c=computeScenario();$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCommSection(c);renderCSCard(c);renderPlanCards(c);renderCmpTable(c);renderClocks();const can=!!(c.recommended&&app.sel&&c.total>0);['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}
+async function buildPdf(){const c=computeScenario();if(!(c.recommended&&app.sel&&c.total>0))return;const fn=$('fName').value.trim()||'Client',ln=$('lName').value.trim()||'';const fullName=`${fn} ${ln}`.trim();const{jsPDF}=window.jspdf;const doc=new jsPDF();let y=20;doc.setFontSize(20);doc.setTextColor(15,157,138);doc.text('Funding Tier - Debt Resolution Summary',14,y);y+=10;doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text(`Prepared for: ${fullName}`,14,y);y+=7;const progType=c.route.route==='LEVEL'?'Debt Settlement':c.route.route==='CONSUMER SHIELD'?'Debt Validation':'Unknown';doc.text(`State: ${app.sel}  |  Program: ${progType}`,14,y);y+=10;if(c.csProg&&c.route.route==='CONSUMER SHIELD'){doc.setFontSize(12);doc.setTextColor(26,110,216);doc.text(`Consumer Shield Program ${c.csProg.k}: ${c.csProg.range}`,14,y);y+=7;doc.setFontSize(10);doc.setTextColor(71,85,105);doc.text(`Monthly: ${fmt(c.csProg.pay)}  |  Term: ${c.csProg.term} months  |  Total: ${fmt(c.csProg.term*c.csProg.pay)}`,14,y);y+=10;}const tRows=[['Monthly Payments',fmt(c.dn.mp),c.shortest?fmt(c.shortest.mp):'--',c.recommended?fmt(c.recommended.mp):'--'],['Total Debt',fmt(c.total),fmt(c.total),fmt(c.total)],['Months to Payoff',`${c.dn.months} mo`,c.shortest?`${c.shortest.term} mo`:'--',c.recommended?`${c.recommended.term} mo`:'--'],['Est. Total Payback',fmt(c.dn.total),c.shortest?fmt(c.shortest.tc):'--',c.recommended?fmt(c.recommended.tc):'--'],['Est. Savings','--',c.shortest?fmt(Math.max(0,c.dn.total-c.shortest.tc)):'--',c.recommended?fmt(Math.max(0,c.dn.total-c.recommended.tc)):'--']];const hdrs=['Detail','Current Situation','Fastest Payoff','Recommended'];const cx=[14,64,114,162];const rh=10;doc.setFillColor(241,245,249);doc.rect(14,y,182,rh,'F');doc.setFontSize(7);doc.setTextColor(51,65,85);hdrs.forEach((h,i)=>doc.text(doc.splitTextToSize(h,44),cx[i]+2,y+4));y+=14;tRows.forEach((row,ri)=>{const isSav=ri===4;if(isSav){doc.setFillColor(15,157,138);doc.rect(14,y,182,rh,'F');}else if(ri%2===1){doc.setFillColor(248,250,252);doc.rect(14,y,182,rh,'F');}row.forEach((cell,ci)=>{if(isSav){doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');}else if(ri===3&&ci===1){doc.setTextColor(239,68,68);doc.setFont(undefined,'bold');}else{doc.setTextColor(15,23,42);doc.setFont(undefined,'normal');}doc.setFontSize(8);doc.text(String(cell),cx[ci]+2,y+6);});y+=rh;});const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Funding-Tier-Debt-Resolution.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+async function sendEmail(){const c=computeScenario();const email=$('pEmail').value.trim();if(!email){$('pEmail').style.borderColor='var(--rd)';$('pEmail').placeholder='Email required!';setTimeout(()=>{$('pEmail').style.borderColor='';$('pEmail').placeholder='prospect@email.com';},3000);return;}if(!(c.recommended&&app.sel&&c.total>0)){alert('Complete the scenario first.');return;}const btn=$('sendBtn');const orig=btn.textContent;btn.disabled=true;btn.textContent='Generating...';try{const payload={firstName:$('fName').value.trim()||'Prospect',lastName:$('lName').value.trim()||'',email,state:app.sel,totalDebt:Math.round(c.total),doNothing:{monthlyPayment:Math.round(c.dn.mp),monthsToPayoff:Math.round(c.dn.months),totalPayback:Math.round(c.dn.total),apr:c.dn.apr},shortest:c.shortest?{term:c.shortest.term,monthlyPayment:Math.round(c.shortest.mp),totalCost:Math.round(c.shortest.tc)}:{},recommended:{term:c.recommended.term,monthlyPayment:Math.round(c.recommended.mp),totalCost:Math.round(c.recommended.tc)},route:c.route.route,routeReason:c.route.reason,csProgramLabel:c.csProg?`Program ${c.csProg.k}`:'',rows:app.rows.filter(r=>num(r.amount)>0).map(r=>({creditorName:r.cred,amount:Math.round(num(r.amount)),debtType:r.dt,isSecured:!!r.secured,inCollections:!!r.collections,inLitigation:!!r.litigation,paymentMade:!!r.paid,businessUnprofitable:!!r.bizUnprof}))};const res=await fetch('/api/generate-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.error||'Failed to generate plan.');const rb=$('planResultBox');const pl=$('planLink');if(rb&&pl){pl.onclick=()=>window.open(data.pageUrl,'_blank');rb.style.display='block';rb.scrollIntoView({behavior:'smooth',block:'center'});}}catch(e){alert(e.message||'Failed to generate plan.');}finally{btn.disabled=false;btn.textContent=orig;}}
 function init(){
-  const ss=$('stateSearch');
-  if(ss){ss.addEventListener('input',e=>{app.sel='';searchStates(e.target.value||'');});ss.addEventListener('focus',e=>searchStates(e.target.value||''));}
+  const ss=$('stateSearch');if(ss){ss.addEventListener('input',e=>{app.sel='';searchStates(e.target.value||'');});ss.addEventListener('focus',e=>searchStates(e.target.value||''));}
   const pb=$('pdfBtn');if(pb)pb.addEventListener('click',buildPdf);
   const sb=$('sendBtn');if(sb)sb.addEventListener('click',sendEmail);
   const ab=$('addBtn');if(ab)ab.addEventListener('click',addRow);
   const fp=$('featurePriority');if(fp)fp.addEventListener('change',render);
-  document.addEventListener('click',e=>{
-    if(!e.target.closest('.ci')&&!e.target.closest('[data-cr]'))document.querySelectorAll('[data-cr]').forEach(b=>{b.innerHTML='';b.className='drop';});
-    if(!e.target.closest('.dt-inp')&&!e.target.closest('.dt-panel'))document.querySelectorAll('.dt-panel').forEach(p=>p.className='dt-panel');
-    if(!e.target.closest('#stateSearch')&&!e.target.closest('#stateResults')){const sr=$('stateResults');if(sr){sr.innerHTML='';sr.className='drop';}}
-  });
+  document.addEventListener('click',e=>{if(!e.target.closest('.ci')&&!e.target.closest('[data-cr]'))document.querySelectorAll('[data-cr]').forEach(b=>{b.innerHTML='';b.className='drop';});if(!e.target.closest('.dt-inp')&&!e.target.closest('.dt-panel'))document.querySelectorAll('.dt-panel').forEach(p=>p.className='dt-panel');if(!e.target.closest('#stateSearch')&&!e.target.closest('#stateResults')){const sr=$('stateResults');if(sr){sr.innerHTML='';sr.className='drop';}}});
   renderRows();render();
   setInterval(renderClocks,1000);
 }
