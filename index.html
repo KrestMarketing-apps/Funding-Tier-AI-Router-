@@ -158,9 +158,11 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 
 /* Tooltip */
 .ttp{position:relative;display:inline-flex;}
-.ttp .ttp-body{visibility:hidden;opacity:0;position:fixed;background:#1e293b;color:#fff;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:500;white-space:normal;max-width:320px;line-height:1.65;z-index:9999;pointer-events:none;transition:opacity .15s;box-shadow:0 8px 32px rgba(0,0,0,.25);width:max-content;}
+.ttp .ttp-body{visibility:hidden;opacity:0;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:500;white-space:nowrap;line-height:1.6;z-index:300;pointer-events:none;transition:opacity .15s;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+.ttp .ttp-body::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1e293b;}
 .ttp:hover .ttp-body{visibility:visible;opacity:1;}
 .ttp-left .ttp-body{left:0;transform:none;}
+.ttp-left .ttp-body::after{left:14px;transform:none;}
 
 /* Provider availability compact horizontal grid */
 .prov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
@@ -173,7 +175,7 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 .prov-badge{font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;}
 /* Route badge — teal pill with white text */
 .route-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border-radius:999px;font-size:13px;font-weight:900;box-shadow:0 2px 8px rgba(15,157,138,.3);}
-.route-badge img{max-height:18px;max-width:48px;object-fit:contain;background:#fff;border-radius:4px;padding:2px 4px;}
+.route-badge img{max-height:16px;max-width:32px;object-fit:contain;background:#fff;border-radius:4px;padding:2px 4px;}
 /* Commission compare green collapsible */
 .comm-acc-hd{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:linear-gradient(135deg,var(--g),var(--gd));border-radius:12px;cursor:pointer;user-select:none;margin-top:18px;}
 .comm-acc-hd:hover{opacity:.93;}
@@ -197,23 +199,22 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .meta-sel:hover{background:rgba(255,255,255,.18);}
 .meta-sel option{background:#1e293b;color:#fff;}
 /* Plan card — single column, commission below */
-.plan-card-v{border:1.5px solid var(--br);border-radius:14px;background:#fff;overflow:hidden;transition:all .15s;display:flex;flex-direction:column;}
-.plan-body{padding:18px;flex:1;}
-.plan-comm-block{padding:14px 18px 18px;background:linear-gradient(135deg,#0f172a 0%,#0b3b50 50%,#0f4f45 100%);}
+.plan-card-v{border:1.5px solid var(--br);border-radius:14px;background:#fff;overflow:hidden;transition:all .15s;}
 .plan-card-v:hover{box-shadow:0 6px 20px rgba(15,23,42,.08);}
 .plan-card-v.rec{border:2px solid var(--g);}
-.plan-comm-block-dup-remove{background:linear-gradient(135deg,#0f172a 0%,#0b3b50 50%,#0f4f45 100%);}
-.plan-comm-block.rec-comm{background:linear-gradient(135deg,#0b2a20 0%,#0b3b50 40%,#0f5a4a 100%);}
-.comm-divider{border:none;border-top:2px solid rgba(15,157,138,.6);margin:0;}
-.comm-inline-hd{font-size:11px;font-weight:800;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.plan-body{padding:18px;}
+.plan-comm-block{padding:14px 18px 18px;background:rgba(15,23,42,.018);}
+.plan-comm-block.rec-comm{background:rgba(15,157,138,.04);}
+.comm-divider{border:none;border-top:2px solid var(--g);margin:0;}
+.comm-inline-hd{font-size:11px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 /* Spiff section accordions */
 .spiff-acc{border:1.5px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:10px;}
 .spiff-acc-btn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border:none;cursor:pointer;font-family:inherit;text-align:left;transition:opacity .12s;}
 .spiff-acc-btn:hover{opacity:.88;}
 .spiff-acc-body{display:none;}
 .spiff-acc-body.open{display:block;}
-.spiff-acc-btn.open .spiff-acc-btn.open .sacc-chev{transform:rotate(180deg);font-weight:900;}
-.sacc-chev{font-size:24px;font-weight:900;line-height:1;transition:transform .25s cubic-bezier(.4,0,.2,1);flex-shrink:0;}
+.spiff-acc-btn.open .sacc-chev{transform:rotate(180deg);}
+.sacc-chev{font-size:15px;transition:transform .2s;flex-shrink:0;}
 /* Send confirmation modal */
 .modal-overlay{display:none;position:fixed;inset:0;z-index:9000;background:rgba(15,23,42,.65);align-items:center;justify-content:center;backdrop-filter:blur(3px);}
 .modal-overlay.open{display:flex;}
@@ -234,14 +235,59 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .spiff-tag.all{background:var(--bg);color:#475569;border:1px solid var(--br);}
 /* Tooltip */
 .tip-wrap{position:relative;display:inline-flex;cursor:help;}
-.tip-wrap .tip-box{visibility:hidden;opacity:0;position:fixed;background:#1e293b;color:#fff;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:500;white-space:normal;max-width:320px;line-height:1.65;z-index:9999;pointer-events:none;transition:opacity .15s;box-shadow:0 8px 32px rgba(0,0,0,.25);width:max-content;}
+.tip-wrap .tip-box{visibility:hidden;opacity:0;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:500;white-space:normal;max-width:240px;line-height:1.55;z-index:300;pointer-events:none;transition:opacity .15s;box-shadow:0 4px 16px rgba(0,0,0,.2);}
 .tip-wrap .tip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1e293b;}
 .tip-wrap:hover .tip-box{visibility:visible;opacity:1;}
 /* Comparison table royal blue row */
 .cmp tr.mp-row td{background:#eff6ff!important;color:#1e3a8a;font-weight:800;}
 .cmp tr.mp-row td:nth-child(2){background:#dbeafe!important;}
-.sendModal-open{display:flex!important;}
+
+/* TZ/Lang meta bar */
+.topbar-meta{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:4px 0 8px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:8px;}
+.meta-sel{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.85);border-radius:7px;padding:3px 8px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;outline:none;}
+.meta-sel option{background:#1e293b;color:#fff;}
+#sysClockBadge{font-size:11px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:3px 10px;letter-spacing:.3px;font-variant-numeric:tabular-nums;white-space:nowrap;}
+/* Plan cards — always 3 columns, equal height */
+#planCards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch;}
+.plan-card-v{border:1.5px solid var(--br);border-radius:14px;background:#fff;overflow:hidden;transition:all .15s;display:flex;flex-direction:column;}
+.plan-card-v.rec{border-color:var(--g);box-shadow:0 0 0 3px rgba(15,157,138,.15);}
+.plan-card-v:hover:not(.unavail){box-shadow:0 6px 20px rgba(15,23,42,.1);}
+.plan-card-v.unavail{opacity:.38;filter:grayscale(.7);pointer-events:none;}
+.plan-body{padding:18px;flex:1;}
+.comm-divider{border:none;border-top:2px solid rgba(15,157,138,.5);margin:0;}
+.plan-comm-block{padding:14px 18px 18px;background:linear-gradient(135deg,#0f172a 0%,#0b3b50 55%,#0f4f45 100%);flex-shrink:0;}
+.plan-comm-block.rec-comm{background:linear-gradient(135deg,#0b2520 0%,#0b3b50 45%,#0d5a48 100%);}
+.comm-inline-hd{font-size:11px;font-weight:800;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.legacy-sliders{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12);}
+/* Tooltips — fixed position, follows mouse via JS */
+.ttp{position:relative;display:inline-flex;cursor:help;}
+.ttp .ttp-body{visibility:hidden;opacity:0;position:fixed;background:#1e293b;color:#fff;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:500;white-space:normal;max-width:320px;line-height:1.65;z-index:9999;pointer-events:none;transition:opacity .15s;box-shadow:0 8px 32px rgba(0,0,0,.3);}
+.ttp:hover .ttp-body{visibility:visible;opacity:1;}
+.ttp-left .ttp-body{left:0;}
+.tip-wrap{position:relative;display:inline-flex;cursor:help;}
+.tip-wrap .tip-box{visibility:hidden;opacity:0;position:fixed;background:#1e293b;color:#fff;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:500;white-space:normal;max-width:320px;line-height:1.65;z-index:9999;pointer-events:none;transition:opacity .15s;box-shadow:0 8px 32px rgba(0,0,0,.3);}
+.tip-wrap:hover .tip-box{visibility:visible;opacity:1;}
+/* Spiff accordions */
+.spiff-acc{border:1.5px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+.spiff-acc-btn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border:none;cursor:pointer;font-family:inherit;text-align:left;}
+.spiff-acc-btn .sacc-chev{font-size:24px;font-weight:900;color:#fff;transition:transform .25s cubic-bezier(.4,0,.2,1);flex-shrink:0;line-height:1;}
+.spiff-acc-btn.open .sacc-chev{transform:rotate(180deg);}
+.spiff-acc-body{display:none;}
+.spiff-acc-body.open{display:block;}
+.spiff-title{font-family:"Poppins",sans-serif;font-size:17px;font-weight:900;color:var(--g);margin-bottom:4px;}
+.spiff-tag{display:inline-block;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;}
+.spiff-tag.cs{background:rgba(26,110,216,.12);color:var(--bl);border:1px solid rgba(26,110,216,.25);}
+.spiff-tag.lg{background:rgba(109,40,217,.12);color:#6d28d9;border:1px solid rgba(109,40,217,.25);}
+.spiff-tag.ld{background:rgba(15,157,138,.12);color:#0b7d6e;border:1px solid rgba(15,157,138,.25);}
+/* Comparison table */
+.cmp tr.mp-row td{background:#eff6ff!important;color:#1e3a8a;font-weight:800;}
+.cmp tr.mp-row td:nth-child(2){background:#dbeafe!important;}
+/* Send modal */
+#sendModal{display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);}
 #sendModal.open{display:flex!important;}
+/* Range sliders */
+input[type=range].rng-p{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:999px;outline:none;cursor:pointer;background:rgba(255,255,255,.2);}
+input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2.5px solid #7c3aed;box-shadow:0 1px 4px rgba(0,0,0,.2);}
 </style>
 </head>
 <body>
@@ -269,7 +315,6 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
           <option value="America/New_York">EST / EDT (Eastern)</option>
           <option value="UTC">UTC</option>
         </select>
-        <span id="sysClockBadge" style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:3px 10px;letter-spacing:.5px;font-variant-numeric:tabular-nums;white-space:nowrap;"></span>
         <span style="font-size:10px;color:rgba(255,255,255,.25);">|</span>
         <select id="langSel" class="meta-sel" onchange="setLang(this.value)">
           <option value="en">&#127482;&#127480; EN</option>
@@ -356,7 +401,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
   <div class="card workspace-full">
     <div class="card-hd">Program Comparison</div>
     <p style="font-size:13px;color:#64748b;margin-bottom:16px;font-weight:500;">Only currently available and eligible options are shown.</p>
-    <div id="planCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;"></div>
+    <div id="planCards"></div>
     <div id="planDiff" style="margin-top:16px;overflow-x:auto;"></div>
     <!-- Spiff bonuses collapsible -->
     <div id="spiffSection" style="display:none;margin-top:16px;">
@@ -530,6 +575,32 @@ const DT_ST={ok:{label:'Accepted',cls:'b-ok'},cond:{label:'Conditional',cls:'b-c
 // ── Timezone / Language globals ────────────────────────────────────────────
 let dispTZ='America/Los_Angeles';
 function setDispTZ(tz){dispTZ=tz;renderClocks();if(lastScenario)renderPanel(lastScenario);}
+
+// ── NEW: timezone conversion helpers ─────────────────────────
+function tzLabel(){const p=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,timeZoneName:'short'}).formatToParts(new Date()).find(x=>x.type==='timeZoneName');return p?p.value:'TZ';}
+function convertToDispTZ(h,m,fromTZ){
+  const now=new Date();
+  const toMin=(tz)=>{const s=new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).format(now);const pts=s.split(':').map(Number);return pts[0]*60+pts[1];};
+  const utcMin=toMin('UTC');
+  const fromOff=toMin(fromTZ)-utcMin;
+  const toOff=toMin(dispTZ)-utcMin;
+  const total=h*60+m-fromOff+toOff;
+  const nm=((total%60)+60)%60;
+  const nh=Math.floor(((total%(24*60))+24*60)%(24*60)/60);
+  return{h:nh,m:nm};
+}
+function fmt12(h,m){const ap=h>=12?'PM':'AM';const h12=h>12?h-12:(h===0?12:h);return m>0?`${h12}:${String(m).padStart(2,'0')} ${ap}`:`${h12} ${ap}`;}
+// ── Tooltip mouse follow ──────────────────────────────────────
+document.addEventListener('mousemove',e=>{
+  document.querySelectorAll('.ttp:hover .ttp-body,.tip-wrap:hover .tip-box').forEach(el=>{
+    let x=e.clientX+14,y=e.clientY-10;
+    const w=el.offsetWidth||300,h2=el.offsetHeight||60;
+    if(x+w>window.innerWidth-10)x=e.clientX-w-14;
+    if(y+h2>window.innerHeight-10)y=e.clientY-h2-10;
+    el.style.left=x+'px';el.style.top=y+'px';
+  });
+});
+
 function setLang(l){/* placeholder for i18n */}
 
 // Convert a local hour/minute in fromTZ to dispTZ
@@ -585,15 +656,8 @@ const SUPP_HOURS=[
 const MAX_ROWS=10;
 const legacyState={feeRate:0.40,months:36};
 function legacyTotalCost(d,f){return d*f;}
-function legacyMaxMonths(d,f){const tc=legacyTotalCost(d,f);if(tc<=0)return 1;return Math.min(60,Math.floor(tc/250));}
-function legacyMinMonths(){return 1;}
-function legacyClampMonths(d,f,mo){
-  const tc=legacyTotalCost(d,f);
-  if(tc<=0)return 1;
-  const maxMo=Math.min(60,Math.floor(tc/250));
-  return Math.max(1,Math.min(maxMo,mo||1));
-}
-
+function legacyMaxMonths(d,f){return Math.min(60,Math.floor(legacyTotalCost(d,f)/250));}
+function legacyMinMonths(){return 12;}
 function legacyMP(d,f,mo){return legacyTotalCost(d,f)/mo;}
 function legacyCommAtFee(baseTotal,f){return Math.round(baseTotal*(f/0.40));}
 function legacyDefaultMonths(total,feeRate,csMp,ldMp){
@@ -653,21 +717,18 @@ function collectFlags(rows,total,sc){
 }
 function chooseRoute(total,sc,flags){
   if(!sc)return{route:'',reason:'Select a state to calculate routing.'};
+  const pref=$('featurePriority')?.value||'best_fit';
   const cs=getCSState(sc),ld=getLDState(sc),legacy=getLegacyState(sc);
   const csOK=cs.status!=='BLACKOUT'&&total>=4000&&!flags.cs.some(f=>f.includes('not accepted')||f.includes('requires at least'));
   const ldStop=flags.ld.some(f=>f.includes('not accepted')||f.includes('requires at least')||f.includes('60%')||f.includes('50%')||f.includes('25%')||f.includes('CA residents')||f.includes('Discover private'));
   const ldOK=ld.status!=='BLACKOUT'&&total>=7000&&!ldStop;
   const legacyOK=legacy.status!=='BLACKOUT'&&total>=6000;
-  if(total>0&&total<4000)return{route:'NO OPTION',reason:'Debt below $4,000 — no current backend matches this scenario.'};
-  // $4,000–$5,999: Consumer Shield only
-  if(total>=4000&&total<6000){
-    if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt between $4,000 and $5,999 routes to Consumer Shield.'};
-    return{route:'NO OPTION',reason:'Debt is in the Consumer Shield range but CS is not available for this state or scenario.'};
-  }
-  // $6,000+: Level Debt first if eligible, then Legacy (always before CS at this level)
+  if(total>0&&total<4000)return{route:'NO OPTION',reason:'Debt below $4,000 - no current backend matches this scenario.'};
+  if(total>=4000&&total<6000){if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt between $4,000 and $5,999 routes to Consumer Shield.'};return{route:'NO OPTION',reason:'Debt in CS range but CS not available for this state/scenario.'};}
+  if(total>=6000&&pref==='debt_validation'){if(legacyOK)return{route:'LEGACY',reason:'Prospect wants debt validation - Legacy Capital Services is available in this state.'};if(csOK)return{route:'CONSUMER SHIELD',reason:'Prospect wants debt validation - Legacy unavailable, routing to Consumer Shield.'};return{route:'NO OPTION',reason:'Prospect wants debt validation but neither Legacy nor Consumer Shield is available.'};}
   if(ldOK)return{route:'LEVEL',reason:ld.status==='RED'?'Best option is Level Debt under the attorney model in this state.':'Best option is Level Debt in a serviceable standard state.'};
-  if(legacyOK)return{route:'LEGACY',reason:'Legacy Capital Services is the preferred route for debt $6,000 and higher.'};
-  if(csOK)return{route:'CONSUMER SHIELD',reason:'Legacy is not available in this state — routing to Consumer Shield as fallback.'};
+  if(legacyOK)return{route:'LEGACY',reason:'Legacy Capital Services preferred for $6,000+ debt.'};
+  if(csOK)return{route:'CONSUMER SHIELD',reason:'Legacy unavailable in this state — Consumer Shield is the fallback.'};
   return{route:'NO OPTION',reason:'No available backend is serviceable in this state.'};
 }
 function computeScenario(){
@@ -716,17 +777,11 @@ function clockStatus(c){
   return{cls:'clk-closed',dot:'🔴',txt:'Closed Today',now:fmtTime(c.tz)};
 }
 function renderClocks(){
-  // Update system clock badge in topbar
-  const sc=$('sysClockBadge');
-  if(sc){
-    const now=new Date();
-    const t=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).format(now);
-    const tzl=tzLabel();
-    sc.textContent=t+' '+tzl;
-  }
   const ttz=tzLabel();
+  const sc=$('sysClockBadge');
+  if(sc){const t=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date());sc.textContent=t+' '+ttz;}
   const tb=$('liveTimeBadge');
-  if(tb){const t=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,hour:'numeric',minute:'2-digit',hour12:true}).format(new Date());tb.textContent=`${t} ${ttz}`;}
+  if(tb){const t=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,hour:'numeric',minute:'2-digit',hour12:true}).format(new Date());tb.textContent=t+' '+ttz;}
   const box=$('clockBox');if(!box)return;
   const rows=SUPP_HOURS.map(c=>{
     const s=clockStatus(c);
@@ -737,9 +792,9 @@ function renderClocks(){
       if(ct.type==='phone')return `<a href="${ct.url}" style="font-size:11px;font-weight:700;${ct.style}border:1px solid;border-radius:8px;padding:3px 8px;text-decoration:none;white-space:nowrap;">&#128222; ${ct.label}</a>`;
       return `<a href="${ct.url}" target="_blank" style="font-size:11px;font-weight:700;${ct.style}border:1px solid;border-radius:8px;padding:3px 8px;text-decoration:none;white-space:nowrap;">${ct.label}</a>`;
     }).join(' ');
-    const open=convertToDispTZ(c.oh,c.om,c.tz);
-    const close=convertToDispTZ(c.ch,c.cm,c.tz);
-    const hoursLabel=`M-F &nbsp;${fmt12(open.h,open.m)} – ${fmt12(close.h,close.m)} ${ttz}`;
+    const op=convertToDispTZ(c.oh,c.om,c.tz);
+    const cl2=convertToDispTZ(c.ch,c.cm,c.tz);
+    const hoursLabel=`M-F &nbsp;${fmt12(op.h,op.m)} \u2013 ${fmt12(cl2.h,cl2.m)} ${ttz}`;
     return `<tr><td><div class="supp-prov">${logoHtml}<div><div class="snap-name" style="font-size:12px;">${c.label}</div><div class="supp-time" style="font-size:10px;">${hoursLabel}</div></div></div></td><td>${statusBadge}</td><td><div class="supp-contact">${contactLinks}</div></td></tr>`;
   }).join('');
   box.innerHTML=`<div style="overflow-x:auto;"><table class="supp-table"><thead><tr><th>Provider</th><th>Status</th><th>Contact</th></tr></thead><tbody>${rows}</tbody></table></div>`;
@@ -777,16 +832,37 @@ function commContentHtml(comm,isRec){
   const timingTip=`<span class="ttp" style="cursor:help;margin-left:5px;"><span style="font-size:10px;color:#94a3b8;border-bottom:1px dashed #94a3b8;font-weight:600;">ℹ</span><span class="ttp-body" style="white-space:normal;max-width:220px;text-align:left;">Paid once all chargeback liability on this deal has cleared. Commissions are contingent on the client remaining enrolled past their chargeback window.</span></span>`;
   let rows='';
   if(comm.isLD){
-    rows=`<tr>
-      <td style="padding:8px 10px;"><span class="ttp ttp-left" style="cursor:help;"><span style="font-size:12px;font-weight:800;color:rgba(255,255,255,.9);border-bottom:1.5px dashed rgba(255,255,255,.3);">Tier 1</span><span class="ttp-body">Tier 1 rate: 1.00% of enrolled debt — active until your monthly volume reaches $1M. Check DS Daily Volume Bonus section for full tier breakdown.</span></span></td>
-      <td style="padding:8px 10px;font-size:17px;font-weight:900;color:#4ade80;text-align:right;">${fmt(comm.p2)}</td>
+    rows=`<tr style="border-bottom:1px solid var(--br);">
+      <td style="padding:8px 10px;"><span class="ttp ttp-left" style="cursor:help;"><span style="font-size:12px;font-weight:800;color:rgba(255,255,255,.9);border-bottom:1.5px dashed rgba(255,255,255,.3);">Tier 1</span><span class="ttp-body" style="white-space:normal;max-width:200px;">Base tier — active when monthly enrolled volume is under $1M.</span></span></td>
+      <td style="padding:8px 10px;font-size:15px;font-weight:900;color:var(--g);text-align:right;">${fmt(comm.p2)}</td>
       <td style="padding:8px 10px;text-align:right;"><span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.85);white-space:nowrap;">${comm.p2when}</span>${timingTip}</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--br);opacity:.72;">
+      <td style="padding:8px 10px;"><span style="font-size:12px;font-weight:700;color:#64748b;">Tier 2</span></td>
+      <td style="padding:8px 10px;font-size:14px;font-weight:900;color:#0b7d6e;text-align:right;">${fmt(comm.t2)}</td>
+      <td style="padding:8px 10px;text-align:right;"><span style="font-size:10px;color:#94a3b8;font-weight:600;white-space:nowrap;">$1M–$1.99M/mo</span></td>
+    </tr>
+    <tr style="opacity:.45;">
+      <td style="padding:8px 10px;"><span style="font-size:12px;font-weight:700;color:#94a3b8;">Tier 3</span></td>
+      <td style="padding:8px 10px;font-size:14px;font-weight:900;color:#94a3b8;text-align:right;">${fmt(comm.t3)}</td>
+      <td style="padding:8px 10px;text-align:right;"><span style="font-size:10px;color:#94a3b8;font-weight:600;white-space:nowrap;">$2M+/mo</span></td>
     </tr>`;
   } else {
+    rows=`<tr style="${comm.p4>0?'border-bottom:1px solid var(--br);':''}">
+      <td style="padding:8px 10px;"><span class="ttp ttp-left" style="cursor:help;"><span style="font-size:12px;font-weight:800;color:rgba(255,255,255,.9);border-bottom:1.5px dashed rgba(255,255,255,.3);">P2</span><span class="ttp-body" style="white-space:normal;max-width:200px;">Second program payment made by client</span></span></td>
+      <td style="padding:8px 10px;font-size:15px;font-weight:900;color:var(--g);text-align:right;">${fmt(comm.p2)}</td>
+      <td style="padding:8px 10px;text-align:right;"><span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.85);white-space:nowrap;">${comm.p2when}</span>${timingTip}</td>
+    </tr>
+    ${comm.p4>0?`<tr>
+      <td style="padding:8px 10px;"><span class="ttp ttp-left" style="cursor:help;"><span style="font-size:12px;font-weight:800;color:rgba(255,255,255,.9);border-bottom:1.5px dashed rgba(255,255,255,.3);">P4</span><span class="ttp-body" style="white-space:normal;max-width:200px;">Fourth program payment made by client</span></span></td>
+      <td style="padding:8px 10px;font-size:15px;font-weight:900;color:var(--g);text-align:right;">${fmt(comm.p4)}</td>
+      <td style="padding:8px 10px;text-align:right;"><span style="font-size:10px;font-weight:800;color:rgba(255,255,255,.85);white-space:nowrap;">${comm.p4when}</span>${timingTip}</td>
+    </tr>`:''}`;
+  }
   const clawHtml=comm.clawback?`<div style="font-size:10px;color:#92400e;background:#fffbeb;border:1px solid rgba(245,158,11,.3);border-radius:6px;padding:5px 9px;margin-top:8px;line-height:1.5;">&#9888; ${comm.clawback}</div>`:'';
   return `<div>
-    <div class="comm-inline-hd" style="color:rgba(255,255,255,.65);">&#9733; Agent Commission <span style="font-size:20px;font-weight:900;color:#4ade80;margin-left:4px;letter-spacing:-0.5px;">${fmt(comm.total)}</span></div>
-    <div style="border:1.5px solid rgba(255,255,255,.12);border-radius:10px;overflow:hidden;">
+    <div class="comm-inline-hd">&#9733; Agent Commission <span style="font-size:16px;font-weight:900;color:var(--g);margin-left:4px;">${fmt(comm.total)}</span></div>
+    <div style="border:1.5px solid var(--br);border-radius:10px;overflow:hidden;">
       <table style="width:100%;border-collapse:collapse;">
         <thead><tr style="background:#f8fafc;border-bottom:1.5px solid var(--br);">
           <th style="padding:6px 10px;text-align:left;font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;">Payment</th>
@@ -797,7 +873,7 @@ function commContentHtml(comm,isRec){
       </table>
     </div>
     ${clawHtml}
-    <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:6px;">${comm.note}</div>
+    <div style="font-size:10px;color:#94a3b8;margin-top:6px;">${comm.note}</div>
   </div>`;
 }
 function renderCommCompare(c){
@@ -827,7 +903,7 @@ function renderCommCompare(c){
         <div style="font-size:13px;font-weight:900;color:#fff;display:flex;align-items:center;gap:7px;">${icon} ${title}</div>
         <div style="font-size:10px;color:rgba(255,255,255,.7);font-weight:500;">${subtitle}</div>
       </div>
-      <span class="sacc-chev" style="color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.3);">&#8964;</span>
+      <span class="sacc-chev" style="color:rgba(255,255,255,.8);">&#8964;</span>
     </button>
     <div class="spiff-acc-body" id="${id}Body">
       <div style="overflow-x:auto;">${content}</div>
@@ -837,7 +913,7 @@ function renderCommCompare(c){
   // Accordion 1: Daily Deal Bonus
   const dailyContent=`
   <div style="background:#f0fdf4;border-bottom:1px solid rgba(15,157,138,.2);padding:8px 12px;font-size:11px;color:#166534;font-weight:600;line-height:1.65;">
-    &#9432; Bonus is <strong>per deal × qualifying deals that day</strong> — e.g. 3 deals = +$50 each ($150 total) &nbsp;·&nbsp; 5 deals = +$75 each ($375 total). <strong>Important:</strong> If any deal from that day cancels within its chargeback window, the bonus for that deal is forfeited and the daily count is recalculated. The daily bonus is only fully honored once all qualifying deals from that day are past their chargeback liability period.
+    &#9432; Bonus is <strong>per deal × qualifying deals that day</strong> — e.g. <strong>3 deals = +$50 each ($150 total)</strong> &nbsp;·&nbsp; <strong>5 deals = +$75 each ($375 total)</strong>.
   </div>
   <table style="width:100%;border-collapse:collapse;">
     ${tHead('Daily Threshold')}
@@ -873,59 +949,41 @@ function renderCommCompare(c){
   // Accordion 3: Balanced Book
   const balancedContent=`
   <div style="background:#fffbeb;border-bottom:1px solid rgba(245,158,11,.25);padding:8px 12px;font-size:11px;color:#92400e;font-weight:600;line-height:1.65;">
-    &#9432; <strong>DV%</strong> = Debt Validation deals (Consumer Shield + Legacy Capital combined) ÷ total deals. <strong>DS</strong> = Debt Settlement (Level Debt + any future DS program). A balanced book means a healthy DV/DS ratio — being too DV-heavy sacrifices Level Debt volume tier bonuses. Keep it balanced.
+    &#9432; <strong>DV%</strong> = Debt Validation deals (Consumer Shield + Legacy Capital combined) ÷ total deals. <strong>DS</strong> = Debt Settlement (Level Debt + any future DS program). A balanced book means a healthy DV/DS ratio — being too DV-heavy sacrifices Level Debt volume tier bonuses. Keep it balanced.ly to <strong>Level DS or any future DS program</strong>. Being too CS-heavy sacrifices LD volume tier bonuses — keep a balanced book.
   </div>
   <table style="width:100%;border-collapse:collapse;">
     <thead><tr>
       <th style="${thStyle}">Bonus Type</th>
-      <th style="${thStyle}">DV% Threshold <span style="font-size:9px;opacity:.7;">(hover for details)</span></th>
+      <th style="${thStyle}">DV% Threshold</th>
       <th style="${thStyle}">Min Deals</th>
       <th style="${thStyle}">DS Program</th>
       <th style="${thStyle}">Bonus Amount</th>
     </tr></thead>
     <tbody>
-      <tr><td style="${tdStyle}font-weight:700;">Balanced Book</td><td style="${tdStyle}"><span class="ttp ttp-left" style="cursor:help;border-bottom:1px dashed #64748b;">30%+ DV ratio<span class="ttp-body">At least 30% of your closed deals this month must be Debt Validation (Consumer Shield or Legacy Capital). DV% = DV deals ÷ total deals. Too DV-heavy and you sacrifice Level Debt volume tier bonuses — keep a balanced mix.</span></span></td><td style="${tdStyle}">5+ deals</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$100 ${timingTip}</td></tr>
-      <tr><td style="${tdStyle}font-weight:700;">Balanced Book</td><td style="${tdStyle}"><span class="ttp ttp-left" style="cursor:help;border-bottom:1px dashed #64748b;">50%+ DV ratio<span class="ttp-body">At least half your deals are Debt Validation (CS or Legacy). Strong DV/DS balance — you earn flat-rate DV commissions while keeping enough DS volume to hit Level Debt tier bonuses.</span></span></td><td style="${tdStyle}">5+ deals</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$250 ${timingTip}</td></tr>
-      <tr><td style="${tdLast}font-weight:700;">Balanced Book</td><td style="${tdLast}"><span class="ttp ttp-left" style="cursor:help;border-bottom:1px dashed #64748b;">70%+ DV ratio<span class="ttp-body">70%+ of deals are Debt Validation (CS or Legacy). Maximum balanced book bonus tier — requires 5+ total deals. Warning: pushing above 80% DV will erode your Level Debt volume tier bonus earnings.</span></span></td><td style="${tdLast}">5+ deals</td><td style="${tdLast}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$500 ${timingTip}</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Balanced Book</td><td style="${tdStyle}">30%+ DV ratio</td><td style="${tdStyle}">5+ deals</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$100 ${timingTip}</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Balanced Book</td><td style="${tdStyle}">50%+ DV ratio</td><td style="${tdStyle}">5+ deals</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$250 ${timingTip}</td></tr>
+      <tr><td style="${tdLast}font-weight:700;">Balanced Book</td><td style="${tdLast}">70%+ DV ratio</td><td style="${tdLast}">5+ deals</td><td style="${tdLast}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$500 ${timingTip}</td></tr>
     </tbody>
   </table>`;
 
-  // Accordion 4: DS Daily Volume Bonus
+  // Accordion 4: LD Enrollment
   const ldContent=`
-  <div style="background:#f0fdf4;border-bottom:1px solid rgba(15,157,138,.2);padding:9px 12px;font-size:11px;color:#166534;font-weight:600;line-height:1.65;">
-    &#9432; This bonus applies to any Debt Settlement program. Currently the only active DS program is <strong>Level Debt</strong>.
-    Focus on enrolling maximum <em>dollar volume</em> of debt — larger individual files accelerate tier bonuses faster than many small files.
-    If a deal is charged back, that enrolled volume is removed from the daily total.
-  </div>
   <table style="width:100%;border-collapse:collapse;">
-    ${tHead('Daily Enrolled $ Volume')}
+    ${tHead('Daily Enrolled Volume')}
     <tbody>
-      <tr><td style="${tdStyle}font-weight:700;">DS Volume Bonus</td><td style="${tdStyle}">$75,000+ enrolled/day</td><td style="${tdStyle}"><span class="spiff-tag ld">Level Debt</span> <span style="font-size:9px;color:#94a3b8;font-style:italic;">any DS program</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$75 ${timingTip}</td></tr>
-      <tr><td style="${tdLast}font-weight:700;">DS Volume Bonus</td><td style="${tdLast}">$100,000+ enrolled/day</td><td style="${tdLast}"><span class="spiff-tag ld">Level Debt</span> <span style="font-size:9px;color:#94a3b8;font-style:italic;">any DS program</span></td><td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$125 ${timingTip}</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">LD Enrollment</td><td style="${tdStyle}">$75,000+ enrolled/day</td><td style="${tdStyle}"><span class="spiff-tag ld">Level Debt</span></td><td style="${tdStyle}font-weight:900;color:#0b7d6e;font-size:15px;">+$75 ${timingTip}</td></tr>
+      <tr><td style="${tdLast}font-weight:700;">LD Enrollment</td><td style="${tdLast}">$100,000+ enrolled/day</td><td style="${tdLast}"><span class="spiff-tag ld">Level Debt</span></td><td style="${tdLast}font-weight:900;color:#0b7d6e;font-size:15px;">+$125 ${timingTip}</td></tr>
     </tbody>
   </table>
   <div style="margin:10px 12px 0;padding:12px;background:#0f172a;border-radius:10px;">
     <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">&#128200; Debt Settlement Tiers</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;">
-      <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 6px;">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:4px;">Tier 1</div>
-        <div style="font-size:20px;font-weight:900;color:#4ade80;line-height:1;">1.00%</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:3px;">$0 – $999k/mo</div>
-      </div>
-      <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:10px 6px;">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:4px;">Tier 2</div>
-        <div style="font-size:20px;font-weight:900;color:#4ade80;line-height:1;">1.15%</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:3px;">$1M – $1.99M/mo</div>
-      </div>
-      <div style="background:rgba(74,222,128,.18);border:1px solid rgba(74,222,128,.35);border-radius:8px;padding:10px 6px;">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:4px;">Tier 3</div>
-        <div style="font-size:20px;font-weight:900;color:#4ade80;line-height:1;">1.30%</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:3px;">$2M+/mo</div>
-      </div>
+      <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 6px;"><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:4px;">Tier 1</div><div style="font-size:20px;font-weight:900;color:#4ade80;">1.00%</div><div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:3px;">$0–$999k/mo</div></div>
+      <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:10px 6px;"><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:4px;">Tier 2</div><div style="font-size:20px;font-weight:900;color:#4ade80;">1.15%</div><div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:3px;">$1M–$1.99M/mo</div></div>
+      <div style="background:rgba(74,222,128,.18);border:1px solid rgba(74,222,128,.35);border-radius:8px;padding:10px 6px;"><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:4px;">Tier 3</div><div style="font-size:20px;font-weight:900;color:#4ade80;">1.30%</div><div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:3px;">$2M+/mo</div></div>
     </div>
-    <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:8px;text-align:center;font-style:italic;">Commission paid on the 20th of Month 3 after 2 payments clear. Volume counts total enrolled debt, not just one file.</div>
+    <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:8px;text-align:center;font-style:italic;">Paid 20th of Month 3. Volume = total enrolled debt across all DS deals, not per file.</div>
   </div>`;
-
 
   spiffCont.innerHTML=`
   <div style="display:grid;gap:10px;">
@@ -973,89 +1031,103 @@ function renderCSCard(c){
   $('csTileGrid').innerHTML=CS_PROGS.map(pr=>`<div class="cs-tile${pr.k===p.k?' act':''}"><div style="font-size:12px;font-weight:800;color:${pr.k===p.k?'var(--bl)':'#64748b'};">Prog ${pr.k}</div><div style="font-size:9px;color:#94a3b8;margin-top:1px;">${pr.range}</div><div style="font-size:18px;font-weight:900;color:${pr.k===p.k?'var(--bl)':'var(--dk)'};margin-top:5px;">${fmt(pr.pay)}</div><div style="font-size:11px;color:#64748b;margin-top:1px;">${pr.term} mo</div></div>`).join('');
 }
 function renderPlanCards(c){
-  const descTip=(text)=>`<span class="ttp" style="cursor:help;margin-left:5px;"><span style="font-size:10px;color:#94a3b8;border:1px solid #e2e8f0;border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;">i</span><span class="ttp-body">${text}</span></span>`;
-
-  // ── Helpers: build a greyed-out unavailable placeholder card ──────────────
-  function greyCard(logo,name,reason,borderColor){
+  function unavailCard(logo,name,reason,accentRgb){
     const init=name.split(' ').map(w=>w[0]).join('').slice(0,3);
     const logoHtml=logo?`<img src="${logo}" alt="${name}" style="max-width:38px;max-height:16px;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:9px;font-weight:800;color:#94a3b8;\\'>${init}</span>';"/>`:`<span style="font-size:9px;font-weight:800;color:#94a3b8;">${init}</span>`;
-    return `<div class="plan-card-v" style="opacity:.35;filter:grayscale(.8);pointer-events:none;border-color:${borderColor};">
+    return `<div class="plan-card-v unavail" style="border-color:rgba(${accentRgb},.25);">
       <div class="plan-body">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-          <div class="logo-sm">${logoHtml}</div>
-          <div style="font-size:14px;font-weight:900;color:#94a3b8;">${name}</div>
-          <span class="pill p-r" style="font-size:10px;">Not Available</span>
-        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><div class="logo-sm">${logoHtml}</div><div style="font-size:14px;font-weight:900;color:#94a3b8;">${name}</div><span style="font-size:9px;font-weight:800;color:#94a3b8;background:#f1f5f9;border-radius:999px;padding:2px 8px;">Not Available</span></div>
         <div style="font-size:12px;color:#94a3b8;line-height:1.6;padding:10px;background:var(--bg);border-radius:8px;">${reason}</div>
       </div>
       <hr class="comm-divider"/>
-      <div class="plan-comm-block" style="min-height:100px;"></div>
+      <div class="plan-comm-block" style="min-height:80px;"></div>
     </div>`;
   }
 
-  // ── CONSUMER SHIELD ───────────────────────────────────────────────────────
+  // ── Commission block content ──────────────────────────────────
+  function commBlock(comm,isRec){
+    if(!comm)return '';
+    const timingTip=`<span class="ttp" style="cursor:help;margin-left:4px;"><span style="font-size:9px;color:#fff;background:#475569;border-radius:50%;width:13px;height:13px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">i</span><span class="ttp-body">Paid once applicable chargeback liability is cleared.</span></span>`;
+    let rows='';
+    if(comm.isLD){
+      rows=`<tr><td style="padding:8px 10px;"><span style="font-size:12px;font-weight:800;color:rgba(255,255,255,.9);">Tier 1</span></td><td style="padding:8px 10px;font-size:17px;font-weight:900;color:#4ade80;text-align:right;">${fmt(comm.p2)}</td><td style="padding:8px 10px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.8);white-space:nowrap;">${comm.p2when}</span>${timingTip}</td></tr>`;
+    } else {
+      rows=`<tr style="${comm.p4>0?'border-bottom:1px solid rgba(255,255,255,.1);':''}"><td style="padding:8px 10px;"><span style="font-size:12px;font-weight:800;color:rgba(255,255,255,.9);">Payment 2</span></td><td style="padding:8px 10px;font-size:17px;font-weight:900;color:#4ade80;text-align:right;">${fmt(comm.p2)}</td><td style="padding:8px 10px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.8);white-space:nowrap;">${comm.p2when}</span>${timingTip}</td></tr>`;
+      if(comm.p4>0)rows+=`<tr><td style="padding:8px 10px;"><span style="font-size:12px;font-weight:800;color:rgba(255,255,255,.9);">Payment 4</span></td><td style="padding:8px 10px;font-size:17px;font-weight:900;color:#4ade80;text-align:right;">${fmt(comm.p4)}</td><td style="padding:8px 10px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.8);white-space:nowrap;">${comm.p4when}</span>${timingTip}</td></tr>`;
+    }
+    const clawHtml=comm.clawback?`<div style="font-size:10px;color:#fbbf24;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:6px;padding:5px 9px;margin-top:8px;line-height:1.5;">&#9888; ${comm.clawback}</div>`:'';
+    return `<div style="color:rgba(255,255,255,.55);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">&#9733; Agent Commission <span style="font-size:20px;font-weight:900;color:#4ade80;margin-left:4px;">${fmt(comm.total)}</span></div>
+    <div style="border:1px solid rgba(255,255,255,.12);border-radius:10px;overflow:hidden;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.1);">
+          <th style="padding:5px 10px;text-align:left;font-size:9px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.5px;">Payment</th>
+          <th style="padding:5px 10px;text-align:right;font-size:9px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.5px;">Amount</th>
+          <th style="padding:5px 10px;text-align:right;font-size:9px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.5px;">Paid On</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    ${clawHtml}
+    <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:6px;">${comm.note}</div>`;
+  }
+
+  // ── CONSUMER SHIELD ───────────────────────────────────────────
   let csHtml;
   if(c.csAvail&&c.csProg){
     const p=c.csProg,isRec=c.route.route==='CONSUMER SHIELD';
     const comm=getCommForCard(c,'CS');
-    const desc='Debt Validation — Fixed monthly payment. Debts challenged through a legal process. No interest, no negotiation.';
     csHtml=`<div class="plan-card-v${isRec?' rec':''}">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div class="ttp"><div class="logo-sm"><img src="${CS_LOGO}" alt="CS"/></div><span class="ttp-body" style="text-align:left;">${desc}</span></div>
-            <div class="ttp" style="cursor:help;"><span style="font-size:14px;font-weight:900;border-bottom:1.5px dashed #cbd5e1;">Consumer Shield</span><span class="ttp-body">Debt Validation program. Fixed flat-rate monthly payment — no settlements.</span></div>
-          </div>
+          <div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${CS_LOGO}" alt="CS"/></div><span style="font-size:14px;font-weight:900;">Consumer Shield</span></div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-b">Program ${p.k}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-b">Available</span>'}</div>
         </div>
         <div style="border:1.5px solid rgba(26,110,216,.25);border-radius:12px;overflow:hidden;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
-            <div style="padding:10px 12px;border-right:1px solid rgba(26,110,216,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:var(--bl);line-height:1;">${fmt(p.pay)}</div></div>
-            <div style="padding:10px 12px;border-right:1px solid rgba(26,110,216,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Length (Months)</div><div style="font-size:18px;font-weight:900;color:var(--bl);line-height:1;">${p.term}<span style="font-size:10px;font-weight:700;vertical-align:middle;"> mo</span></div></div>
-            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);line-height:1;">${fmt(p.term*p.pay)}</div></div>
+            <div style="padding:10px 12px;border-right:1px solid rgba(26,110,216,.15);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:var(--bl);">${fmt(p.pay)}</div></div>
+            <div style="padding:10px 12px;border-right:1px solid rgba(26,110,216,.15);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Months</div><div style="font-size:18px;font-weight:900;color:var(--bl);">${p.term}</div></div>
+            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);">${fmt(p.term*p.pay)}</div></div>
           </div>
         </div>
+        <div style="margin-top:10px;font-size:11px;color:#64748b;line-height:1.5;">Debt Validation — Fixed monthly payment. Debts challenged through legal process.</div>
       </div>
       <hr class="comm-divider"/>
-      <div class="plan-comm-block${isRec?' rec-comm':''}">${commContentHtml(comm,isRec)}</div>
+      <div class="plan-comm-block${isRec?' rec-comm':''}">${commBlock(comm,isRec)}</div>
     </div>`;
   } else {
-    const reason=c.css?c.css.status==='BLACKOUT'?'Not serviceable in this state.':c.total<4000?'Minimum $4,000 enrolled debt required.':'Not available for this scenario.':'Select a state to check availability.';
-    csHtml=greyCard(CS_LOGO,'Consumer Shield',reason,'rgba(26,110,216,.2)');
+    const r=c.css&&c.css.status==='BLACKOUT'?'Not serviceable in this state.':c.total<4000?'Minimum $4,000 required.':'Routing rules — not available.';
+    csHtml=unavailCard(CS_LOGO,'Consumer Shield',r,'26,110,216');
   }
 
-  // ── LEVEL DEBT ────────────────────────────────────────────────────────────
+  // ── LEVEL DEBT ────────────────────────────────────────────────
   let ldHtml;
   if(c.ldAvail){
     const mt=getLDMaxTerm(c.total),mp=Math.round((c.total*.5+c.total*c.feeRate)/mt),isRec=c.route.route==='LEVEL';
     const comm=getCommForCard(c,'LEVEL');
-    const desc='Debt Settlement — Negotiates with creditors to reduce balances. Program fee applies. Savings vs paying minimum can be substantial.';
     ldHtml=`<div class="plan-card-v${isRec?' rec':''}">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div class="ttp"><div class="logo-sm"><img src="${LD_LOGO}" alt="LD"/></div><span class="ttp-body" style="text-align:left;">${desc}</span></div>
-            <div class="ttp" style="cursor:help;"><span style="font-size:14px;font-weight:900;border-bottom:1.5px dashed #cbd5e1;">Level Debt</span><span class="ttp-body">Debt Settlement program. Creditors are negotiated down — program fee applies.</span></div>
-          </div>
+          <div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${LD_LOGO}" alt="LD"/></div><span style="font-size:14px;font-weight:900;">Level Debt</span></div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill ${c.lds.status==='RED'?'p-a':'p-g'}">${c.lds.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-g">Available</span>'}</div>
         </div>
         <div style="border:1.5px solid rgba(15,157,138,.25);border-radius:12px;overflow:hidden;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
-            <div style="padding:10px 12px;border-right:1px solid rgba(15,157,138,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:#0b7d6e;line-height:1;">${fmt(mp)}</div></div>
-            <div style="padding:10px 12px;border-right:1px solid rgba(15,157,138,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Length (Months)</div><div style="font-size:18px;font-weight:900;color:#0b7d6e;line-height:1;">${mt}<span style="font-size:10px;font-weight:700;vertical-align:middle;"> mo</span></div></div>
-            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);line-height:1;">${fmt(mp*mt)}</div></div>
+            <div style="padding:10px 12px;border-right:1px solid rgba(15,157,138,.15);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:#0b7d6e;">${fmt(mp)}</div></div>
+            <div style="padding:10px 12px;border-right:1px solid rgba(15,157,138,.15);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Months</div><div style="font-size:18px;font-weight:900;color:#0b7d6e;">${mt}</div></div>
+            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);">${fmt(mp*mt)}</div></div>
           </div>
         </div>
+        <div style="margin-top:10px;font-size:11px;color:#64748b;line-height:1.5;">Debt Settlement — Negotiates with creditors to reduce balances.</div>
       </div>
       <hr class="comm-divider"/>
-      <div class="plan-comm-block${isRec?' rec-comm':''}">${commContentHtml(comm,isRec)}</div>
+      <div class="plan-comm-block${isRec?' rec-comm':''}">${commBlock(comm,isRec)}</div>
     </div>`;
   } else {
-    const reason=c.lds?c.lds.status==='BLACKOUT'?'Not serviceable in this state.':c.total<7000?'Minimum $7,000 enrolled debt required.':'Routing rules prevent Level Debt for this file.':'Select a state to check availability.';
-    ldHtml=greyCard(LD_LOGO,'Level Debt',reason,'rgba(15,157,138,.2)');
+    const r=c.lds&&c.lds.status==='BLACKOUT'?'Not serviceable in this state.':c.total<7000?'Minimum $7,000 required.':'Routing rules — not available.';
+    ldHtml=unavailCard(LD_LOGO,'Level Debt',r,'15,157,138');
   }
 
-  // ── LEGACY CAPITAL ────────────────────────────────────────────────────────
+  // ── LEGACY CAPITAL ────────────────────────────────────────────
   let legacyHtml;
   if(c.legacyAvail){
     const isRec=c.route.route==='LEGACY';
@@ -1066,49 +1138,45 @@ function renderPlanCards(c){
     const ldMp=c.ldAvail?Math.round((total*.5+c.feeRate*total)/getLDMaxTerm(total)):0;
     if(!legacyState._init||legacyState._initTotal!==total){legacyState.months=legacyDefaultMonths(total,feeRate,csMp,ldMp);legacyState._init=true;legacyState._initTotal=total;}
     const mo=Math.max(minMo,Math.min(maxMo,legacyState.months));legacyState.months=mo;
-    const rawMp=tc/mo;const mp=Math.max(250,Math.round(rawMp));const feeLabel=Math.round(feeRate*100);
+    const mp=Math.max(250,Math.round(tc/mo));const feeLabel=Math.round(feeRate*100);
     const comm=getCommForCard(c,'LEGACY');
-    const desc='Attorney-Led Resolution — Debts resolved through legal channels with adjustable fee structure.';
     legacyHtml=`<div class="plan-card-v${isRec?' rec':''}" id="legacyPlanCard">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div class="ttp"><div class="logo-sm"><img src="${LEGACY_LOGO}" alt="Legacy" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:8px;font-weight:800;color:#6d28d9;\\'>LCS</span>';"/></div><span class="ttp-body" style="text-align:left;">${desc}</span></div>
-            <div class="ttp" style="cursor:help;"><span style="font-size:14px;font-weight:900;border-bottom:1.5px dashed #cbd5e1;">Legacy Capital Services</span><span class="ttp-body">Attorney-led resolution. Adjustable service fee (35–49%) controls monthly payment and commission.</span></div>
-          </div>
+          <div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${LEGACY_LOGO}" alt="Legacy" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:8px;font-weight:800;color:#6d28d9;\\'>LCS</span>';"/></div><span style="font-size:14px;font-weight:900;">Legacy Capital Services</span></div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-p">${c.lgs.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-p">Available</span>'}</div>
         </div>
         <div style="border:1.5px solid rgba(109,40,217,.2);border-radius:12px;overflow:hidden;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
-            <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:#6d28d9;line-height:1;">${fmt(mp)}</div></div>
-            <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Length (Months)</div><div style="font-size:18px;font-weight:900;color:#6d28d9;line-height:1;">${mo}<span style="font-size:10px;font-weight:700;vertical-align:middle;"> mo</span></div></div>
-            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);line-height:1;">${fmt(tc)}</div></div>
+            <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:#6d28d9;">${fmt(mp)}</div></div>
+            <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Months</div><div style="font-size:18px;font-weight:900;color:#6d28d9;">${mo}</div></div>
+            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);">${fmt(tc)}</div></div>
           </div>
         </div>
+        <div style="margin-top:10px;font-size:11px;color:#64748b;line-height:1.5;">Attorney-Led Resolution — Adjustable fee structure (35–49%). Lower fee = lower payment.</div>
       </div>
       <hr class="comm-divider"/>
       <div class="plan-comm-block${isRec?' rec-comm':''}">
-        ${commContentHtml(comm,isRec)}
-        <div class="legacy-calc" style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12);">
+        ${commBlock(comm,isRec)}
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12);">
           <div style="margin-bottom:10px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Service Fee</span><span style="font-size:11px;font-weight:800;color:#4ade80;">${feeLabel}%</span></div>
-            <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="legacyState.feeRate=this.value/100;legacyState._init=false;if(lastScenario)legacyState.months=legacyClampMonths(lastScenario.total,legacyState.feeRate,legacyState.months);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);renderCommCompare(lastScenario);}"/>
-            <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:1px;"><span>35% (most affordable)</span><span>49% (max)</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Service Fee</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${feeLabel}%</span></div>
+            <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="legacyState.feeRate=this.value/100;legacyState._init=false;if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);renderCommCompare(lastScenario);}"/>
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>35%</span><span>49%</span></div>
           </div>
           <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Program Length</span><span style="font-size:11px;font-weight:800;color:#4ade80;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
-            <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="legacyState.months=legacyClampMonths(lastScenario?lastScenario.total:0,legacyState.feeRate,parseInt(this.value));if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);}"/>
-            <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:1px;"><span>${minMo} mo (${fmt(Math.round(tc/minMo))}/mo)</span><span>${maxMo} mo (${fmt(250)}/mo floor)</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Program Length</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
+            <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="legacyState.months=parseInt(this.value);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);}"/>
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>1 mo</span><span>${maxMo} mo ($250 floor)</span></div>
           </div>
         </div>
       </div>
     </div>`;
   } else {
-    const reason=c.lgs?c.lgs.status==='BLACKOUT'?'Not serviceable in this state.':c.total<6000?'Minimum $6,000 enrolled debt required.':'Not available for this scenario.':'Select a state to check availability.';
-    legacyHtml=greyCard(LEGACY_LOGO,'Legacy Capital Services',reason,'rgba(109,40,217,.2)');
+    const r=c.lgs&&c.lgs.status==='BLACKOUT'?'Not serviceable in this state.':c.total<6000?'Minimum $6,000 required.':'Routing rules — not available.';
+    legacyHtml=unavailCard(LEGACY_LOGO,'Legacy Capital Services',r,'109,40,217');
   }
 
-  // Always render all 3 cards
   $('planCards').innerHTML=csHtml+ldHtml+legacyHtml;
 
   $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:12px;overflow:hidden;"><div style="background:var(--dk);padding:11px 16px;font-size:13px;font-weight:800;color:#fff;">How the Programs Differ</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Legacy Capital Services</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$6,000 and Higher</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Service Fee</td><td style="padding:10px 14px;">Fixed by program tier</td><td style="padding:10px 14px;">25–27% of enrolled</td><td style="padding:10px 14px;">Adjustable 35–49%</td></tr></tbody></table></div></div>`;
@@ -1274,17 +1342,6 @@ async function sendEmailConfirmed(){
     alert(msg);
   }finally{btn.disabled=false;btn.textContent=orig;}
 }
-
-// Tooltip mouse follow (prevents clipping)
-document.addEventListener('mousemove',e=>{
-  document.querySelectorAll('.ttp:hover .ttp-body,.tip-wrap:hover .tip-box').forEach(el=>{
-    let x=e.clientX+14,y=e.clientY-10;
-    const w=el.offsetWidth||300,h=el.offsetHeight||60;
-    if(x+w>window.innerWidth-10)x=e.clientX-w-10;
-    if(y+h>window.innerHeight-10)y=e.clientY-h-10;
-    el.style.left=x+'px';el.style.top=y+'px';
-  });
-});
 function init(){
   const ss=$('stateSearch');if(ss){ss.addEventListener('input',e=>{app.sel='';searchStates(e.target.value||'');});ss.addEventListener('focus',e=>searchStates(e.target.value||''));}
   const pb=$('pdfBtn');if(pb)pb.addEventListener('click',buildPdf);
@@ -1313,14 +1370,10 @@ init();
   </div>
 </div>
 
-<!-- Send Confirmation Modal -->
-<div id="sendModal" style="display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);">
-  <div style="background:#fff;border-radius:20px;padding:28px;max-width:480px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.25);">
+<div id="sendModal">
+  <div style="background:#fff;border-radius:20px;padding:28px;max-width:460px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.25);">
     <div style="font-size:17px;font-weight:900;color:var(--dk);margin-bottom:6px;">&#128231; Send Plan to Prospect</div>
-    <p style="font-size:13px;color:#64748b;margin-bottom:20px;line-height:1.6;">This will generate a personalized debt resolution plan and send it to <strong id="modalEmail"></strong> for <strong id="modalName"></strong>.</p>
-    <div style="background:var(--bg);border:1px solid var(--br);border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:13px;color:#475569;line-height:1.65;">
-      Review the details above before sending. The plan will include all enrolled debts, the recommended program, and the financial comparison.
-    </div>
+    <p style="font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.6;">Sending personalized plan to <strong id="modalEmail"></strong> for <strong id="modalName"></strong>.</p>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button onclick="closeSendModal()" class="btn" style="background:var(--bg);color:#64748b;border:1.5px solid var(--br);">Cancel</button>
       <button onclick="sendEmailConfirmed()" class="btn btn-g">&#10003; Confirm &amp; Send</button>
