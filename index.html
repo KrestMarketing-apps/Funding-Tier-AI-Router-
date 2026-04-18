@@ -437,7 +437,30 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
     </div>
     <div style="border:1.5px solid var(--br);border-radius:14px;overflow:hidden;">
       <div class="row-hdr"><div>Creditor Name</div><div>Amount</div><div>Debt Type</div><div></div></div>
-      <div id="rows" style="display:grid;gap:8px;padding:10px;"></div>
+      <div id="rows" style="display:grid;gap:8px;padding:10px;">
+        <div class="row-card" data-row="0">
+          <div class="row-inner">
+            <div style="position:relative;">
+              <input class="fi ci" data-i="0" placeholder="Type creditor name…" value="" autocomplete="off"/>
+              <div class="drop" data-cr="0"></div>
+              <div class="aw" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div>
+            </div>
+            <div>
+              <input class="fi" data-i="0" data-k="amount" placeholder="$0" value=""/>
+            </div>
+            <div>
+              <div class="dt-wrap" data-dw="0">
+                <svg class="dt-icon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg>
+                <input class="dt-inp" data-di="0" placeholder="Search debt type…" autocomplete="off"/>
+                <button class="dt-x" data-dx="0">&#10005;</button>
+                <div class="dt-panel" data-dp="0"></div>
+              </div>
+              <div class="dt-sel" data-ds="0"><span></span><button data-dsc="0">&#10005;</button></div>
+            </div>
+            <div></div>
+          </div>
+        </div>
+      </div>
       <div style="padding:0 10px 10px;"><button id="addBtn" class="btn-add" type="button"><span style="font-size:22px;line-height:1;">+</span><span>Add Creditor</span></button></div>
     </div>
   </div>
@@ -684,6 +707,7 @@ const DT_ALL=[];
 Object.entries(DT_CATS).forEach(([cat,types])=>types.forEach(t=>DT_ALL.push({t,cat,s:DT_REJ.has(t)?'no':DT_COND.has(t)?'cond':'ok'})));
 const DT_ST={ok:{label:'Accepted',cls:'b-ok'},cond:{label:'Conditional',cls:'b-cond'},no:{label:'Not accepted',cls:'b-no'}};
 // ── Timezone / Language globals ────────────────────────────────────────────
+window.onerror=function(m,s,l,c,e){console.error('Global JS error:',m,'line',l,e);return false;};
 let dispTZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'America/Los_Angeles';}catch(e){return 'America/Los_Angeles';}})();
 let _selectingState=false;
 let legacyAdjOpen=false;
@@ -1513,7 +1537,12 @@ function init(){
   renderRows();render();
   setInterval(renderClocks,1000);
 }
-init();
+// Call init directly (script is after DOM) + fallback listener
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',init);
+}else{
+  init();
+}
 </script>
 </body>
 </html>
