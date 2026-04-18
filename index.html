@@ -326,6 +326,15 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
   box-shadow:0 8px 32px rgba(0,0,0,.3);
 }
 .tip-wrap:hover .tip-box{visibility:visible;opacity:1;}
+
+/* Commission block equal height — table portion fixed, sliders below */
+.comm-block-inner{min-height:130px;display:flex;flex-direction:column;}
+.adj-prog-wrap{border-top:1px solid rgba(255,255,255,.12);margin-top:14px;padding-top:2px;}
+.adj-prog-btn{width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;cursor:pointer;padding:10px 0;font-family:inherit;}
+.adj-prog-body{display:none;padding-top:6px;}
+.adj-prog-body.open{display:block;}
+.adj-chev{font-size:16px;font-weight:900;color:rgba(255,255,255,.6);transition:transform .2s;line-height:1;}
+.adj-prog-btn.open .adj-chev{transform:rotate(180deg);}
 </style>
 </head>
 <body>
@@ -1102,7 +1111,7 @@ function renderPlanCards(c){
       if(comm.p4>0)rows+=`<tr><td style="padding:8px 10px;"><span style="font-size:12px;font-weight:800;color:rgba(255,255,255,.9);">Payment 4</span></td><td style="padding:8px 10px;font-size:17px;font-weight:900;color:#4ade80;text-align:right;">${fmt(comm.p4)}</td><td style="padding:8px 10px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.8);white-space:nowrap;">${comm.p4when}</span>${timingTip}</td></tr>`;
     }
     const clawHtml=(!comm.isLD&&comm.clawback)?`<div style="font-size:10px;color:#fbbf24;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:6px;padding:5px 9px;margin-top:8px;line-height:1.5;">&#9888; ${comm.clawback}</div>`:'';
-    return `<div style="color:rgba(255,255,255,.55);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf81db129f4704935e1.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;border-radius:3px;margin-right:2px;" alt="FT"/> Agent Commission <span style="font-size:20px;font-weight:900;color:#4ade80;margin-left:4px;">${fmt(comm.total)}</span></div>
+    return `<div class="comm-block-inner"><div style="color:rgba(255,255,255,.55);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf81db129f4704935e1.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;border-radius:3px;margin-right:2px;" alt="FT"/> Agent Commission <span style="font-size:20px;font-weight:900;color:#4ade80;margin-left:4px;">${fmt(comm.total)}</span></div>
     <div style="border:1px solid rgba(255,255,255,.12);border-radius:10px;overflow:hidden;">
       <table style="width:100%;border-collapse:collapse;">
         <thead><tr style="background:rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.1);">
@@ -1114,7 +1123,7 @@ function renderPlanCards(c){
       </table>
     </div>
     ${clawHtml}
-    <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:6px;">${comm.note}</div>`;
+    <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:6px;">${comm.note}</div></div>`;
   }
 
   // ── CONSUMER SHIELD ───────────────────────────────────────────
@@ -1204,20 +1213,23 @@ function renderPlanCards(c){
       <hr class="comm-divider"/>
       <div class="plan-comm-block${isRec?' rec-comm':''}">
         ${commBlock(comm,isRec)}
-        <div class="ttp" style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12);">
-          <div style="border:1.5px solid rgba(255,255,255,.35);border-radius:10px;padding:12px;position:relative;cursor:default;">
-            <div style="position:absolute;top:-9px;left:12px;background:#0f172a;padding:0 6px;font-size:9px;font-weight:800;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;">Adjust Program</div>
-            <span class="ttp-body">Adjust the <strong>Service Fee</strong> (35–49%) to control the client's monthly payment and your commission — lower fee means a more affordable payment but slightly lower commission. Adjust <strong>Program Length</strong> to find the best monthly payment for the client. The $250/mo floor is enforced automatically.</span>
-          <div style="margin-bottom:10px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Service Fee</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${feeLabel}%</span></div>
-            <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="legacyState.feeRate=this.value/100;legacyState._init=false;if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);renderCommCompare(lastScenario);}"/>
-            <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>35%</span><span>49%</span></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Program Length</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
-            <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="legacyState.months=parseInt(this.value);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);}"/>
-            <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>1 mo</span><span>${maxMo} mo ($250 floor)</span></div>
-          </div>
+        <div class="adj-prog-wrap">
+          <button class="adj-prog-btn" id="adjProgBtn_${isRec?'rec':'avail'}" onclick="(function(btn){const body=btn.nextElementSibling;const open=body.classList.toggle('open');btn.classList.toggle('open',open);})(this)">
+            <span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.6px;">⚙ Adjust Program</span>
+            <span class="adj-chev">&#8964;</span>
+          </button>
+          <div class="adj-prog-body">
+            <div style="font-size:10px;color:rgba(255,255,255,.45);line-height:1.55;margin-bottom:10px;">Adjust service fee to change affordability &amp; commission. Program length sets the monthly payment — $250/mo floor enforced.</div>
+            <div style="margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Service Fee</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${feeLabel}%</span></div>
+              <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="legacyState.feeRate=this.value/100;legacyState._init=false;if(lastScenario)legacyState.months=legacyClampMonths(lastScenario.total,legacyState.feeRate,legacyState.months);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);renderCommCompare(lastScenario);}"/>
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>35%</span><span>49%</span></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Program Length</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
+              <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="legacyState.months=parseInt(this.value);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);}"/>
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>1 mo</span><span>${maxMo} mo ($250 floor)</span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1378,10 +1390,9 @@ function _prospectKey(){return [$('fName').value.trim(),$('lName').value.trim(),
 function _modalShow(viewId){['modalConfirmView','modalSendingView','modalSuccessView','modalErrorView'].forEach(id=>{const el=$(id);if(el)el.style.display=id===viewId?'block':'none';});const m=$('sendModal');if(m)m.style.display='flex';}
 function _progressTo(pct,label){const p=$('modalProgress'),l=$('modalProgressLabel');if(p)p.style.width=pct+'%';if(l)l.textContent=label||'';}
 function _showSuccessModal(pageUrl,email){
-  const se=$('modalSuccessEmail');if(se)se.textContent='Sent to '+email;
+  const se=$('modalSuccessEmail');if(se)se.textContent=email&&email!=='(no email)'?'Sent to '+email:'Plan URL generated';
   const ur=$('modalUrlRow'),ui=$('modalUrlInput'),ul=$('modalUrlLink');
   if(pageUrl&&ur&&ui&&ul){ui.value=pageUrl;ul.href=pageUrl;ur.style.display='block';}
-  if(pageUrl){const rb=$('planResultBox');if(rb){rb.innerHTML=`<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:13px;color:#0b7d6e;">&#10003;</span><div style="font-size:12px;font-weight:700;color:#0b7d6e;">Plan sent · <a href="${pageUrl}" target="_blank" style="color:var(--bl);text-decoration:underline;">Open ↗</a></div><button onclick="this.closest('div').parentElement.style.display='none'" style="border:none;background:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:0;margin-left:4px;">&times;</button></div>`;rb.style.display='block';}}
   _modalShow('modalSuccessView');
 }
 async function _callAPI(sendEmail){
