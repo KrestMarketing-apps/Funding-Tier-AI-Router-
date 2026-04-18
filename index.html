@@ -713,7 +713,7 @@ const MAX_ROWS=10;
 const legacyState={feeRate:0.40,months:36};
 function legacyTotalCost(d,f){return d*f;}
 function legacyMaxMonths(d,f){return Math.min(60,Math.floor(legacyTotalCost(d,f)/250));}
-function legacyMinMonths(){return 12;}
+function legacyMinMonths(){return 1;}
 function legacyMP(d,f,mo){return legacyTotalCost(d,f)/mo;}
 function legacyCommAtFee(baseTotal,f){return Math.round(baseTotal*(f/0.40));}
 function legacyDefaultMonths(total,feeRate,csMp,ldMp){
@@ -1235,8 +1235,8 @@ function renderPlanCards(c){
             </div>
             <div>
               <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Program Length</span><span id="lgMoDisp" style="font-size:11px;font-weight:900;color:#4ade80;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
-              <input id="lgMoInput" type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" onclick="event.stopPropagation();" oninput="updateLegacyCalc(undefined,parseInt(this.value))"/>
-              <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>1 mo</span><span>${maxMo} mo ($250 floor)</span></div>
+              <input id="lgMoInput" type="range" class="rng-p" min="1" max="${maxMo}" value="${mo}" step="1" onclick="event.stopPropagation();" oninput="updateLegacyCalc(undefined,parseInt(this.value))"/>
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>1 mo</span><span>${maxMo} mo ($250 min)</span></div>
             </div>
           </div>
         </div>
@@ -1430,60 +1430,52 @@ async function generateUrlOnly(){
 function updateLegacyCalc(newFee, newMo){
   if(!lastScenario||!lastScenario.legacyAvail)return;
   const total=lastScenario.total;
-  // Update state
-  if(newFee!==undefined){
-    legacyState.feeRate=newFee/100;
-    // Clamp months for new fee but don't reset to default
-    const maxMo=legacyMaxMonths(total,legacyState.feeRate);
-    legacyState.months=Math.max(legacyMinMonths(),Math.min(maxMo,legacyState.months||1));
-  }
-  if(newMo!==undefined){
-    const maxMo=legacyMaxMonths(total,legacyState.feeRate);
-    legacyState.months=Math.max(legacyMinMonths(),Math.min(maxMo,parseInt(newMo)));
-  }
+  // Update fee
+  if(newFee!==undefined) legacyState.feeRate=newFee/100;
+  // Recompute derived values with current fee
   const feeRate=legacyState.feeRate;
-  const mo=legacyState.months;
   const tc=legacyTotalCost(total,feeRate);
+  const maxMo=Math.min(60,Math.floor(tc/250));  // max months for $250 floor
+  const minMo=1;
+  // Update months — clamp to valid range
+  if(newMo!==undefined) legacyState.months=Math.max(minMo,Math.min(maxMo,parseInt(newMo)));
+  else legacyState.months=Math.max(minMo,Math.min(maxMo,legacyState.months||maxMo));
+  const mo=legacyState.months;
   const mp=Math.max(250,Math.round(tc/mo));
   const feeLabel=Math.round(feeRate*100);
-  const maxMo=legacyMaxMonths(total,feeRate);
-  // Patch DOM directly — no card re-render
+  // Patch display elements directly
   const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
-  const setHtml=(id,v)=>{const el=$(id);if(el)el.innerHTML=v;};
   set('lgFeeDisp',feeLabel+'%');
-  set('lgMoDisp',mo+' mo → '+fmt(mp)+'/mo');
+  set('lgMoDisp',mo+' mo \u2192 '+fmt(mp)+'/mo');
   set('lgPayVal',fmt(mp));
   set('lgMoVal',String(mo));
   set('lgTcVal',fmt(tc));
-  // Update slider positions
+  // Update slider values + range
   const fi=$('lgFeeInput');if(fi)fi.value=feeLabel;
-  const mi=$('lgMoInput');if(mi){mi.max=maxMo;mi.value=mo;}
-  // Update mo slider labels
-  const moLabels=mi&&mi.parentElement?mi.parentElement.querySelector('div:last-child'):null;
-  if(moLabels)moLabels.innerHTML=`<span>1 mo</span><span>${maxMo} mo ($250 floor)</span>`;
-  // Update comm block total
+  const mi=$('lgMoInput');if(mi){mi.min=minMo;mi.max=maxMo;mi.value=mo;}
+  // Update max label in slider hints
+  const moWrap=mi?mi.closest('div'):null;
+  if(moWrap){const last=moWrap.querySelector('div:last-child');if(last)last.innerHTML=`<span>1 mo</span><span>${maxMo} mo ($250 min)</span>`;}
+  // Update commission block
   const band=getLegacyComm(total);
   if(band){
     const commTotal=legacyCommAtFee(band.total,feeRate);
     const p2=Math.round(band.p2*(feeRate/0.40));
     const p4=Math.round(band.p4*(feeRate/0.40));
-    // Find the commission total span (big green number after FT icon)
     const card=$('legacyPlanCard');
     if(card){
-      const commHeader=card.querySelector('.comm-block-inner .comm-inline-hd,.comm-block-inner>div:first-child');
-      // Simpler: find the big green span inside .plan-comm-block
       const bigSpan=card.querySelector('.plan-comm-block span[style*="font-size:20px"]');
       if(bigSpan)bigSpan.textContent=fmt(commTotal);
-      // Update P2/P4 amount cells
       const amtCells=card.querySelectorAll('.plan-comm-block tbody td:nth-child(2)');
       if(amtCells[0])amtCells[0].textContent=fmt(p2);
       if(amtCells[1]&&band.p4>0)amtCells[1].textContent=fmt(p4);
-      // Update note
-      const noteDiv=card.querySelector('.plan-comm-block .comm-block-inner>div:last-child');
-      if(noteDiv)noteDiv.textContent=`Band ${band.code} @ ${feeLabel}% fee`;
+      // Update note line
+      const noteDivs=card.querySelectorAll('.comm-block-inner>div');
+      const noteDiv=noteDivs[noteDivs.length-1];
+      if(noteDiv&&noteDiv.textContent.includes('Band'))noteDiv.textContent=`Band ${band.code} @ ${feeLabel}% fee`;
     }
   }
-  // Also update the comparison table and legacy program card (non-destructive)
+  // Update comparison table (non-destructive — doesn't touch plan cards)
   renderCmpTable(lastScenario);
   renderLegacyCard(lastScenario);
 }
