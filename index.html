@@ -623,6 +623,7 @@ const DT_ST={ok:{label:'Accepted',cls:'b-ok'},cond:{label:'Conditional',cls:'b-c
 // ── Timezone / Language globals ────────────────────────────────────────────
 let dispTZ='America/Los_Angeles';
 let _selectingState=false;
+let legacyAdjOpen=false;
 function setDispTZ(tz){dispTZ=tz;renderClocks();if(lastScenario)renderPanel(lastScenario);}
 
 // ── NEW: timezone conversion helpers ─────────────────────────
@@ -1055,8 +1056,15 @@ function renderPanel(c){
   const rLogo=c.route.route==='LEVEL'?LD_LOGO:c.route.route==='CONSUMER SHIELD'?CS_LOGO:c.route.route==='LEGACY'?LEGACY_LOGO:'';
   const rl=c.route.route==='LEVEL'?'Route: Level Debt':c.route.route==='CONSUMER SHIELD'?'Route: Consumer Shield':c.route.route==='LEGACY'?'Route: Legacy Capital Services':'No Route Available';
   const bc=c.route.route==='LEVEL'?'rb-ld':c.route.route==='CONSUMER SHIELD'?'rb-cs':c.route.route==='LEGACY'?'rb-lg':'rb-no';
+  const badgeBg=c.route.route==='LEVEL'
+    ?'linear-gradient(135deg,#0f9d8a,#0b7d6e)'
+    :c.route.route==='CONSUMER SHIELD'
+    ?'linear-gradient(135deg,#0f2a5e,#1a3a8f,#1e52c4)'
+    :c.route.route==='LEGACY'
+    ?'linear-gradient(135deg,#7f1d1d,#6d28d9,#2563eb)'
+    :'';
   const badgeHtml=c.route.route&&c.route.route!=='NO OPTION'
-    ?`<div class="route-badge">${rLogo?`<img src="${rLogo}" alt=""/>`:''}${rl}</div>`
+    ?`<div class="route-badge" style="background:${badgeBg};">${rLogo?`<img src="${rLogo}" alt=""/>`:''}${rl}</div>`
     :`<span class="rb rb-no">${rl}</span>`;
   $('routeBadges').innerHTML=badgeHtml;
   $('routeReason').textContent=c.route.reason||'Enter debts to calculate routing.';
@@ -1214,20 +1222,20 @@ function renderPlanCards(c){
       <div class="plan-comm-block${isRec?' rec-comm':''}">
         ${commBlock(comm,isRec)}
         <div class="adj-prog-wrap">
-          <button class="adj-prog-btn" id="adjProgBtn_${isRec?'rec':'avail'}" onclick="(function(btn){const body=btn.nextElementSibling;const open=body.classList.toggle('open');btn.classList.toggle('open',open);})(this)">
+          <button class="adj-prog-btn" onclick="(function(btn){legacyAdjOpen=!legacyAdjOpen;const body=btn.nextElementSibling;body.classList.toggle('open',legacyAdjOpen);btn.classList.toggle('open',legacyAdjOpen);})(this)" id="adjProgBtn"${legacyAdjOpen?' class=\"adj-prog-btn open\"':''}>
             <span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.6px;">⚙ Adjust Program</span>
             <span class="adj-chev">&#8964;</span>
           </button>
-          <div class="adj-prog-body">
+          <div class="adj-prog-body${legacyAdjOpen?' open':''}">
             <div style="font-size:10px;color:rgba(255,255,255,.45);line-height:1.55;margin-bottom:10px;">Adjust service fee to change affordability &amp; commission. Program length sets the monthly payment — $250/mo floor enforced.</div>
             <div style="margin-bottom:10px;">
               <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Service Fee</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${feeLabel}%</span></div>
-              <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="legacyState.feeRate=this.value/100;legacyState._init=false;if(lastScenario)legacyState.months=legacyClampMonths(lastScenario.total,legacyState.feeRate,legacyState.months);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);renderCommCompare(lastScenario);}"/>
+              <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" onclick="event.stopPropagation();" oninput="legacyState.feeRate=this.value/100;legacyState._init=false;if(lastScenario)legacyState.months=legacyClampMonths(lastScenario.total,legacyState.feeRate,legacyState.months);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);renderCommCompare(lastScenario);}"/>
               <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>35%</span><span>49%</span></div>
             </div>
             <div>
               <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Program Length</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
-              <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="legacyState.months=parseInt(this.value);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);}"/>
+              <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" onclick="event.stopPropagation();" oninput="legacyState.months=parseInt(this.value);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);}"/>
               <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>1 mo</span><span>${maxMo} mo ($250 floor)</span></div>
             </div>
           </div>
