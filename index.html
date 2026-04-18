@@ -291,7 +291,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .plan-card-v{border:1.5px solid var(--br);border-radius:14px;background:#fff;overflow:hidden;transition:box-shadow .15s,border-color .15s;display:flex;flex-direction:column;}
 .plan-card-v:hover:not(.unavail){box-shadow:0 6px 24px rgba(15,23,42,.1);}
 .plan-card-v.rec{border:2.5px solid var(--g);box-shadow:0 0 0 4px rgba(15,157,138,.15),0 8px 28px rgba(15,157,138,.12);}
-.plan-card-v.rec::before{content:'✓ RECOMMENDED';display:block;background:linear-gradient(90deg,var(--g),var(--gd));color:#fff;text-align:center;font-size:9px;font-weight:900;letter-spacing:1.5px;padding:5px 0;flex-shrink:0;}
+
 .plan-card-v.unavail{opacity:.35;filter:grayscale(.7);pointer-events:none;}
 .plan-body{padding:18px;display:flex;flex-direction:column;flex:1;}
 .plan-body-stats{flex-shrink:0;}
@@ -335,6 +335,33 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .adj-prog-body.open{display:block;}
 .adj-chev{font-size:16px;font-weight:900;color:rgba(255,255,255,.6);transition:transform .2s;line-height:1;}
 .adj-prog-btn.open .adj-chev{transform:rotate(180deg);}
+
+/* ── Equal-height card alignment ── */
+.plan-rec-banner{height:24px;background:linear-gradient(90deg,var(--g),var(--gd));color:#fff;text-align:center;font-size:9px;font-weight:900;letter-spacing:1.5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.plan-rec-spacer{height:24px;flex-shrink:0;}
+.plan-body-desc{display:none;} /* desc moved to tooltip */
+/* ── Legacy inline steppers ── */
+.lg-stepper{display:flex;align-items:center;justify-content:center;gap:3px;}
+.lg-step-val{font-size:17px;font-weight:900;min-width:44px;text-align:center;line-height:1;}
+.lg-step-btn{width:22px;height:22px;border-radius:6px;border:1.5px solid rgba(109,40,217,.35);background:rgba(109,40,217,.08);color:#6d28d9;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;transition:all .12s;}
+.lg-step-btn:hover{background:rgba(109,40,217,.18);border-color:#7c3aed;}
+.lg-step-btn:active{transform:scale(.9);}
+/* ── Support hours dark blue ── */
+#hoursBtn{background:linear-gradient(135deg,#0f2a5e,#1a3a8f) !important;color:#fff !important;border-radius:10px;}
+#hoursBtn span{color:#fff !important;}
+#hoursBtn .acc-chevron{color:rgba(255,255,255,.7) !important;}
+/* ── Header inline notification (no modal, no height expansion) ── */
+.hdr-delivery{position:relative;}
+.hdr-notif{position:absolute;bottom:calc(100% + 6px);left:0;right:0;background:linear-gradient(135deg,#0f172a,#0b3b50);color:#fff;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:600;line-height:1.55;z-index:200;display:none;box-shadow:0 4px 20px rgba(0,0,0,.3);}
+.hdr-notif.show{display:block;}
+.hdr-notif.success{border-left:3px solid var(--g);}
+.hdr-notif.error{border-left:3px solid var(--rd);}
+.hdr-notif.sending{border-left:3px solid var(--am);}
+.hdr-url-row{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.hdr-url-input{flex:1;font-size:10px;padding:4px 8px;border:1px solid rgba(255,255,255,.2);border-radius:6px;background:rgba(255,255,255,.1);color:#fff;font-family:monospace;outline:none;}
+.hdr-copy-btn{font-size:10px;padding:3px 8px;border-radius:6px;background:var(--g);color:#fff;border:none;cursor:pointer;font-family:inherit;font-weight:700;white-space:nowrap;}
+/* ── Amount input currency display ── */
+.fi.currency{font-variant-numeric:tabular-nums;}
 </style>
 </head>
 <body>
@@ -372,7 +399,8 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
       </div>
     </div>
     <!-- RIGHT: Prospect Delivery with narrower inputs -->
-    <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px;">
+    <div class="hdr-delivery" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px;position:relative;">
+      <div id="hdrNotif" class="hdr-notif"></div>
       <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Prospect Delivery</div>
       <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
         <div style="flex:0 0 auto;width:140px;"><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">First Name</label><input id="fName" class="fi" style="font-size:13px;padding:7px 10px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="text" placeholder="John"/></div>
@@ -382,7 +410,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
         <button id="urlBtn" class="btn" style="height:34px;font-size:12px;padding:0 12px;flex-shrink:0;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;">&#128279; URL</button>
         <button id="sendBtn" class="btn btn-dk" style="height:34px;font-size:12px;padding:0 14px;flex-shrink:0;">Generate + Send</button>
       </div>
-      <div id="planResultBox"><div style="font-weight:700;color:var(--dk);margin-bottom:8px;font-size:13px;">&#10003; Plan Created Successfully</div><button id="planLink" class="btn btn-g" style="font-size:12px;">View Personalized Plan</button></div>
+      <button id="planLink" class="btn btn-g" style="font-size:12px;">View Personalized Plan</button></div>
     </div>
   </div>
 </div>
@@ -612,8 +640,42 @@ const CRED_RULES=[
   {n:['OneMain','OneMain Financial'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
   {n:['Regional Finance','Regional Finance Corp'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
   {n:['Republic Finance'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
+  {n:['Goldman Sachs','Goldman Sachs Credit Card'],s:'rej',r:'GS credit cards not accepted. Apple Cards and GS personal loans ARE accepted.'},
+  {n:['AGCO Finance','AGCO Financial'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['DR Bank'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['FCRP Capital','FCRP Capital LLC'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Fort Worth Credit Union','Fort Worth CU','FWCU'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Fortera Credit Union','Fortera CU'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Garden Federal Credit Union','Garden FCU'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Golden One Credit Union','Golden 1 Credit Union','Golden1'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Heights Financial','Heights Finance'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['ISPC'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['LHPCC Trust','LHPCC Trust I','LHPCC'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Local Government Federal Credit Union','LGFCU'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Matco Tools','Matco Fin','Matco Tools Financing'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Omni Loans','Omni Financial'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Pioneer Loans','Pioneer Financial'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Preferred Loans'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Quick Help Loans','Quick Help'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Red River Credit','REDRIVERCR'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Redstone Credit Union','Redstone FCU'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['RFFC Financial','RFFC'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['Sunset Financial','Sunset Finance'],s:'rej',r:'Not accepted by Level Debt.'},
+  {n:['WSECU','Washington State Employees Credit Union'],s:'rej',r:'Not accepted by Level Debt.'},
 ];
-const TRAD_CARDS=['American Express','Amex','Bank of America','Capital One','Chase','Citi','Citibank','Discover','Wells Fargo','Synchrony','Barclays','Barclaycard','Comenity Bank','Bread Financial','HSBC','Merrick Bank','Mission Lane','First Premier Bank','Credit One','Milestone','Upgrade','Avant','Best Egg','LendingClub','SoFi','Upstart','Prosper','Marcus','PayPal Credit','Apple Card','Navy Federal','USAA','PNC','TD Bank','U.S. Bank','US Bank','Regions Bank','Fifth Third Bank','Truist','SunTrust','BB&T','M&T Bank','KeyBank','Citizens Bank','Santander','Nordstrom Card',"Macy's Card","JCPenney Card","Kohl's Card",'Best Buy Card','Home Depot Card',"Lowe's Card",'Walmart Card','Target RedCard','Amazon Store Card','CareCredit',"Sam's Club Card",'Costco Card','Dell Financial'];
+const TRAD_CARDS=['American Express','Amex','Bank of America','Capital One','Chase','Citi','Citibank','Discover','Wells Fargo','Synchrony','Barclays','Barclaycard','Comenity Bank','Bread Financial','HSBC','Merrick Bank','Mission Lane','First Premier Bank','Credit One','Milestone','Upgrade','Avant','Best Egg','LendingClub','SoFi','Upstart','Prosper','Marcus','PayPal Credit','Apple Card','Navy Federal','USAA','PNC','TD Bank','U.S. Bank','US Bank','Regions Bank','Fifth Third Bank','Truist','SunTrust','BB&T','M&T Bank','KeyBank','Citizens Bank','Santander','Nordstrom Card',"Macy's Card","JCPenney Card","Kohl's Card",'Best Buy Card','Home Depot Card',"Lowe's Card",'Walmart Card','Target RedCard','Amazon Store Card','CareCredit',"Sam's Club Card",'Costco Card','Dell Financial',
+  'Lendmark','Lendmark Financial','Mariner Finance','OneMain Financial','OneMain',
+  'Regional Finance','Republic Finance','BHG Financial','Cabela\'s Club Visa',
+  'Academy Sports Card','Bass Pro Card','Victoria\'s Secret Card','Gap Card',
+  'Old Navy Card','Banana Republic Card','Pottery Barn Card','Williams-Sonoma Card',
+  'Crate & Barrel Card','Overstock Card','Wayfair Card','Rooms To Go Card',
+  'Conn\'s Card','Ashley Furniture Card','Rooms To Go',
+  'Upgrade','Avant','Best Egg','LendingClub','Prosper','Upstart',
+  'First Tech Federal Credit Union','Pentagon Federal Credit Union','PenFed',
+  'Navy Federal Credit Union','USAA Bank','Alliant Credit Union',
+  'Mission Lane','Merrick Bank','Credit One Bank','First Premier',
+  'Milestone Gold','Indigo Platinum','Destiny Card'
+];
 const DT_CATS={'Credit cards & loans':['Unsecured','Unsecured Personal Loan','Unsecured Line of Credit','Medical Bill','Payday Loan','Tribal Loan','Cell Phone Bill'],'Auto & vehicle':['Repossession Deficiency','Auto Repo Deficiency','Deficiency','Auto Loan (Secured)'],'Student loans':['Private Student Loan','Federal Student Loan','Navient Student Loan'],'Housing & utilities':['Back Rent','Apartment Back Rent (Collections)','Utility Bill','Mortgage'],'Business':['Business Debt','SBA Loan'],'Tax & government':['IRS Tax Debt','Alimony / Child Support'],'Other':['Judgment','Peer-to-Peer Loan','USAA','Secured Loan','Cross Collateralized Account','Installment Sales Contract','Furniture Store Financing','Direct Furniture Store Loan','Credit Union Loan','Timeshare','Military Account','AFES Account','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Loan from Individual','Other']};
 const DT_REJ=new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Mortgage','Auto Loan (Secured)','Cross Collateralized Account','Furniture Store Financing','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','Secured Loan','Installment Sales Contract']);
 const DT_COND=new Set(['Private Student Loan','Medical Bill','Back Rent','Apartment Back Rent (Collections)','Repossession Deficiency','Auto Repo Deficiency','Business Debt','Judgment','USAA','Deficiency','Tribal Loan']);
@@ -621,7 +683,7 @@ const DT_ALL=[];
 Object.entries(DT_CATS).forEach(([cat,types])=>types.forEach(t=>DT_ALL.push({t,cat,s:DT_REJ.has(t)?'no':DT_COND.has(t)?'cond':'ok'})));
 const DT_ST={ok:{label:'Accepted',cls:'b-ok'},cond:{label:'Conditional',cls:'b-cond'},no:{label:'Not accepted',cls:'b-no'}};
 // ── Timezone / Language globals ────────────────────────────────────────────
-let dispTZ='America/Los_Angeles';
+let dispTZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'America/Los_Angeles';}catch(e){return 'America/Los_Angeles';}})();
 let _selectingState=false;
 let legacyAdjOpen=false;
 function setDispTZ(tz){dispTZ=tz;renderClocks();if(lastScenario)renderPanel(lastScenario);}
@@ -659,29 +721,7 @@ document.addEventListener('mouseover',e=>{
 
 function setLang(l){/* placeholder for i18n */}
 
-// Convert a local hour/minute in fromTZ to dispTZ
-function tzOffset(tz){
-  const now=new Date();
-  const a=new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
-  const b=new Intl.DateTimeFormat('en-GB',{timeZone:'UTC',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
-  const[ah,am]=a.split(':').map(Number);const[bh,bm]=b.split(':').map(Number);
-  return(ah-bh)*60+(am-bm);
-}
-function convertToDispTZ(h,m,fromTZ){
-  const fromOff=tzOffset(fromTZ),toOff=tzOffset(dispTZ);
-  const total=h*60+m-fromOff+toOff;
-  const nh=Math.floor(((total%(24*60))+24*60)%(24*60)/60);
-  const nm=((total%60)+60)%60;
-  return{h:nh,m:nm};
-}
-function fmt12(h,m){
-  const ampm=h>=12?'PM':'AM';const h12=h>12?h-12:(h===0?12:h);
-  return m>0?`${h12}:${String(m).padStart(2,'0')}${ampm}`:`${h12}${ampm}`;
-}
-function tzLabel(){
-  const s=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,timeZoneName:'short'}).formatToParts(new Date()).find(p=>p.type==='timeZoneName');
-  return s?s.value:'TZ';
-}
+
 
 const SUPP_HOURS=[
   {
@@ -835,7 +875,7 @@ function clockStatus(c){
 function renderClocks(){
   const ttz=tzLabel();
   const sc=$('sysClockBadge');
-  if(sc){const t=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date());sc.textContent=t+' '+ttz;}
+  if(sc){const now=new Date();const t=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).format(now);sc.textContent=t+' '+ttz;}
   const tb=$('liveTimeBadge');
   if(tb){const t=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,hour:'numeric',minute:'2-digit',hour12:true}).format(new Date());tb.textContent=t+' '+ttz;}
   const box=$('clockBox');if(!box)return;
@@ -1140,9 +1180,12 @@ function renderPlanCards(c){
     const p=c.csProg,isRec=c.route.route==='CONSUMER SHIELD';
     const comm=getCommForCard(c,'CS');
     csHtml=`<div class="plan-card-v${isRec?' rec':''}">
+      ${isRec?'<div class="plan-rec-banner">✓ RECOMMENDED</div>':'<div class="plan-rec-spacer"></div>'}
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${CS_LOGO}" alt="CS"/></div><span style="font-size:14px;font-weight:900;">Consumer Shield</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${CS_LOGO}" alt="CS"/></div>
+            <span class="ttp" style="cursor:help;"><span style="font-size:14px;font-weight:900;border-bottom:1.5px dashed #cbd5e1;">Consumer Shield</span><span class="ttp-body">Debt Validation — Fixed monthly payment. Debts challenged through a legal process. No interest accruing. Equifax credit pull required.</span></span>
+          </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-b">Program ${p.k}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-b">Available</span>'}</div>
         </div>
         <div class="plan-body-stats" style="border:1.5px solid rgba(26,110,216,.25);border-radius:12px;overflow:hidden;">
@@ -1152,7 +1195,7 @@ function renderPlanCards(c){
             <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);">${fmt(p.term*p.pay)}</div></div>
           </div>
         </div>
-        <div class="plan-body-desc">Debt Validation — Fixed monthly payment. Debts challenged through a legal process. No interest accruing.</div>
+        <div class="plan-body-desc"></div>
       </div>
       <hr class="comm-divider"/>
       <div class="plan-comm-block${isRec?' rec-comm':''}">${commBlock(comm,isRec)}</div>
@@ -1168,9 +1211,12 @@ function renderPlanCards(c){
     const mt=getLDMaxTerm(c.total),mp=Math.round((c.total*.5+c.total*c.feeRate)/mt),isRec=c.route.route==='LEVEL';
     const comm=getCommForCard(c,'LEVEL');
     ldHtml=`<div class="plan-card-v${isRec?' rec':''}">
+      ${isRec?'<div class="plan-rec-banner">✓ RECOMMENDED</div>':'<div class="plan-rec-spacer"></div>'}
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-          <div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${LD_LOGO}" alt="LD"/></div><span style="font-size:14px;font-weight:900;">Level Debt</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><div class="logo-sm"><img src="${LD_LOGO}" alt="LD"/></div>
+            <span class="ttp" style="cursor:help;"><span style="font-size:14px;font-weight:900;border-bottom:1.5px dashed #cbd5e1;">Level Debt</span><span class="ttp-body">Debt Settlement — Negotiates with creditors to reduce outstanding balances. Program fee 25–27% of enrolled debt. Best for files $7,000+.</span></span>
+          </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill ${c.lds.status==='RED'?'p-a':'p-g'}">${c.lds.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-g">Available</span>'}</div>
         </div>
         <div class="plan-body-stats" style="border:1.5px solid rgba(15,157,138,.25);border-radius:12px;overflow:hidden;">
@@ -1180,7 +1226,7 @@ function renderPlanCards(c){
             <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);">${fmt(mp*mt)}</div></div>
           </div>
         </div>
-        <div class="plan-body-desc">Debt Settlement — Negotiates with creditors to reduce outstanding balances. Program fee applies to enrolled debt.</div>
+        <div class="plan-body-desc"></div>
       </div>
       <hr class="comm-divider"/>
       <div class="plan-comm-block${isRec?' rec-comm':''}">${commBlock(comm,isRec)}</div>
@@ -1210,37 +1256,36 @@ function renderPlanCards(c){
           <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-p">${c.lgs.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-p">Available</span>'}</div>
         </div>
         <div class="plan-body-stats" style="border:1.5px solid rgba(109,40,217,.2);border-radius:12px;overflow:hidden;">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
-            <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div id="lgPayVal" style="font-size:18px;font-weight:900;color:#6d28d9;">${fmt(mp)}</div></div>
-            <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Months</div><div id="lgMoVal" style="font-size:18px;font-weight:900;color:#6d28d9;">${mo}</div></div>
-            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div id="lgTcVal" style="font-size:18px;font-weight:900;color:var(--g);">${fmt(tc)}</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;">
+            <div style="padding:10px 8px;border-right:1px solid rgba(109,40,217,.12);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div id="lgPayVal" style="font-size:16px;font-weight:900;color:#6d28d9;">${fmt(mp)}</div></div>
+            <div style="padding:10px 8px;border-right:1px solid rgba(109,40,217,.12);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Months</div><div id="lgMoVal" style="font-size:16px;font-weight:900;color:#6d28d9;">${mo}</div></div>
+            <div style="padding:10px 8px;border-right:1px solid rgba(109,40,217,.12);background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div id="lgTcVal" style="font-size:16px;font-weight:900;color:var(--g);">${fmt(tc)}</div></div>
+            <div style="padding:8px 6px;border-right:1px solid rgba(109,40,217,.12);text-align:center;background:rgba(109,40,217,.03);">
+              <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Fee</div>
+              <div class="lg-stepper">
+                <button class="lg-step-btn" onclick="event.stopPropagation();updateLegacyCalc(Math.max(35,${feeLabel}-1),undefined)" title="Lower fee">&#9660;</button>
+                <span id="lgFeeDisp" class="lg-step-val" style="color:#6d28d9;font-size:14px;">${feeLabel}%</span>
+                <button class="lg-step-btn" onclick="event.stopPropagation();updateLegacyCalc(Math.min(49,${feeLabel}+1),undefined)" title="Higher fee">&#9650;</button>
+              </div>
+            </div>
+            <div style="padding:8px 6px;text-align:center;background:rgba(109,40,217,.03);">
+              <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Prog Mo</div>
+              <div class="lg-stepper">
+                <button class="lg-step-btn" onclick="event.stopPropagation();updateLegacyCalc(undefined,${mo}-1)" title="Fewer months">&#9660;</button>
+                <span id="lgMoDisp" class="lg-step-val" style="color:#6d28d9;font-size:13px;">${mo}</span>
+                <button class="lg-step-btn" onclick="event.stopPropagation();updateLegacyCalc(undefined,${mo}+1)" title="More months">&#9650;</button>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="plan-body-desc">Attorney-Led Resolution — Adjustable service fee (35–49%). Lower fee = more affordable monthly payment.</div>
+        <div class="plan-body-desc"></div>
       </div>
       <hr class="comm-divider"/>
       <div class="plan-comm-block${isRec?' rec-comm':''}">
         ${commBlock(comm,isRec)}
-        <div class="adj-prog-wrap">
-          <button class="adj-prog-btn" onclick="(function(btn){legacyAdjOpen=!legacyAdjOpen;const body=btn.nextElementSibling;body.classList.toggle('open',legacyAdjOpen);btn.classList.toggle('open',legacyAdjOpen);})(this)" id="adjProgBtn"${legacyAdjOpen?' class=\"adj-prog-btn open\"':''}>
-            <span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.6px;">⚙ Adjust Program</span>
-            <span class="adj-chev">&#8964;</span>
-          </button>
-          <div class="adj-prog-body${legacyAdjOpen?' open':''}">
-            <div style="font-size:10px;color:rgba(255,255,255,.45);line-height:1.55;margin-bottom:10px;">Adjust service fee to change affordability &amp; commission. Program length sets the monthly payment — $250/mo floor enforced.</div>
-            <div style="margin-bottom:10px;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Service Fee</span><span id="lgFeeDisp" style="font-size:11px;font-weight:900;color:#4ade80;">${feeLabel}%</span></div>
-              <input id="lgFeeInput" type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" onclick="event.stopPropagation();" oninput="updateLegacyCalc(parseInt(this.value),undefined)"/>
-              <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>35%</span><span>49%</span></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Program Length</span><span id="lgMoDisp" style="font-size:11px;font-weight:900;color:#4ade80;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
-              <input id="lgMoInput" type="range" class="rng-p" min="1" max="${maxMo}" value="${mo}" step="1" onclick="event.stopPropagation();" oninput="updateLegacyCalc(undefined,parseInt(this.value))"/>
-              <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>1 mo</span><span>${maxMo} mo ($250 min)</span></div>
-            </div>
-          </div>
         </div>
-      </div>
+    </div>
+    </div>
     </div>`;
   } else {
     const r=c.lgs&&c.lgs.status==='BLACKOUT'?'Not serviceable in this state.':c.total<6000?'Minimum $6,000 required.':'Routing rules — not available.';
@@ -1335,7 +1380,7 @@ function renderRows(){
   $('rows').innerHTML=app.rows.map((row,i)=>`<div class="row-card" data-row="${i}"><div class="row-inner"><div style="position:relative;"><input class="fi ci" data-i="${i}" placeholder="Type creditor name&#8230;" value="${esc(row.cred||'')}" autocomplete="off"/><div class="drop" data-cr="${i}"></div><div class="aw" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div></div><div><input class="fi" data-i="${i}" data-k="amount" placeholder="$0" value="${row.amount||''}"/>${total>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${((num(row.amount)/total)*100).toFixed(1)}%</div>`:''}</div><div><div class="dt-wrap" data-dw="${i}"><svg class="dt-icon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg><input class="dt-inp" data-di="${i}" placeholder="Search debt type&#8230;" autocomplete="off"/><button class="dt-x" data-dx="${i}">&#10005;</button><div class="dt-panel" data-dp="${i}"></div></div><div class="dt-sel" data-ds="${i}"><span></span><button data-dsc="${i}">&#10005;</button></div></div><div>${app.rows.length>1?`<button type="button" data-rem="${i}" style="width:30px;height:30px;border:1.5px solid rgba(239,68,68,.4);border-radius:8px;background:#fef2f2;color:var(--rd);font-weight:900;font-size:16px;cursor:pointer;margin-top:5px;font-family:inherit;">&#8722;</button>`:'<div></div>'}</div></div></div>`).join('');
   app.rows.forEach((row,i)=>{if(row.dt){const sel=document.querySelector(`[data-ds="${i}"]`);if(sel){const s=DT_REJ.has(row.dt)?'no':DT_COND.has(row.dt)?'cond':'ok';sel.querySelector('span').textContent=row.dt;sel.className=`dt-sel s-${s}`;}}});
   $('addBtn').style.display=app.rows.length<MAX_ROWS?'flex':'none';
-  document.querySelectorAll('[data-k="amount"]').forEach(n=>{n.addEventListener('input',onAmtChange);});
+  document.querySelectorAll('[data-k="amount"]').forEach(n=>{n.addEventListener('input',onAmtChange);n.addEventListener('blur',onAmtBlur);n.addEventListener('focus',onAmtFocus);});
   document.querySelectorAll('[data-rem]').forEach(b=>b.addEventListener('click',()=>removeRow(Number(b.dataset.rem))));
   bindCredSearches();bindDTRows();refreshRowVisuals();
 }
@@ -1360,71 +1405,34 @@ function dtPick(idx,item){app.rows[idx].dt=item.t;if(item.t==='Secured Loan'||it
 function dtSetValue(idx,val){if(!val)return;const wrap=document.querySelector(`[data-dw="${idx}"]`);if(!wrap)return;const inp=wrap.querySelector(`[data-di="${idx}"]`);if(inp)inp.placeholder=val;const sel=document.querySelector(`[data-ds="${idx}"]`);if(sel){const s=DT_REJ.has(val)?'no':DT_COND.has(val)?'cond':'ok';sel.querySelector('span').textContent=val;sel.className=`dt-sel s-${s}`;}}
 function bindDTRows(){app.rows.forEach((_,idx)=>{const wrap=document.querySelector(`[data-dw="${idx}"]`);if(!wrap)return;const inp=wrap.querySelector(`[data-di="${idx}"]`);const panel=wrap.querySelector(`[data-dp="${idx}"]`);const xbtn=wrap.querySelector(`[data-dx="${idx}"]`);const sel=document.querySelector(`[data-ds="${idx}"]`);if(!inp||!panel)return;let ai=-1;const open=q=>{dtBuildPanel(panel,q,idx);panel.className='dt-panel open';ai=-1;};const close=()=>{panel.className='dt-panel';ai=-1;};inp.addEventListener('focus',()=>open(inp.value));inp.addEventListener('input',e=>{const q=e.target.value;if(xbtn)xbtn.style.display=q?'flex':'none';open(q);});inp.addEventListener('blur',()=>setTimeout(close,160));inp.addEventListener('keydown',e=>{if(!panel.classList.contains('open'))return;const els=panel.querySelectorAll('.dt-item');if(e.key==='ArrowDown'){e.preventDefault();ai=Math.min(ai+1,els.length-1);}else if(e.key==='ArrowUp'){e.preventDefault();ai=Math.max(ai-1,-1);}else if(e.key==='Enter'&&ai>=0){e.preventDefault();const q=inp.value;const fl=q?DT_ALL.filter(x=>x.t.toLowerCase().includes(q.toLowerCase())):DT_ALL;if(fl[ai])dtPick(idx,fl[ai]);return;}else if(e.key==='Escape'){close();inp.blur();return;}els.forEach((el,j)=>{el.classList.toggle('dt-act',j===ai);if(j===ai)el.scrollIntoView({block:'nearest'});});});if(xbtn){xbtn.addEventListener('click',()=>{inp.value='';inp.placeholder='Search debt type\u2026';xbtn.style.display='none';app.rows[idx].dt='Unsecured';if(sel)sel.className='dt-sel';inp.focus();open('');refreshRowVisuals();render();});}if(sel){const scb=document.querySelector(`[data-dsc="${idx}"]`);if(scb){scb.addEventListener('click',()=>{app.rows[idx].dt='Unsecured';sel.className='dt-sel';inp.placeholder='Search debt type\u2026';inp.focus();refreshRowVisuals();render();});}}});}
 function searchStates(q){const box=$('stateResults');if(!box)return;if(!q.trim()){box.innerHTML='';box.className='drop';return;}const lq=q.toLowerCase();const matches=STATE_OPTS.filter(s=>s.a.toLowerCase().includes(lq)||s.n.toLowerCase().includes(lq));if(!matches.length){box.innerHTML='';box.className='drop';return;}box.innerHTML=matches.map(s=>`<button type="button" data-sa="${s.a}" data-sl="${esc(s.l)}">${esc(s.l)}</button>`).join('');box.className='drop open';box.querySelectorAll('[data-sa]').forEach(b=>{b.onclick=()=>{_selectingState=true;app.sel=b.dataset.sa;const inp=$('stateSearch');const bx=$('stateResults');if(inp)inp.value=b.dataset.sl||'';if(bx){bx.innerHTML='';bx.className='drop';}render();setTimeout(()=>{_selectingState=false;render();},50);};});}
+function parseAmt(v){return parseFloat(String(v).replace(/[^0-9.]/g,''))||0;}
+function fmtAmt(v){const n=parseAmt(v);if(!n)return '';return '$'+n.toLocaleString('en-US',{maximumFractionDigits:0});}
 function onAmtChange(e){const i=Number(e.target.dataset.i);if(!app.rows[i])return;app.rows[i].amount=e.target.value;render();}
+function onAmtBlur(e){const i=Number(e.target.dataset.i);if(!app.rows[i])return;const raw=parseAmt(e.target.value);if(raw>0){e.target.value=fmtAmt(raw);app.rows[i].amount=raw;}else{e.target.value='';}}
+function onAmtFocus(e){const i=Number(e.target.dataset.i);if(!app.rows[i])return;const raw=parseAmt(e.target.value||app.rows[i].amount);if(raw>0)e.target.value=raw;}
 function addRow(){if(app.rows.length>=MAX_ROWS)return;app.rows.push(newRow(nextId++));renderRows();render();}
 function removeRow(i){if(app.rows.length<=1)return;app.rows.splice(i,1);renderRows();render();}
 let lastScenario=null;
 function render(){try{const c=computeScenario();lastScenario=c;$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCommCompare(c);renderCSCard(c);renderLegacyCard(c);renderPlanCards(c);renderCmpTable(c);renderClocks();const can=!!(c.recommended&&app.sel&&c.total>0);['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}catch(err){console.error('render error:',err);}}
 async function buildPdf(){const c=computeScenario();if(!(c.recommended&&app.sel&&c.total>0))return;const fn=$('fName').value.trim()||'Client',ln=$('lName').value.trim()||'';const fullName=`${fn} ${ln}`.trim();const{jsPDF}=window.jspdf;const doc=new jsPDF();let y=20;doc.setFontSize(20);doc.setTextColor(15,157,138);doc.text('Funding Tier - Debt Resolution Summary',14,y);y+=10;doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text(`Prepared for: ${fullName}`,14,y);y+=7;const progType=c.route.route==='LEVEL'?'Debt Settlement':c.route.route==='CONSUMER SHIELD'?'Debt Validation':'Unknown';doc.text(`State: ${app.sel}  |  Program: ${progType}`,14,y);y+=10;if(c.csProg&&c.route.route==='CONSUMER SHIELD'){doc.setFontSize(12);doc.setTextColor(26,110,216);doc.text(`Consumer Shield Program ${c.csProg.k}: ${c.csProg.range}`,14,y);y+=7;doc.setFontSize(10);doc.setTextColor(71,85,105);doc.text(`Monthly: ${fmt(c.csProg.pay)}  |  Term: ${c.csProg.term} months  |  Total: ${fmt(c.csProg.term*c.csProg.pay)}`,14,y);y+=10;}const tRows=[['Monthly Payments',fmt(c.dn.mp),c.shortest?fmt(c.shortest.mp):'--',c.recommended?fmt(c.recommended.mp):'--'],['Total Debt',fmt(c.total),fmt(c.total),fmt(c.total)],['Months to Payoff',`${c.dn.months} mo`,c.shortest?`${c.shortest.term} mo`:'--',c.recommended?`${c.recommended.term} mo`:'--'],['Est. Total Payback',fmt(c.dn.total),c.shortest?fmt(c.shortest.tc):'--',c.recommended?fmt(c.recommended.tc):'--'],['Est. Savings','--',c.shortest?fmt(Math.max(0,c.dn.total-c.shortest.tc)):'--',c.recommended?fmt(Math.max(0,c.dn.total-c.recommended.tc)):'--']];const hdrs=['Detail','Current Situation','Fastest Payoff','Recommended'];const cx=[14,64,114,162];const rh=10;doc.setFillColor(241,245,249);doc.rect(14,y,182,rh,'F');doc.setFontSize(7);doc.setTextColor(51,65,85);hdrs.forEach((h,i)=>doc.text(doc.splitTextToSize(h,44),cx[i]+2,y+4));y+=14;tRows.forEach((row,ri)=>{const isSav=ri===4;if(isSav){doc.setFillColor(15,157,138);doc.rect(14,y,182,rh,'F');}else if(ri%2===1){doc.setFillColor(248,250,252);doc.rect(14,y,182,rh,'F');}row.forEach((cell,ci)=>{if(isSav){doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');}else if(ri===3&&ci===1){doc.setTextColor(239,68,68);doc.setFont(undefined,'bold');}else{doc.setTextColor(15,23,42);doc.setFont(undefined,'normal');}doc.setFontSize(8);doc.text(String(cell),cx[ci]+2,y+6);});y+=rh;});const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Funding-Tier-Debt-Resolution.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+function _hdrNotif(msg, type='success', urlVal=''){
+  const el=document.getElementById('hdrNotif');if(!el)return;
+  el.className='hdr-notif show '+type;
+  el.innerHTML=msg+(urlVal?`<div class="hdr-url-row"><input class="hdr-url-input" id="hdrUrlInput" readonly value="${urlVal}" onclick="this.select();"/><button class="hdr-copy-btn" onclick="(function(){const i=document.getElementById('hdrUrlInput');if(i){navigator.clipboard.writeText(i.value).then(()=>{const b=this;const o=b.textContent;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',1500);}).catch(()=>{i.select();document.execCommand('copy');});}}).call(this)">Copy</button><a href="${urlVal}" target="_blank" style="font-size:10px;color:#93c5fd;text-decoration:underline;white-space:nowrap;">Open ↗</a></div>`:'' );
+  clearTimeout(_hdrNotif._t);
+  if(!urlVal)_hdrNotif._t=setTimeout(()=>{el.classList.remove('show');},6000);
+}
+_hdrNotif._t=null;
 function showSendModal(){
   const c=computeScenario();
   const email=$('pEmail').value.trim();
   if(!email){$('pEmail').style.borderColor='var(--rd)';$('pEmail').placeholder='Email required!';setTimeout(()=>{$('pEmail').style.borderColor='';$('pEmail').placeholder='prospect@email.com';},3000);return;}
-  if(!(c.recommended&&app.sel&&c.total>0)){alert('Complete the scenario first.');return;}
-  const fn=$('fName').value.trim()||'Prospect',ln=$('lName').value.trim()||'';
-  $('modalEmail').textContent=email;
-  $('modalName').textContent=`${fn} ${ln}`.trim()||'Prospect';
-  _modalShow('modalConfirmView');
+  if(!(c.recommended&&app.sel&&c.total>0)){_hdrNotif('⚠ Complete the scenario first (state + debts required).','error');return;}
+  sendEmailConfirmed();
 }
-function closeSendModal(){const m=$('sendModal');if(m)m.style.display='none';}
-async function sendEmailConfirmed(){
-  const email=$('pEmail').value.trim();
-  const btn=$('sendBtn');const orig=btn?btn.textContent:'';if(btn){btn.disabled=true;btn.textContent='Sending…';}
-  _modalShow('modalSendingView');_progressTo(15,'Connecting to server…');
-  try{
-    await new Promise(r=>setTimeout(r,300));_progressTo(40,'Building prospect plan…');
-    const data=await _callAPI(true);_progressTo(80,'Sending email…');
-    await new Promise(r=>setTimeout(r,400));_progressTo(100,'Done!');
-    await new Promise(r=>setTimeout(r,350));
-    _showSuccessModal(data.pageUrl,email);
-  }catch(e){
-    const em=$('modalErrorMsg');if(em)em.textContent=e.message||'Something went wrong.';
-    _modalShow('modalErrorView');
-  }finally{if(btn){btn.disabled=false;btn.textContent=orig;}}
-}
+function closeSendModal(){}
 
-let _lastPlanUrl=null,_lastPlanKey=null;
-function _prospectKey(){return [$('fName').value.trim(),$('lName').value.trim(),$('pEmail').value.trim(),app.sel||''].join('|').toLowerCase();}
-function _modalShow(viewId){['modalConfirmView','modalSendingView','modalSuccessView','modalErrorView'].forEach(id=>{const el=$(id);if(el)el.style.display=id===viewId?'block':'none';});const m=$('sendModal');if(m)m.style.display='flex';}
-function _progressTo(pct,label){const p=$('modalProgress'),l=$('modalProgressLabel');if(p)p.style.width=pct+'%';if(l)l.textContent=label||'';}
-function _showSuccessModal(pageUrl,email){
-  const se=$('modalSuccessEmail');if(se)se.textContent=email&&email!=='(no email)'?'Sent to '+email:'Plan URL generated';
-  const ur=$('modalUrlRow'),ui=$('modalUrlInput'),ul=$('modalUrlLink');
-  if(pageUrl&&ur&&ui&&ul){ui.value=pageUrl;ul.href=pageUrl;ur.style.display='block';}
-  _modalShow('modalSuccessView');
-}
-async function _callAPI(sendEmail){
-  const c=computeScenario();const email=$('pEmail').value.trim();const key=_prospectKey();
-  if(!sendEmail&&_lastPlanUrl&&_lastPlanKey===key)return{ok:true,pageUrl:_lastPlanUrl,cached:true};
-  const payload={firstName:$('fName').value.trim()||'Prospect',lastName:$('lName').value.trim()||'',email,state:app.sel,totalDebt:Math.round(c.total),sendEmail,doNothing:{monthlyPayment:Math.round(c.dn.mp),months:c.dn.months,totalCost:Math.round(c.dn.total)},recommended:c.recommended?{term:c.recommended.term,mp:Math.round(c.recommended.mp),tc:Math.round(c.recommended.tc)}:null,route:c.route.route};
-  const res=await fetch('/api/generate-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  const data=await res.json();
-  if(!res.ok||!data.ok)throw new Error(data.error||'Server error');
-  if(data.pageUrl){_lastPlanUrl=data.pageUrl;_lastPlanKey=key;}
-  return data;
-}
-function retryConfirm(){_modalShow('modalConfirmView');}
-function copyPlanUrl(){const inp=$('modalUrlInput');if(!inp||!inp.value)return;navigator.clipboard.writeText(inp.value).then(()=>{const b=inp.nextElementSibling;if(b){const o=b.textContent;b.textContent='Copied!';setTimeout(()=>b.textContent=o,1500);}}).catch(()=>{inp.select();document.execCommand('copy');});}
-async function generateUrlOnly(){
-  const c=computeScenario();if(!(app.sel&&c.total>0)){alert('Enter debts and a state first.');return;}
-  const btn=$('urlBtn');const orig=btn?btn.textContent:'';if(btn){btn.disabled=true;btn.textContent='…';}
-  _modalShow('modalSendingView');_progressTo(20,'Generating plan URL…');
-  try{
-    const data=await _callAPI(false);_progressTo(100,'Done!');await new Promise(r=>setTimeout(r,300));
-    _showSuccessModal(data.pageUrl,$('pEmail').value.trim()||'(no email)');
-  }catch(e){const em=$('modalErrorMsg');if(em)em.textContent=e.message||'Could not generate URL.';_modalShow('modalErrorView');}
-  finally{if(btn){btn.disabled=false;btn.textContent=orig;}}
-}
+
 
 
 function updateLegacyCalc(newFee, newMo){
@@ -1446,16 +1454,12 @@ function updateLegacyCalc(newFee, newMo){
   // Patch display elements directly
   const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
   set('lgFeeDisp',feeLabel+'%');
-  set('lgMoDisp',mo+' mo \u2192 '+fmt(mp)+'/mo');
+  set('lgMoDisp',String(mo));
   set('lgPayVal',fmt(mp));
   set('lgMoVal',String(mo));
   set('lgTcVal',fmt(tc));
   // Update slider values + range
-  const fi=$('lgFeeInput');if(fi)fi.value=feeLabel;
-  const mi=$('lgMoInput');if(mi){mi.min=minMo;mi.max=maxMo;mi.value=mo;}
-  // Update max label in slider hints
-  const moWrap=mi?mi.closest('div'):null;
-  if(moWrap){const last=moWrap.querySelector('div:last-child');if(last)last.innerHTML=`<span>1 mo</span><span>${maxMo} mo ($250 min)</span>`;}
+  // No sliders — steppers update live via updateLegacyCalc button re-call
   // Update commission block
   const band=getLegacyComm(total);
   if(band){
@@ -1480,8 +1484,25 @@ function updateLegacyCalc(newFee, newMo){
   renderLegacyCard(lastScenario);
 }
 
+
+let _lastPlanUrl=null,_lastPlanKey=null;
+function _prospectKey(){return [$('fName').value.trim(),$('lName').value.trim(),$('pEmail').value.trim(),app.sel||''].join('|').toLowerCase();}
+async function _callAPI(sendEmail){
+  const c=computeScenario();const email=$('pEmail').value.trim();const key=_prospectKey();
+  if(!sendEmail&&_lastPlanUrl&&_lastPlanKey===key)return{ok:true,pageUrl:_lastPlanUrl,cached:true};
+  const payload={firstName:$('fName').value.trim()||'Prospect',lastName:$('lName').value.trim()||'',email,state:app.sel,totalDebt:Math.round(c.total),sendEmail,doNothing:{monthlyPayment:Math.round(c.dn.mp),months:c.dn.months,totalCost:Math.round(c.dn.total)},recommended:c.recommended?{term:c.recommended.term,mp:Math.round(c.recommended.mp),tc:Math.round(c.recommended.tc)}:null,route:c.route.route};
+  const res=await fetch('/api/generate-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const data=await res.json();
+  if(!res.ok||!data.ok)throw new Error(data.error||'Server error — check your backend is running.');
+  if(data.pageUrl){_lastPlanUrl=data.pageUrl;_lastPlanKey=key;}
+  return data;
+}
+
 function init(){
-  const ss=$('stateSearch');if(ss){ss.addEventListener('input',e=>{if(_selectingState)return;app.sel='';searchStates(e.target.value||'');});ss.addEventListener('focus',e=>searchStates(e.target.value||''));}
+  // Set timezone selector to detected timezone
+const tzSelEl=$('tzSel');if(tzSelEl){const opts=Array.from(tzSelEl.options);const match=opts.find(o=>o.value===dispTZ);if(match){tzSelEl.value=dispTZ;}else{// Try matching region
+const region=dispTZ.split('/')[1]||'';const closest=opts.find(o=>o.value.includes(dispTZ.split('/')[0]))||opts[0];if(closest)tzSelEl.value=closest.value;}}
+const ss=$('stateSearch');if(ss){ss.addEventListener('input',e=>{if(_selectingState)return;app.sel='';searchStates(e.target.value||'');});ss.addEventListener('focus',e=>searchStates(e.target.value||''));}
   const pb=$('pdfBtn');if(pb)pb.addEventListener('click',buildPdf);
   const sb=$('sendBtn');if(sb)sb.addEventListener('click',showSendModal);
   const ub=$('urlBtn');if(ub)ub.addEventListener('click',generateUrlOnly);
@@ -1493,31 +1514,8 @@ function init(){
 }
 init();
 </script>
-<!-- Send Confirmation Modal -->
-
-
-<div id="sendModal">
-  <div style="background:#fff;border-radius:20px;padding:28px;max-width:460px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.25);">
-    <div style="font-size:17px;font-weight:900;color:var(--dk);margin-bottom:6px;">&#128231; Send Plan to Prospect</div>
-    <p style="font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.6;">Sending personalized plan to <strong id="modalEmail"></strong> for <strong id="modalName"></strong>.</p>
-    <div style="display:flex;gap:10px;justify-content:flex-end;">
-      <button onclick="closeSendModal()" class="btn" style="background:var(--bg);color:#64748b;border:1.5px solid var(--br);">Cancel</button>
-      <button onclick="sendEmailConfirmed()" class="btn btn-g">&#10003; Confirm &amp; Send</button>
-    </div>
-  </div>
 </div>
 
-<div id="sendModal" style="display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;background:rgba(15,23,42,.65);backdrop-filter:blur(6px);">
-  <div style="background:#fff;border-radius:20px;padding:28px;max-width:500px;width:92%;box-shadow:0 24px 64px rgba(0,0,0,.3);">
-    <!-- Confirm view -->
-    <div id="modalConfirmView">
-      <div style="font-size:17px;font-weight:900;color:var(--dk);margin-bottom:6px;">&#128231; Send Plan to Prospect</div>
-      <p style="font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.6;">This will generate a personalized debt resolution plan and send it to <strong id="modalEmail"></strong> for <strong id="modalName"></strong>.</p>
-      <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button onclick="closeSendModal()" class="btn" style="background:var(--bg);color:#64748b;border:1.5px solid var(--br);">Cancel</button>
-        <button onclick="sendEmailConfirmed()" class="btn btn-g">&#10003; Yes, Send</button>
-      </div>
-    </div>
     <!-- Sending progress view -->
     <div id="modalSendingView" style="display:none;text-align:center;padding:8px 0;">
       <div style="font-size:15px;font-weight:800;color:var(--dk);margin-bottom:16px;">&#9889; Generating &amp; Sending Plan…</div>
