@@ -201,7 +201,8 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 /* Plan card — single column, commission below */
 .plan-card-v{border:1.5px solid var(--br);border-radius:14px;background:#fff;overflow:hidden;transition:all .15s;}
 .plan-card-v:hover{box-shadow:0 6px 20px rgba(15,23,42,.08);}
-.plan-card-v.rec{border:2px solid var(--g);}
+.plan-card-v.rec{border:2.5px solid var(--g);box-shadow:0 0 0 4px rgba(15,157,138,.18),0 8px 32px rgba(15,157,138,.15);}
+.plan-card-v.rec::before{content:'✓ RECOMMENDED';display:block;background:linear-gradient(90deg,var(--g),var(--gd));color:#fff;text-align:center;font-size:9px;font-weight:900;letter-spacing:1.5px;padding:4px 0;}
 .plan-body{padding:18px;}
 .plan-comm-block{padding:14px 18px 18px;background:rgba(15,23,42,.018);}
 .plan-comm-block.rec-comm{background:rgba(15,157,138,.04);}
@@ -283,8 +284,8 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .cmp tr.mp-row td{background:#eff6ff!important;color:#1e3a8a;font-weight:800;}
 .cmp tr.mp-row td:nth-child(2){background:#dbeafe!important;}
 /* Send modal */
-#sendModal{display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);}
-#sendModal.open{display:flex!important;}
+#sendModal{display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;background:rgba(15,23,42,.65);backdrop-filter:blur(6px);}
+
 /* Range sliders */
 input[type=range].rng-p{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:999px;outline:none;cursor:pointer;background:rgba(255,255,255,.2);}
 input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2.5px solid #7c3aed;box-shadow:0 1px 4px rgba(0,0,0,.2);}
@@ -332,6 +333,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
         <div style="flex:0 0 auto;width:140px;"><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Last Name</label><input id="lName" class="fi" style="font-size:13px;padding:7px 10px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="text" placeholder="Smith"/></div>
         <div style="flex:0 0 auto;width:190px;"><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Email</label><input id="pEmail" class="fi" style="font-size:13px;padding:7px 10px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="email" placeholder="prospect@email.com"/></div>
         <button id="pdfBtn" class="btn btn-g" style="height:34px;font-size:12px;padding:0 14px;flex-shrink:0;">&#8595; PDF</button>
+        <button id="urlBtn" class="btn" style="height:34px;font-size:12px;padding:0 12px;flex-shrink:0;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;">&#128279; URL</button>
         <button id="sendBtn" class="btn btn-dk" style="height:34px;font-size:12px;padding:0 14px;flex-shrink:0;">Generate + Send</button>
       </div>
       <div id="planResultBox"><div style="font-weight:700;color:var(--dk);margin-bottom:8px;font-size:13px;">&#10003; Plan Created Successfully</div><button id="planLink" class="btn btn-g" style="font-size:12px;">View Personalized Plan</button></div>
@@ -861,7 +863,7 @@ function commContentHtml(comm,isRec){
   }
   const clawHtml=comm.clawback?`<div style="font-size:10px;color:#92400e;background:#fffbeb;border:1px solid rgba(245,158,11,.3);border-radius:6px;padding:5px 9px;margin-top:8px;line-height:1.5;">&#9888; ${comm.clawback}</div>`:'';
   return `<div>
-    <div class="comm-inline-hd">&#9733; Agent Commission <span style="font-size:16px;font-weight:900;color:var(--g);margin-left:4px;">${fmt(comm.total)}</span></div>
+    <div class="comm-inline-hd"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf81db129f4704935e1.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;border-radius:3px;margin-right:2px;" alt="FT"/> Agent Commission <span style="font-size:16px;font-weight:900;color:var(--g);margin-left:4px;">${fmt(comm.total)}</span></div>
     <div style="border:1.5px solid var(--br);border-radius:10px;overflow:hidden;">
       <table style="width:100%;border-collapse:collapse;">
         <thead><tr style="background:#f8fafc;border-bottom:1.5px solid var(--br);">
@@ -1055,8 +1057,8 @@ function renderPlanCards(c){
       rows=`<tr style="${comm.p4>0?'border-bottom:1px solid rgba(255,255,255,.1);':''}"><td style="padding:8px 10px;"><span style="font-size:12px;font-weight:800;color:rgba(255,255,255,.9);">Payment 2</span></td><td style="padding:8px 10px;font-size:17px;font-weight:900;color:#4ade80;text-align:right;">${fmt(comm.p2)}</td><td style="padding:8px 10px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.8);white-space:nowrap;">${comm.p2when}</span>${timingTip}</td></tr>`;
       if(comm.p4>0)rows+=`<tr><td style="padding:8px 10px;"><span style="font-size:12px;font-weight:800;color:rgba(255,255,255,.9);">Payment 4</span></td><td style="padding:8px 10px;font-size:17px;font-weight:900;color:#4ade80;text-align:right;">${fmt(comm.p4)}</td><td style="padding:8px 10px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.8);white-space:nowrap;">${comm.p4when}</span>${timingTip}</td></tr>`;
     }
-    const clawHtml=comm.clawback?`<div style="font-size:10px;color:#fbbf24;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:6px;padding:5px 9px;margin-top:8px;line-height:1.5;">&#9888; ${comm.clawback}</div>`:'';
-    return `<div style="color:rgba(255,255,255,.55);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">&#9733; Agent Commission <span style="font-size:20px;font-weight:900;color:#4ade80;margin-left:4px;">${fmt(comm.total)}</span></div>
+    const clawHtml=(!comm.isLD&&comm.clawback)?`<div style="font-size:10px;color:#fbbf24;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:6px;padding:5px 9px;margin-top:8px;line-height:1.5;">&#9888; ${comm.clawback}</div>`:'';
+    return `<div style="color:rgba(255,255,255,.55);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf81db129f4704935e1.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;border-radius:3px;margin-right:2px;" alt="FT"/> Agent Commission <span style="font-size:20px;font-weight:900;color:#4ade80;margin-left:4px;">${fmt(comm.total)}</span></div>
     <div style="border:1px solid rgba(255,255,255,.12);border-radius:10px;overflow:hidden;">
       <table style="width:100%;border-collapse:collapse;">
         <thead><tr style="background:rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.1);">
@@ -1158,7 +1160,10 @@ function renderPlanCards(c){
       <hr class="comm-divider"/>
       <div class="plan-comm-block${isRec?' rec-comm':''}">
         ${commBlock(comm,isRec)}
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12);">
+        <div class="ttp" style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12);">
+          <div style="border:1.5px solid rgba(255,255,255,.35);border-radius:10px;padding:12px;position:relative;cursor:default;">
+            <div style="position:absolute;top:-9px;left:12px;background:#0f172a;padding:0 6px;font-size:9px;font-weight:800;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;">Adjust Program</div>
+            <span class="ttp-body">Adjust the <strong>Service Fee</strong> (35–49%) to control the client's monthly payment and your commission — lower fee means a more affordable payment but slightly lower commission. Adjust <strong>Program Length</strong> to find the best monthly payment for the client. The $250/mo floor is enforced automatically.</span>
           <div style="margin-bottom:10px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Service Fee</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${feeLabel}%</span></div>
             <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="legacyState.feeRate=this.value/100;legacyState._init=false;if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);renderCommCompare(lastScenario);}"/>
@@ -1168,6 +1173,7 @@ function renderPlanCards(c){
             <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Program Length</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
             <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="legacyState.months=parseInt(this.value);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);}"/>
             <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>1 mo</span><span>${maxMo} mo ($250 floor)</span></div>
+          </div>
           </div>
         </div>
       </div>
@@ -1308,44 +1314,60 @@ function showSendModal(){
 }
 function closeSendModal(){$('sendModal').classList.remove('open');}
 async function sendEmailConfirmed(){
-  closeSendModal();
-  const c=computeScenario();
   const email=$('pEmail').value.trim();
-  const btn=$('sendBtn');const orig=btn.textContent;btn.disabled=true;btn.textContent='Sending…';
+  const btn=$('sendBtn');const orig=btn?btn.textContent:'';if(btn){btn.disabled=true;btn.textContent='Sending…';}
+  _modalShow('modalSendingView');_progressTo(15,'Connecting to server…');
   try{
-    const payload={firstName:$('fName').value.trim()||'Prospect',lastName:$('lName').value.trim()||'',email,state:app.sel,totalDebt:Math.round(c.total),doNothing:{monthlyPayment:Math.round(c.dn.mp),monthsToPayoff:Math.round(c.dn.months),totalPayback:Math.round(c.dn.total),apr:c.dn.apr},shortest:c.shortest?{term:c.shortest.term,monthlyPayment:Math.round(c.shortest.mp),totalCost:Math.round(c.shortest.tc)}:{},recommended:{term:c.recommended.term,monthlyPayment:Math.round(c.recommended.mp),totalCost:Math.round(c.recommended.tc)},route:c.route.route,routeReason:c.route.reason,csProgramLabel:c.csProg?`Program ${c.csProg.k}`:'',rows:app.rows.filter(r=>num(r.amount)>0).map(r=>({creditorName:r.cred,amount:Math.round(num(r.amount)),debtType:r.dt,isSecured:!!r.secured,inCollections:!!r.collections,inLitigation:!!r.litigation,paymentMade:!!r.paid,businessUnprofitable:!!r.bizUnprof}))};
-    const res=await fetch('/api/generate-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    const data=await res.json();
-    if(!res.ok||!data.ok)throw new Error(data.error||'Server returned an error. Check that your backend is running.');
-    const rb=$('planResultBox');const pl=$('planLink');
-    if(rb&&pl){
-      pl.onclick=()=>window.open(data.pageUrl,'_blank');
-      rb.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:18px;">✅</span>
-          <div>
-            <div style="font-size:13px;font-weight:800;color:#0b7d6e;">Plan sent to ${$('pEmail').value.trim()}</div>
-            <div style="font-size:11px;color:#64748b;margin-top:1px;">Dynamic program page generated for ${($('fName').value.trim()||'Prospect')+' '+($('lName').value.trim()||'')}.</div>
-          </div>
-        </div>
-        ${data.pageUrl?`<button id="planLink" class="btn btn-g" style="font-size:11px;padding:6px 12px;">View Page ↗</button>`:''}
-        <button onclick="document.getElementById('planResultBox').style.display='none'" style="border:none;background:none;cursor:pointer;font-size:16px;color:#94a3b8;padding:0;font-family:inherit;">&times;</button>
-      </div>`;
-      rb.style.display='block';
-      setTimeout(()=>{if(rb.style.display!=='none')rb.style.display='none';},8000);
-    }
+    await new Promise(r=>setTimeout(r,300));_progressTo(40,'Building prospect plan…');
+    const data=await _callAPI(true);_progressTo(80,'Sending email…');
+    await new Promise(r=>setTimeout(r,400));_progressTo(100,'Done!');
+    await new Promise(r=>setTimeout(r,350));
+    _showSuccessModal(data.pageUrl,email);
   }catch(e){
-    const isFetch=!e.message||e.message.toLowerCase().includes('fetch')||e.message.toLowerCase().includes('network');
-    const msg=isFetch
-      ?'⚠️ Cannot reach the server.\n\nThe /api/generate-plan endpoint is not responding. Make sure your backend is running and deployed, then try again.'
-      :'⚠️ '+( e.message||'Something went wrong generating the plan.');
-    alert(msg);
-  }finally{btn.disabled=false;btn.textContent=orig;}
+    const em=$('modalErrorMsg');if(em)em.textContent=e.message||'Something went wrong.';
+    _modalShow('modalErrorView');
+  }finally{if(btn){btn.disabled=false;btn.textContent=orig;}}
 }
+
+let _lastPlanUrl=null,_lastPlanKey=null;
+function _prospectKey(){return [$('fName').value.trim(),$('lName').value.trim(),$('pEmail').value.trim(),app.sel||''].join('|').toLowerCase();}
+function _modalShow(viewId){['modalConfirmView','modalSendingView','modalSuccessView','modalErrorView'].forEach(id=>{const el=$(id);if(el)el.style.display=id===viewId?'block':'none';});const m=$('sendModal');if(m)m.style.display='flex';}
+function _progressTo(pct,label){const p=$('modalProgress'),l=$('modalProgressLabel');if(p)p.style.width=pct+'%';if(l)l.textContent=label||'';}
+function _showSuccessModal(pageUrl,email){
+  const se=$('modalSuccessEmail');if(se)se.textContent='Sent to '+email;
+  const ur=$('modalUrlRow'),ui=$('modalUrlInput'),ul=$('modalUrlLink');
+  if(pageUrl&&ur&&ui&&ul){ui.value=pageUrl;ul.href=pageUrl;ur.style.display='block';}
+  if(pageUrl){const rb=$('planResultBox');if(rb){rb.innerHTML=`<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:13px;color:#0b7d6e;">&#10003;</span><div style="font-size:12px;font-weight:700;color:#0b7d6e;">Plan sent · <a href="${pageUrl}" target="_blank" style="color:var(--bl);text-decoration:underline;">Open ↗</a></div><button onclick="this.closest('div').parentElement.style.display='none'" style="border:none;background:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:0;margin-left:4px;">&times;</button></div>`;rb.style.display='block';}}
+  _modalShow('modalSuccessView');
+}
+async function _callAPI(sendEmail){
+  const c=computeScenario();const email=$('pEmail').value.trim();const key=_prospectKey();
+  if(!sendEmail&&_lastPlanUrl&&_lastPlanKey===key)return{ok:true,pageUrl:_lastPlanUrl,cached:true};
+  const payload={firstName:$('fName').value.trim()||'Prospect',lastName:$('lName').value.trim()||'',email,state:app.sel,totalDebt:Math.round(c.total),sendEmail,doNothing:{monthlyPayment:Math.round(c.dn.mp),months:c.dn.months,totalCost:Math.round(c.dn.total)},recommended:c.recommended?{term:c.recommended.term,mp:Math.round(c.recommended.mp),tc:Math.round(c.recommended.tc)}:null,route:c.route.route};
+  const res=await fetch('/api/generate-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const data=await res.json();
+  if(!res.ok||!data.ok)throw new Error(data.error||'Server error');
+  if(data.pageUrl){_lastPlanUrl=data.pageUrl;_lastPlanKey=key;}
+  return data;
+}
+function retryConfirm(){_modalShow('modalConfirmView');}
+function copyPlanUrl(){const inp=$('modalUrlInput');if(!inp||!inp.value)return;navigator.clipboard.writeText(inp.value).then(()=>{const b=inp.nextElementSibling;if(b){const o=b.textContent;b.textContent='Copied!';setTimeout(()=>b.textContent=o,1500);}}).catch(()=>{inp.select();document.execCommand('copy');});}
+async function generateUrlOnly(){
+  const c=computeScenario();if(!(app.sel&&c.total>0)){alert('Enter debts and a state first.');return;}
+  const btn=$('urlBtn');const orig=btn?btn.textContent:'';if(btn){btn.disabled=true;btn.textContent='…';}
+  _modalShow('modalSendingView');_progressTo(20,'Generating plan URL…');
+  try{
+    const data=await _callAPI(false);_progressTo(100,'Done!');await new Promise(r=>setTimeout(r,300));
+    _showSuccessModal(data.pageUrl,$('pEmail').value.trim()||'(no email)');
+  }catch(e){const em=$('modalErrorMsg');if(em)em.textContent=e.message||'Could not generate URL.';_modalShow('modalErrorView');}
+  finally{if(btn){btn.disabled=false;btn.textContent=orig;}}
+}
+
 function init(){
   const ss=$('stateSearch');if(ss){ss.addEventListener('input',e=>{app.sel='';searchStates(e.target.value||'');});ss.addEventListener('focus',e=>searchStates(e.target.value||''));}
   const pb=$('pdfBtn');if(pb)pb.addEventListener('click',buildPdf);
   const sb=$('sendBtn');if(sb)sb.addEventListener('click',showSendModal);
+  const ub=$('urlBtn');if(ub)ub.addEventListener('click',generateUrlOnly);
   const ab=$('addBtn');if(ab)ab.addEventListener('click',addRow);
   const fp=$('featurePriority');if(fp)fp.addEventListener('change',render);
   document.addEventListener('click',e=>{if(!e.target.closest('.ci')&&!e.target.closest('[data-cr]'))document.querySelectorAll('[data-cr]').forEach(b=>{b.innerHTML='';b.className='drop';});if(!e.target.closest('.dt-inp')&&!e.target.closest('.dt-panel'))document.querySelectorAll('.dt-panel').forEach(p=>p.className='dt-panel');if(!e.target.closest('#stateSearch')&&!e.target.closest('#stateResults')){const sr=$('stateResults');if(sr){sr.innerHTML='';sr.className='drop';}}});
@@ -1355,20 +1377,7 @@ function init(){
 init();
 </script>
 <!-- Send Confirmation Modal -->
-<div id="sendModal" class="modal-overlay">
-  <div class="modal-box">
-    <div style="font-size:32px;margin-bottom:10px;">📧</div>
-    <div style="font-size:18px;font-weight:900;color:var(--dk);margin-bottom:6px;">Confirm Delivery</div>
-    <div style="font-size:13px;color:#475569;font-weight:500;line-height:1.75;margin-bottom:6px;">Send email to:</div>
-    <div style="font-size:14px;font-weight:900;color:var(--g);background:rgba(15,157,138,.08);border:1px solid rgba(15,157,138,.25);border-radius:8px;padding:7px 14px;margin-bottom:8px;word-break:break-all;" id="modalEmail"></div>
-    <div style="font-size:12px;color:#64748b;margin-bottom:4px;font-weight:500;">And generate a dynamic program page for:</div>
-    <div style="font-size:14px;font-weight:900;color:var(--dk);margin-bottom:20px;" id="modalName"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <button onclick="closeSendModal()" style="padding:11px 16px;border-radius:10px;border:1.5px solid rgba(239,68,68,.4);background:#fef2f2;color:var(--rd);font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;transition:all .12s;">&#10005; No, Cancel</button>
-      <button id="modalConfirmBtn" onclick="sendEmailConfirmed()" style="padding:11px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;transition:all .12s;box-shadow:0 4px 12px rgba(15,157,138,.3);">&#10003; Yes, Send</button>
-    </div>
-  </div>
-</div>
+
 
 <div id="sendModal">
   <div style="background:#fff;border-radius:20px;padding:28px;max-width:460px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.25);">
@@ -1377,6 +1386,58 @@ init();
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button onclick="closeSendModal()" class="btn" style="background:var(--bg);color:#64748b;border:1.5px solid var(--br);">Cancel</button>
       <button onclick="sendEmailConfirmed()" class="btn btn-g">&#10003; Confirm &amp; Send</button>
+    </div>
+  </div>
+</div>
+
+<div id="sendModal" style="display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;background:rgba(15,23,42,.65);backdrop-filter:blur(6px);">
+  <div style="background:#fff;border-radius:20px;padding:28px;max-width:500px;width:92%;box-shadow:0 24px 64px rgba(0,0,0,.3);">
+    <!-- Confirm view -->
+    <div id="modalConfirmView">
+      <div style="font-size:17px;font-weight:900;color:var(--dk);margin-bottom:6px;">&#128231; Send Plan to Prospect</div>
+      <p style="font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.6;">This will generate a personalized debt resolution plan and send it to <strong id="modalEmail"></strong> for <strong id="modalName"></strong>.</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeSendModal()" class="btn" style="background:var(--bg);color:#64748b;border:1.5px solid var(--br);">Cancel</button>
+        <button onclick="sendEmailConfirmed()" class="btn btn-g">&#10003; Yes, Send</button>
+      </div>
+    </div>
+    <!-- Sending progress view -->
+    <div id="modalSendingView" style="display:none;text-align:center;padding:8px 0;">
+      <div style="font-size:15px;font-weight:800;color:var(--dk);margin-bottom:16px;">&#9889; Generating &amp; Sending Plan…</div>
+      <div style="background:#e2e8f0;border-radius:999px;height:8px;overflow:hidden;margin-bottom:12px;">
+        <div id="modalProgress" style="height:100%;background:linear-gradient(90deg,var(--g),var(--gd));border-radius:999px;width:0%;transition:width .4s ease;"></div>
+      </div>
+      <div id="modalProgressLabel" style="font-size:12px;color:#64748b;">Connecting to server…</div>
+    </div>
+    <!-- Success view -->
+    <div id="modalSuccessView" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div style="width:44px;height:44px;background:rgba(15,157,138,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">&#10003;</div>
+        <div>
+          <div style="font-size:16px;font-weight:900;color:#0b7d6e;">Plan Sent Successfully</div>
+          <div id="modalSuccessEmail" style="font-size:12px;color:#64748b;margin-top:2px;"></div>
+        </div>
+      </div>
+      <div id="modalUrlRow" style="background:#f0fdf4;border:1.5px solid rgba(15,157,138,.3);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:none;">
+        <div style="font-size:10px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Prospect Plan URL</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input id="modalUrlInput" readonly style="flex:1;font-size:11px;padding:6px 10px;border:1px solid var(--br);border-radius:7px;background:#fff;color:var(--dk);font-family:monospace;" value=""/>
+          <button onclick="copyPlanUrl()" class="btn btn-g" style="font-size:11px;padding:6px 12px;white-space:nowrap;flex-shrink:0;">Copy</button>
+          <a id="modalUrlLink" href="#" target="_blank" class="btn" style="font-size:11px;padding:6px 12px;white-space:nowrap;background:#eff6ff;color:var(--bl);border:1.5px solid rgba(26,110,216,.3);flex-shrink:0;">Open ↗</a>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;">
+        <button onclick="closeSendModal()" class="btn btn-g">Done</button>
+      </div>
+    </div>
+    <!-- Error view -->
+    <div id="modalErrorView" style="display:none;">
+      <div style="font-size:15px;font-weight:800;color:var(--rd);margin-bottom:10px;">&#9888; Could Not Send</div>
+      <div id="modalErrorMsg" style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:16px;"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeSendModal()" class="btn" style="background:var(--bg);color:#64748b;border:1.5px solid var(--br);">Close</button>
+        <button onclick="retryConfirm()" class="btn btn-g">Retry</button>
+      </div>
     </div>
   </div>
 </div>
