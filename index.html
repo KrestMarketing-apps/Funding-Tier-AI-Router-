@@ -1211,9 +1211,9 @@ function renderPlanCards(c){
         </div>
         <div class="plan-body-stats" style="border:1.5px solid rgba(109,40,217,.2);border-radius:12px;overflow:hidden;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
-            <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:#6d28d9;">${fmt(mp)}</div></div>
-            <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Months</div><div style="font-size:18px;font-weight:900;color:#6d28d9;">${mo}</div></div>
-            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);">${fmt(tc)}</div></div>
+            <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div id="lgPayVal" style="font-size:18px;font-weight:900;color:#6d28d9;">${fmt(mp)}</div></div>
+            <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Months</div><div id="lgMoVal" style="font-size:18px;font-weight:900;color:#6d28d9;">${mo}</div></div>
+            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div id="lgTcVal" style="font-size:18px;font-weight:900;color:var(--g);">${fmt(tc)}</div></div>
           </div>
         </div>
         <div class="plan-body-desc">Attorney-Led Resolution — Adjustable service fee (35–49%). Lower fee = more affordable monthly payment.</div>
@@ -1229,13 +1229,13 @@ function renderPlanCards(c){
           <div class="adj-prog-body${legacyAdjOpen?' open':''}">
             <div style="font-size:10px;color:rgba(255,255,255,.45);line-height:1.55;margin-bottom:10px;">Adjust service fee to change affordability &amp; commission. Program length sets the monthly payment — $250/mo floor enforced.</div>
             <div style="margin-bottom:10px;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Service Fee</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${feeLabel}%</span></div>
-              <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" onclick="event.stopPropagation();" oninput="legacyState.feeRate=this.value/100;legacyState._init=false;if(lastScenario)legacyState.months=legacyClampMonths(lastScenario.total,legacyState.feeRate,legacyState.months);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);renderCommCompare(lastScenario);}"/>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Service Fee</span><span id="lgFeeDisp" style="font-size:11px;font-weight:900;color:#4ade80;">${feeLabel}%</span></div>
+              <input id="lgFeeInput" type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" onclick="event.stopPropagation();" oninput="updateLegacyCalc(parseInt(this.value),undefined)"/>
               <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>35%</span><span>49%</span></div>
             </div>
             <div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Program Length</span><span style="font-size:11px;font-weight:900;color:#4ade80;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
-              <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" onclick="event.stopPropagation();" oninput="legacyState.months=parseInt(this.value);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);}"/>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);">Program Length</span><span id="lgMoDisp" style="font-size:11px;font-weight:900;color:#4ade80;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
+              <input id="lgMoInput" type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" onclick="event.stopPropagation();" oninput="updateLegacyCalc(undefined,parseInt(this.value))"/>
               <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px;"><span>1 mo</span><span>${maxMo} mo ($250 floor)</span></div>
             </div>
           </div>
@@ -1424,6 +1424,68 @@ async function generateUrlOnly(){
     _showSuccessModal(data.pageUrl,$('pEmail').value.trim()||'(no email)');
   }catch(e){const em=$('modalErrorMsg');if(em)em.textContent=e.message||'Could not generate URL.';_modalShow('modalErrorView');}
   finally{if(btn){btn.disabled=false;btn.textContent=orig;}}
+}
+
+
+function updateLegacyCalc(newFee, newMo){
+  if(!lastScenario||!lastScenario.legacyAvail)return;
+  const total=lastScenario.total;
+  // Update state
+  if(newFee!==undefined){
+    legacyState.feeRate=newFee/100;
+    // Clamp months for new fee but don't reset to default
+    const maxMo=legacyMaxMonths(total,legacyState.feeRate);
+    legacyState.months=Math.max(legacyMinMonths(),Math.min(maxMo,legacyState.months||1));
+  }
+  if(newMo!==undefined){
+    const maxMo=legacyMaxMonths(total,legacyState.feeRate);
+    legacyState.months=Math.max(legacyMinMonths(),Math.min(maxMo,parseInt(newMo)));
+  }
+  const feeRate=legacyState.feeRate;
+  const mo=legacyState.months;
+  const tc=legacyTotalCost(total,feeRate);
+  const mp=Math.max(250,Math.round(tc/mo));
+  const feeLabel=Math.round(feeRate*100);
+  const maxMo=legacyMaxMonths(total,feeRate);
+  // Patch DOM directly — no card re-render
+  const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
+  const setHtml=(id,v)=>{const el=$(id);if(el)el.innerHTML=v;};
+  set('lgFeeDisp',feeLabel+'%');
+  set('lgMoDisp',mo+' mo → '+fmt(mp)+'/mo');
+  set('lgPayVal',fmt(mp));
+  set('lgMoVal',String(mo));
+  set('lgTcVal',fmt(tc));
+  // Update slider positions
+  const fi=$('lgFeeInput');if(fi)fi.value=feeLabel;
+  const mi=$('lgMoInput');if(mi){mi.max=maxMo;mi.value=mo;}
+  // Update mo slider labels
+  const moLabels=mi&&mi.parentElement?mi.parentElement.querySelector('div:last-child'):null;
+  if(moLabels)moLabels.innerHTML=`<span>1 mo</span><span>${maxMo} mo ($250 floor)</span>`;
+  // Update comm block total
+  const band=getLegacyComm(total);
+  if(band){
+    const commTotal=legacyCommAtFee(band.total,feeRate);
+    const p2=Math.round(band.p2*(feeRate/0.40));
+    const p4=Math.round(band.p4*(feeRate/0.40));
+    // Find the commission total span (big green number after FT icon)
+    const card=$('legacyPlanCard');
+    if(card){
+      const commHeader=card.querySelector('.comm-block-inner .comm-inline-hd,.comm-block-inner>div:first-child');
+      // Simpler: find the big green span inside .plan-comm-block
+      const bigSpan=card.querySelector('.plan-comm-block span[style*="font-size:20px"]');
+      if(bigSpan)bigSpan.textContent=fmt(commTotal);
+      // Update P2/P4 amount cells
+      const amtCells=card.querySelectorAll('.plan-comm-block tbody td:nth-child(2)');
+      if(amtCells[0])amtCells[0].textContent=fmt(p2);
+      if(amtCells[1]&&band.p4>0)amtCells[1].textContent=fmt(p4);
+      // Update note
+      const noteDiv=card.querySelector('.plan-comm-block .comm-block-inner>div:last-child');
+      if(noteDiv)noteDiv.textContent=`Band ${band.code} @ ${feeLabel}% fee`;
+    }
+  }
+  // Also update the comparison table and legacy program card (non-destructive)
+  renderCmpTable(lastScenario);
+  renderLegacyCard(lastScenario);
 }
 
 function init(){
