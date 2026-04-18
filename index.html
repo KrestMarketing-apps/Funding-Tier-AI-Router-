@@ -348,7 +348,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .lg-step-btn:active{transform:scale(.9);}
 /* ── Support hours dark blue ── */
 #hoursBtn{background:linear-gradient(135deg,#0f2a5e,#1a3a8f) !important;color:#fff !important;border-radius:10px;}
-#hoursBtn span{color:#fff !important;}
+#hoursBtn>span:first-child>span:not(#liveTimeBadge){color:#fff !important;}
 #hoursBtn .acc-chevron{color:rgba(255,255,255,.7) !important;}
 /* ── Header inline notification (no modal, no height expansion) ── */
 .hdr-delivery{position:relative;}
@@ -389,6 +389,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
           <option value="America/New_York">EST / EDT (Eastern)</option>
           <option value="UTC">UTC</option>
         </select>
+        <span id="sysClockBadge" style="font-size:10px;font-weight:800;color:rgba(255,255,255,.9);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:2px 8px;font-variant-numeric:tabular-nums;white-space:nowrap;"></span>
         <span style="font-size:10px;color:rgba(255,255,255,.25);">|</span>
         <select id="langSel" class="meta-sel" onchange="setLang(this.value)">
           <option value="en">&#127482;&#127480; EN</option>
@@ -410,7 +411,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
         <button id="urlBtn" class="btn" style="height:34px;font-size:12px;padding:0 12px;flex-shrink:0;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;">&#128279; URL</button>
         <button id="sendBtn" class="btn btn-dk" style="height:34px;font-size:12px;padding:0 14px;flex-shrink:0;">Generate + Send</button>
       </div>
-      <button id="planLink" class="btn btn-g" style="font-size:12px;">View Personalized Plan</button></div>
+
     </div>
   </div>
 </div>
@@ -462,7 +463,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
       <!-- Support Hours - single collapsible accordion -->
       <div style="border:1px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:14px;">
         <button class="acc-btn" id="hoursBtn" onclick="toggleAcc('hoursBody','hoursBtn')">
-          <span style="display:flex;align-items:center;gap:8px;"><span>&#128336;</span><span>Support Hours &amp; Status</span><span id="liveTimeBadge" style="font-size:10px;font-weight:600;color:#64748b;background:var(--bg);border:1px solid var(--br);border-radius:6px;padding:2px 7px;"></span></span>
+          <span style="display:flex;align-items:center;gap:8px;"><span>&#128336;</span><span>Support Hours &amp; Status</span><span id="liveTimeBadge" style="font-size:10px;font-weight:900;color:#0f172a;background:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:2px 8px;letter-spacing:.2px;font-variant-numeric:tabular-nums;"></span></span>
           <span class="acc-chevron">&#8964;</span>
         </button>
         <div class="acc-body" id="hoursBody" style="border-top:1px solid var(--br);">
@@ -1376,15 +1377,15 @@ function renderCmpTable(c){
   $('cmpTable').innerHTML=rows.map(r=>`<tr class="${r[4]}">${r.slice(0,4).map(v=>`<td>${v}</td>`).join('')}</tr>`).join('');
 }
 function refreshRowVisuals(){const c=computeScenario();app.rows.forEach((row,i)=>{const card=document.querySelector(`[data-row="${i}"]`);if(!card)return;const alerts=rowAlerts(row,c.route.route);card.className='row-card'+(row.secured?' fr':alerts.some(a=>a.tone==='r')?' fr':alerts.some(a=>a.tone==='a')?' fa':'');const wrap=card.querySelector('.aw');if(wrap)wrap.innerHTML=alerts.map(a=>`<span class="pill b-${a.tone==='r'?'no':'cond'}" style="font-size:10px;cursor:help;" title="${esc(a.detail||a.label)}">${a.label}</span>`).join('');});}
-function renderRows(){
+function renderRows(){try{
   const total=app.rows.reduce((s,r)=>s+num(r.amount),0);
-  $('rows').innerHTML=app.rows.map((row,i)=>`<div class="row-card" data-row="${i}"><div class="row-inner"><div style="position:relative;"><input class="fi ci" data-i="${i}" placeholder="Type creditor name&#8230;" value="${esc(row.cred||'')}" autocomplete="off"/><div class="drop" data-cr="${i}"></div><div class="aw" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div></div><div><input class="fi" data-i="${i}" data-k="amount" placeholder="$0" value="${row.amount>0?'$'+Number(row.amount).toLocaleString('en-US',{maximumFractionDigits:0}):''}"/>${total>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${((num(row.amount)/total)*100).toFixed(1)}%</div>`:''}</div><div><div class="dt-wrap" data-dw="${i}"><svg class="dt-icon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg><input class="dt-inp" data-di="${i}" placeholder="Search debt type&#8230;" autocomplete="off"/><button class="dt-x" data-dx="${i}">&#10005;</button><div class="dt-panel" data-dp="${i}"></div></div><div class="dt-sel" data-ds="${i}"><span></span><button data-dsc="${i}">&#10005;</button></div></div><div>${app.rows.length>1?`<button type="button" data-rem="${i}" style="width:30px;height:30px;border:1.5px solid rgba(239,68,68,.4);border-radius:8px;background:#fef2f2;color:var(--rd);font-weight:900;font-size:16px;cursor:pointer;margin-top:5px;font-family:inherit;">&#8722;</button>`:'<div></div>'}</div></div></div>`).join('');
+  $('rows').innerHTML=app.rows.map((row,i)=>`<div class="row-card" data-row="${i}"><div class="row-inner"><div style="position:relative;"><input class="fi ci" data-i="${i}" placeholder="Type creditor name&#8230;" value="${esc(row.cred||'')}" autocomplete="off"/><div class="drop" data-cr="${i}"></div><div class="aw" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div></div><div><input class="fi" data-i="${i}" data-k="amount" placeholder="$0" value="${row.amount||''}"/>${total>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${((num(row.amount)/total)*100).toFixed(1)}%</div>`:''}</div><div><div class="dt-wrap" data-dw="${i}"><svg class="dt-icon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg><input class="dt-inp" data-di="${i}" placeholder="Search debt type&#8230;" autocomplete="off"/><button class="dt-x" data-dx="${i}">&#10005;</button><div class="dt-panel" data-dp="${i}"></div></div><div class="dt-sel" data-ds="${i}"><span></span><button data-dsc="${i}">&#10005;</button></div></div><div>${app.rows.length>1?`<button type="button" data-rem="${i}" style="width:30px;height:30px;border:1.5px solid rgba(239,68,68,.4);border-radius:8px;background:#fef2f2;color:var(--rd);font-weight:900;font-size:16px;cursor:pointer;margin-top:5px;font-family:inherit;">&#8722;</button>`:'<div></div>'}</div></div></div>`).join('');
   app.rows.forEach((row,i)=>{if(row.dt){const sel=document.querySelector(`[data-ds="${i}"]`);if(sel){const s=DT_REJ.has(row.dt)?'no':DT_COND.has(row.dt)?'cond':'ok';sel.querySelector('span').textContent=row.dt;sel.className=`dt-sel s-${s}`;}}});
   $('addBtn').style.display=app.rows.length<MAX_ROWS?'flex':'none';
   document.querySelectorAll('[data-k="amount"]').forEach(n=>{n.addEventListener('input',onAmtChange);n.addEventListener('blur',onAmtBlur);n.addEventListener('focus',onAmtFocus);});
   document.querySelectorAll('[data-rem]').forEach(b=>b.addEventListener('click',()=>removeRow(Number(b.dataset.rem))));
   bindCredSearches();bindDTRows();refreshRowVisuals();
-}
+}catch(e){console.error('renderRows error:',e);}}
 function getTradMatches(q){const lq=q.trim().toLowerCase();if(!lq)return[];return TRAD_CARDS.filter(n=>n.toLowerCase().includes(lq)).slice(0,8).map(n=>({display_name:n,secured:false,product_type:'credit card'}));}
 async function searchCred(i,query){
   const box=document.querySelector(`[data-cr="${i}"]`);if(!box)return;
@@ -1500,10 +1501,9 @@ async function _callAPI(sendEmail){
 }
 
 function init(){
-  // Set timezone selector to detected timezone
-const tzSelEl=$('tzSel');if(tzSelEl){const opts=Array.from(tzSelEl.options);const match=opts.find(o=>o.value===dispTZ);if(match){tzSelEl.value=dispTZ;}else{// Try matching region
-const region=dispTZ.split('/')[1]||'';const closest=opts.find(o=>o.value.includes(dispTZ.split('/')[0]))||opts[0];if(closest)tzSelEl.value=closest.value;}}
-const ss=$('stateSearch');if(ss){ss.addEventListener('input',e=>{if(_selectingState)return;app.sel='';searchStates(e.target.value||'');});ss.addEventListener('focus',e=>searchStates(e.target.value||''));}
+  // Auto-detect and set timezone selector
+  try{const tzSelEl=$('tzSel');if(tzSelEl){const opts=Array.from(tzSelEl.options);const match=opts.find(o=>o.value===dispTZ);if(match){tzSelEl.value=dispTZ;}else{const closest=opts.find(o=>o.value.includes(dispTZ.split('/')[0]))||opts[0];if(closest)tzSelEl.value=closest.value;}}}catch(e){}
+  const ss=$('stateSearch');if(ss){ss.addEventListener('input',e=>{if(_selectingState)return;app.sel='';searchStates(e.target.value||'');});ss.addEventListener('focus',e=>searchStates(e.target.value||''));}
   const pb=$('pdfBtn');if(pb)pb.addEventListener('click',buildPdf);
   const sb=$('sendBtn');if(sb)sb.addEventListener('click',showSendModal);
   const ub=$('urlBtn');if(ub)ub.addEventListener('click',generateUrlOnly);
@@ -1515,47 +1515,5 @@ const ss=$('stateSearch');if(ss){ss.addEventListener('input',e=>{if(_selectingSt
 }
 init();
 </script>
-</div>
-
-    <!-- Sending progress view -->
-    <div id="modalSendingView" style="display:none;text-align:center;padding:8px 0;">
-      <div style="font-size:15px;font-weight:800;color:var(--dk);margin-bottom:16px;">&#9889; Generating &amp; Sending Plan…</div>
-      <div style="background:#e2e8f0;border-radius:999px;height:8px;overflow:hidden;margin-bottom:12px;">
-        <div id="modalProgress" style="height:100%;background:linear-gradient(90deg,var(--g),var(--gd));border-radius:999px;width:0%;transition:width .4s ease;"></div>
-      </div>
-      <div id="modalProgressLabel" style="font-size:12px;color:#64748b;">Connecting to server…</div>
-    </div>
-    <!-- Success view -->
-    <div id="modalSuccessView" style="display:none;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-        <div style="width:44px;height:44px;background:rgba(15,157,138,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">&#10003;</div>
-        <div>
-          <div style="font-size:16px;font-weight:900;color:#0b7d6e;">Plan Sent Successfully</div>
-          <div id="modalSuccessEmail" style="font-size:12px;color:#64748b;margin-top:2px;"></div>
-        </div>
-      </div>
-      <div id="modalUrlRow" style="background:#f0fdf4;border:1.5px solid rgba(15,157,138,.3);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:none;">
-        <div style="font-size:10px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Prospect Plan URL</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <input id="modalUrlInput" readonly style="flex:1;font-size:11px;padding:6px 10px;border:1px solid var(--br);border-radius:7px;background:#fff;color:var(--dk);font-family:monospace;" value=""/>
-          <button onclick="copyPlanUrl()" class="btn btn-g" style="font-size:11px;padding:6px 12px;white-space:nowrap;flex-shrink:0;">Copy</button>
-          <a id="modalUrlLink" href="#" target="_blank" class="btn" style="font-size:11px;padding:6px 12px;white-space:nowrap;background:#eff6ff;color:var(--bl);border:1.5px solid rgba(26,110,216,.3);flex-shrink:0;">Open ↗</a>
-        </div>
-      </div>
-      <div style="display:flex;justify-content:flex-end;">
-        <button onclick="closeSendModal()" class="btn btn-g">Done</button>
-      </div>
-    </div>
-    <!-- Error view -->
-    <div id="modalErrorView" style="display:none;">
-      <div style="font-size:15px;font-weight:800;color:var(--rd);margin-bottom:10px;">&#9888; Could Not Send</div>
-      <div id="modalErrorMsg" style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:16px;"></div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button onclick="closeSendModal()" class="btn" style="background:var(--bg);color:#64748b;border:1.5px solid var(--br);">Close</button>
-        <button onclick="retryConfirm()" class="btn btn-g">Retry</button>
-      </div>
-    </div>
-  </div>
-</div>
 </body>
 </html>
