@@ -118,7 +118,17 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 /* Commission inside program comparison */
 .comm-section{border-top:1.5px solid var(--br);margin-top:20px;padding-top:20px;}
 .comm-title{font-size:14px;font-weight:900;color:var(--am);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-#planResultBox{display:none;margin-top:10px;padding:12px;border-radius:12px;border:1px solid var(--g);background:rgba(15,157,138,.08);}
+#planResultBox{display:none;margin:0 0 10px 0;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.12);backdrop-filter:blur(6px);}
+.delivery-result-title{font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;}
+.delivery-result-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.delivery-url-input{flex:1 1 280px;min-width:220px;height:34px;padding:0 10px;border-radius:9px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.95);color:#0f172a;font-size:12px;font-weight:700;}
+.delivery-mini-btn{height:34px;border:none;border-radius:9px;padding:0 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;}
+.delivery-copy-btn{background:#fff;color:#0f172a;}
+.delivery-open-btn{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;}
+.plan-body-desc{min-height:38px;font-size:12px;color:#475569;font-weight:600;line-height:1.5;display:flex;align-items:flex-start;margin:10px 0 14px 0;}
+.closed-x{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;background:rgba(239,68,68,.16);border:1px solid rgba(239,68,68,.35);color:#fecaca;font-size:13px;font-weight:900;line-height:1;cursor:help;}
+.closed-x .ttp-body{white-space:normal;max-width:260px;text-align:left;}
+
 
 /* Commission compare strip */
 .comm-compare-wrap{border-top:1.5px solid var(--br);margin-top:18px;padding-top:16px;}
@@ -294,14 +304,15 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
     <!-- RIGHT: Prospect Delivery with narrower inputs -->
     <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px;">
       <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Prospect Delivery</div>
+      <div id="planResultBox"></div>
       <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
         <div style="flex:0 0 auto;width:140px;"><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">First Name</label><input id="fName" class="fi" style="font-size:13px;padding:7px 10px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="text" placeholder="John"/></div>
         <div style="flex:0 0 auto;width:140px;"><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Last Name</label><input id="lName" class="fi" style="font-size:13px;padding:7px 10px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="text" placeholder="Smith"/></div>
         <div style="flex:0 0 auto;width:190px;"><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Email</label><input id="pEmail" class="fi" style="font-size:13px;padding:7px 10px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="email" placeholder="prospect@email.com"/></div>
         <button id="pdfBtn" class="btn btn-g" style="height:34px;font-size:12px;padding:0 14px;flex-shrink:0;">&#8595; PDF</button>
+        <button id="urlBtn" class="btn" style="height:34px;font-size:12px;padding:0 12px;flex-shrink:0;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;">&#128279; URL</button>
         <button id="sendBtn" class="btn btn-dk" style="height:34px;font-size:12px;padding:0 14px;flex-shrink:0;">Generate + Send</button>
       </div>
-      <div id="planResultBox"><div style="font-weight:700;color:var(--dk);margin-bottom:8px;font-size:13px;">&#10003; Plan Created Successfully</div><button id="planLink" class="btn btn-g" style="font-size:12px;">View Personalized Plan</button></div>
     </div>
   </div>
 </div>
@@ -598,28 +609,161 @@ const SUPP_HOURS=[
 ];
 const MAX_ROWS=10;
 const legacyState={feeRate:0.40,months:36};
-function legacyTotalCost(d,f){return d*f;}
-function legacyMaxMonths(d,f){return Math.min(60,Math.floor(legacyTotalCost(d,f)/250));}
+function legacyTotalCost(d,f){return Math.round((d||0)*(f||0));}
 function legacyMinMonths(){return 1;}
-function legacyMP(d,f,mo){return legacyTotalCost(d,f)/mo;}
+function legacyMaxMonths(d,f){
+  const total=legacyTotalCost(d,f);
+  const maxByPayment=Math.floor(total/250);
+  return Math.max(legacyMinMonths(),Math.min(60,maxByPayment>0?maxByPayment:60));
+}
+function legacyClampMonths(d,f,mo){
+  const minMo=legacyMinMonths();
+  const maxMo=legacyMaxMonths(d,f);
+  const n=parseInt(mo,10);
+  const safe=Number.isFinite(n)?n:minMo;
+  return Math.max(minMo,Math.min(maxMo,safe));
+}
+function legacyMP(d,f,mo){
+  const months=legacyClampMonths(d,f,mo);
+  return Math.round(legacyTotalCost(d,f)/months);
+}
 function legacyCommAtFee(baseTotal,f){return Math.round(baseTotal*(f/0.40));}
 function legacyDefaultMonths(total,feeRate,csMp,ldMp){
   const tc=legacyTotalCost(total,feeRate);
   const maxMo=legacyMaxMonths(total,feeRate);
   const minMo=legacyMinMonths();
   const targets=[csMp,ldMp].filter(v=>v&&v>0);
-  if(!targets.length)return Math.min(maxMo,36);
+  if(!targets.length)return Math.max(minMo,Math.min(maxMo,36));
   const target=Math.min(...targets);
   const ideal=Math.round(tc/target);
-  return Math.max(minMo,Math.min(maxMo,ideal));
+  return legacyClampMonths(total,feeRate,ideal);
 }
+const LEGACY_REJECT_RULES=[
+  {n:["American Recovery Systems"],s:"rej",r:"Legacy Capital Services list: Collateral Recovery."},
+  {n:["Aqua Finance"],s:"rej",r:"Legacy Capital Services list: Lending / Financing company."},
+  {n:["Arrowhead Advance"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Big Picture Loans"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Birch Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Bison Cash"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Blue Mountain Loan"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Bonneville Collection"],s:"rej",r:"Legacy Capital Services list: Standard collection agency / Debt recovery firm."},
+  {n:["Boost Credit"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Bright Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["BX Omni"],s:"rej",r:"Legacy Capital Services list: Unknown / ambiguous."},
+  {n:["Clear Air Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Climb Loans"],s:"rej",r:"Legacy Capital Services list: Student Loans."},
+  {n:["Crane Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Credit 9"],s:"rej",r:"Legacy Capital Services list: Likely consumer credit / lending."},
+  {n:["Credit Cube"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["E Loan Warehouse"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Eagle Wing Funds"],s:"rej",r:"Legacy Capital Services list: Possibly investment / lending fund."},
+  {n:["Elective Group USA (this is a federal student loan provider)"],s:"rej",r:"Legacy Capital Services list: Student / educational loan / financing."},
+  {n:["Eloan Warehouse"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Equity Sales Finance"],s:"rej",r:"Legacy Capital Services list: Asset finance / sales financing."},
+  {n:["Express Cash Flow"],s:"rej",r:"Legacy Capital Services list: Must be 3rd party or not part of colleterial, business or commercial debt."},
+  {n:["Figure Tech/Figure Lending"],s:"rej",r:"Legacy Capital Services list: Not accepted by Legacy Capital Services.."},
+  {n:["Fineday Funds"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["GoodLeap LLC (Does business as Goodleap Solar)"],s:"rej",r:"Legacy Capital Services list: Fintech / clean energy finance / Solar."},
+  {n:["Green Arrow Loans"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Greenline"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Greensky"],s:"rej",r:"Legacy Capital Services list: Per Legal."},
+  {n:["Hollis Cobb"],s:"rej",r:"Legacy Capital Services list: possibly collection / finance."},
+  {n:["Home Equity Line of Credit"],s:"rej",r:"Legacy Capital Services list: Not accepted by Legacy Capital Services.."},
+  {n:["Kadikorn Bank"],s:"rej",r:"Legacy Capital Services list: Bank / financial institution."},
+  {n:["Lendumo"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Level Up Funding"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["LIGHTSTREAM"],s:"rej",r:"Legacy Capital Services list: Home Improvement, Auto, Debt Consolidation, Recreation, Adoption, education, etc.)."},
+  {n:["Little Lake Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Loan At Last"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Lookout Credit Union"],s:"rej",r:"Legacy Capital Services list: Credit union / cooperative financial institution."},
+  {n:["Makwa Finance"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Makwa Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Mariner Finance"],s:"rej",r:"Legacy Capital Services list: Installment Loans."},
+  {n:["Maxlend"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Merit Financial Trust (Tribal Loans)"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Military Star"],s:"rej",r:"Legacy Capital Services list: Government-backed loans."},
+  {n:["Minto Money"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["MobiLoans LLC (Tribal Loan Company)"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["My QuickWallet"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["NCR Finance"],s:"rej",r:"Legacy Capital Services list: Finance company / lender."},
+  {n:["Night Wings Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Opici Funds LLC"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Post Lake Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Premier Loan Solutions"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Reach Financial"],s:"rej",r:"Legacy Capital Services list: Personal / small-dollar / consumer finance."},
+  {n:["Rise Up Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["River Valley Loans"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Sallie Mae Loans"],s:"rej",r:"Legacy Capital Services list: Education / student lending."},
+  {n:["Same Day Credit"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["SBA Loans"],s:"rej",r:"Legacy Capital Services list: Government-backed small business loans."},
+  {n:["Simple Fast Loans"],s:"rej",r:"Legacy Capital Services list: Payday / quick consumer lending."},
+  {n:["Snap On Credit"],s:"rej",r:"Legacy Capital Services list: Secured Loans only."},
+  {n:["Spotloan"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Sunbelt Federal Credit Union (Sunbelt FCU)"],s:"rej",r:"Legacy Capital Services list: Credit union / cooperative bank."},
+  {n:["Three Sticks Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Today Cash"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Tule Lake Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Uprova"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Versara Lending"],s:"rej",r:"Legacy Capital Services list: Consolidation/Negotiation."},
+  {n:["White Pine Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Willow Lake Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["WithU Loans"],s:"rej",r:"Legacy Capital Services list: Tribal."},
+  {n:["Write St. Education Leins"],s:"rej",r:"Legacy Capital Services list: Educational lender / student finance / lien recording in education."},
+  {n:["Yendo"],s:"rej",r:"Legacy Capital Services list: Not accepted by Legacy Capital Services.."},
+  {n:["ZipLoan (AKA Zuntafi)"],s:"rej",r:"Legacy Capital Services list: Student / consumer loan origination & servicing."},
+  {n:["Zuntafi (AKA ZipLoan)"],s:"rej",r:"Legacy Capital Services list: Student / consumer loan origination & servicing."}
+];
+const LEGACY_ACCEPT_RULES=[
+  {n:["3rd Party Collections"],s:"ok",r:"Legacy Capital Services accepted list: See unacceptable debt list below."},
+  {n:["ADT Alarm System"],s:"ok",r:"Legacy Capital Services accepted list: Removal of the system may be required based on its age. Create a NOTE that client is aware the system may be removed."},
+  {n:["Auto Loans (RVs/Moto/Leases//Repos/Balances)"],s:"ok",r:"Legacy Capital Services accepted list: MUST BE IN 3RD PARTY COLLECTIONS / Cannot accept deficiency loans."},
+  {n:["Back Rent"],s:"ok",r:"Legacy Capital Services accepted list: Client is no longer living in unit."},
+  {n:["Business Debts/Loans"],s:"ok",r:"Legacy Capital Services accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
+  {n:["Cash Advance"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
+  {n:["Check Cashing"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
+  {n:["Consolidation Loans"],s:"ok",r:"Legacy Capital Services accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
+  {n:["Credit Builder Loans"],s:"ok",r:"Legacy Capital Services accepted list: Add Repo Note in Sales Force."},
+  {n:["Credit Unions / Federal"],s:"ok",r:"Legacy Capital Services accepted list: Add Repo Note in Sales Force."},
+  {n:["Department Stores"],s:"ok",r:"Legacy Capital Services accepted list: Add Repo Note in Sales Force."},
+  {n:["Furniture and/or Jewelry"],s:"ok",r:"Legacy Capital Services accepted list: Add Repo Note in Sales Force."},
+  {n:["Gas Cards"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
+  {n:["Gyms / Fitness Centers"],s:"ok",r:"Legacy Capital Services accepted list: Add note, client unerstands will lose membership."},
+  {n:["Health clubs"],s:"ok",r:"Legacy Capital Services accepted list: Add note, client unerstands will lose membership."},
+  {n:["Installment Loans / Note Loans"],s:"ok",r:"Legacy Capital Services accepted list: Not Issues from Debt Settlement Company. Add Cross Collateral / Repo Note in Sales Force."},
+  {n:["Judgements"],s:"ok",r:"Legacy Capital Services accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Lake Lending"],s:"ok",r:"Legacy Capital Services accepted list: Not tied to Collateral."},
+  {n:["Lawsuits"],s:"ok",r:"Legacy Capital Services accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Lending Club"],s:"ok",r:"Legacy Capital Services accepted list: Not Secured to collateral and/or Not Secured to Home."},
+  {n:["Lines of Credit"],s:"ok",r:"Legacy Capital Services accepted list: Must be used like a credit card and include the first page of the statement with client and billing information."},
+  {n:["Medical Debt"],s:"ok",r:"Legacy Capital Services accepted list: Needs to provide the first page of the statement showing both client and billing details.."},
+  {n:["Merchant Cash Advance Loans"],s:"ok",r:"Legacy Capital Services accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
+  {n:["Military Credit Unions"],s:"ok",r:"Legacy Capital Services accepted list: Excludes: Military, Star, Pioneer Loans, BX Omni, and VA Loans.."},
+  {n:["Military Loans"],s:"ok",r:"Legacy Capital Services accepted list: Not endorsed by the government, noted on bottom of website."},
+  {n:["Navy Federal Credit Union"],s:"ok",r:"Legacy Capital Services accepted list: Verify they are not currently in the military, and they don't have, or have to get secret or top secret clearance. Cannot be endorsed by the government.."},
+  {n:["OMNI Financial"],s:"ok",r:"Legacy Capital Services accepted list: Military Personal Loans / Not Backed by the Government."},
+  {n:["Online Buy Now - Pay Later"],s:"ok",r:"Legacy Capital Services accepted list: Clear screenshot of balance acceptable. Check for Wage Assignment (Affirm, Afterpay, Klarna, Online Payback Programs.)."},
+  {n:["Payday Loans"],s:"ok",r:"Legacy Capital Services accepted list: Check for Wage Assignment."},
+  {n:["Personal Loans"],s:"ok",r:"Legacy Capital Services accepted list: Not Secured to collateral and/or Not Secured to Home."},
+  {n:["Signature Loans"],s:"ok",r:"Legacy Capital Services accepted list: Not Secured to collateral and/or Not Secured to Home."},
+  {n:["Summons"],s:"ok",r:"Legacy Capital Services accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Timeshares"],s:"ok",r:"Legacy Capital Services accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
+  {n:["Together Loans (aka Transform Credit)"],s:"ok",r:"Legacy Capital Services accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
+  {n:["Transform Credit"],s:"ok",r:"Legacy Capital Services accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
+  {n:["Unsecured Credit Cards"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
+  {n:["Unsecured Debts"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
+  {n:["USAA Federal Savings Bank"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
+  {n:["Utility Bills"],s:"ok",r:"Legacy Capital Services accepted list: Items such as power, internet, electric, cellular, and cable require a NOTE confirming the client is aware service will be shut off.."},
+  {n:["Velocity"],s:"ok",r:"Legacy Capital Services accepted list: Acceptable 3rd party."}
+];
+const ALL_CRED_RULES=[...CRED_RULES,...LEGACY_REJECT_RULES,...LEGACY_ACCEPT_RULES];
+
 const $=id=>document.getElementById(id);
 const fmt=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n||0);
 const num=v=>{const n=parseFloat(String(v).replace(/[^0-9.]/g,''));return Number.isFinite(n)?n:0;};
 const esc=v=>String(v||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const pct=v=>`${(v||0).toFixed(1)}%`;
 function normName(v){return String(v||'').toUpperCase().replace(/&/g,' AND ').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();}
-function getCredRule(name){if(!name)return null;const a=normName(name);return CRED_RULES.find(r=>r.n.some(n=>{const b=normName(n);if(a===b||a.includes(b)||b.includes(a))return true;const ta=a.split(' '),tb=b.split(' ');const[sh,lo]=ta.length<=tb.length?[ta,tb]:[tb,ta];return sh.length>=2&&sh.every(t=>t.length>2&&lo.includes(t));}))||null;}
+function getCredRule(name){if(!name)return null;const a=normName(name);return ALL_CRED_RULES.find(r=>r.n.some(n=>{const b=normName(n);if(a===b||a.includes(b)||b.includes(a))return true;const ta=a.split(' '),tb=b.split(' ');const[sh,lo]=ta.length<=tb.length?[ta,tb]:[tb,ta];return sh.length>=2&&sh.every(t=>t.length>2&&lo.includes(t));}))||null;}
 const isTradCard=n=>TRAD_CARDS.some(t=>normName(n).includes(normName(t)));
 const getLDState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:LD_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Black Out'}:LD_RED.has(c)?{status:'RED',label:'Attorney Model'}:{status:'GREEN',label:'Standard Model'};
 const getCSState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:CS_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Black Out'}:{status:'GREEN',label:'Serviceable'};
@@ -722,23 +866,50 @@ function clockStatus(c){
 function renderClocks(){
   const ttz=tzLabel();
   const tb=$('liveTimeBadge');
-  if(tb){const t=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,hour:'numeric',minute:'2-digit',hour12:true}).format(new Date());tb.textContent=`${t} ${ttz}`;}
+  if(tb){
+    const t=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date());
+    tb.textContent=`${t} ${ttz}`;
+    tb.style.color='#fff';
+    tb.style.background='rgba(255,255,255,.12)';
+    tb.style.borderColor='rgba(255,255,255,.22)';
+  }
   const box=$('clockBox');if(!box)return;
+  const dayFmt=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,weekday:'long'});
+  const todayName=dayFmt.format(new Date());
   const rows=SUPP_HOURS.map(c=>{
     const s=clockStatus(c);
     const init=c.label.split(' ').map(w=>w[0]).join('').slice(0,3);
-    const logoHtml=`<div class="logo-sm" style="width:38px;height:20px;"><img src="${c.logo}" alt="${c.label}" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:9px;font-weight:800;color:#64748b;\\'>${init}</span>';"/></div>`;
-    const statusBadge=`<span class="pill ${s.cls}" style="font-size:10px;padding:3px 8px;white-space:nowrap;">${s.txt}</span>`;
+    const logoHtml=`<div class="logo-sm" style="width:38px;height:20px;border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.95);"><img src="${c.logo}" alt="${c.label}" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-size:9px;font-weight:800;color:#64748b;\'>${init}</span>';"/></div>`;
+    const hoursLine=`${fmt12(c.oh,c.om)} - ${fmt12(c.ch,c.cm)} ${new Intl.DateTimeFormat('en-US',{timeZone:c.tz,timeZoneName:'short'}).formatToParts(new Date()).find(p=>p.type==='timeZoneName')?.value||''}`.trim();
+    const scheduleTip=`${todayName}: ${c.days.includes(new Date(new Date().toLocaleString('en-US',{timeZone:c.tz})).getDay())?hoursLine:'Closed'}`;
+    const statusBadge=s.txt==='Closed Today'||s.txt==='Closed'
+      ?`<span class="ttp"><span class="closed-x">✕</span><span class="ttp-body">Closed. ${scheduleTip}</span></span>`
+      :`<span class="pill ${s.cls}" style="font-size:10px;padding:3px 8px;white-space:nowrap;">${s.txt}</span>`;
     const contactLinks=c.contacts.map(ct=>{
-      if(ct.type==='phone')return `<a href="${ct.url}" style="font-size:11px;font-weight:700;${ct.style}border:1px solid;border-radius:8px;padding:3px 8px;text-decoration:none;white-space:nowrap;">&#128222; ${ct.label}</a>`;
-      return `<a href="${ct.url}" target="_blank" style="font-size:11px;font-weight:700;${ct.style}border:1px solid;border-radius:8px;padding:3px 8px;text-decoration:none;white-space:nowrap;">${ct.label}</a>`;
-    }).join(' ');
-    const open=convertToDispTZ(c.oh,c.om,c.tz);
-    const close=convertToDispTZ(c.ch,c.cm,c.tz);
-    const hoursLabel=`M-F &nbsp;${fmt12(open.h,open.m)} – ${fmt12(close.h,close.m)} ${ttz}`;
-    return `<tr><td><div class="supp-prov">${logoHtml}<div><div class="snap-name" style="font-size:12px;">${c.label}</div><div class="supp-time" style="font-size:10px;">${hoursLabel}</div></div></div></td><td>${statusBadge}</td><td><div class="supp-contact">${contactLinks}</div></td></tr>`;
+      const base=`font-size:11px;font-weight:700;${ct.style}border:1px solid;border-radius:8px;padding:3px 8px;text-decoration:none;white-space:nowrap;`;
+      if(ct.type==='phone')return `<a href="${ct.url}" style="${base}">&#128222; ${ct.label}</a>`;
+      return `<a href="${ct.url}" target="_blank" style="${base}">${ct.type==='slack'?'#':'&#128279;'} ${ct.label}</a>`;
+    }).join('');
+    return `<tr>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,.08);background:#0f2a5e;color:#fff;">
+        <div class="supp-prov">${logoHtml}<div><div style="font-size:12px;font-weight:800;color:#fff;">${c.label}</div><div class="supp-time" style="color:rgba(255,255,255,.72);">${hoursLine}</div></div></div>
+      </td>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,.08);background:#0f2a5e;color:#fff;">${statusBadge}</td>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,.08);background:#0f2a5e;color:#fff;"><span style="font-size:12px;font-weight:800;color:#fff;">${s.now}</span></td>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,.08);background:#0f2a5e;color:#fff;"><div class="supp-contact">${contactLinks||'<span style="color:rgba(255,255,255,.65);">-</span>'}</div></td>
+    </tr>`;
   }).join('');
-  box.innerHTML=`<div style="overflow-x:auto;"><table class="supp-table"><thead><tr><th>Provider</th><th>Status</th><th>Contact</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  box.innerHTML=`<div style="background:#0f2a5e;border-radius:0 0 12px 12px;overflow:hidden;">
+    <table class="supp-table" style="width:100%;border-collapse:collapse;background:#0f2a5e;">
+      <thead><tr>
+        <th style="background:#0b1f47;color:rgba(255,255,255,.7);">Provider</th>
+        <th style="background:#0b1f47;color:rgba(255,255,255,.7);">Status</th>
+        <th style="background:#0b1f47;color:rgba(255,255,255,.7);">Local Time</th>
+        <th style="background:#0b1f47;color:rgba(255,255,255,.7);">Support</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
 }
 
 function getCommForCard(c,key){
@@ -982,6 +1153,7 @@ function renderPlanCards(c){
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-b">Program ${p.k}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-b">Available</span>'}</div>
         </div>
+        <div class="plan-body-desc">${desc}</div>
         <div style="border:1.5px solid rgba(26,110,216,.25);border-radius:12px;overflow:hidden;margin-bottom:0;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
             <div style="padding:10px 12px;border-right:1px solid rgba(26,110,216,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:var(--bl);line-height:1;">${fmt(p.pay)}</div></div>
@@ -1008,6 +1180,7 @@ function renderPlanCards(c){
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill ${c.lds.status==='RED'?'p-a':'p-g'}">${c.lds.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-g">Available</span>'}</div>
         </div>
+        <div class="plan-body-desc">${desc}</div>
         <div style="border:1.5px solid rgba(15,157,138,.25);border-radius:12px;overflow:hidden;margin-bottom:0;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
             <div style="padding:10px 12px;border-right:1px solid rgba(15,157,138,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:#0b7d6e;line-height:1;">${fmt(mp)}</div></div>
@@ -1029,8 +1202,8 @@ function renderPlanCards(c){
     const csMp=c.csProg?c.csProg.pay:0;
     const ldMp=c.ldAvail?Math.round((total*.5+total*c.feeRate)/getLDMaxTerm(total)):0;
     if(!legacyState._init||legacyState._initTotal!==total){legacyState.months=legacyDefaultMonths(total,feeRate,csMp,ldMp);legacyState._init=true;legacyState._initTotal=total;}
-    const mo=Math.max(minMo,Math.min(maxMo,legacyState.months));legacyState.months=mo;
-    const mp=Math.round(tc/mo);const feeLabel=Math.round(feeRate*100);
+    const mo=legacyClampMonths(total,feeRate,legacyState.months);legacyState.months=mo;
+    const mp=legacyMP(total,feeRate,mo);const feeLabel=Math.round(feeRate*100);
     const comm=getCommForCard(c,'LEGACY');
     const desc='Attorney-Led Resolution — Debts resolved through legal channels with adjustable fee structure. Balance affordability and commission by tuning the service fee.';
     cards.push(`<div class="plan-card-v${isRec?' rec':''}" id="legacyPlanCard">
@@ -1042,6 +1215,7 @@ function renderPlanCards(c){
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="pill p-p">${c.lgs.label}</span>${isRec?'<span class="pill p-g">&#10003; Recommended</span>':'<span class="pill p-p">Available</span>'}</div>
         </div>
+        <div class="plan-body-desc">${desc}</div>
         <div style="border:1.5px solid rgba(109,40,217,.2);border-radius:12px;overflow:hidden;margin-bottom:14px;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
             <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:#6d28d9;line-height:1;">${fmt(mp)}</div></div>
@@ -1052,12 +1226,12 @@ function renderPlanCards(c){
         <div class="legacy-calc">
           <div style="margin-bottom:10px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:#334155;">Service Fee</span><span style="font-size:11px;font-weight:800;color:#6d28d9;">${feeLabel}%</span></div>
-            <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="legacyState.feeRate=this.value/100;legacyState._init=false;if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);renderCommCompare(lastScenario);}"/>
+            <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="updateLegacyCalc(this.value,null)"/>
             <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>35% (most affordable)</span><span>49% (max)</span></div>
           </div>
           <div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:#334155;">Program Length</span><span style="font-size:11px;font-weight:800;color:#6d28d9;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
-            <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="legacyState.months=parseInt(this.value);if(lastScenario){renderPlanCards(lastScenario);renderLegacyCard(lastScenario);renderCmpTable(lastScenario);}"/>
+            <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="updateLegacyCalc(null,this.value)"/>
             <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>${minMo} mo (${fmt(Math.round(tc/minMo))}/mo)</span><span>${maxMo} mo ($250/mo min)</span></div>
           </div>
           ${mp<250?'<div style="background:#fef2f2;border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 10px;font-size:11px;color:#b91c1c;font-weight:700;margin-top:8px;">&#9888; Below $250 minimum — increase fee or shorten program.</div>':''}
@@ -1246,43 +1420,16 @@ async function generateUrlOnly(){
 function updateLegacyCalc(newFee,newMo){
   if(!lastScenario||!lastScenario.legacyAvail)return;
   const total=lastScenario.total;
-  if(newFee!==undefined)legacyState.feeRate=newFee/100;
-  const feeRate=legacyState.feeRate;
-  const tc=legacyTotalCost(total,feeRate);
-  const maxMo=Math.min(60,Math.floor(tc/250));
-  const minMo=1;
-  if(newMo!==undefined)legacyState.months=Math.max(minMo,Math.min(maxMo,parseInt(newMo)));
-  else legacyState.months=Math.max(minMo,Math.min(maxMo,legacyState.months||maxMo));
-  const mo=legacyState.months;
-  const mp=Math.max(250,Math.round(tc/mo));
-  const feeLabel=Math.round(feeRate*100);
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  set('lgFeeDisp',feeLabel+'%');
-  set('lgMoDisp',mo+' mo \u2192 '+fmt(mp)+'/mo');
-  set('lgPayVal',fmt(mp));set('lgMoVal',String(mo));set('lgTcVal',fmt(tc));
-  const fi=document.getElementById('lgFeeInput');if(fi)fi.value=feeLabel;
-  const mi=document.getElementById('lgMoInput');
-  if(mi){mi.min=minMo;mi.max=maxMo;mi.value=mo;}
-  const moWrap=mi?mi.closest('div'):null;
-  if(moWrap){const last=moWrap.querySelector('div:last-child');if(last)last.innerHTML=`<span>1 mo</span><span>${maxMo} mo ($250 min)</span>`;}
-  const band=getLegacyComm(total);
-  if(band){
-    const commTotal=legacyCommAtFee(band.total,feeRate);
-    const p2=Math.round(band.p2*(feeRate/0.40));
-    const p4=Math.round(band.p4*(feeRate/0.40));
-    const card=document.getElementById('legacyPlanCard');
-    if(card){
-      const bigSpan=card.querySelector('.plan-comm-block span[style*="font-size:20px"]');
-      if(bigSpan)bigSpan.textContent=fmt(commTotal);
-      const amtCells=card.querySelectorAll('.plan-comm-block tbody td:nth-child(2)');
-      if(amtCells[0])amtCells[0].textContent=fmt(p2);
-      if(amtCells[1]&&band.p4>0)amtCells[1].textContent=fmt(p4);
-      const noteDivs=card.querySelectorAll('.comm-block-inner>div');
-      const noteDiv=noteDivs[noteDivs.length-1];
-      if(noteDiv&&noteDiv.textContent.includes('Band'))noteDiv.textContent=`Band ${band.code} @ ${feeLabel}% fee`;
-    }
-  }
-  renderCmpTable(lastScenario);renderLegacyCard(lastScenario);
+  if(newFee!==undefined&&newFee!==null&&newFee!=='')legacyState.feeRate=parseFloat(newFee)/100;
+  legacyState.feeRate=Math.max(0.35,Math.min(0.49,legacyState.feeRate||0.40));
+  if(newMo!==undefined&&newMo!==null&&newMo!=='')legacyState.months=legacyClampMonths(total,legacyState.feeRate,newMo);
+  else legacyState.months=legacyClampMonths(total,legacyState.feeRate,legacyState.months||legacyDefaultMonths(total,legacyState.feeRate, lastScenario.csProg?lastScenario.csProg.pay:0, lastScenario.ldAvail?Math.round((total*.5+total*lastScenario.feeRate)/getLDMaxTerm(total)):0));
+  legacyState._init=true;
+  legacyState._initTotal=total;
+  renderPlanCards(lastScenario);
+  renderLegacyCard(lastScenario);
+  renderCmpTable(lastScenario);
+  if(typeof renderCommCompare==='function')renderCommCompare(lastScenario);
 }
 
 let _lastPlanUrl=null,_lastPlanKey=null;
@@ -1293,18 +1440,100 @@ function _showSuccessModal(pageUrl,email){const se=$('modalSuccessEmail');if(se)
 async function _callAPI(sendEmail){
   const c=computeScenario();const email=$('pEmail').value.trim();const key=_prospectKey();
   if(!sendEmail&&_lastPlanUrl&&_lastPlanKey===key)return{ok:true,pageUrl:_lastPlanUrl,cached:true};
-  const payload={firstName:$('fName').value.trim()||'Prospect',lastName:$('lName').value.trim()||'',email,state:app.sel,totalDebt:Math.round(c.total),sendEmail,doNothing:{monthlyPayment:Math.round(c.dn.mp),months:c.dn.months,totalCost:Math.round(c.dn.total)},recommended:c.recommended?{term:c.recommended.term,mp:Math.round(c.recommended.mp),tc:Math.round(c.recommended.tc)}:null,route:c.route.route};
+  const payload=buildFullPayload(sendEmail);
   const res=await fetch('/api/generate-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
   const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.error||'Server error');
-  if(data.pageUrl){_lastPlanUrl=data.pageUrl;_lastPlanKey=key;}return data;
+  if(data.pageUrl){_lastPlanUrl=data.pageUrl;_lastPlanKey=key;}
+  return data;
 }
 function retryConfirm(){_modalShow('modalConfirmView');}
 function copyPlanUrl(){const inp=$('modalUrlInput');if(!inp||!inp.value)return;navigator.clipboard.writeText(inp.value).then(()=>{const b=inp.nextElementSibling;if(b){const o=b.textContent;b.textContent='Copied!';setTimeout(()=>b.textContent=o,1500);}}).catch(()=>{inp.select();document.execCommand('copy');});}
 
+function buildFullPayload(sendEmail){
+  const c=computeScenario();
+  const email=$('pEmail').value.trim();
+  const total=Math.round(c.total||0);
+  const legacyTotal=c.route.route==='LEGACY' || c.legacyAvail ? legacyTotalCost(total,legacyState.feeRate) : 0;
+  const legacyMonths=c.legacyAvail ? legacyClampMonths(total,legacyState.feeRate,legacyState.months||36) : null;
+  const recommended=c.route.route==='LEGACY'
+    ? {term:legacyMonths,monthlyPayment:legacyMP(total,legacyState.feeRate,legacyMonths),totalCost:legacyTotal,serviceFeePct:Math.round((legacyState.feeRate||0)*100)}
+    : c.recommended
+      ? {term:c.recommended.term,monthlyPayment:Math.round(c.recommended.mp),totalCost:Math.round(c.recommended.tc),serviceFeePct:c.route.route==='LEVEL'?Math.round((c.feeRate||0)*100):undefined}
+      : null;
+  return {
+    firstName:$('fName').value.trim()||'Prospect',
+    lastName:$('lName').value.trim()||'',
+    email,
+    state:app.sel,
+    totalDebt:total,
+    sendEmail:!!sendEmail,
+    attachPdf:true,
+    deliveryMode:sendEmail?'email_and_pdf':'url_only',
+    doNothing:{monthlyPayment:Math.round(c.dn.mp),monthsToPayoff:Math.round(c.dn.months),totalPayback:Math.round(c.dn.total),apr:c.dn.apr},
+    shortest:c.shortest?{term:c.shortest.term,monthlyPayment:Math.round(c.shortest.mp),totalCost:Math.round(c.shortest.tc)}:null,
+    recommended,
+    route:c.route.route,
+    routeReason:c.route.reason,
+    csProgramLabel:c.csProg?`Program ${c.csProg.k}`:'',
+    legacy:{available:!!c.legacyAvail,serviceFeePct:Math.round((legacyState.feeRate||0)*100),months:legacyMonths,monthlyPayment:legacyMonths?legacyMP(total,legacyState.feeRate,legacyMonths):null,totalCost:legacyTotal||null},
+    rows:app.rows.filter(r=>num(r.amount)>0).map(r=>({creditorName:r.cred,amount:Math.round(num(r.amount)),debtType:r.dt,isSecured:!!r.secured,inCollections:!!r.collections,inLitigation:!!r.litigation,paymentMade:!!r.paid,businessUnprofitable:!!r.bizUnprof})),
+    emailOptions:{
+      template:'prospect_program_delivery',
+      attachPdf:true,
+      includePlanUrl:true
+    }
+  };
+}
+function renderPlanResult(data, mode){
+  const box=$('planResultBox');if(!box)return;
+  const planUrl=(data&& (data.pageUrl||data.url)) || _lastPlanUrl || '';
+  if(planUrl){_lastPlanUrl=planUrl;_lastPlanKey=_prospectKey();}
+  const title=mode==='send'
+    ? `✅ Plan generated and send request submitted to ${esc($('pEmail').value.trim())}`
+    : '✅ Personalized plan URL generated';
+  box.innerHTML=`<div class="delivery-result-title">${title}</div>
+    <div class="delivery-result-row">
+      <input id="planUrlDisplay" class="delivery-url-input" type="text" readonly value="${esc(planUrl)}" />
+      <button id="copyPlanBtn" class="delivery-mini-btn delivery-copy-btn" type="button">Copy</button>
+      <button id="openPlanBtn" class="delivery-mini-btn delivery-open-btn" type="button">Open ↗</button>
+    </div>`;
+  box.style.display='block';
+  const copyBtn=$('copyPlanBtn'), openBtn=$('openPlanBtn'), input=$('planUrlDisplay');
+  if(copyBtn&&input)copyBtn.onclick=()=>navigator.clipboard.writeText(input.value).then(()=>{const o=copyBtn.textContent;copyBtn.textContent='Copied!';setTimeout(()=>copyBtn.textContent=o,1200);}).catch(()=>{input.select();document.execCommand('copy');});
+  if(openBtn&&planUrl)openBtn.onclick=()=>window.open(planUrl,'_blank','noopener');
+}
+async function generateUrlOnlyDirect(){
+  const c=computeScenario();
+  if(!(app.sel&&c.total>0)){alert('Enter debts and a state first.');return;}
+  const btn=$('urlBtn');const orig=btn?btn.textContent:'';if(btn){btn.disabled=true;btn.textContent='Generating...';}
+  try{
+    const data=await _callAPI(false);
+    renderPlanResult(data,'url');
+    if(data&&data.pageUrl)window.open(data.pageUrl,'_blank','noopener');
+  }catch(e){
+    alert((e&&e.message)||'Could not generate URL.');
+  }finally{if(btn){btn.disabled=false;btn.textContent=orig;}}
+}
+async function sendPlanDirect(){
+  const c=computeScenario();
+  const email=$('pEmail').value.trim();
+  if(!email){$('pEmail').style.borderColor='var(--rd)';$('pEmail').focus();return;}
+  if(!(app.sel&&c.total>0)){alert('Complete the scenario first.');return;}
+  const btn=$('sendBtn');const orig=btn.textContent;btn.disabled=true;btn.textContent='Generating + Sending...';
+  try{
+    const data=await _callAPI(true);
+    renderPlanResult(data,'send');
+  }catch(e){
+    const isFetch=!e.message||String(e.message).toLowerCase().includes('fetch')||String(e.message).toLowerCase().includes('network');
+    alert(isFetch?'Cannot reach /api/generate-plan. Make sure your backend is running and deployed.':(e.message||'Something went wrong while sending the plan.'));
+  }finally{btn.disabled=false;btn.textContent=orig;}
+}
+
 function init(){
   const ss=$('stateSearch');if(ss){ss.addEventListener('input',e=>{if(_selectingState)return;app.sel='';searchStates(e.target.value||'');});ss.addEventListener('focus',e=>searchStates(e.target.value||''));}
   const pb=$('pdfBtn');if(pb)pb.addEventListener('click',buildPdf);
-  const sb=$('sendBtn');if(sb)sb.addEventListener('click',showSendModal);
+  const ub=$('urlBtn');if(ub)ub.addEventListener('click',generateUrlOnlyDirect);
+  const sb=$('sendBtn');if(sb)sb.addEventListener('click',sendPlanDirect);
   const ab=$('addBtn');if(ab)ab.addEventListener('click',addRow);
   const fp=$('featurePriority');if(fp)fp.addEventListener('change',render);
   document.addEventListener('click',e=>{if(!e.target.closest('.ci')&&!e.target.closest('[data-cr]'))document.querySelectorAll('[data-cr]').forEach(b=>{b.innerHTML='';b.className='drop';});if(!e.target.closest('.dt-inp')&&!e.target.closest('.dt-panel'))document.querySelectorAll('.dt-panel').forEach(p=>p.className='dt-panel');if(!e.target.closest('#stateSearch')&&!e.target.closest('#stateResults')){const sr=$('stateResults');if(sr){sr.innerHTML='';sr.className='drop';}}});
