@@ -242,39 +242,18 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .cmp tr.mp-row td{background:#eff6ff!important;color:#1e3a8a;font-weight:800;}
 .cmp tr.mp-row td:nth-child(2){background:#dbeafe!important;}
 
-/* ── Tooltips ── */
-.ttp{position:relative;display:inline-flex;cursor:help;}
-.ttp .ttp-body{visibility:hidden;opacity:0;position:fixed;left:0;top:0;background:#1e293b;color:#fff;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:500;line-height:1.65;white-space:normal;max-width:300px;z-index:9999;pointer-events:none;transition:opacity .15s;box-shadow:0 8px 32px rgba(0,0,0,.3);}
-.ttp:hover .ttp-body{visibility:visible;opacity:1;}
-.tip-wrap{position:relative;display:inline-flex;cursor:help;}
-.tip-wrap .tip-box{visibility:hidden;opacity:0;position:fixed;left:0;top:0;background:#1e293b;color:#fff;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:500;line-height:1.65;white-space:normal;max-width:300px;z-index:9999;pointer-events:none;transition:opacity .15s;box-shadow:0 8px 32px rgba(0,0,0,.3);}
-.tip-wrap:hover .tip-box{visibility:visible;opacity:1;}
-/* ── Route badge ── */
-.route-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;color:#fff;border-radius:999px;font-size:13px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,.2);}
-.route-badge img{max-height:16px;max-width:32px;object-fit:contain;background:#fff;border-radius:4px;padding:2px 4px;}
-/* ── Plan card equal height banners ── */
-.plan-rec-banner{height:24px;background:linear-gradient(90deg,var(--g),var(--gd));color:#fff;text-align:center;font-size:9px;font-weight:900;letter-spacing:1.5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.plan-rec-spacer{height:24px;flex-shrink:0;}
-.plan-body-desc{display:none;}
-/* ── Legacy inline steppers ── */
-.lg-stepper{display:flex;align-items:center;justify-content:center;gap:3px;}
-.lg-step-val{font-size:16px;font-weight:900;min-width:40px;text-align:center;line-height:1;color:#6d28d9;}
-.lg-step-btn{width:22px;height:22px;border-radius:6px;border:1.5px solid rgba(109,40,217,.35);background:rgba(109,40,217,.08);color:#6d28d9;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;transition:all .12s;}
-.lg-step-btn:hover{background:rgba(109,40,217,.18);}
 /* ── Support hours dark blue ── */
 #hoursBtn{background:linear-gradient(135deg,#0f2a5e,#1a3a8f)!important;color:#fff!important;border-radius:10px;}
+#hoursBtn>span:first-child>span:not(#liveTimeBadge){color:#fff!important;}
 #hoursBtn .acc-chevron{color:rgba(255,255,255,.7)!important;}
-#liveTimeBadge{color:#0f172a!important;font-weight:900!important;background:rgba(255,255,255,.9)!important;border:1px solid rgba(255,255,255,.4)!important;}
-/* ── Header inline notification ── */
-.hdr-delivery{position:relative;}
-.hdr-notif{position:absolute;bottom:calc(100%+6px);left:0;right:0;background:linear-gradient(135deg,#0f172a,#0b3b50);color:#fff;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:600;line-height:1.55;z-index:200;display:none;box-shadow:0 4px 20px rgba(0,0,0,.3);}
-.hdr-notif.show{display:block;}
-.hdr-notif.success{border-left:3px solid var(--g);}
-.hdr-notif.error{border-left:3px solid var(--rd);}
-.hdr-notif.sending{border-left:3px solid var(--am);}
-.hdr-url-row{display:flex;align-items:center;gap:6px;margin-top:6px;}
-.hdr-url-input{flex:1;font-size:10px;padding:4px 8px;border:1px solid rgba(255,255,255,.2);border-radius:6px;background:rgba(255,255,255,.1);color:#fff;font-family:monospace;outline:none;}
-.hdr-copy-btn{font-size:10px;padding:3px 8px;border-radius:6px;background:var(--g);color:#fff;border:none;cursor:pointer;font-family:inherit;font-weight:700;white-space:nowrap;}
+/* ── adj-prog ── */
+.adj-prog-wrap{border-top:1px solid rgba(255,255,255,.12);margin-top:14px;padding-top:2px;}
+.adj-prog-btn{width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;cursor:pointer;padding:10px 0;font-family:inherit;}
+.adj-prog-body{display:none;padding-top:6px;}
+.adj-prog-body.open{display:block;}
+.adj-chev{font-size:16px;font-weight:900;color:rgba(255,255,255,.6);transition:transform .2s;line-height:1;}
+.adj-prog-btn.open .adj-chev{transform:rotate(180deg);}
+.comm-block-inner{min-height:130px;display:flex;flex-direction:column;}
 </style>
 </head>
 <body>
@@ -302,7 +281,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
           <option value="America/New_York">EST / EDT (Eastern)</option>
           <option value="UTC">UTC</option>
         </select>
-        <span id="sysClockBadge" style="font-size:10px;font-weight:800;color:rgba(255,255,255,.9);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:2px 8px;font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:.2px;"></span>
+        <span id="sysClockBadge" style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:3px 10px;letter-spacing:.3px;font-variant-numeric:tabular-nums;white-space:nowrap;"></span>
         <span style="font-size:10px;color:rgba(255,255,255,.25);">|</span>
         <select id="langSel" class="meta-sel" onchange="setLang(this.value)">
           <option value="en">&#127482;&#127480; EN</option>
@@ -313,8 +292,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
       </div>
     </div>
     <!-- RIGHT: Prospect Delivery with narrower inputs -->
-    <div class="hdr-delivery" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px;position:relative;">
-      <div id="hdrNotif" class="hdr-notif"></div>
+    <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px;">
       <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Prospect Delivery</div>
       <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
         <div style="flex:0 0 auto;width:140px;"><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">First Name</label><input id="fName" class="fi" style="font-size:13px;padding:7px 10px;background:rgba(255,255,255,.9);border-color:rgba(255,255,255,.2);" type="text" placeholder="John"/></div>
@@ -323,7 +301,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
         <button id="pdfBtn" class="btn btn-g" style="height:34px;font-size:12px;padding:0 14px;flex-shrink:0;">&#8595; PDF</button>
         <button id="sendBtn" class="btn btn-dk" style="height:34px;font-size:12px;padding:0 14px;flex-shrink:0;">Generate + Send</button>
       </div>
-      </div>
+      <div id="planResultBox"><div style="font-weight:700;color:var(--dk);margin-bottom:8px;font-size:13px;">&#10003; Plan Created Successfully</div><button id="planLink" class="btn btn-g" style="font-size:12px;">View Personalized Plan</button></div>
     </div>
   </div>
 </div>
@@ -553,27 +531,6 @@ const CRED_RULES=[
   {n:['OneMain','OneMain Financial'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
   {n:['Regional Finance','Regional Finance Corp'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
   {n:['Republic Finance'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
-  {n:['AGCO Finance','AGCO Financial'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['DR Bank'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['FCRP Capital','FCRP Capital LLC'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Fort Worth Credit Union','Fort Worth CU'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Fortera Credit Union','Fortera CU'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Garden Federal Credit Union','Garden FCU'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Golden One Credit Union','Golden 1 Credit Union'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Heights Financial','Heights Finance'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['ISPC'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['LHPCC Trust','LHPCC Trust I'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Local Government Federal Credit Union','LGFCU'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Matco Tools','Matco Fin'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Omni Loans','Omni Financial'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Pioneer Loans'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Preferred Loans'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Quick Help Loans'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Red River Credit'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Redstone Credit Union','Redstone FCU'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['RFFC Financial','RFFC'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['Sunset Financial','Sunset Finance'],s:'rej',r:'Not accepted by Level Debt.'},
-  {n:['WSECU','Washington State Employees Credit Union'],s:'rej',r:'Not accepted by Level Debt.'},
 ];
 const TRAD_CARDS=['American Express','Amex','Bank of America','Capital One','Chase','Citi','Citibank','Discover','Wells Fargo','Synchrony','Barclays','Barclaycard','Comenity Bank','Bread Financial','HSBC','Merrick Bank','Mission Lane','First Premier Bank','Credit One','Milestone','Upgrade','Avant','Best Egg','LendingClub','SoFi','Upstart','Prosper','Marcus','PayPal Credit','Apple Card','Navy Federal','USAA','PNC','TD Bank','U.S. Bank','US Bank','Regions Bank','Fifth Third Bank','Truist','SunTrust','BB&T','M&T Bank','KeyBank','Citizens Bank','Santander','Nordstrom Card',"Macy's Card","JCPenney Card","Kohl's Card",'Best Buy Card','Home Depot Card',"Lowe's Card",'Walmart Card','Target RedCard','Amazon Store Card','CareCredit',"Sam's Club Card",'Costco Card','Dell Financial'];
 const DT_CATS={'Credit cards & loans':['Unsecured','Unsecured Personal Loan','Unsecured Line of Credit','Medical Bill','Payday Loan','Tribal Loan','Cell Phone Bill'],'Auto & vehicle':['Repossession Deficiency','Auto Repo Deficiency','Deficiency','Auto Loan (Secured)'],'Student loans':['Private Student Loan','Federal Student Loan','Navient Student Loan'],'Housing & utilities':['Back Rent','Apartment Back Rent (Collections)','Utility Bill','Mortgage'],'Business':['Business Debt','SBA Loan'],'Tax & government':['IRS Tax Debt','Alimony / Child Support'],'Other':['Judgment','Peer-to-Peer Loan','USAA','Secured Loan','Cross Collateralized Account','Installment Sales Contract','Furniture Store Financing','Direct Furniture Store Loan','Credit Union Loan','Timeshare','Military Account','AFES Account','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Loan from Individual','Other']};
@@ -583,7 +540,7 @@ const DT_ALL=[];
 Object.entries(DT_CATS).forEach(([cat,types])=>types.forEach(t=>DT_ALL.push({t,cat,s:DT_REJ.has(t)?'no':DT_COND.has(t)?'cond':'ok'})));
 const DT_ST={ok:{label:'Accepted',cls:'b-ok'},cond:{label:'Conditional',cls:'b-cond'},no:{label:'Not accepted',cls:'b-no'}};
 // ── Timezone / Language globals ────────────────────────────────────────────
-let dispTZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'America/Los_Angeles';}catch(e){return 'America/Los_Angeles';}})();
+let dispTZ='America/Los_Angeles';
 let _selectingState=false;
 let legacyAdjOpen=false;
 function setDispTZ(tz){dispTZ=tz;renderClocks();if(lastScenario)renderPanel(lastScenario);}
@@ -1007,6 +964,8 @@ function renderCSCard(c){
   $('csTileGrid').innerHTML=CS_PROGS.map(pr=>`<div class="cs-tile${pr.k===p.k?' act':''}"><div style="font-size:12px;font-weight:800;color:${pr.k===p.k?'var(--bl)':'#64748b'};">Prog ${pr.k}</div><div style="font-size:9px;color:#94a3b8;margin-top:1px;">${pr.range}</div><div style="font-size:18px;font-weight:900;color:${pr.k===p.k?'var(--bl)':'var(--dk)'};margin-top:5px;">${fmt(pr.pay)}</div><div style="font-size:11px;color:#64748b;margin-top:1px;">${pr.term} mo</div></div>`).join('');
 }
 function renderPlanCards(c){
+  function commBlock(comm,isRec){return commContentHtml(comm,isRec);}
+
   const cards=[];
   const descTip=(text)=>`<span class="ttp" style="cursor:help;margin-left:5px;"><span style="font-size:10px;color:#94a3b8;border:1px solid #e2e8f0;border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;">?</span><span class="ttp-body" style="white-space:normal;max-width:240px;text-align:left;">${text}</span></span>`;
 
@@ -1227,16 +1186,15 @@ function removeRow(i){if(app.rows.length<=1)return;app.rows.splice(i,1);renderRo
 let lastScenario=null;
 function render(){const c=computeScenario();lastScenario=c;$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCommCompare(c);renderCSCard(c);renderLegacyCard(c);renderPlanCards(c);renderCmpTable(c);renderClocks();const can=!!(c.recommended&&app.sel&&c.total>0);['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}
 async function buildPdf(){const c=computeScenario();if(!(c.recommended&&app.sel&&c.total>0))return;const fn=$('fName').value.trim()||'Client',ln=$('lName').value.trim()||'';const fullName=`${fn} ${ln}`.trim();const{jsPDF}=window.jspdf;const doc=new jsPDF();let y=20;doc.setFontSize(20);doc.setTextColor(15,157,138);doc.text('Funding Tier - Debt Resolution Summary',14,y);y+=10;doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text(`Prepared for: ${fullName}`,14,y);y+=7;const progType=c.route.route==='LEVEL'?'Debt Settlement':c.route.route==='CONSUMER SHIELD'?'Debt Validation':'Unknown';doc.text(`State: ${app.sel}  |  Program: ${progType}`,14,y);y+=10;if(c.csProg&&c.route.route==='CONSUMER SHIELD'){doc.setFontSize(12);doc.setTextColor(26,110,216);doc.text(`Consumer Shield Program ${c.csProg.k}: ${c.csProg.range}`,14,y);y+=7;doc.setFontSize(10);doc.setTextColor(71,85,105);doc.text(`Monthly: ${fmt(c.csProg.pay)}  |  Term: ${c.csProg.term} months  |  Total: ${fmt(c.csProg.term*c.csProg.pay)}`,14,y);y+=10;}const tRows=[['Monthly Payments',fmt(c.dn.mp),c.shortest?fmt(c.shortest.mp):'--',c.recommended?fmt(c.recommended.mp):'--'],['Total Debt',fmt(c.total),fmt(c.total),fmt(c.total)],['Months to Payoff',`${c.dn.months} mo`,c.shortest?`${c.shortest.term} mo`:'--',c.recommended?`${c.recommended.term} mo`:'--'],['Est. Total Payback',fmt(c.dn.total),c.shortest?fmt(c.shortest.tc):'--',c.recommended?fmt(c.recommended.tc):'--'],['Est. Savings','--',c.shortest?fmt(Math.max(0,c.dn.total-c.shortest.tc)):'--',c.recommended?fmt(Math.max(0,c.dn.total-c.recommended.tc)):'--']];const hdrs=['Detail','Current Situation','Fastest Payoff','Recommended'];const cx=[14,64,114,162];const rh=10;doc.setFillColor(241,245,249);doc.rect(14,y,182,rh,'F');doc.setFontSize(7);doc.setTextColor(51,65,85);hdrs.forEach((h,i)=>doc.text(doc.splitTextToSize(h,44),cx[i]+2,y+4));y+=14;tRows.forEach((row,ri)=>{const isSav=ri===4;if(isSav){doc.setFillColor(15,157,138);doc.rect(14,y,182,rh,'F');}else if(ri%2===1){doc.setFillColor(248,250,252);doc.rect(14,y,182,rh,'F');}row.forEach((cell,ci)=>{if(isSav){doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');}else if(ri===3&&ci===1){doc.setTextColor(239,68,68);doc.setFont(undefined,'bold');}else{doc.setTextColor(15,23,42);doc.setFont(undefined,'normal');}doc.setFontSize(8);doc.text(String(cell),cx[ci]+2,y+6);});y+=rh;});const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Funding-Tier-Debt-Resolution.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
-async function showSendModal(){
+function showSendModal(){
   const c=computeScenario();
   const email=$('pEmail').value.trim();
   if(!email){$('pEmail').style.borderColor='var(--rd)';$('pEmail').placeholder='Email required!';setTimeout(()=>{$('pEmail').style.borderColor='';$('pEmail').placeholder='prospect@email.com';},3000);return;}
-  if(!(app.sel&&c.total>0)){_hdrNotif('⚠ Enter state and debts first.','error','');return;}
-  const btn=$('sendBtn');const orig=btn?btn.textContent:'';if(btn){btn.disabled=true;btn.textContent='Sending…';}
-  _hdrNotif('⚡ Generating & sending plan…','sending','');
-  try{const data=await _callAPI(true);_hdrNotif('✓ Plan sent to <strong>'+email+'</strong>','success',data.pageUrl||'');}
-  catch(e){_hdrNotif('⚠ '+(e.message||'Could not send.'),'error','');}
-  finally{if(btn){btn.disabled=false;btn.textContent=orig;}}
+  if(!(c.recommended&&app.sel&&c.total>0)){alert('Complete the scenario first.');return;}
+  const fn=$('fName').value.trim()||'Prospect',ln=$('lName').value.trim()||'';
+  $('modalEmail').textContent=email;
+  $('modalName').textContent=`${fn} ${ln}`.trim()||'Prospect';
+  $('sendModal').classList.add('open');
 }
 function closeSendModal(){$('sendModal').classList.remove('open');}
 async function sendEmailConfirmed(){
@@ -1274,6 +1232,17 @@ async function sendEmailConfirmed(){
     alert(msg);
   }finally{btn.disabled=false;btn.textContent=orig;}
 }
+async function generateUrlOnly(){
+  const c=computeScenario();if(!(app.sel&&c.total>0)){alert('Enter debts and a state first.');return;}
+  const btn=$('urlBtn');const orig=btn?btn.textContent:'';if(btn){btn.disabled=true;btn.textContent='...';}
+  _modalShow('modalSendingView');_progressTo(20,'Generating plan URL...');
+  try{
+    const data=await _callAPI(false);_progressTo(100,'Done!');await new Promise(r=>setTimeout(r,300));
+    _showSuccessModal(data.pageUrl,$('pEmail').value.trim()||'(no email)');
+  }catch(e){const em=$('modalErrorMsg');if(em)em.textContent=e.message||'Could not generate URL.';_modalShow('modalErrorView');}
+  finally{if(btn){btn.disabled=false;btn.textContent=orig;}}
+}
+
 function updateLegacyCalc(newFee,newMo){
   if(!lastScenario||!lastScenario.legacyAvail)return;
   const total=lastScenario.total;
@@ -1289,10 +1258,13 @@ function updateLegacyCalc(newFee,newMo){
   const feeLabel=Math.round(feeRate*100);
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   set('lgFeeDisp',feeLabel+'%');
-  set('lgMoDisp',String(mo));
-  set('lgPayVal',fmt(mp));
-  set('lgMoVal',String(mo));
-  set('lgTcVal',fmt(tc));
+  set('lgMoDisp',mo+' mo \u2192 '+fmt(mp)+'/mo');
+  set('lgPayVal',fmt(mp));set('lgMoVal',String(mo));set('lgTcVal',fmt(tc));
+  const fi=document.getElementById('lgFeeInput');if(fi)fi.value=feeLabel;
+  const mi=document.getElementById('lgMoInput');
+  if(mi){mi.min=minMo;mi.max=maxMo;mi.value=mo;}
+  const moWrap=mi?mi.closest('div'):null;
+  if(moWrap){const last=moWrap.querySelector('div:last-child');if(last)last.innerHTML=`<span>1 mo</span><span>${maxMo} mo ($250 min)</span>`;}
   const band=getLegacyComm(total);
   if(band){
     const commTotal=legacyCommAtFee(band.total,feeRate);
@@ -1305,32 +1277,29 @@ function updateLegacyCalc(newFee,newMo){
       const amtCells=card.querySelectorAll('.plan-comm-block tbody td:nth-child(2)');
       if(amtCells[0])amtCells[0].textContent=fmt(p2);
       if(amtCells[1]&&band.p4>0)amtCells[1].textContent=fmt(p4);
+      const noteDivs=card.querySelectorAll('.comm-block-inner>div');
+      const noteDiv=noteDivs[noteDivs.length-1];
+      if(noteDiv&&noteDiv.textContent.includes('Band'))noteDiv.textContent=`Band ${band.code} @ ${feeLabel}% fee`;
     }
   }
-  renderCmpTable(lastScenario);
-  renderLegacyCard(lastScenario);
+  renderCmpTable(lastScenario);renderLegacyCard(lastScenario);
 }
 
-function _hdrNotif(msg,type,urlVal){
-  const el=document.getElementById('hdrNotif');if(!el)return;
-  el.className='hdr-notif show '+type;
-  el.innerHTML=msg+(urlVal?`<div class="hdr-url-row"><input class="hdr-url-input" id="hdrUrlInput" readonly value="${urlVal}"/><button class="hdr-copy-btn" onclick="(function(){const i=document.getElementById('hdrUrlInput');if(!i)return;navigator.clipboard.writeText(i.value).catch(()=>{i.select();document.execCommand('copy');});const b=this;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',1500);}).call(this)">Copy</button><a href="${urlVal}" target="_blank" style="font-size:10px;color:#93c5fd;text-decoration:underline;white-space:nowrap;margin-left:4px;">Open ↗</a></div>`:'');
-  clearTimeout(_hdrNotif._t);
-  if(!urlVal)_hdrNotif._t=setTimeout(()=>{if(el)el.classList.remove('show');},6000);
-}
-_hdrNotif._t=null;
 let _lastPlanUrl=null,_lastPlanKey=null;
-function _prospectKey(){return [document.getElementById('fName').value.trim(),document.getElementById('lName').value.trim(),document.getElementById('pEmail').value.trim(),app.sel||''].join('|').toLowerCase();}
+function _prospectKey(){return [$('fName').value.trim(),$('lName').value.trim(),$('pEmail').value.trim(),app.sel||''].join('|').toLowerCase();}
+function _modalShow(viewId){['modalConfirmView','modalSendingView','modalSuccessView','modalErrorView'].forEach(id=>{const el=$(id);if(el)el.style.display=id===viewId?'block':'none';});const m=$('sendModal');if(m)m.style.display='flex';}
+function _progressTo(pct,label){const p=$('modalProgress'),l=$('modalProgressLabel');if(p)p.style.width=pct+'%';if(l)l.textContent=label||'';}
+function _showSuccessModal(pageUrl,email){const se=$('modalSuccessEmail');if(se)se.textContent=email&&email!=='(no email)'?'Sent to '+email:'Plan URL generated';const ur=$('modalUrlRow'),ui=$('modalUrlInput'),ul=$('modalUrlLink');if(pageUrl&&ur&&ui&&ul){ui.value=pageUrl;ul.href=pageUrl;ur.style.display='block';}_modalShow('modalSuccessView');}
 async function _callAPI(sendEmail){
-  const c=computeScenario();const email=document.getElementById('pEmail').value.trim();const key=_prospectKey();
+  const c=computeScenario();const email=$('pEmail').value.trim();const key=_prospectKey();
   if(!sendEmail&&_lastPlanUrl&&_lastPlanKey===key)return{ok:true,pageUrl:_lastPlanUrl,cached:true};
-  const payload={firstName:document.getElementById('fName').value.trim()||'Prospect',lastName:document.getElementById('lName').value.trim()||'',email,state:app.sel,totalDebt:Math.round(c.total),sendEmail,doNothing:{monthlyPayment:Math.round(c.dn.mp),months:c.dn.months,totalCost:Math.round(c.dn.total)},recommended:c.recommended?{term:c.recommended.term,mp:Math.round(c.recommended.mp),tc:Math.round(c.recommended.tc)}:null,route:c.route.route};
+  const payload={firstName:$('fName').value.trim()||'Prospect',lastName:$('lName').value.trim()||'',email,state:app.sel,totalDebt:Math.round(c.total),sendEmail,doNothing:{monthlyPayment:Math.round(c.dn.mp),months:c.dn.months,totalCost:Math.round(c.dn.total)},recommended:c.recommended?{term:c.recommended.term,mp:Math.round(c.recommended.mp),tc:Math.round(c.recommended.tc)}:null,route:c.route.route};
   const res=await fetch('/api/generate-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  const data=await res.json();
-  if(!res.ok||!data.ok)throw new Error(data.error||'Server error');
-  if(data.pageUrl){_lastPlanUrl=data.pageUrl;_lastPlanKey=key;}
-  return data;
+  const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.error||'Server error');
+  if(data.pageUrl){_lastPlanUrl=data.pageUrl;_lastPlanKey=key;}return data;
 }
+function retryConfirm(){_modalShow('modalConfirmView');}
+function copyPlanUrl(){const inp=$('modalUrlInput');if(!inp||!inp.value)return;navigator.clipboard.writeText(inp.value).then(()=>{const b=inp.nextElementSibling;if(b){const o=b.textContent;b.textContent='Copied!';setTimeout(()=>b.textContent=o,1500);}}).catch(()=>{inp.select();document.execCommand('copy');});}
 
 function init(){
   const ss=$('stateSearch');if(ss){ss.addEventListener('input',e=>{if(_selectingState)return;app.sel='';searchStates(e.target.value||'');});ss.addEventListener('focus',e=>searchStates(e.target.value||''));}
@@ -1343,20 +1312,107 @@ function init(){
   setInterval(renderClocks,1000);
 }
 init();
-
-document.addEventListener('mousemove',function(e){
-  document.querySelectorAll('.ttp:hover .ttp-body,.tip-wrap:hover .tip-box').forEach(function(el){
-    var x=e.clientX+14,y=e.clientY-10;
-    var w=el.offsetWidth||280,h=el.offsetHeight||60;
-    if(x+w>window.innerWidth-8)x=e.clientX-w-14;
-    if(y+h>window.innerHeight-8)y=e.clientY-h-10;
-    if(x<4)x=4;if(y<4)y=4;
-    el.style.left=x+'px';el.style.top=y+'px';
-  });
-});
 </script>
 <!-- Send Confirmation Modal -->
-
+<div id="sendModal" class="modal-overlay">
+  <div class="modal-box">
+    <div style="font-size:32px;margin-bottom:10px;">📧</div>
+    <div style="font-size:18px;font-weight:900;color:var(--dk);margin-bottom:6px;">Confirm Delivery</div>
+    <div style="font-size:13px;color:#475569;font-weight:500;line-height:1.75;margin-bottom:6px;">Send email to:</div>
+    <div style="font-size:14px;font-weight:900;color:var(--g);background:rgba(15,157,138,.08);border:1px solid rgba(15,157,138,.25);border-radius:8px;padding:7px 14px;margin-bottom:8px;word-break:break-all;" id="modalEmail"></div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:4px;font-weight:500;">And generate a dynamic program page for:</div>
+    <div style="font-size:14px;font-weight:900;color:var(--dk);margin-bottom:20px;" id="modalName"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button onclick="closeSendModal()" style="padding:11px 16px;border-radius:10px;border:1.5px solid rgba(239,68,68,.4);background:#fef2f2;color:var(--rd);font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;transition:all .12s;">&#10005; No, Cancel</button>
+      <button id="modalConfirmBtn" onclick="sendEmailConfirmed()" style="padding:11px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;transition:all .12s;box-shadow:0 4px 12px rgba(15,157,138,.3);">&#10003; Yes, Send</button>
+    </div>
+  </div>
 </div>
+
+<div id="sendModal" style="display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;background:rgba(15,23,42,.65);backdrop-filter:blur(6px);">
+  <div style="background:#fff;border-radius:20px;padding:28px;max-width:500px;width:92%;box-shadow:0 24px 64px rgba(0,0,0,.3);">
+    <div id="modalConfirmView">
+      <div style="font-size:17px;font-weight:900;color:var(--dk);margin-bottom:6px;">&#128231; Send Plan to Prospect</div>
+      <p style="font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.6;">This will generate a personalized debt resolution plan and send it to <strong id="modalEmail"></strong> for <strong id="modalName"></strong>.</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeSendModal()" class="btn" style="background:var(--bg);color:#64748b;border:1.5px solid var(--br);">Cancel</button>
+        <button onclick="sendEmailConfirmed()" class="btn btn-g">&#10003; Yes, Send</button>
+      </div>
+    </div>
+    <div id="modalSendingView" style="display:none;text-align:center;padding:8px 0;">
+      <div style="font-size:15px;font-weight:800;color:var(--dk);margin-bottom:16px;">&#9889; Generating &amp; Sending Plan…</div>
+      <div style="background:#e2e8f0;border-radius:999px;height:8px;overflow:hidden;margin-bottom:12px;">
+        <div id="modalProgress" style="height:100%;background:linear-gradient(90deg,var(--g),var(--gd));border-radius:999px;width:0%;transition:width .4s ease;"></div>
+      </div>
+      <div id="modalProgressLabel" style="font-size:12px;color:#64748b;">Connecting to server…</div>
+    </div>
+    <div id="modalSuccessView" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div style="width:44px;height:44px;background:rgba(15,157,138,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">&#10003;</div>
+        <div><div style="font-size:16px;font-weight:900;color:#0b7d6e;">Plan Sent Successfully</div><div id="modalSuccessEmail" style="font-size:12px;color:#64748b;margin-top:2px;"></div></div>
+      </div>
+      <div id="modalUrlRow" style="background:#f0fdf4;border:1.5px solid rgba(15,157,138,.3);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:none;">
+        <div style="font-size:10px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Prospect Plan URL</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input id="modalUrlInput" readonly style="flex:1;font-size:11px;padding:6px 10px;border:1px solid var(--br);border-radius:7px;background:#fff;color:var(--dk);font-family:monospace;" value=""/>
+          <button onclick="copyPlanUrl()" class="btn btn-g" style="font-size:11px;padding:6px 12px;white-space:nowrap;flex-shrink:0;">Copy</button>
+          <a id="modalUrlLink" href="#" target="_blank" class="btn" style="font-size:11px;padding:6px 12px;white-space:nowrap;background:#eff6ff;color:var(--bl);border:1.5px solid rgba(26,110,216,.3);flex-shrink:0;">Open ↗</a>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;"><button onclick="closeSendModal()" class="btn btn-g">Done</button></div>
+    </div>
+    <div id="modalErrorView" style="display:none;">
+      <div style="font-size:15px;font-weight:800;color:var(--rd);margin-bottom:10px;">&#9888; Could Not Send</div>
+      <div id="modalErrorMsg" style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:16px;"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeSendModal()" class="btn" style="background:var(--bg);color:#64748b;border:1.5px solid var(--br);">Close</button>
+        <button onclick="retryConfirm()" class="btn btn-g">Retry</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="sendModal" style="display:none;position:fixed;inset:0;z-index:500;align-items:center;justify-content:center;background:rgba(15,23,42,.65);backdrop-filter:blur(6px);">
+  <div style="background:#fff;border-radius:20px;padding:28px;max-width:500px;width:92%;box-shadow:0 24px 64px rgba(0,0,0,.3);">
+    <div id="modalConfirmView">
+      <div style="font-size:17px;font-weight:900;color:var(--dk);margin-bottom:6px;">&#128231; Send Plan to Prospect</div>
+      <p style="font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.6;">Generate and send personalized plan to <strong id="modalEmail"></strong> for <strong id="modalName"></strong>.</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeSendModal()" class="btn" style="background:var(--bg);color:#64748b;border:1.5px solid var(--br);">Cancel</button>
+        <button onclick="sendEmailConfirmed()" class="btn btn-g">&#10003; Yes, Send</button>
+      </div>
+    </div>
+    <div id="modalSendingView" style="display:none;text-align:center;padding:8px 0;">
+      <div style="font-size:15px;font-weight:800;color:var(--dk);margin-bottom:16px;">&#9889; Generating &amp; Sending Plan...</div>
+      <div style="background:#e2e8f0;border-radius:999px;height:8px;overflow:hidden;margin-bottom:12px;"><div id="modalProgress" style="height:100%;background:linear-gradient(90deg,var(--g),var(--gd));border-radius:999px;width:0%;transition:width .4s ease;"></div></div>
+      <div id="modalProgressLabel" style="font-size:12px;color:#64748b;">Connecting to server...</div>
+    </div>
+    <div id="modalSuccessView" style="display:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div style="width:44px;height:44px;background:rgba(15,157,138,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;">&#10003;</div>
+        <div><div style="font-size:16px;font-weight:900;color:#0b7d6e;">Plan Sent Successfully</div><div id="modalSuccessEmail" style="font-size:12px;color:#64748b;margin-top:2px;"></div></div>
+      </div>
+      <div id="modalUrlRow" style="background:#f0fdf4;border:1.5px solid rgba(15,157,138,.3);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:none;">
+        <div style="font-size:10px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Prospect Plan URL</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input id="modalUrlInput" readonly style="flex:1;font-size:11px;padding:6px 10px;border:1px solid var(--br);border-radius:7px;background:#fff;color:var(--dk);font-family:monospace;" value=""/>
+          <button onclick="copyPlanUrl()" class="btn btn-g" style="font-size:11px;padding:6px 12px;white-space:nowrap;flex-shrink:0;">Copy</button>
+          <a id="modalUrlLink" href="#" target="_blank" class="btn" style="font-size:11px;padding:6px 12px;white-space:nowrap;background:#eff6ff;color:var(--bl);border:1.5px solid rgba(26,110,216,.3);flex-shrink:0;">Open &#8599;</a>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;"><button onclick="closeSendModal()" class="btn btn-g">Done</button></div>
+    </div>
+    <div id="modalErrorView" style="display:none;">
+      <div style="font-size:15px;font-weight:800;color:var(--rd);margin-bottom:10px;">&#9888; Could Not Send</div>
+      <div id="modalErrorMsg" style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:16px;"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeSendModal()" class="btn" style="background:var(--bg);color:#64748b;border:1.5px solid var(--br);">Close</button>
+        <button onclick="retryConfirm()" class="btn btn-g">Retry</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
