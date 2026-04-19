@@ -1316,26 +1316,21 @@ function renderCSCard(c){
   $('csTileGrid').innerHTML=CS_PROGS.map(pr=>`<div class="cs-tile${pr.k===p.k?' act':''}"><div style="font-size:12px;font-weight:800;color:${pr.k===p.k?'var(--bl)':'#64748b'};">Prog ${pr.k}</div><div style="font-size:9px;color:#94a3b8;margin-top:1px;">${pr.range}</div><div style="font-size:18px;font-weight:900;color:${pr.k===p.k?'var(--bl)':'var(--dk)'};margin-top:5px;">${fmt(pr.pay)}</div><div style="font-size:11px;color:#64748b;margin-top:1px;">${pr.term} mo</div></div>`).join('');
 }
 function renderPlanCards(c){
-  function commBlock(comm,isRec){return commContentHtml(comm,isRec);}
-
   const cards=[];
-  const descTip=(text)=>`<span class="ttp" style="cursor:help;margin-left:5px;"><span style="font-size:10px;color:#94a3b8;border:1px solid #e2e8f0;border-radius:50%;width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;">?</span><span class="ttp-body" style="white-space:normal;max-width:240px;text-align:left;">${text}</span></span>`;
 
   if(c.csAvail&&c.csProg){
     const p=c.csProg,isRec=c.route.route==='CONSUMER SHIELD';
     const comm=getCommForCard(c,'CS');
-    const desc='';
     cards.push(`<div class="plan-card-v pc-cs${isRec?' rec':''}">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
-            <div class="ttp"><div class="logo-sm"><img src="${CS_LOGO}" alt="CS"/></div><span class="ttp-body" style="white-space:normal;max-width:240px;text-align:left;">${desc}</span></div>
-            <div class="ttp" style="cursor:help;"><span style="font-size:14px;font-weight:900;border-bottom:1.5px dashed #cbd5e1;">Consumer Shield</span><span class="ttp-body" style="white-space:normal;max-width:240px;text-align:left;">${desc}</span></div>
+            <div class="logo-sm"><img src="${CS_LOGO}" alt="CS"/></div>
+            <div><span style="font-size:14px;font-weight:900;">Consumer Shield</span></div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class=\"plan-chip-rec\">Recommended</span>':'<span class=\"plan-chip-check\">✓</span>'}</div>
+          <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class="plan-chip-rec">Recommended</span>':'<span class="plan-chip-check">✓</span>'}</div>
         </div>
-        <div class="plan-body-desc">${desc}</div>
-        <div style="border:1.5px solid rgba(26,110,216,.25);border-radius:12px;overflow:hidden;margin-bottom:0;">
+        <div style="border:1.5px solid rgba(26,110,216,.25);border-radius:12px;overflow:hidden;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
             <div style="padding:10px 12px;border-right:1px solid rgba(26,110,216,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:var(--bl);line-height:1;">${fmt(p.pay)}</div></div>
             <div style="padding:10px 12px;border-right:1px solid rgba(26,110,216,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Length (Months)</div><div style="font-size:18px;font-weight:900;color:var(--bl);line-height:1;">${p.term}<span style="font-size:10px;font-weight:700;vertical-align:middle;"> mo</span></div></div>
@@ -1344,41 +1339,23 @@ function renderPlanCards(c){
         </div>
       </div>
       <hr class="comm-divider"/>
-        </div>
-      </div>
-      <hr class="comm-divider"/>
       <div class="plan-comm-block${isRec?' rec-comm':''}">${commContentHtml(comm,isRec)}</div>
-      <div class="legacy-calc" style="margin:14px 18px 18px 18px;">
-          <div style="margin-bottom:10px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:#334155;">Service Fee</span><span style="font-size:11px;font-weight:800;color:#6d28d9;">${feeLabel}%</span></div>
-            <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="updateLegacyCalc(this.value,null)"/>
-            <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>35% (most affordable)</span><span>49% (max)</span></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:#334155;">Program Length</span><span style="font-size:11px;font-weight:800;color:#6d28d9;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
-            <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="updateLegacyCalc(null,this.value)"/>
-            <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>${minMo} mo (${fmt(Math.round(tc/minMo))}/mo)</span><span>${maxMo} mo ($250/mo min)</span></div>
-          </div>
-          ${mp<250?'<div style="background:#fef2f2;border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 10px;font-size:11px;color:#b91c1c;font-weight:700;margin-top:8px;">&#9888; Below $250 minimum — increase fee or shorten program.</div>':''}
-        </div>
     </div>`);
   }
 
   if(c.ldAvail){
     const mt=getLDMaxTerm(c.total),mp=Math.round((c.total*.5+c.total*c.feeRate)/mt),isRec=c.route.route==='LEVEL';
     const comm=getCommForCard(c,'LEVEL');
-    const desc='';
     cards.push(`<div class="plan-card-v pc-ld${isRec?' rec':''}">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
-            <div class="ttp"><div class="logo-sm"><img src="${LD_LOGO}" alt="LD"/></div><span class="ttp-body" style="white-space:normal;max-width:240px;text-align:left;">${desc}</span></div>
-            <div class="ttp" style="cursor:help;"><span style="font-size:14px;font-weight:900;border-bottom:1.5px dashed #cbd5e1;">Level Debt</span><span class="ttp-body" style="white-space:normal;max-width:240px;text-align:left;">${desc}</span></div>
+            <div class="logo-sm"><img src="${LD_LOGO}" alt="LD"/></div>
+            <div><span style="font-size:14px;font-weight:900;">Level Debt</span></div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class=\"plan-chip-rec\">Recommended</span>':'<span class=\"plan-chip-check\">✓</span>'}</div>
+          <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class="plan-chip-rec">Recommended</span>':'<span class="plan-chip-check">✓</span>'}</div>
         </div>
-        <div class="plan-body-desc">${desc}</div>
-        <div style="border:1.5px solid rgba(15,157,138,.25);border-radius:12px;overflow:hidden;margin-bottom:0;">
+        <div style="border:1.5px solid rgba(15,157,138,.25);border-radius:12px;overflow:hidden;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
             <div style="padding:10px 12px;border-right:1px solid rgba(15,157,138,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:#0b7d6e;line-height:1;">${fmt(mp)}</div></div>
             <div style="padding:10px 12px;border-right:1px solid rgba(15,157,138,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Length (Months)</div><div style="font-size:18px;font-weight:900;color:#0b7d6e;line-height:1;">${mt}<span style="font-size:10px;font-weight:700;vertical-align:middle;"> mo</span></div></div>
@@ -1391,28 +1368,30 @@ function renderPlanCards(c){
     </div>`);
   }
 
-  if(c.legacyAvail){
+  {
     const isRec=c.route.route==='LEGACY';
     const total=c.total,feeRate=legacyState.feeRate;
     const tc=legacyTotalCost(total,feeRate);
     const maxMo=legacyMaxMonths(total,feeRate),minMo=legacyMinMonths();
     const csMp=c.csProg?c.csProg.pay:0;
     const ldMp=c.ldAvail?Math.round((total*.5+total*c.feeRate)/getLDMaxTerm(total)):0;
-    if(!legacyState._init||legacyState._initTotal!==total){legacyState.months=legacyDefaultMonths(total,feeRate,csMp,ldMp);legacyState._init=true;legacyState._initTotal=total;}
-    const mo=legacyClampMonths(total,feeRate,legacyState.months);legacyState.months=mo;
+    if(total>0 && (!legacyState._init||legacyState._initTotal!==total)){
+      legacyState.months=legacyDefaultMonths(total,feeRate,csMp,ldMp);
+      legacyState._init=true;legacyState._initTotal=total;
+    }
+    const mo=legacyClampMonths(total,feeRate,legacyState.months||minMo);legacyState.months=mo;
     const mp=legacyMP(total,feeRate,mo);const feeLabel=Math.round(feeRate*100);
     const comm=getCommForCard(c,'LEGACY');
-    const desc='';
-    cards.push(`<div class="plan-card-v pc-lg${isRec?' rec':''}" id="legacyPlanCard">
+    const cardStyle = c.legacyAvail ? '' : ' style="filter:grayscale(1);opacity:.5;"';
+    cards.push(`<div class="plan-card-v pc-lg${isRec?' rec':''}" id="legacyPlanCard"${cardStyle}>
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
-            <div class="ttp"><div class="logo-sm"><img src="${LEGACY_LOGO}" alt="Legacy" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:8px;font-weight:800;color:#6d28d9;\\'>LCS</span>';"/></div><span class="ttp-body" style="white-space:normal;max-width:240px;text-align:left;">${desc}</span></div>
-            <div class="ttp" style="cursor:help;"><span style="font-size:14px;font-weight:900;border-bottom:1.5px dashed #cbd5e1;">Legacy Capital Services</span><span class="ttp-body" style="white-space:normal;max-width:240px;text-align:left;">${desc}</span></div>
+            <div class="logo-sm"><img src="${LEGACY_LOGO}" alt="Legacy" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-size:8px;font-weight:800;color:#6d28d9;\'>LCS</span>';"/></div>
+            <div><span style="font-size:14px;font-weight:900;">Legacy Capital Services</span></div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class=\"plan-chip-rec\">Recommended</span>':'<span class=\"plan-chip-check\">✓</span>'}</div>
+          <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class="plan-chip-rec">Recommended</span>':(c.legacyAvail?'<span class="plan-chip-check">✓</span>':'')}</div>
         </div>
-        <div class="plan-body-desc">${desc}</div>
         <div style="border:1.5px solid rgba(109,40,217,.2);border-radius:12px;overflow:hidden;margin-bottom:14px;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
             <div style="padding:10px 12px;border-right:1px solid rgba(109,40,217,.12);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:#6d28d9;line-height:1;">${fmt(mp)}</div></div>
@@ -1420,6 +1399,22 @@ function renderPlanCards(c){
             <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);line-height:1;">${fmt(tc)}</div></div>
           </div>
         </div>
+      </div>
+      <hr class="comm-divider"/>
+      <div class="plan-comm-block${isRec?' rec-comm':''}">${commContentHtml(comm,isRec)}</div>
+      <div class="legacy-calc" style="margin:14px 18px 18px 18px;">
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:#334155;">Service Fee</span><span style="font-size:11px;font-weight:800;color:#6d28d9;">${feeLabel}%</span></div>
+          <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="updateLegacyCalc(this.value,null)" ${c.legacyAvail?'':'disabled'}>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>35% (most affordable)</span><span>49% (max)</span></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:#334155;">Program Length</span><span style="font-size:11px;font-weight:800;color:#6d28d9;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
+          <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="updateLegacyCalc(null,this.value)" ${c.legacyAvail?'':'disabled'}>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>${minMo} mo (${fmt(Math.round(tc/Math.max(minMo,1)))}/mo)</span><span>${maxMo} mo ($250/mo min)</span></div>
+        </div>
+        ${!c.legacyAvail?'<div style="background:#f8fafc;border:1px solid var(--br);border-radius:8px;padding:6px 10px;font-size:11px;color:#64748b;font-weight:700;margin-top:8px;">Legacy is unavailable for this state or debt range.</div>':(mp<250?'<div style="background:#fef2f2;border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 10px;font-size:11px;color:#b91c1c;font-weight:700;margin-top:8px;">&#9888; Below $250 minimum — increase fee or shorten program.</div>':'')}
+      </div>
     </div>`);
   }
 
