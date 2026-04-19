@@ -756,6 +756,83 @@ const LEGACY_ACCEPT_RULES=[
   {n:["Velocity"],s:"ok",r:"Legacy Capital Services accepted list: Acceptable 3rd party."}
 ];
 const ALL_CRED_RULES=[...CRED_RULES,...LEGACY_REJECT_RULES,...LEGACY_ACCEPT_RULES];
+const LEVEL_DEBT_UNACCEPTED_LOOKUP=[
+  "ALLEVIATE TAX LLC",
+  "Acceptance Now",
+  "ACIMA",
+  "Advance Financial",
+  "AGCO FINANCE",
+  "ALL the \"State Employee Credit Union\" / STATEEMP",
+  "Aqua Finance",
+  "Bell Finance",
+  "BHG Financial/ BHG Money/ all the BHG's",
+  "Bobs Discount Furniture",
+  "Bobs Finance",
+  "Bobs Furniture",
+  "Concord Servicing",
+  "Cornerstone Financial",
+  "CreditCentral",
+  "Credologi LLC",
+  "DR Bank",
+  "EMPOWER FCU",
+  "Enerbank",
+  "ESL Credit Union",
+  "Farmers Furniture (FRMRS FURN)",
+  "FCRP Capital LLC",
+  "Fort Worth Credit Union or Forth Worth CU",
+  "Fortera Credit Union",
+  "Garden Federal Credit Union",
+  "Golden One Credit Union",
+  "Goldman Sachs - credit card only (we do accept Apple Cards and GS Loans)",
+  "GoodLeap",
+  "Hawaii CU",
+  "HC ROYA / HYCITE / Royal Prestige",
+  "Heights Financial",
+  "Island Finance (PR)",
+  "ISPC",
+  "Kabbage Loans",
+  "KIKOFF",
+  "Koalafi",
+  "Lendmark  (No Secured Accounts, Unsecured is okay)",
+  "LHPCC Trust I",
+  "Loan Pal",
+  "Local Government Federal Credit Union",
+  "Mariner Finance (No Secured Accounts, Unsecured is okay)",
+  "Matco Tools Financing and Matco Fin",
+  "Military Star",
+  "Nebraska Furniture",
+  "Omni Loans",
+  "OneMain  (No Secured Accounts, Unsecured is okay)",
+  "Opensky",
+  "PINNACLE FINANCIAL GROUP",
+  "Pioneer Loans",
+  "Popular Bank - Banco Popular (PR)",
+  "PowerPay",
+  "Preferred Loans",
+  "Quick Help Loans",
+  "Red River Credit  (REDRIVERCR)",
+  "REDSTONE Credit Union",
+  "Regional Finance  (No Secured Accounts, Unsecured is okay)",
+  "RENT-A CENTER",
+  "Republic Finance  (No Secured Accounts, Unsecured is okay)",
+  "RFFC FINANCIAL",
+  "Robinhood",
+  "Royal Prestige",
+  "Security Finance",
+  "STATE EMPLOYEES C U",
+  "Service Finance Company ( SVCFIN )  ( SRVFINCO)",
+  "Snap On Credit",
+  "SOLAR MOSAIC",
+  "Southern Finance",
+  "Sunset Financial",
+  "Toledo Finance",
+  "Tower Loans",
+  "West Creek Financial",
+  "WSECU",
+  "Yendo"
+];
+const LEVEL_DEBT_UNACCEPTED_RULES=LEVEL_DEBT_UNACCEPTED_LOOKUP.map(name=>({n:[name],s:'rej',r:'Listed on the Level Debt unaccepted creditor list.'}));
+const ALL_CRED_RULES_EXTENDED=[...ALL_CRED_RULES,...LEVEL_DEBT_UNACCEPTED_RULES];
 
 const $=id=>document.getElementById(id);
 const fmt=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n||0);
@@ -763,11 +840,32 @@ const num=v=>{const n=parseFloat(String(v).replace(/[^0-9.]/g,''));return Number
 const esc=v=>String(v||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const pct=v=>`${(v||0).toFixed(1)}%`;
 function normName(v){return String(v||'').toUpperCase().replace(/&/g,' AND ').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();}
-function getCredRule(name){if(!name)return null;const a=normName(name);return ALL_CRED_RULES.find(r=>r.n.some(n=>{const b=normName(n);if(a===b||a.includes(b)||b.includes(a))return true;const ta=a.split(' '),tb=b.split(' ');const[sh,lo]=ta.length<=tb.length?[ta,tb]:[tb,ta];return sh.length>=2&&sh.every(t=>t.length>2&&lo.includes(t));}))||null;}
+function getCredRule(name){if(!name)return null;const a=normName(name);return ALL_CRED_RULES_EXTENDED.find(r=>r.n.some(n=>{const b=normName(n);if(a===b||a.includes(b)||b.includes(a))return true;const ta=a.split(' '),tb=b.split(' ');const[sh,lo]=ta.length<=tb.length?[ta,tb]:[tb,ta];return sh.length>=2&&sh.every(t=>t.length>2&&lo.includes(t));}))||null;}
 const isTradCard=n=>TRAD_CARDS.some(t=>normName(n).includes(normName(t)));
 const getLDState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:LD_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Black Out'}:LD_RED.has(c)?{status:'RED',label:'Attorney Model'}:{status:'GREEN',label:'Standard Model'};
 const getCSState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:CS_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Black Out'}:{status:'GREEN',label:'Serviceable'};
 const getLegacyState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:LEGACY_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Not Serviceable'}:{status:'GREEN',label:'Serviceable'};
+function resolveStateInput(raw){
+  const v=String(raw||'').trim();
+  if(!v)return null;
+  const nv=normName(v);
+  const hit=STATE_OPTS.find(s=>nv===normName(s.a)||nv===normName(s.n)||nv===normName(s.l)||nv===normName(`${s.n} ${s.a}`)||nv===normName(`${s.a} ${s.n}`));
+  if(hit)return hit;
+  const partial=STATE_OPTS.find(s=>normName(s.n).startsWith(nv)||normName(s.l).startsWith(nv));
+  return partial||null;
+}
+function syncStateFromInput(force){
+  const inp=$('stateSearch');
+  if(!inp)return false;
+  const hit=resolveStateInput(inp.value||'');
+  if(hit){
+    app.sel=hit.a;
+    if(force)inp.value=hit.l;
+    return true;
+  }
+  if(force)app.sel='';
+  return false;
+}
 const getLDMaxTerm=d=>d<10000?24:d<12500?30:d<15000?36:d<25000?42:d<35000?48:d<50000?54:60;
 function toggleAcc(bodyId,btnId){const b=$(bodyId),btn=$(btnId);if(!b||!btn)return;const open=b.classList.contains('open');b.classList.toggle('open',!open);btn.classList.toggle('open',!open);}
 let nextId=2;
@@ -841,9 +939,16 @@ function computeScenario(){
 }
 function rowAlerts(row,route){
   const alerts=[];
-  if(route==='LEVEL'){const rule=getCredRule(row.cred);if(rule){if(rule.s==='rej')alerts.push({label:'Not accepted by Level',tone:'r',detail:rule.r});else if(rule.s==='cond')alerts.push({label:row.secured?'Secured - not eligible':'Conditional - unsecured only',tone:row.secured?'r':'a',detail:rule.r});}if(LD_REJ.has(row.dt))alerts.push({label:'Debt type not accepted',tone:'r',detail:row.dt+' not accepted by Level.'});}
-  if(route==='CONSUMER SHIELD'){if(CS_REJ.has(row.dt))alerts.push({label:'Not accepted by CS',tone:'r',detail:row.dt+' not accepted by Consumer Shield.'});if(CS_COND.has(row.dt))alerts.push({label:'Conditional - docs needed',tone:'a',detail:row.dt+' requires additional documentation.'});}
-  if(!route||route==='NO OPTION'){const rule=getCredRule(row.cred);if(rule&&rule.s==='rej')alerts.push({label:'Level excluded creditor',tone:'r',detail:rule.r});if(rule&&rule.s==='cond')alerts.push({label:'Conditional creditor',tone:'a',detail:rule.r});}
+  const rule=getCredRule(row.cred);
+  if(rule){
+    if(rule.s==='rej')alerts.push({label:'Level rejected creditor',tone:'r',detail:rule.r});
+    else if(rule.s==='cond')alerts.push({label:row.secured?'Level conditional - secured not eligible':'Level conditional creditor',tone:row.secured?'r':'a',detail:rule.r});
+  }
+  if(route==='LEVEL'&&LD_REJ.has(row.dt))alerts.push({label:'Debt type not accepted',tone:'r',detail:row.dt+' not accepted by Level.'});
+  if(route==='CONSUMER SHIELD'){
+    if(CS_REJ.has(row.dt))alerts.push({label:'Not accepted by CS',tone:'r',detail:row.dt+' not accepted by Consumer Shield.'});
+    if(CS_COND.has(row.dt))alerts.push({label:'Conditional - docs needed',tone:'a',detail:row.dt+' requires additional documentation.'});
+  }
   return alerts;
 }
 function clockParts(tz){const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());const m={};p.forEach(x=>{if(x.type!=='literal')m[x.type]=x.value;});const wd={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};return{h:Number(m.hour),min:Number(m.minute),wd:wd[m.weekday]};}
@@ -1333,17 +1438,43 @@ function renderRows(){
   document.querySelectorAll('[data-rem]').forEach(b=>b.addEventListener('click',()=>removeRow(Number(b.dataset.rem))));
   bindCredSearches();bindDTRows();refreshRowVisuals();
 }
-function getTradMatches(q){const lq=q.trim().toLowerCase();if(!lq)return[];return TRAD_CARDS.filter(n=>n.toLowerCase().includes(lq)).slice(0,8).map(n=>({display_name:n,secured:false,product_type:'credit card'}));}
+function getTradMatches(q){const lq=q.trim().toLowerCase();if(!lq)return[];return TRAD_CARDS.filter(n=>n.toLowerCase().includes(lq)).slice(0,8).map(n=>({display_name:n,secured:false,product_type:'credit card',source:'local_card'}));}
+function getRuleMatches(q){
+  const lq=normName(q);
+  if(!lq)return[];
+  const found=[];
+  ALL_CRED_RULES_EXTENDED.forEach(rule=>{
+    (rule.n||[]).forEach(name=>{
+      const nn=normName(name);
+      if(nn.includes(lq)||lq.includes(nn)){
+        if(!found.some(x=>normName(x.display_name)===nn))found.push({display_name:name,secured:false,product_type:'lookup',source:'rule',ruleStatus:rule.s,ruleReason:rule.r});
+      }
+    });
+  });
+  return found.slice(0,12);
+}
+function getLocalCreditorMatches(q){
+  const merged=[];
+  [...getRuleMatches(q),...getTradMatches(q)].forEach(item=>{
+    const key=normName(item.display_name||'');
+    if(key&&!merged.some(x=>normName(x.display_name)===key))merged.push(item);
+  });
+  return merged;
+}
 async function searchCred(i,query){
   const box=document.querySelector(`[data-cr="${i}"]`);if(!box)return;
   if(!query.trim()){box.innerHTML='';box.className='drop';return;}
-  const local=getTradMatches(query);let merged=[...local];
-  try{const res=await fetch(`/api/ghl-creditors?search=${encodeURIComponent(query)}`);const data=await res.json();if(data.ok&&Array.isArray(data.results)){data.results.forEach(item=>{const nm=String(item.display_name||'').trim();if(nm&&!merged.some(x=>normName(x.display_name)===normName(nm)))merged.push(item);});}}catch(e){}
+  let merged=[...getLocalCreditorMatches(query)];
+  try{
+    const res=await fetch(`/api/ghl-creditors?search=${encodeURIComponent(query)}`);
+    const data=await res.json();
+    if(data.ok&&Array.isArray(data.results))data.results.forEach(item=>{const nm=String(item.display_name||'').trim();if(nm&&!merged.some(x=>normName(x.display_name)===normName(nm)))merged.push({...item,source:'api'});});
+  }catch(e){}
   if(!merged.length){box.innerHTML=`<button type="button" data-mv="${i}" data-mq="${esc(query)}">Use "${esc(query)}" as manual entry</button>`;box.className='drop open';bindCredClicks();return;}
-  box.innerHTML=merged.slice(0,10).map(item=>{const sec=item.secured===true||item.secured==='true';const rule=getCredRule(item.display_name||'');const isRej=rule&&rule.s==='rej',isCond=rule&&rule.s==='cond';const dt=isTradCard(item.display_name||'')?'Unsecured':sec?'Secured Loan':'Unsecured';return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="${esc(dt)}" data-ps="${sec}" style="background:${isRej?'#fef2f2':isCond?'#fffbeb':'#fff'};"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;"><span style="font-weight:800;color:${isRej?'var(--rd)':isCond?'#92400e':'var(--dk)'};">${esc(item.display_name||'')}</span>${isRej?`<span style="font-size:10px;font-weight:800;background:var(--rd);color:#fff;border-radius:999px;padding:2px 7px;">Level excluded</span>`:''}${isCond?`<span style="font-size:10px;font-weight:800;background:var(--am);color:#fff;border-radius:999px;padding:2px 7px;">Conditional</span>`:''}</div><div style="font-size:11px;color:${sec?'var(--rd)':'#0b7d6e'};margin-top:2px;">${esc(dt)} &middot; ${sec?'Secured':'Unsecured'}</div>${rule?`<div style="font-size:11px;color:#64748b;margin-top:2px;font-style:italic;">${esc(rule.r)}</div>`:''}</button>`;}).join('');
+  box.innerHTML=merged.slice(0,12).map(item=>{const sec=item.secured===true||item.secured==='true';const rule=getCredRule(item.display_name||'');const isRej=rule&&rule.s==='rej',isCond=rule&&rule.s==='cond';const dt=isTradCard(item.display_name||'')?'Unsecured':sec?'Secured Loan':'Unsecured';return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="${esc(dt)}" data-ps="${sec}" style="background:${isRej?'#fef2f2':isCond?'#fffbeb':'#fff'};"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;"><span style="font-weight:800;color:${isRej?'var(--rd)':isCond?'#92400e':'var(--dk)'};">${esc(item.display_name||'')}</span><span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${item.source==='rule'?`<span style="font-size:10px;font-weight:800;background:#e2e8f0;color:#334155;border-radius:999px;padding:2px 7px;">Lookup</span>`:''}${isRej?`<span style="font-size:10px;font-weight:800;background:var(--rd);color:#fff;border-radius:999px;padding:2px 7px;">Level rejected</span>`:''}${isCond?`<span style="font-size:10px;font-weight:800;background:var(--am);color:#fff;border-radius:999px;padding:2px 7px;">Level conditional</span>`:''}</span></div><div style="font-size:11px;color:${sec?'var(--rd)':'#0b7d6e'};margin-top:2px;">${esc(dt)} &middot; ${sec?'Secured':'Unsecured'}</div>${rule?`<div style="font-size:11px;color:#64748b;margin-top:2px;font-style:italic;">${esc(rule.r)}</div>`:''}</button>`;}).join('');
   box.className='drop open';bindCredClicks();
 }
-function bindCredSearches(){document.querySelectorAll('.ci').forEach(n=>{n.addEventListener('input',e=>{const i=Number(e.target.dataset.i);app.rows[i].cred=e.target.value||'';if(isTradCard(e.target.value||'')){app.rows[i].dt='Unsecured';app.rows[i].secured=false;}searchCred(i,e.target.value||'');});n.addEventListener('focus',e=>searchCred(Number(e.target.dataset.i),e.target.value||''));});}
+function bindCredSearches(){document.querySelectorAll('.ci').forEach(n=>{n.addEventListener('input',e=>{const i=Number(e.target.dataset.i);app.rows[i].cred=e.target.value||'';if(isTradCard(e.target.value||'')){app.rows[i].dt='Unsecured';app.rows[i].secured=false;}searchCred(i,e.target.value||'');render();});n.addEventListener('focus',e=>searchCred(Number(e.target.dataset.i),e.target.value||''));});}
 function bindCredClicks(){
   document.querySelectorAll('[data-pi]').forEach(b=>{b.onclick=()=>{const i=Number(b.dataset.pi),nm=b.dataset.pn||'',dt=b.dataset.pt||'Unsecured',sec=b.dataset.ps==='true';app.rows[i].cred=nm;app.rows[i].secured=sec;app.rows[i].dt=sec?'Secured Loan':isTradCard(nm)?'Unsecured':dt;const inp=document.querySelector(`.ci[data-i="${i}"]`);const box=document.querySelector(`[data-cr="${i}"]`);if(inp)inp.value=nm;if(box){box.innerHTML='';box.className='drop';}dtSetValue(i,app.rows[i].dt);renderRows();render();};});
   document.querySelectorAll('[data-mv]').forEach(b=>{b.onclick=()=>{const i=Number(b.dataset.mv),val=b.dataset.mq||'';app.rows[i].cred=val;app.rows[i].dt='Unsecured';app.rows[i].secured=false;const inp=document.querySelector(`.ci[data-i="${i}"]`);const box=document.querySelector(`[data-cr="${i}"]`);if(inp)inp.value=val;if(box){box.innerHTML='';box.className='drop';}renderRows();render();};});
@@ -1489,7 +1620,7 @@ function renderPlanResult(data, mode){
   const planUrl=(data&& (data.pageUrl||data.url)) || _lastPlanUrl || '';
   if(planUrl){_lastPlanUrl=planUrl;_lastPlanKey=_prospectKey();}
   const title=mode==='send'
-    ? `✅ Plan generated and send request submitted to ${esc($('pEmail').value.trim())}`
+    ? `✅ Plan generated and delivery submitted to ${esc($('pEmail').value.trim())}`
     : '✅ Personalized plan URL generated';
   box.innerHTML=`<div class="delivery-result-title">${title}</div>
     <div class="delivery-result-row">
@@ -1509,7 +1640,6 @@ async function generateUrlOnlyDirect(){
   try{
     const data=await _callAPI(false);
     renderPlanResult(data,'url');
-    if(data&&data.pageUrl)window.open(data.pageUrl,'_blank','noopener');
   }catch(e){
     alert((e&&e.message)||'Could not generate URL.');
   }finally{if(btn){btn.disabled=false;btn.textContent=orig;}}
@@ -1530,7 +1660,12 @@ async function sendPlanDirect(){
 }
 
 function init(){
-  const ss=$('stateSearch');if(ss){ss.addEventListener('input',e=>{if(_selectingState)return;app.sel='';searchStates(e.target.value||'');});ss.addEventListener('focus',e=>searchStates(e.target.value||''));}
+  const ss=$('stateSearch');if(ss){
+    ss.addEventListener('input',e=>{if(_selectingState)return;syncStateFromInput(false);searchStates(e.target.value||'');render();});
+    ss.addEventListener('focus',e=>searchStates(e.target.value||''));
+    ss.addEventListener('blur',()=>{if(_selectingState)return;syncStateFromInput(true);render();});
+    ss.addEventListener('keydown',e=>{if(e.key==='Enter'){syncStateFromInput(true);const sr=$('stateResults');if(sr){sr.innerHTML='';sr.className='drop';}render();}});
+  }
   const pb=$('pdfBtn');if(pb)pb.addEventListener('click',buildPdf);
   const ub=$('urlBtn');if(ub)ub.addEventListener('click',generateUrlOnlyDirect);
   const sb=$('sendBtn');if(sb)sb.addEventListener('click',sendPlanDirect);
