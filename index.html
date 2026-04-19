@@ -185,7 +185,7 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 .prov-badge{font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;}
 /* Route badge — teal pill with white text */
 .route-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border-radius:999px;font-size:13px;font-weight:900;box-shadow:0 2px 8px rgba(15,157,138,.3);}
-.route-badge img{max-height:16px;max-width:32px;object-fit:contain;filter:brightness(0) invert(1);}
+.route-badge img{max-height:18px;max-width:42px;object-fit:contain;}
 /* Commission compare green collapsible */
 .comm-acc-hd{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:linear-gradient(135deg,var(--g),var(--gd));border-radius:12px;cursor:pointer;user-select:none;margin-top:18px;}
 .comm-acc-hd:hover{opacity:.93;}
@@ -209,9 +209,15 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .meta-sel:hover{background:rgba(255,255,255,.18);}
 .meta-sel option{background:#1e293b;color:#fff;}
 /* Plan card — single column, commission below */
-.plan-card-v{border:1.5px solid var(--br);border-radius:14px;background:#fff;overflow:hidden;transition:all .15s;}
+.plan-card-v{border:1.5px solid var(--br);border-radius:14px;background:linear-gradient(180deg,#ffffff 0%,#fcfffe 100%);overflow:visible;transition:all .15s;box-shadow:0 6px 20px rgba(15,23,42,.05);}
 .plan-card-v:hover{box-shadow:0 6px 20px rgba(15,23,42,.08);}
 .plan-card-v.rec{border:2px solid var(--g);}
+.plan-card-v::before{content:"";display:block;height:5px;background:linear-gradient(135deg,var(--g),var(--gd));}
+.plan-card-v.pc-cs::before{background:linear-gradient(135deg,#1a6ed8,#0f9d8a);}
+.plan-card-v.pc-ld::before{background:linear-gradient(135deg,#0f9d8a,#0b7d6e);}
+.plan-card-v.pc-lg::before{background:linear-gradient(135deg,#6d28d9,#1a6ed8,#0f9d8a);}
+.spiff-acc{overflow:visible!important;}
+.tip-wrap .tip-box,.ttp .ttp-body{z-index:9999;}
 .plan-body{padding:18px;}
 .plan-comm-block{padding:14px 18px 18px;background:rgba(15,23,42,.018);}
 .plan-comm-block.rec-comm{background:rgba(15,157,138,.04);}
@@ -253,7 +259,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .cmp tr.mp-row td:nth-child(2){background:#dbeafe!important;}
 
 /* ── Support hours dark blue ── */
-#hoursBtn{background:linear-gradient(135deg,#0f2a5e,#1a3a8f)!important;color:#fff!important;border-radius:10px;}
+#hoursBtn{background:linear-gradient(135deg,#0f2a5e,#1a3a8f)!important;color:#fff!important;border-radius:0!important;}
 #hoursBtn>span:first-child>span:not(#liveTimeBadge){color:#fff!important;}
 #hoursBtn .acc-chevron{color:rgba(255,255,255,.7)!important;}
 /* ── adj-prog ── */
@@ -282,23 +288,34 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
         </div>
       </div>
       <!-- TZ + Language selectors consolidated below logo -->
-      <div style="display:flex;align-items:center;gap:6px;padding-left:2px;">
-        <span style="font-size:10px;color:rgba(255,255,255,.35);">&#127760;</span>
-        <select id="tzSel" class="meta-sel" onchange="setDispTZ(this.value)">
-          <option value="America/Los_Angeles">PST / PDT (Pacific)</option>
-          <option value="America/Denver">MST / MDT (Mountain)</option>
-          <option value="America/Chicago">CST / CDT (Central)</option>
-          <option value="America/New_York">EST / EDT (Eastern)</option>
-          <option value="UTC">UTC</option>
-        </select>
-        <span id="sysClockBadge" style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:3px 10px;letter-spacing:.3px;font-variant-numeric:tabular-nums;white-space:nowrap;"></span>
-        <span style="font-size:10px;color:rgba(255,255,255,.25);">|</span>
-        <select id="langSel" class="meta-sel" onchange="setLang(this.value)">
-          <option value="en">&#127482;&#127480; EN</option>
-          <option value="es">&#127466;&#127480; ES</option>
-          <option value="pt">&#127463;&#127479; PT</option>
-          <option value="fr">&#127467;&#127479; FR</option>
-        </select>
+      <div style="display:flex;flex-direction:column;gap:6px;padding-left:2px;">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span style="font-size:10px;color:rgba(255,255,255,.35);">&#127760;</span>
+          <select id="tzSel" class="meta-sel" onchange="setDispTZ(this.value)">
+            <option value="America/Los_Angeles">PST / PDT (Pacific)</option>
+            <option value="America/Denver">MST / MDT (Mountain)</option>
+            <option value="America/Chicago">CST / CDT (Central)</option>
+            <option value="America/New_York">EST / EDT (Eastern)</option>
+            <option value="UTC">UTC</option>
+          </select>
+          <span id="sysClockBadge" style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:3px 10px;letter-spacing:.3px;font-variant-numeric:tabular-nums;white-space:nowrap;"></span>
+          <span style="font-size:10px;color:rgba(255,255,255,.25);">|</span>
+          <select id="langSel" class="meta-sel" onchange="setLang(this.value)">
+            <option value="en">&#127482;&#127480; EN</option>
+            <option value="es">&#127466;&#127480; ES</option>
+            <option value="pt">&#127463;&#127479; PT</option>
+            <option value="fr">&#127467;&#127479; FR</option>
+          </select>
+        </div>
+        <div style="border:1px solid rgba(255,255,255,.14);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.05);">
+          <button class="acc-btn" id="hoursBtn" onclick="toggleAcc('hoursBody','hoursBtn')" style="padding:7px 10px;background:transparent;color:#fff;border-radius:0;font-size:11px;">
+            <span style="display:flex;align-items:center;gap:7px;"><span>&#128336;</span><span>Support Hours &amp; Status</span><span id="liveTimeBadge" style="font-size:10px;font-weight:900;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:6px;padding:2px 8px;font-variant-numeric:tabular-nums;"></span></span>
+            <span class="acc-chevron">&#8964;</span>
+          </button>
+          <div class="acc-body" id="hoursBody" style="border-top:1px solid rgba(255,255,255,.1);">
+            <div id="clockBox"></div>
+          </div>
+        </div>
       </div>
     </div>
     <!-- RIGHT: Prospect Delivery with narrower inputs -->
@@ -361,16 +378,6 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
         </select>
       </div>
       <div id="providerAvail" style="border:1px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:10px;"></div>
-      <!-- Support Hours - single collapsible accordion -->
-      <div style="border:1px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:14px;">
-        <button class="acc-btn" id="hoursBtn" onclick="toggleAcc('hoursBody','hoursBtn')">
-          <span style="display:flex;align-items:center;gap:8px;"><span>&#128336;</span><span>Support Hours &amp; Status</span><span id="liveTimeBadge" style="font-size:10px;font-weight:900;color:#0f172a;background:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:2px 8px;font-variant-numeric:tabular-nums;"></span></span>
-          <span class="acc-chevron">&#8964;</span>
-        </button>
-        <div class="acc-body" id="hoursBody" style="border-top:1px solid var(--br);">
-          <div id="clockBox"></div>
-        </div>
-      </div>
       <div id="flagsBox" style="display:grid;gap:6px;"></div>
     </div>
   </div>
@@ -379,7 +386,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
   <div class="card workspace-full">
     <div class="card-hd">Program Comparison</div>
     <p style="font-size:13px;color:#64748b;margin-bottom:16px;font-weight:500;">Only currently available and eligible options are shown.</p>
-    <div id="planCards" style="display:grid;grid-template-columns:1fr;gap:16px;max-width:780px;"></div>
+    <div id="planCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;align-items:start;"></div>
     <div id="planDiff" style="margin-top:16px;overflow-x:auto;"></div>
     <!-- Spiff bonuses collapsible -->
     <div id="spiffSection" style="display:none;margin-top:16px;">
@@ -878,6 +885,7 @@ function collectFlags(rows,total,sc){
   if(sc&&getCSState(sc).status==='BLACKOUT')csF.push('Consumer Shield does not service this state.');
   if(total>0&&total<7000)ldF.push('Level Debt requires at least $7,000 total enrolled debt.');
   const discDebt=rows.reduce((s,r)=>normName(r.cred).includes('DISCOVER')?s+num(r.amount):s,0);
+  if(discDebt>0)ldF.push(`Discover debt portion is ${pct(discDebt/Math.max(total,1)*100)} of enrolled. Level Debt caps Discover exposure at 60% of total enrolled debt.`);
   if(total>0&&discDebt/total>.6)ldF.push(`Discover debt is ${pct(discDebt/total*100)} of enrolled - Level max is 60%.`);
   const medDebt=rows.reduce((s,r)=>['Medical Bill','Back Rent','Apartment Back Rent (Collections)','Repossession Deficiency','Auto Repo Deficiency'].includes(r.dt)?s+num(r.amount):s,0);
   if(total>0&&medDebt/total>.5)ldF.push(`Medical/back rent/repo is ${pct(medDebt/total*100)} of enrolled - Level max is 50%.`);
@@ -907,9 +915,10 @@ function chooseRoute(total,sc,flags){
   const csOK=cs.status!=='BLACKOUT'&&total>=4000&&!flags.cs.some(f=>f.includes('not accepted')||f.includes('requires at least'));
   const ldStop=flags.ld.some(f=>f.includes('not accepted')||f.includes('requires at least')||f.includes('60%')||f.includes('50%')||f.includes('25%')||f.includes('CA residents')||f.includes('Discover private'));
   const ldOK=ld.status!=='BLACKOUT'&&total>=7000&&!ldStop;
-  const legacyOK=legacy.status!=='BLACKOUT'&&total>6000;
+  const legacyOK=legacy.status!=='BLACKOUT'&&total>=6000;
   if(total>0&&total<4000)return{route:'NO OPTION',reason:'Debt below $4,000 - no current backend matches this scenario.'};
-  if(total>=4000&&total<=6000){if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt between $4,000 and $6,000 routes to Consumer Shield.'};return{route:'NO OPTION',reason:'Debt in CS range but CS not available for this state/scenario.'};}
+  if(total>=4000&&total<=5999){if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt between $4,000 and $5,999 routes to Consumer Shield.'};return{route:'NO OPTION',reason:'Debt in Consumer Shield range but CS is not available for this state or scenario.'};}
+  if(total>=6000&&total<=6999){if(legacyOK)return{route:'LEGACY',reason:'Debt between $6,000 and $6,999 routes to Legacy Capital Services when state and creditor rules allow.'};if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt is in the Legacy preferred band, but Legacy is unavailable, so routing falls back to Consumer Shield.'};return{route:'NO OPTION',reason:'Debt is in the Legacy preferred band, but no backend is available for this state or scenario.'};}
   if(total>6000&&pref==='debt_validation'){if(legacyOK)return{route:'LEGACY',reason:'Prospect wants debt validation - Legacy Capital Services is available in this state.'};if(csOK)return{route:'CONSUMER SHIELD',reason:'Prospect wants debt validation - Legacy unavailable, routing to Consumer Shield.'};return{route:'NO OPTION',reason:'Prospect wants debt validation but neither Legacy nor Consumer Shield is available.'};}
   if(ldOK)return{route:'LEVEL',reason:ld.status==='RED'?'Best option is Level Debt under the attorney model in this state.':'Best option is Level Debt in a serviceable standard state.'};
   if(legacyOK)return{route:'LEGACY',reason:'Level Debt not available under current routing rules - Legacy Capital Services is the next best option.'};
@@ -925,14 +934,22 @@ function computeScenario(){
   const csProg=getCsProg(total);
   const csAvail=css.status!=='BLACKOUT'&&total>=4000&&!flags.cs.some(f=>f.includes('not accepted')||f.includes('requires at least'));
   const ldAvail=lds.status!=='BLACKOUT'&&total>=7000;
-  const legacyAvail=lgs.status!=='BLACKOUT'&&total>6000;
+  const legacyAvail=lgs.status!=='BLACKOUT'&&total>=6000;
   const feeRate=route.route==='LEVEL'?(lds.status==='RED'?.27:.25):0;
   const dn=calcDN(total);
   let shortest=null,recommended=null;
   if(route.route==='LEVEL'){const tc=total*.5+total*feeRate;shortest={term:12,tc,mp:tc/12};const mt=getLDMaxTerm(total);recommended={term:mt,tc,mp:tc/mt};}
   else if(route.route==='CONSUMER SHIELD'&&csProg){const tc=csProg.term*csProg.pay;shortest={term:csProg.term,tc,mp:csProg.pay};recommended=shortest;}
+  else if(route.route==='LEGACY'&&legacyAvail){
+    const tc=legacyTotalCost(total,legacyState.feeRate);
+    const minMo=legacyMinMonths();
+    const mo=legacyClampMonths(total,legacyState.feeRate,legacyState.months||legacyDefaultMonths(total,legacyState.feeRate,csProg?csProg.pay:0,0));
+    shortest={term:minMo,tc,mp:legacyMP(total,legacyState.feeRate,minMo)};
+    recommended={term:mo,tc,mp:legacyMP(total,legacyState.feeRate,mo)};
+  }
   const activeFlags=[];
   if(route.route==='LEVEL')activeFlags.push(...flags.ld);
+  if(rows.some(r=>normName(r.cred).includes('DISCOVER')))activeFlags.push(`Discover selected — apply Level Debt's 60% Discover exposure rule when evaluating routing.`);
   if(route.route==='CONSUMER SHIELD'){activeFlags.push(...flags.cs);activeFlags.push('Consumer Shield support: Mon-Fri 9am-7pm EST.');activeFlags.push('Consumer Shield uses Equifax for credit pull.');}
   if(route.route==='NO OPTION')activeFlags.push(route.reason);
   return{rows,total,route,dn,shortest,recommended,feeRate,lds,css,lgs,csProg,csAvail,ldAvail,legacyAvail,flags:activeFlags};
@@ -945,6 +962,7 @@ function rowAlerts(row,route){
     else if(rule.s==='cond')alerts.push({label:row.secured?'Level conditional - secured not eligible':'Level conditional creditor',tone:row.secured?'r':'a',detail:rule.r});
   }
   if(route==='LEVEL'&&LD_REJ.has(row.dt))alerts.push({label:'Debt type not accepted',tone:'r',detail:row.dt+' not accepted by Level.'});
+  if(route==='LEVEL'&&normName(row.cred).includes('DISCOVER'))alerts.push({label:'Discover rule applies',tone:'a',detail:'Level Debt allows Discover only when total Discover exposure stays at or below 60% of enrolled debt.'});
   if(route==='CONSUMER SHIELD'){
     if(CS_REJ.has(row.dt))alerts.push({label:'Not accepted by CS',tone:'r',detail:row.dt+' not accepted by Consumer Shield.'});
     if(CS_COND.has(row.dt))alerts.push({label:'Conditional - docs needed',tone:'a',detail:row.dt+' requires additional documentation.'});
@@ -1196,9 +1214,9 @@ function renderCommCompare(c){
   spiffCont.innerHTML=`
   <div style="display:grid;gap:10px;">
     ${makeAcc('spiffDaily','⚡','Daily Deal Bonus','Per-deal bonus × qualifying deals that day','linear-gradient(135deg,#0f9d8a,#0b7d6e)',dailyContent)}
-    ${makeAcc('spiffMonthly','📈','Monthly Volume Bonus','Hit monthly thresholds to stack volume bonuses','linear-gradient(135deg,#1a6ed8,#1558b0)',monthlyContent)}
-    ${makeAcc('spiffBalanced','⚖️','Balanced Book Bonus','Maintain proper CS/DS deal mix to earn book bonuses','linear-gradient(135deg,#d97706,#b45309)',balancedContent)}
-    ${makeAcc('spiffLD','🏆','LD Enrollment Bonus','Level Debt daily enrolled volume threshold bonus','linear-gradient(135deg,#059669,#047857)',ldContent)}
+    ${makeAcc('spiffMonthly','📈','Monthly Volume Bonus','Hit monthly thresholds to stack volume bonuses','linear-gradient(135deg,#16a34a,#15803d)',monthlyContent)}
+    ${makeAcc('spiffBalanced','⚖️','Balanced Book Bonus','Maintain proper CS/DS deal mix to earn book bonuses','linear-gradient(135deg,#22c55e,#16a34a)',balancedContent)}
+    ${makeAcc('spiffLD','🏆','LD Enrollment Bonus','Level Debt daily enrolled volume threshold bonus','linear-gradient(135deg,#0f9d8a,#047857)',ldContent)}
   </div>`;
 }
 
@@ -1249,7 +1267,7 @@ function renderPlanCards(c){
     const p=c.csProg,isRec=c.route.route==='CONSUMER SHIELD';
     const comm=getCommForCard(c,'CS');
     const desc='Debt Validation — Fixed monthly payment. Debts challenged through a legal process. No interest, no negotiation.';
-    cards.push(`<div class="plan-card-v${isRec?' rec':''}">
+    cards.push(`<div class="plan-card-v pc-cs${isRec?' rec':''}">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -1276,7 +1294,7 @@ function renderPlanCards(c){
     const mt=getLDMaxTerm(c.total),mp=Math.round((c.total*.5+c.total*c.feeRate)/mt),isRec=c.route.route==='LEVEL';
     const comm=getCommForCard(c,'LEVEL');
     const desc='Debt Settlement — Negotiates with creditors to reduce balances. Program fee applies. Savings vs paying minimum can be substantial.';
-    cards.push(`<div class="plan-card-v${isRec?' rec':''}">
+    cards.push(`<div class="plan-card-v pc-ld${isRec?' rec':''}">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -1311,7 +1329,7 @@ function renderPlanCards(c){
     const mp=legacyMP(total,feeRate,mo);const feeLabel=Math.round(feeRate*100);
     const comm=getCommForCard(c,'LEGACY');
     const desc='Attorney-Led Resolution — Debts resolved through legal channels with adjustable fee structure. Balance affordability and commission by tuning the service fee.';
-    cards.push(`<div class="plan-card-v${isRec?' rec':''}" id="legacyPlanCard">
+    cards.push(`<div class="plan-card-v pc-lg${isRec?' rec':''}" id="legacyPlanCard">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -1348,7 +1366,7 @@ function renderPlanCards(c){
   }
 
   $('planCards').innerHTML=cards.length?cards.join(''):`<div style="grid-column:1/-1;border:1px solid rgba(239,68,68,.3);background:#fef2f2;color:#b91c1c;border-radius:12px;padding:14px;font-weight:700;">No program options available for this state and debt scenario.</div>`;
-  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:12px;overflow:hidden;"><div style="background:var(--dk);padding:11px 16px;font-size:13px;font-weight:800;color:#fff;">How the Programs Differ</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Legacy Capital Services</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$6,000 and Higher</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Service Fee</td><td style="padding:10px 14px;">Fixed by program tier</td><td style="padding:10px 14px;">25–27% of enrolled</td><td style="padding:10px 14px;">Adjustable 35–49%</td></tr></tbody></table></div></div>`;
+  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:12px;overflow:hidden;"><div style="background:var(--dk);padding:11px 16px;font-size:13px;font-weight:800;color:#fff;">How the Programs Differ</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Legacy Capital Services</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$6,000+</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Service Fee</td><td style="padding:10px 14px;">Fixed by program tier</td><td style="padding:10px 14px;">25–27% of enrolled</td><td style="padding:10px 14px;">Adjustable 35–49%</td></tr></tbody></table></div></div>`;
 }
 
 function renderLegacyCard(c){
@@ -1489,8 +1507,8 @@ function onAmtChange(e){const i=Number(e.target.dataset.i);if(!app.rows[i])retur
 function addRow(){if(app.rows.length>=MAX_ROWS)return;app.rows.push(newRow(nextId++));renderRows();render();}
 function removeRow(i){if(app.rows.length<=1)return;app.rows.splice(i,1);renderRows();render();}
 let lastScenario=null;
-function render(){const c=computeScenario();lastScenario=c;$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCommCompare(c);renderCSCard(c);renderLegacyCard(c);renderPlanCards(c);renderCmpTable(c);renderClocks();const can=!!(c.recommended&&app.sel&&c.total>0);['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}
-async function buildPdf(){const c=computeScenario();if(!(c.recommended&&app.sel&&c.total>0))return;const fn=$('fName').value.trim()||'Client',ln=$('lName').value.trim()||'';const fullName=`${fn} ${ln}`.trim();const{jsPDF}=window.jspdf;const doc=new jsPDF();let y=20;doc.setFontSize(20);doc.setTextColor(15,157,138);doc.text('Funding Tier - Debt Resolution Summary',14,y);y+=10;doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text(`Prepared for: ${fullName}`,14,y);y+=7;const progType=c.route.route==='LEVEL'?'Debt Settlement':c.route.route==='CONSUMER SHIELD'?'Debt Validation':'Unknown';doc.text(`State: ${app.sel}  |  Program: ${progType}`,14,y);y+=10;if(c.csProg&&c.route.route==='CONSUMER SHIELD'){doc.setFontSize(12);doc.setTextColor(26,110,216);doc.text(`Consumer Shield Program ${c.csProg.k}: ${c.csProg.range}`,14,y);y+=7;doc.setFontSize(10);doc.setTextColor(71,85,105);doc.text(`Monthly: ${fmt(c.csProg.pay)}  |  Term: ${c.csProg.term} months  |  Total: ${fmt(c.csProg.term*c.csProg.pay)}`,14,y);y+=10;}const tRows=[['Monthly Payments',fmt(c.dn.mp),c.shortest?fmt(c.shortest.mp):'--',c.recommended?fmt(c.recommended.mp):'--'],['Total Debt',fmt(c.total),fmt(c.total),fmt(c.total)],['Months to Payoff',`${c.dn.months} mo`,c.shortest?`${c.shortest.term} mo`:'--',c.recommended?`${c.recommended.term} mo`:'--'],['Est. Total Payback',fmt(c.dn.total),c.shortest?fmt(c.shortest.tc):'--',c.recommended?fmt(c.recommended.tc):'--'],['Est. Savings','--',c.shortest?fmt(Math.max(0,c.dn.total-c.shortest.tc)):'--',c.recommended?fmt(Math.max(0,c.dn.total-c.recommended.tc)):'--']];const hdrs=['Detail','Current Situation','Fastest Payoff','Recommended'];const cx=[14,64,114,162];const rh=10;doc.setFillColor(241,245,249);doc.rect(14,y,182,rh,'F');doc.setFontSize(7);doc.setTextColor(51,65,85);hdrs.forEach((h,i)=>doc.text(doc.splitTextToSize(h,44),cx[i]+2,y+4));y+=14;tRows.forEach((row,ri)=>{const isSav=ri===4;if(isSav){doc.setFillColor(15,157,138);doc.rect(14,y,182,rh,'F');}else if(ri%2===1){doc.setFillColor(248,250,252);doc.rect(14,y,182,rh,'F');}row.forEach((cell,ci)=>{if(isSav){doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');}else if(ri===3&&ci===1){doc.setTextColor(239,68,68);doc.setFont(undefined,'bold');}else{doc.setTextColor(15,23,42);doc.setFont(undefined,'normal');}doc.setFontSize(8);doc.text(String(cell),cx[ci]+2,y+6);});y+=rh;});const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Funding-Tier-Debt-Resolution.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+function render(){const c=computeScenario();lastScenario=c;$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCommCompare(c);renderCSCard(c);renderLegacyCard(c);renderPlanCards(c);renderCmpTable(c);renderClocks();const can=!!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION');['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}
+async function buildPdf(){const c=computeScenario();if(!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION'))return;const fn=$('fName').value.trim()||'Client',ln=$('lName').value.trim()||'';const fullName=`${fn} ${ln}`.trim();const{jsPDF}=window.jspdf;const doc=new jsPDF();let y=20;doc.setFontSize(20);doc.setTextColor(15,157,138);doc.text('Funding Tier - Debt Resolution Summary',14,y);y+=10;doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text(`Prepared for: ${fullName}`,14,y);y+=7;const progType=c.route.route==='LEVEL'?'Debt Settlement':c.route.route==='CONSUMER SHIELD'?'Debt Validation':c.route.route==='LEGACY'?'Attorney-Led Resolution':'Unknown';doc.text(`State: ${app.sel}  |  Program: ${progType}`,14,y);y+=10;if(c.csProg&&c.route.route==='CONSUMER SHIELD'){doc.setFontSize(12);doc.setTextColor(26,110,216);doc.text(`Consumer Shield Program ${c.csProg.k}: ${c.csProg.range}`,14,y);y+=7;doc.setFontSize(10);doc.setTextColor(71,85,105);doc.text(`Monthly: ${fmt(c.csProg.pay)}  |  Term: ${c.csProg.term} months  |  Total: ${fmt(c.csProg.term*c.csProg.pay)}`,14,y);y+=10;} if(c.route.route==='LEGACY'&&c.recommended){doc.setFontSize(12);doc.setTextColor(109,40,217);doc.text(`Legacy Capital Services`,14,y);y+=7;doc.setFontSize(10);doc.setTextColor(71,85,105);doc.text(`Monthly: ${fmt(c.recommended.mp)}  |  Term: ${c.recommended.term} months  |  Total: ${fmt(c.recommended.tc)}`,14,y);y+=10;}const tRows=[['Monthly Payments',fmt(c.dn.mp),c.shortest?fmt(c.shortest.mp):'--',c.recommended?fmt(c.recommended.mp):'--'],['Total Debt',fmt(c.total),fmt(c.total),fmt(c.total)],['Months to Payoff',`${c.dn.months} mo`,c.shortest?`${c.shortest.term} mo`:'--',c.recommended?`${c.recommended.term} mo`:'--'],['Est. Total Payback',fmt(c.dn.total),c.shortest?fmt(c.shortest.tc):'--',c.recommended?fmt(c.recommended.tc):'--'],['Est. Savings','--',c.shortest?fmt(Math.max(0,c.dn.total-c.shortest.tc)):'--',c.recommended?fmt(Math.max(0,c.dn.total-c.recommended.tc)):'--']];const hdrs=['Detail','Current Situation','Fastest Payoff','Recommended'];const cx=[14,64,114,162];const rh=10;doc.setFillColor(241,245,249);doc.rect(14,y,182,rh,'F');doc.setFontSize(7);doc.setTextColor(51,65,85);hdrs.forEach((h,i)=>doc.text(doc.splitTextToSize(h,44),cx[i]+2,y+4));y+=14;tRows.forEach((row,ri)=>{const isSav=ri===4;if(isSav){doc.setFillColor(15,157,138);doc.rect(14,y,182,rh,'F');}else if(ri%2===1){doc.setFillColor(248,250,252);doc.rect(14,y,182,rh,'F');}row.forEach((cell,ci)=>{if(isSav){doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');}else if(ri===3&&ci===1){doc.setTextColor(239,68,68);doc.setFont(undefined,'bold');}else{doc.setTextColor(15,23,42);doc.setFont(undefined,'normal');}doc.setFontSize(8);doc.text(String(cell),cx[ci]+2,y+6);});y+=rh;});const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Funding-Tier-Debt-Resolution.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
 function showSendModal(){
   const c=computeScenario();
   const email=$('pEmail').value.trim();
@@ -1595,10 +1613,18 @@ function buildFullPayload(sendEmail){
     firstName:$('fName').value.trim()||'Prospect',
     lastName:$('lName').value.trim()||'',
     email,
+    recipientEmail:email,
+    prospectEmail:email,
+    sendToEmail:email,
     state:app.sel,
     totalDebt:total,
     sendEmail:!!sendEmail,
+    emailDelivery:!!sendEmail,
     attachPdf:true,
+    attachPDF:true,
+    generatePdf:true,
+    sendPdf:!!sendEmail,
+    deliverPdfToEmail:!!sendEmail,
     deliveryMode:sendEmail?'email_and_pdf':'url_only',
     doNothing:{monthlyPayment:Math.round(c.dn.mp),monthsToPayoff:Math.round(c.dn.months),totalPayback:Math.round(c.dn.total),apr:c.dn.apr},
     shortest:c.shortest?{term:c.shortest.term,monthlyPayment:Math.round(c.shortest.mp),totalCost:Math.round(c.shortest.tc)}:null,
@@ -1619,8 +1645,9 @@ function renderPlanResult(data, mode){
   const box=$('planResultBox');if(!box)return;
   const planUrl=(data&& (data.pageUrl||data.url)) || _lastPlanUrl || '';
   if(planUrl){_lastPlanUrl=planUrl;_lastPlanKey=_prospectKey();}
+  const emailStatus=(data&&Object.prototype.hasOwnProperty.call(data,'emailSent')) ? data.emailSent : null;
   const title=mode==='send'
-    ? `✅ Plan generated and delivery submitted to ${esc($('pEmail').value.trim())}`
+    ? (emailStatus===false ? `⚠️ Plan generated but email was not confirmed by the server for ${esc($('pEmail').value.trim())}` : `✅ Plan generated and delivery submitted to ${esc($('pEmail').value.trim())}`)
     : '✅ Personalized plan URL generated';
   box.innerHTML=`<div class="delivery-result-title">${title}</div>
     <div class="delivery-result-row">
