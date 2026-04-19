@@ -120,6 +120,8 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 .comm-title{font-size:14px;font-weight:900;color:var(--am);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 #planResultBox{display:none;margin:0 0 10px 0;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.12);backdrop-filter:blur(6px);}
 .delivery-result-title{font-size:12px;font-weight:800;color:#fff;margin-bottom:6px;}
+.delivery-result-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;padding:8px 10px;border-radius:10px;background:rgba(15,23,42,.72);}
+.delivery-result-close{border:none;background:rgba(255,255,255,.1);color:#fff;width:24px;height:24px;border-radius:999px;cursor:pointer;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;}
 .delivery-result-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .delivery-url-input{flex:1 1 280px;min-width:220px;height:34px;padding:0 10px;border-radius:9px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.95);color:#0f172a;font-size:12px;font-weight:700;}
 .delivery-mini-btn{height:34px;border:none;border-radius:9px;padding:0 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;}
@@ -229,21 +231,24 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .ttp .ttp-body{max-width:340px;white-space:normal;}
 .tip-wrap .tip-box{max-width:340px;}
 .delivery-fab{position:fixed;right:18px;bottom:18px;z-index:1200;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+.support-fab-panel{display:none;width:min(420px,calc(100vw - 28px));background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:18px;box-shadow:0 18px 42px rgba(15,23,42,.36);overflow:visible;}
+.support-fab-panel.open{display:block;}
+.support-fab-body{padding:14px 16px;background:linear-gradient(135deg,#0f172a 0%,#0f2a5e 45%,#0f766e 100%);}
+.support-fab-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 15px;border:none;border-radius:999px;background:linear-gradient(135deg,#0f2a5e,#1a3a8f);color:#fff;font-size:13px;font-weight:900;box-shadow:0 14px 30px rgba(15,23,42,.26);cursor:pointer;}
+.support-fab-btn img{width:15px;height:15px;object-fit:contain;filter:brightness(0) invert(1);}
+.support-fab-panel .acc-body,.support-fab-panel #clockBox{display:block!important;}
 .delivery-fab-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 16px;border:none;border-radius:999px;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;font-size:13px;font-weight:900;box-shadow:0 14px 30px rgba(15,157,138,.32);cursor:pointer;}
-.delivery-fab-panel{display:none;width:min(420px,calc(100vw - 28px));background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:18px;box-shadow:0 18px 42px rgba(15,23,42,.36);overflow:hidden;}
+.delivery-fab-panel{display:none;width:min(420px,calc(100vw - 28px));background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:18px;box-shadow:0 18px 42px rgba(15,23,42,.36);overflow:visible;}
 .delivery-fab-panel.open{display:block;}
 .delivery-fab-body{padding:16px;background:linear-gradient(135deg,#0f172a 0%,#0f2a5e 45%,#0f766e 100%);}
 .delivery-fab-grid{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;}
-@media(max-width:760px){.delivery-fab{right:12px;left:12px;align-items:stretch;}.delivery-fab-panel{width:100%;}.delivery-fab-btn{justify-content:center;width:100%;}}
+@media(max-width:760px){.delivery-fab{right:12px;left:12px;align-items:stretch;}.delivery-fab-panel,.support-fab-panel{width:100%;}.delivery-fab-btn,.support-fab-btn{justify-content:center;width:100%;}}
 .tip-wrap .tip-box,.ttp .ttp-body{z-index:9999;}
 .plan-body{padding:18px;}
-.plan-comm-block{padding:14px 18px 18px;background:rgba(15,23,42,.018);}
-.plan-comm-block.rec-comm{background:rgba(15,157,138,.04);}
-.comm-divider{border:none;border-top:2px solid var(--g);margin:0;}
-.comm-inline-hd{font-size:11px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.comm-divider{display:none;}
 /* Spiff section accordions */
 .spiff-acc{border:1.5px solid var(--br);border-radius:12px;overflow:visible;margin-bottom:10px;}
-.spiff-acc-btn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border:none;cursor:pointer;font-family:inherit;text-align:left;transition:opacity .12s;}
+.spiff-acc-btn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 15px 11px;border:none;cursor:pointer;font-family:inherit;text-align:left;transition:opacity .12s;overflow:visible;}
 .spiff-acc-btn:hover{opacity:.88;}
 .spiff-acc-body{display:none;}
 .spiff-acc-body.open{display:block;}
@@ -325,15 +330,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
             <option value="fr">&#127467;&#127479; FR</option>
           </select>
         </div>
-        <div style="border:1px solid rgba(255,255,255,.14);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.05);">
-          <button class="acc-btn" id="hoursBtn" onclick="toggleAcc('hoursBody','hoursBtn')" style="padding:7px 10px;background:transparent;color:#fff;border-radius:0;font-size:11px;">
-            <span style="display:flex;align-items:center;gap:7px;"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69e53a2e50b9a3263a22de91.png" alt="Support" style="width:14px;height:14px;object-fit:contain;filter:brightness(0) invert(1);"/><span>GET SUPPORT</span><span id="liveTimeBadge" style="font-size:10px;font-weight:900;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:6px;padding:2px 8px;font-variant-numeric:tabular-nums;"></span></span>
-            <span class="acc-chevron">&#8964;</span>
-          </button>
-          <div class="acc-body" id="hoursBody" style="border-top:1px solid rgba(255,255,255,.1);">
-            <div id="clockBox"></div>
-          </div>
-        </div>
+<div id="liveTimeBadge" style="display:none;"></div>
       </div>
     </div>
     <!-- Prospect Delivery moved to floating launcher -->
@@ -480,6 +477,19 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 </div>
 </main>
 <div class="delivery-fab">
+  <div id="supportFabPanel" class="support-fab-panel">
+    <div class="support-fab-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
+        <div>
+          <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.4px;">Get Support</div>
+          <div style="font-size:13px;font-weight:900;color:#fff;margin-top:2px;">Live backend support hours and contacts</div>
+        </div>
+        <button type="button" onclick="toggleSupportFab(false)" style="border:none;background:rgba(255,255,255,.12);color:#fff;width:28px;height:28px;border-radius:999px;cursor:pointer;font-size:16px;">×</button>
+      </div>
+      <div id="clockBox"></div>
+    </div>
+  </div>
+  <button id="supportFabBtn" class="support-fab-btn" type="button" onclick="toggleSupportFab()"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69e53a2e50b9a3263a22de91.png" alt="Support"/> Get Support</button>
   <div id="planResultBox"></div>
   <div id="deliveryFabPanel" class="delivery-fab-panel">
     <div class="delivery-fab-body">
@@ -1166,7 +1176,7 @@ function renderCommCompare(c){
   if(!c.total||c.total<4000||!app.sel){spiffSec.style.display='none';return;}
   spiffSec.style.display='block';
 
-  const timingTip=`<span class="ttp" style="cursor:help;margin-left:4px;display:inline-flex;align-items:center;vertical-align:middle;"><span style="font-size:10px;color:#fff;background:#64748b;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;line-height:1;">i</span><span class="ttp-body" style="white-space:normal;max-width:230px;text-align:left;">Paid once <strong>all chargeback liability</strong> on qualifying deals has fully cleared. Commissions are held while any chargeback risk remains open.</span></span>`;
+  const timingTip=`<span class="ttp" style="cursor:help;margin-left:4px;display:inline-flex;align-items:center;vertical-align:middle;"><span style="font-size:10px;color:#fff;background:#64748b;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;line-height:1;position:relative;top:0;">i</span><span class="ttp-body" style="white-space:normal;max-width:230px;text-align:left;">Paid once <strong>all chargeback liability</strong> on qualifying deals has fully cleared. Commissions are held while any chargeback risk remains open.</span></span>`;
   const thStyle='padding:8px 12px;background:var(--dk);color:rgba(255,255,255,.75);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:left;white-space:nowrap;';
   const tdStyle='padding:9px 12px;border-bottom:1px solid var(--br);vertical-align:middle;font-size:12px;';
   const tdLast='padding:9px 12px;vertical-align:middle;font-size:12px;';
@@ -1334,7 +1344,23 @@ function renderPlanCards(c){
         </div>
       </div>
       <hr class="comm-divider"/>
+        </div>
+      </div>
+      <hr class="comm-divider"/>
       <div class="plan-comm-block${isRec?' rec-comm':''}">${commContentHtml(comm,isRec)}</div>
+      <div class="legacy-calc" style="margin:14px 18px 18px 18px;">
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:#334155;">Service Fee</span><span style="font-size:11px;font-weight:800;color:#6d28d9;">${feeLabel}%</span></div>
+            <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="updateLegacyCalc(this.value,null)"/>
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>35% (most affordable)</span><span>49% (max)</span></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:#334155;">Program Length</span><span style="font-size:11px;font-weight:800;color:#6d28d9;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
+            <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="updateLegacyCalc(null,this.value)"/>
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>${minMo} mo (${fmt(Math.round(tc/minMo))}/mo)</span><span>${maxMo} mo ($250/mo min)</span></div>
+          </div>
+          ${mp<250?'<div style="background:#fef2f2;border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 10px;font-size:11px;color:#b91c1c;font-weight:700;margin-top:8px;">&#9888; Below $250 minimum — increase fee or shorten program.</div>':''}
+        </div>
     </div>`);
   }
 
@@ -1394,22 +1420,6 @@ function renderPlanCards(c){
             <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);line-height:1;">${fmt(tc)}</div></div>
           </div>
         </div>
-        <div class="legacy-calc">
-          <div style="margin-bottom:10px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:#334155;">Service Fee</span><span style="font-size:11px;font-weight:800;color:#6d28d9;">${feeLabel}%</span></div>
-            <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="updateLegacyCalc(this.value,null)"/>
-            <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>35% (most affordable)</span><span>49% (max)</span></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:#334155;">Program Length</span><span style="font-size:11px;font-weight:800;color:#6d28d9;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
-            <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="updateLegacyCalc(null,this.value)"/>
-            <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>${minMo} mo (${fmt(Math.round(tc/minMo))}/mo)</span><span>${maxMo} mo ($250/mo min)</span></div>
-          </div>
-          ${mp<250?'<div style="background:#fef2f2;border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 10px;font-size:11px;color:#b91c1c;font-weight:700;margin-top:8px;">&#9888; Below $250 minimum — increase fee or shorten program.</div>':''}
-        </div>
-      </div>
-      <hr class="comm-divider"/>
-      <div class="plan-comm-block${isRec?' rec-comm':''}">${commContentHtml(comm,isRec)}</div>
     </div>`);
   }
 
@@ -1706,7 +1716,7 @@ function renderPlanResult(data, mode){
   const title=mode==='send'
     ? (emailStatus===false ? `⚠️ Plan generated but email was not confirmed by the server for ${esc($('pEmail').value.trim())}` : `✅ Plan generated and delivery submitted to ${esc($('pEmail').value.trim())}`)
     : '✅ Personalized plan URL generated';
-  box.innerHTML=`<div class="delivery-result-title">${title}</div>
+  box.innerHTML=`<div class="delivery-result-head"><div class="delivery-result-title">${title}</div><button class="delivery-result-close" type="button" onclick="document.getElementById('planResultBox').style.display='none'">&times;</button></div>
     <div class="delivery-result-row">
       <input id="planUrlDisplay" class="delivery-url-input" type="text" readonly value="${esc(planUrl)}" />
       <button id="copyPlanBtn" class="delivery-mini-btn delivery-copy-btn" type="button">Copy</button>
@@ -1743,6 +1753,7 @@ async function sendPlanDirect(){
   }finally{btn.disabled=false;btn.textContent=orig;}
 }
 
+function toggleSupportFab(force){const p=$('supportFabPanel');if(!p)return;const open=typeof force==='boolean'?force:!p.classList.contains('open');p.classList.toggle('open',open);}
 function toggleDeliveryFab(force){const p=$('deliveryFabPanel');if(!p)return;const open=typeof force==='boolean'?force:!p.classList.contains('open');p.classList.toggle('open',open);}
 function init(){
   const ss=$('stateSearch');if(ss){
