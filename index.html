@@ -11,7 +11,7 @@
 :root{--g:#0f9d8a;--gd:#0b7d6e;--dk:#0f172a;--bl:#1a6ed8;--am:#f59e0b;--rd:#ef4444;--br:#e2e8f0;--bg:#f8fafc;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--dk);min-height:100vh;}
-.topbar{position:sticky;top:0;z-index:80;background:linear-gradient(135deg,var(--dk) 0%,#0b3b50 45%,#0f766e 100%);box-shadow:0 4px 24px rgba(15,23,42,.22);}
+.topbar{position:sticky;top:0;z-index:80;background:linear-gradient(135deg,var(--dk) 0%,#0b3b50 42%,#0f9d8a 100%);box-shadow:0 4px 24px rgba(15,23,42,.22);}
 .workspace{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,400px);gap:20px;align-items:start;}
 .workspace-full{grid-column:1/-1;}
 @media(max-width:1100px){.workspace{grid-template-columns:1fr;}.workspace-full{grid-column:1;}}
@@ -207,7 +207,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .lc-band-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;}
 /* TZ / Lang selectors */
 .topbar-meta{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:4px 0 8px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:8px;}
-.meta-sel{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.85);border-radius:7px;padding:3px 8px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;outline:none;}
+.meta-sel{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;outline:none;min-height:32px;}
 .meta-sel:hover{background:rgba(255,255,255,.18);}
 .meta-sel option{background:#1e293b;color:#fff;}
 /* Plan card — single column, commission below */
@@ -234,7 +234,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .support-fab-panel{display:none;width:min(420px,calc(100vw - 28px));background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:18px;box-shadow:0 18px 42px rgba(15,23,42,.36);overflow:visible;}
 .support-fab-panel.open{display:block;}
 .support-fab-body{padding:14px 16px;background:linear-gradient(135deg,#0f172a 0%,#0f2a5e 45%,#0f766e 100%);}
-.support-fab-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 15px;border:none;border-radius:999px;background:linear-gradient(135deg,#0f2a5e,#1a3a8f);color:#fff;font-size:13px;font-weight:900;box-shadow:0 14px 30px rgba(15,23,42,.26);cursor:pointer;}
+.support-fab-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 15px;border:none;border-radius:999px;background:linear-gradient(135deg,#0f172a,#0b3b50,#0f9d8a);color:#fff;font-size:13px;font-weight:900;box-shadow:0 14px 30px rgba(15,23,42,.26);cursor:pointer;}
 .support-fab-btn img{width:15px;height:15px;object-fit:contain;filter:brightness(0) invert(1);}
 .support-fab-panel .acc-body,.support-fab-panel #clockBox{display:block!important;}
 .delivery-fab-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 16px;border:none;border-radius:999px;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;font-size:13px;font-weight:900;box-shadow:0 14px 30px rgba(15,157,138,.32);cursor:pointer;}
@@ -244,7 +244,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .delivery-fab-grid{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;}
 @media(max-width:760px){.delivery-fab{right:12px;left:12px;align-items:stretch;}.delivery-fab-panel,.support-fab-panel{width:100%;}.delivery-fab-btn,.support-fab-btn{justify-content:center;width:100%;}}
 .tip-wrap .tip-box,.ttp .ttp-body{z-index:9999;}
-.plan-body{padding:18px;}
+.plan-body{padding:18px;min-height:185px;display:flex;flex-direction:column;justify-content:flex-start;}
 .comm-divider{display:none;}
 /* Spiff section accordions */
 .spiff-acc{border:1.5px solid var(--br);border-radius:12px;overflow:visible;margin-bottom:10px;}
@@ -292,50 +292,39 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .adj-prog-body.open{display:block;}
 .adj-chev{font-size:16px;font-weight:900;color:rgba(255,255,255,.6);transition:transform .2s;line-height:1;}
 .adj-prog-btn.open .adj-chev{transform:rotate(180deg);}
-.comm-block-inner{min-height:130px;display:flex;flex-direction:column;}
+.comm-block-inner{min-height:178px;display:flex;flex-direction:column;}
+.support-fab-panel{backdrop-filter:blur(8px);}
+.goog-te-banner-frame.skiptranslate,.goog-te-gadget-icon{display:none!important;}
+body{top:0!important;}
+#google_translate_element,.skiptranslate{font-size:0!important;}
+
 </style>
 </head>
 <body>
 
 <header class="topbar">
 <div style="max-width:1420px;margin:0 auto;padding:10px 20px 14px;">
-  <!-- Main topbar row: Logo+settings left | Prospect Delivery right -->
-  <div style="display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;">
-    <!-- LEFT: Logo + title + TZ/lang below -->
-    <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" style="height:32px;width:auto;" alt="Funding Tier"/>
-        <div>
-          <div style="font-size:17px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.1;">AI Deal Router</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;font-weight:600;letter-spacing:.2px;">Debt Resolution Estimator</div>
-        </div>
-      </div>
-      <!-- TZ + Language selectors consolidated below logo -->
-      <div style="display:flex;flex-direction:column;gap:6px;padding-left:2px;">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <span style="font-size:10px;color:rgba(255,255,255,.35);">&#127760;</span>
-          <select id="tzSel" class="meta-sel" onchange="setDispTZ(this.value)">
-            <option value="America/Los_Angeles">PST / PDT (Pacific)</option>
-            <option value="America/Denver">MST / MDT (Mountain)</option>
-            <option value="America/Chicago">CST / CDT (Central)</option>
-            <option value="America/New_York">EST / EDT (Eastern)</option>
-            <option value="UTC">UTC</option>
-          </select>
-          <span id="sysClockBadge" style="font-size:11px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:3px 10px;letter-spacing:.3px;font-variant-numeric:tabular-nums;white-space:nowrap;"></span>
-          <span style="font-size:10px;color:rgba(255,255,255,.25);">|</span>
-          <select id="langSel" class="meta-sel" onchange="setLang(this.value)">
-            <option value="en">&#127482;&#127480; EN</option>
-            <option value="es">&#127466;&#127480; ES</option>
-            <option value="pt">&#127463;&#127479; PT</option>
-            <option value="fr">&#127467;&#127479; FR</option>
-          </select>
-        </div>
-<div id="liveTimeBadge" style="display:none;"></div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+      <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" style="height:32px;width:auto;" alt="Funding Tier"/>
+      <div>
+        <div style="font-size:17px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.1;">AI Deal Router</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;font-weight:600;letter-spacing:.2px;">Debt Resolution Estimator</div>
       </div>
     </div>
-    <!-- Prospect Delivery moved to floating launcher -->
+    <div id="headerMetaControls" style="margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;">
+      <select id="tzSel" class="meta-sel" onchange="setDispTZ(this.value)">
+        <option value="America/Los_Angeles">PST / PDT (Pacific)</option>
+        <option value="America/Denver">MST / MDT (Mountain)</option>
+        <option value="America/Chicago">CST / CDT (Central)</option>
+        <option value="America/New_York">EST / EDT (Eastern)</option>
+        <option value="UTC">UTC</option>
+      </select>
+      <span id="sysClockBadge" style="font-size:11px;font-weight:800;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:4px 10px;letter-spacing:.3px;font-variant-numeric:tabular-nums;white-space:nowrap;"></span>
+      <select id="langSel" class="meta-sel" onchange="setLang(this.value)"></select>
     </div>
   </div>
+  <div id="google_translate_element" style="position:absolute;left:-9999px;top:-9999px;opacity:0;pointer-events:none;"></div>
 </div>
 </header>
 
@@ -618,7 +607,47 @@ let dispTZ='America/Los_Angeles';
 let _selectingState=false;
 let legacyAdjOpen=false;
 function setDispTZ(tz){dispTZ=tz;renderClocks();if(lastScenario)renderPanel(lastScenario);}
-function setLang(l){/* placeholder for i18n */}
+const LANG_OPTIONS=[
+  ['en','🇺🇸','English'],['af','🇿🇦','Afrikaans'],['sq','🇦🇱','Albanian'],['am','🇪🇹','Amharic'],['ar','🇸🇦','Arabic'],['hy','🇦🇲','Armenian'],['az','🇦🇿','Azerbaijani'],['eu','🇪🇸','Basque'],['be','🇧🇾','Belarusian'],['bn','🇧🇩','Bengali'],['bs','🇧🇦','Bosnian'],['bg','🇧🇬','Bulgarian'],['ca','🇪🇸','Catalan'],['ceb','🇵🇭','Cebuano'],['ny','🇲🇼','Chichewa'],['zh-CN','🇨🇳','Chinese (Simplified)'],['zh-TW','🇹🇼','Chinese (Traditional)'],['co','🇫🇷','Corsican'],['hr','🇭🇷','Croatian'],['cs','🇨🇿','Czech'],['da','🇩🇰','Danish'],['nl','🇳🇱','Dutch'],['eo','🌍','Esperanto'],['et','🇪🇪','Estonian'],['tl','🇵🇭','Filipino'],['fi','🇫🇮','Finnish'],['fr','🇫🇷','French'],['fy','🇳🇱','Frisian'],['gl','🇪🇸','Galician'],['ka','🇬🇪','Georgian'],['de','🇩🇪','German'],['el','🇬🇷','Greek'],['gu','🇮🇳','Gujarati'],['ht','🇭🇹','Haitian Creole'],['ha','🇳🇬','Hausa'],['haw','🇺🇸','Hawaiian'],['iw','🇮🇱','Hebrew'],['hi','🇮🇳','Hindi'],['hmn','🇨🇳','Hmong'],['hu','🇭🇺','Hungarian'],['is','🇮🇸','Icelandic'],['ig','🇳🇬','Igbo'],['id','🇮🇩','Indonesian'],['ga','🇮🇪','Irish'],['it','🇮🇹','Italian'],['ja','🇯🇵','Japanese'],['jw','🇮🇩','Javanese'],['kn','🇮🇳','Kannada'],['kk','🇰🇿','Kazakh'],['km','🇰🇭','Khmer'],['ko','🇰🇷','Korean'],['ku','🇹🇷','Kurdish'],['ky','🇰🇬','Kyrgyz'],['lo','🇱🇦','Lao'],['la','🇻🇦','Latin'],['lv','🇱🇻','Latvian'],['lt','🇱🇹','Lithuanian'],['lb','🇱🇺','Luxembourgish'],['mk','🇲🇰','Macedonian'],['mg','🇲🇬','Malagasy'],['ms','🇲🇾','Malay'],['ml','🇮🇳','Malayalam'],['mt','🇲🇹','Maltese'],['mi','🇳🇿','Maori'],['mr','🇮🇳','Marathi'],['mn','🇲🇳','Mongolian'],['my','🇲🇲','Myanmar'],['ne','🇳🇵','Nepali'],['no','🇳🇴','Norwegian'],['ps','🇦🇫','Pashto'],['fa','🇮🇷','Persian'],['pl','🇵🇱','Polish'],['pt','🇵🇹','Portuguese'],['pa','🇮🇳','Punjabi'],['ro','🇷🇴','Romanian'],['ru','🇷🇺','Russian'],['sm','🇼🇸','Samoan'],['gd','🏴','Scots Gaelic'],['sr','🇷🇸','Serbian'],['st','🇱🇸','Sesotho'],['sn','🇿🇼','Shona'],['sd','🇵🇰','Sindhi'],['si','🇱🇰','Sinhala'],['sk','🇸🇰','Slovak'],['sl','🇸🇮','Slovenian'],['so','🇸🇴','Somali'],['es','🇪🇸','Spanish'],['su','🇮🇩','Sundanese'],['sw','🇹🇿','Swahili'],['sv','🇸🇪','Swedish'],['tg','🇹🇯','Tajik'],['ta','🇮🇳','Tamil'],['te','🇮🇳','Telugu'],['th','🇹🇭','Thai'],['tr','🇹🇷','Turkish'],['uk','🇺🇦','Ukrainian'],['ur','🇵🇰','Urdu'],['uz','🇺🇿','Uzbek'],['vi','🇻🇳','Vietnamese'],['cy','🏴','Welsh'],['xh','🇿🇦','Xhosa'],['yi','🇮🇱','Yiddish'],['yo','🇳🇬','Yoruba'],['zu','🇿🇦','Zulu']
+];
+let appLang='en';
+function getGoogTransLang(){
+  const m=document.cookie.match(/(?:^|; )googtrans=\/en\/([^;]+)/);
+  return m&&m[1]?decodeURIComponent(m[1]):'en';
+}
+function populateLanguageSelector(){
+  const sel=$('langSel'); if(!sel) return;
+  sel.innerHTML=LANG_OPTIONS.map(([code,flag,label])=>`<option value="${code}">${flag} ${label}</option>`).join('');
+  appLang=getGoogTransLang();
+  if(!LANG_OPTIONS.some(([c])=>c===appLang)) appLang='en';
+  sel.value=appLang;
+}
+function applyGoogleTranslate(lang){
+  const combo=document.querySelector('.goog-te-combo');
+  if(!combo) return false;
+  combo.value=lang;
+  combo.dispatchEvent(new Event('change'));
+  return true;
+}
+function setLang(l){
+  appLang=l||'en';
+  document.cookie=`googtrans=/en/${appLang};path=/`;
+  const sel=$('langSel'); if(sel && sel.value!==appLang) sel.value=appLang;
+  if(appLang==='en'){ window.location.reload(); return; }
+  if(!applyGoogleTranslate(appLang)){
+    setTimeout(()=>{ if(!applyGoogleTranslate(appLang)) window.location.reload(); },500);
+  }
+}
+window.googleTranslateElementInit=function(){
+  new google.translate.TranslateElement({
+    pageLanguage:'en',
+    autoDisplay:false,
+    includedLanguages: LANG_OPTIONS.map(([code])=>code).join(',')
+  }, 'google_translate_element');
+  if(appLang && appLang!=='en'){
+    setTimeout(()=>applyGoogleTranslate(appLang),700);
+  }
+};
 
 // Convert a local hour/minute in fromTZ to dispTZ
 function tzOffset(tz){
@@ -653,7 +682,7 @@ function tzLabel(){
 const SUPP_HOURS=[
   {
     key:'LEVEL',label:'Level Debt',logo:LD_LOGO,color:'var(--g)',
-    tz:'America/New_York',
+    tz:'America/Los_Angeles',
     days:[1,2,3,4,5],oh:9,om:0,ch:18,cm:0,
     contacts:[
       {type:'slack',label:'Slack Support',url:'https://funding-tier.slack.com/archives/C0AMBM9EBNV',style:'color:#6d28d9;background:#f5f3ff;border-color:#ddd6fe;'}
@@ -1012,7 +1041,7 @@ function computeScenario(){
   const activeFlags=[];
   if(route.route==='LEVEL')activeFlags.push(...flags.ld);
   if(rows.some(r=>normName(r.cred).includes('DISCOVER')))activeFlags.push(`Discover selected — apply Level Debt's 60% Discover exposure rule when evaluating routing.`);
-  if(route.route==='CONSUMER SHIELD'){activeFlags.push(...flags.cs);activeFlags.push('Consumer Shield support: Mon-Fri 9am-7pm EST.');activeFlags.push('Consumer Shield uses Equifax for credit pull.');}
+  if(route.route==='CONSUMER SHIELD'){activeFlags.push(...flags.cs);activeFlags.push(`Consumer Shield support window: ${fmtHoursInDisplayTZ(SUPP_HOURS.find(x=>x.key==='CS'))}.`);activeFlags.push('Consumer Shield uses Equifax for credit pull.');}
   if(route.route==='NO OPTION')activeFlags.push(route.reason);
   return{rows,total,route,dn,shortest,recommended,feeRate,lds,css,lgs,csProg,csAvail,ldAvail,legacyAvail,flags:activeFlags};
 }
@@ -1050,13 +1079,10 @@ function clockStatus(c){
 }
 function renderClocks(){
   const ttz=tzLabel();
-  const tb=$('liveTimeBadge');
+  const t=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,weekday:'short',hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date());
+  const tb=$('sysClockBadge');
   if(tb){
-    const t=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date());
     tb.textContent=`${t} ${ttz}`;
-    tb.style.color='#fff';
-    tb.style.background='rgba(255,255,255,.12)';
-    tb.style.borderColor='rgba(255,255,255,.22)';
   }
   const box=$('clockBox');if(!box)return;
   const dayFmt=new Intl.DateTimeFormat('en-US',{timeZone:dispTZ,weekday:'long'});
@@ -1123,29 +1149,30 @@ function getCommForCard(c,key){
   return null;
 }
 function commContentHtml(comm,isRec){
-  if(!comm)return `<div style="font-size:11px;color:rgba(255,255,255,.68);padding:4px 0;">Commission data not available for this scenario.</div>`;
-  const riskTip=(txt)=>`<span class="ttp" style="cursor:help;margin-left:4px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);color:#86efac;font-size:10px;font-weight:900;">*</span><span class="ttp-body" style="white-space:normal;max-width:300px;text-align:left;">${txt}</span></span>`;
+  if(!comm)return `<div style="font-size:11px;color:rgba(255,255,255,.72);padding:4px 0;">Commission data not available for this scenario.</div>`;
   let rows='';
+  let noteLine=comm.note?`<div style="font-size:10px;color:rgba(255,255,255,.76);font-weight:700;margin-top:10px;line-height:1.55;">${comm.note}</div>`:'';
+  let riskLine=comm.clawback?`<div style="font-size:10px;color:#d1fae5;font-weight:700;margin-top:6px;line-height:1.55;">* ${comm.clawback}</div>`:'';
   if(comm.isLD){
     rows=`<tr style="border-bottom:1px solid rgba(255,255,255,.10);">
       <td style="padding:10px 12px;color:#fff;font-weight:800;">Tier 1</td>
-      <td style="padding:10px 12px;font-size:18px;font-weight:900;color:#86efac;text-align:right;">${fmt(comm.p2)}${comm.clawback?riskTip(comm.clawback):''}</td>
+      <td style="padding:10px 12px;font-size:18px;font-weight:900;color:#86efac;text-align:right;">${fmt(comm.p2)}</td>
       <td style="padding:10px 12px;text-align:right;"><span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.82);white-space:nowrap;">${comm.p2when}</span></td>
     </tr>
     <tr style="border-bottom:1px solid rgba(255,255,255,.10);opacity:.92;">
-      <td style="padding:10px 12px;color:rgba(255,255,255,.78);font-weight:800;">Tier 2</td>
+      <td style="padding:10px 12px;color:rgba(255,255,255,.82);font-weight:800;">Tier 2</td>
       <td style="padding:10px 12px;font-size:16px;font-weight:900;color:#5eead4;text-align:right;">${fmt(comm.t2)}</td>
       <td style="padding:10px 12px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.62);font-weight:700;white-space:nowrap;">$1M–$1.99M/mo</span></td>
     </tr>
     <tr>
-      <td style="padding:10px 12px;color:rgba(255,255,255,.62);font-weight:800;">Tier 3</td>
+      <td style="padding:10px 12px;color:rgba(255,255,255,.7);font-weight:800;">Tier 3</td>
       <td style="padding:10px 12px;font-size:16px;font-weight:900;color:#2dd4bf;text-align:right;">${fmt(comm.t3)}</td>
       <td style="padding:10px 12px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.62);font-weight:700;white-space:nowrap;">$2M+/mo</span></td>
     </tr>`;
   } else {
     rows=`<tr style="${comm.p4>0?'border-bottom:1px solid rgba(255,255,255,.10);':''}">
       <td style="padding:10px 12px;color:#fff;font-weight:800;">P2</td>
-      <td style="padding:10px 12px;font-size:18px;font-weight:900;color:#86efac;text-align:right;">${fmt(comm.p2)}${comm.clawback?riskTip(comm.clawback):''}</td>
+      <td style="padding:10px 12px;font-size:18px;font-weight:900;color:#86efac;text-align:right;">${fmt(comm.p2)}</td>
       <td style="padding:10px 12px;text-align:right;"><span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.82);white-space:nowrap;">${comm.p2when}</span></td>
     </tr>
     ${comm.p4>0?`<tr>
@@ -1156,17 +1183,18 @@ function commContentHtml(comm,isRec){
   }
   return `<div class="comm-block-inner">
     <div class="comm-inline-hd">Agent Commission <span style="font-size:20px;font-weight:900;color:#86efac;margin-left:6px;">${fmt(comm.total)}</span></div>
-    <div style="border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.04);min-height:150px;">
+    <div style="border:1px solid rgba(255,255,255,.14);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.05);min-height:150px;">
       <table style="width:100%;border-collapse:collapse;">
-        <thead><tr style="background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.10);">
-          <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:800;color:rgba(255,255,255,.62);text-transform:uppercase;letter-spacing:.5px;">Payment</th>
-          <th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:800;color:rgba(255,255,255,.62);text-transform:uppercase;letter-spacing:.5px;">Amount</th>
-          <th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:800;color:rgba(255,255,255,.62);text-transform:uppercase;letter-spacing:.5px;">Paid On</th>
+        <thead><tr style="background:rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.10);">
+          <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:800;color:rgba(255,255,255,.70);text-transform:uppercase;letter-spacing:.5px;">Payment</th>
+          <th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:800;color:rgba(255,255,255,.70);text-transform:uppercase;letter-spacing:.5px;">Amount</th>
+          <th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:800;color:rgba(255,255,255,.70);text-transform:uppercase;letter-spacing:.5px;">When Paid</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
-    <div style="font-size:11px;color:rgba(255,255,255,.72);margin-top:8px;">${comm.note}</div>
+    ${noteLine}
+    ${riskLine}
   </div>`;
 }
 function renderCommCompare(c){
@@ -1176,7 +1204,7 @@ function renderCommCompare(c){
   if(!c.total||c.total<4000||!app.sel){spiffSec.style.display='none';return;}
   spiffSec.style.display='block';
 
-  const timingTip=`<span class="ttp" style="cursor:help;margin-left:4px;display:inline-flex;align-items:center;vertical-align:middle;"><span style="font-size:10px;color:#fff;background:#64748b;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;line-height:1;position:relative;top:0;">i</span><span class="ttp-body" style="white-space:normal;max-width:230px;text-align:left;">Paid once <strong>all chargeback liability</strong> on qualifying deals has fully cleared. Commissions are held while any chargeback risk remains open.</span></span>`;
+
   const thStyle='padding:8px 12px;background:var(--dk);color:rgba(255,255,255,.75);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:left;white-space:nowrap;';
   const tdStyle='padding:9px 12px;border-bottom:1px solid var(--br);vertical-align:middle;font-size:12px;';
   const tdLast='padding:9px 12px;vertical-align:middle;font-size:12px;';
@@ -1215,13 +1243,13 @@ function renderCommCompare(c){
         <td style="${tdStyle}font-weight:700;">Daily Deal Bonus</td>
         <td style="${tdStyle}">3 deals in one day</td>
         <td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td>
-        <td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$50 /deal ${timingTip}</td>
+        <td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$50 /deal</td>
       </tr>
       <tr>
         <td style="${tdLast}font-weight:700;">Daily Deal Bonus</td>
         <td style="${tdLast}">5+ deals in one day</td>
         <td style="${tdLast}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td>
-        <td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$75 /deal ${timingTip}</td>
+        <td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$75 /deal</td>
       </tr>
     </tbody>
   </table>`;
@@ -1231,11 +1259,11 @@ function renderCommCompare(c){
   <table style="width:100%;border-collapse:collapse;">
     ${tHead('Monthly Threshold')}
     <tbody>
-      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">8 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$300 ${timingTip}</td></tr>
-      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">12 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$600 ${timingTip}</td></tr>
-      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">17 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$1,000 ${timingTip}</td></tr>
-      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">23 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$1,500 ${timingTip}</td></tr>
-      <tr><td style="${tdLast}font-weight:700;">Monthly Volume</td><td style="${tdLast}">30+ deals/mo</td><td style="${tdLast}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$2,250 ${timingTip}</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">8 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$300</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">12 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$600</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">17 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$1,000</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">23 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$1,500</td></tr>
+      <tr><td style="${tdLast}font-weight:700;">Monthly Volume</td><td style="${tdLast}">30+ deals/mo</td><td style="${tdLast}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$2,250</td></tr>
     </tbody>
   </table>`;
 
@@ -1253,9 +1281,9 @@ function renderCommCompare(c){
       <th style="${thStyle}">Bonus Amount</th>
     </tr></thead>
     <tbody>
-      <tr><td style="${tdStyle}font-weight:700;">Balanced Book</td><td style="${tdStyle}">30%+ CS mix</td><td style="${tdStyle}">5+ deals</td><td style="${tdStyle}"><span class="spiff-tag ld">Level DS / Future DS</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$100 ${timingTip}</td></tr>
-      <tr><td style="${tdStyle}font-weight:700;">Balanced Book</td><td style="${tdStyle}">50%+ CS mix</td><td style="${tdStyle}">5+ deals</td><td style="${tdStyle}"><span class="spiff-tag ld">Level DS / Future DS</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$250 ${timingTip}</td></tr>
-      <tr><td style="${tdLast}font-weight:700;">Balanced Book</td><td style="${tdLast}">70%+ CS mix</td><td style="${tdLast}">5+ deals</td><td style="${tdLast}"><span class="spiff-tag ld">Level DS / Future DS</span></td><td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$500 ${timingTip}</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Balanced Book</td><td style="${tdStyle}">30%+ CS mix</td><td style="${tdStyle}">5+ deals</td><td style="${tdStyle}"><span class="spiff-tag ld">Level DS / Future DS</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$100</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Balanced Book</td><td style="${tdStyle}">50%+ CS mix</td><td style="${tdStyle}">5+ deals</td><td style="${tdStyle}"><span class="spiff-tag ld">Level DS / Future DS</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$250</td></tr>
+      <tr><td style="${tdLast}font-weight:700;">Balanced Book</td><td style="${tdLast}">70%+ CS mix</td><td style="${tdLast}">5+ deals</td><td style="${tdLast}"><span class="spiff-tag ld">Level DS / Future DS</span></td><td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$500</td></tr>
     </tbody>
   </table>`;
 
@@ -1264,8 +1292,8 @@ function renderCommCompare(c){
   <table style="width:100%;border-collapse:collapse;">
     ${tHead('Daily Enrolled Volume')}
     <tbody>
-      <tr><td style="${tdStyle}font-weight:700;">LD Enrollment</td><td style="${tdStyle}">$75,000+ enrolled/day</td><td style="${tdStyle}"><span class="spiff-tag ld">Level Debt</span></td><td style="${tdStyle}font-weight:900;color:#0b7d6e;font-size:15px;">+$75 ${timingTip}</td></tr>
-      <tr><td style="${tdLast}font-weight:700;">LD Enrollment</td><td style="${tdLast}">$100,000+ enrolled/day</td><td style="${tdLast}"><span class="spiff-tag ld">Level Debt</span></td><td style="${tdLast}font-weight:900;color:#0b7d6e;font-size:15px;">+$125 ${timingTip}</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">LD Enrollment</td><td style="${tdStyle}">$75,000+ enrolled/day</td><td style="${tdStyle}"><span class="spiff-tag ld">Level Debt</span></td><td style="${tdStyle}font-weight:900;color:#0b7d6e;font-size:15px;">+$75</td></tr>
+      <tr><td style="${tdLast}font-weight:700;">LD Enrollment</td><td style="${tdLast}">$100,000+ enrolled/day</td><td style="${tdLast}"><span class="spiff-tag ld">Level Debt</span></td><td style="${tdLast}font-weight:900;color:#0b7d6e;font-size:15px;">+$125</td></tr>
     </tbody>
   </table>`;
 
@@ -1275,6 +1303,7 @@ function renderCommCompare(c){
     ${makeAcc('spiffMonthly','📈','Monthly Volume Bonus','Hit monthly thresholds to stack volume bonuses','linear-gradient(135deg,#16a34a,#15803d)',monthlyContent)}
     ${makeAcc('spiffBalanced','⚖️','Balanced Book Bonus','Maintain proper CS/DS deal mix to earn book bonuses','linear-gradient(135deg,#22c55e,#16a34a)',balancedContent)}
     ${makeAcc('spiffLD','🏆','LD Enrollment Bonus','Level Debt daily enrolled volume threshold bonus','linear-gradient(135deg,#0f9d8a,#047857)',ldContent)}
+    ${makeAcc('spiffPolicy','🛡️','Bonus Policy & Accounting Controls','Read this before accounting or payout decisions are finalized','linear-gradient(135deg,#0f172a,#0b3b50,#0f9d8a)',`<div style="padding:14px 16px;background:#fff;line-height:1.75;font-size:12px;color:#334155;"><div style="font-weight:900;color:#0f172a;margin-bottom:8px;">All bonus payouts are subject to Funding Tier clawback and chargeback policy.</div><ul style="padding-left:18px;display:grid;gap:6px;"><li>Daily, monthly, balanced-book, and Level Debt volume bonuses are all subject to review before payout.</li><li>Chargeback liability is enforced across the board on a daily basis, and any open risk period can delay or reverse a bonus payout.</li><li>Accounting should treat bonus amounts as provisional until the related files have fully cleared the applicable clawback and chargeback windows.</li><li>This policy applies uniformly to avoid reconciliation issues, overpayment errors, and incorrect bonus accruals.</li></ul></div>`)}
   </div>`;
 }
 
@@ -1461,6 +1490,17 @@ function renderLegacyCard(c){
         At ${feeLabel}%: ${fmt(legacyCommAtFee(activeBand.total,feeRate))}. 
         If a prospect needs a lower payment, reduce the fee — the monthly drops while you retain eligibility.
         ${activeBand.p4>0?` P2 (${fmt(activeBand.p2)}) paid after Payment 2 clears · P4 (${fmt(activeBand.p4)}) paid after Payment 4 clears.`:`Full ${fmt(activeBand.total)} paid after Payment 2 clears.`}
+      </div>
+      <div style="font-size:12px;color:#334155;line-height:1.8;margin-top:14px;">
+        <div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Program Explanation</div>
+        <ul style="padding-left:18px;display:grid;gap:6px;">
+          <li>Legacy is a legal debt dispute and resolution program that works through a consumer-rights law-firm model rather than a traditional loan structure.</li>
+          <li>The program challenges creditor, collector, and credit-reporting records for accuracy and compliance using federal and state consumer-protection laws.</li>
+          <li>Clients receive legal representation and can direct creditor contact back to the law firm after enrollment.</li>
+          <li>The fees pay for legal services and representation, not for direct creditor payoff, and the program is not a loan.</li>
+          <li>Program timelines vary, but the process is typically framed as a longer legal-resolution path that can run roughly 24–48 months depending on the file.</li>
+          <li>If collectors keep contacting the client after representation begins, that activity should be reported to the law firm because it may affect case handling.</li>
+        </ul>
       </div>
     </div>`;
   } else {
