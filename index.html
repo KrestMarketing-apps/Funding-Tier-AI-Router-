@@ -965,6 +965,8 @@ function syncStateFromInput(force){
   return false;
 }
 const getLDMaxTerm=d=>d<10000?24:d<12500?30:d<15000?36:d<25000?42:d<35000?48:d<50000?54:60;
+  const LD_DRAFT_MINS=[{min:7000,max:9999,minPay:150},{min:10000,max:12999,minPay:200},{min:13000,max:Infinity,minPay:250}];
+const getLDMinDraft=d=>(LD_DRAFT_MINS.find(t=>d>=t.min&&(t.max===Infinity||d<=t.max))||{minPay:150}).minPay;
 function toggleAcc(bodyId,btnId){const b=$(bodyId),btn=$(btnId);if(!b||!btn)return;const open=b.classList.contains('open');b.classList.toggle('open',!open);btn.classList.toggle('open',!open);}
 let nextId=2;
 const app={sel:'',rows:[newRow(1)]};
@@ -1029,8 +1031,7 @@ function computeScenario(){
   const feeRate=route.route==='LEVEL'?(lds.status==='RED'?.27:.25):0;
   const dn=calcDN(total);
   let shortest=null,recommended=null;
-  if(route.route==='LEVEL'){const tc=total*.5+total*feeRate;shortest={term:12,tc,mp:tc/12};const mt=getLDMaxTerm(total);recommended={term:mt,tc,mp:tc/mt};}
-  else if(route.route==='CONSUMER SHIELD'&&csProg){const tc=csProg.term*csProg.pay;shortest={term:csProg.term,tc,mp:csProg.pay};recommended=shortest;}
+if(route.route==='LEVEL'){const tc=total*.5+total*feeRate;const minDraft=getLDMinDraft(total);const mt=getLDMaxTerm(total);const maxTermForMin=minDraft>0?Math.floor(tc/minDraft):mt;const effTerm=Math.min(mt,maxTermForMin>0?maxTermForMin:mt);shortest={term:12,tc,mp:tc/12};recommended={term:effTerm,tc,mp:Math.round(tc/effTerm)};}  else if(route.route==='CONSUMER SHIELD'&&csProg){const tc=csProg.term*csProg.pay;shortest={term:csProg.term,tc,mp:csProg.pay};recommended=shortest;}
   else if(route.route==='LEGACY'&&legacyAvail){
     const tc=legacyTotalCost(total,legacyState.feeRate);
     const minMo=legacyMinMonths();
@@ -1373,8 +1374,7 @@ function renderPlanCards(c){
   }
 
   if(c.ldAvail){
-    const mt=getLDMaxTerm(c.total),mp=Math.round((c.total*.5+c.total*c.feeRate)/mt),isRec=c.route.route==='LEVEL';
-    const comm=getCommForCard(c,'LEVEL');
+const mt=getLDMaxTerm(c.total),minDraft=getLDMinDraft(c.total),_ldTc=c.total*.5+c.total*c.feeRate,_ldMaxT=Math.min(mt,minDraft>0?Math.floor(_ldTc/minDraft):mt),mp=Math.round(_ldTc/Math.max(1,_ldMaxT)),isRec=c.route.route==='LEVEL';    const comm=getCommForCard(c,'LEVEL');
     cards.push(`<div class="plan-card-v pc-ld${isRec?' rec':''}">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
@@ -1456,7 +1456,10 @@ function renderLDCard(c){
   if(!c.ldAvail){card.style.display='none';return;}
   card.style.display='block';
   const term=getLDMaxTerm(c.total);
-  const mp=Math.round((c.total*.5 + c.total*c.feeRate)/term);
+const minDraftLD=getLDMinDraft(c.total);
+const _ldTcDet=c.total*.5+c.total*c.feeRate;
+const _ldTermDet=Math.min(term,minDraftLD>0?Math.floor(_ldTcDet/minDraftLD):term);
+const mp=Math.round(_ldTcDet/Math.max(1,_ldTermDet));
   $('ldActiveDetail').innerHTML=`<div style="background:rgba(15,157,138,.06);border:2px solid var(--g);border-radius:12px;padding:16px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:#0b7d6e;">Level Debt Program Explanation</span><span style="font-size:12px;color:#64748b;margin-left:10px;">Client-facing quick pitch</span></div><span class="pill p-g">Settlement</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px;text-align:center;">${[['Monthly Payment',fmt(mp),'est. monthly'],['Program Length',`${term} mo`,'estimated'],['Estimated Total',fmt(mp*term),'program total']].map(([l,v,s])=>`<div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">${l}</div><div style="font-size:22px;font-weight:900;color:#0b7d6e;margin-top:4px;">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${s}</div></div>`).join('')}</div><div style="font-size:12px;color:#334155;line-height:1.8;"><div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Program Explanation</div><ul style="padding-left:18px;display:grid;gap:6px;"><li>One structured monthly deposit replaces the chaos of multiple unsecured debt payments.</li><li>The program works to negotiate enrolled creditors and may reduce what the client ultimately pays, depending on creditor participation.</li><li>Clients gain a defined timeline instead of revolving minimum payments that can drag on for years.</li><li>There are no guarantees on settlement timing or savings, but the goal is to improve cash flow and create a realistic path out of debt.</li><li>Credit impact can occur while accounts are being resolved, so expectations should stay clear and transparent.</li></ul></div></div>`;
 }
 
