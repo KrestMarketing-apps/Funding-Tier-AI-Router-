@@ -6,7 +6,27 @@ export const knowledgebase = {
 
   minimums: {
     totalDebt: 7000,
-    perAccount: 200
+    perAccount: 200,
+    draftPayments: [
+      {
+        label: "Debt enrolled $7,000 – $9,999",
+        debtMin: 7000,
+        debtMax: 9999,
+        minMonthlyPayment: 150
+      },
+      {
+        label: "Debt enrolled $10,000 – $12,999",
+        debtMin: 10000,
+        debtMax: 12999,
+        minMonthlyPayment: 200
+      },
+      {
+        label: "Debt enrolled $13,000+",
+        debtMin: 13000,
+        debtMax: null,
+        minMonthlyPayment: 250
+      }
+    ]
   },
 
   stateRules: {
