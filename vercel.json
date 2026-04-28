@@ -6,20 +6,24 @@
       "destination": "/api/plan?slug=:slug"
     },
     {
+      "source": "/agents/legacy-capital-program-calculator",
+      "destination": "/agents/legacy-capital-program-calculator.html"
+    },
+    {
+      "source": "/agents/commission-simulator",
+      "destination": "https://funding-tier-profit-engine.vercel.app/commission-simulator"
+    },
+    {
+      "source": "/agents/commission-simulator/:path*",
+      "destination": "https://funding-tier-profit-engine.vercel.app/commission-simulator/:path*"
+    },
+    {
       "source": "/profit-engine",
       "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine"
     },
     {
       "source": "/profit-engine/:path*",
       "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*"
-    },
-    {
-      "source": "/commission-simulator",
-      "destination": "https://funding-tier-profit-engine.vercel.app/commission-simulator"
-    },
-    {
-      "source": "/commission-simulator/:path*",
-      "destination": "https://funding-tier-profit-engine.vercel.app/commission-simulator/:path*"
     }
   ]
 }
