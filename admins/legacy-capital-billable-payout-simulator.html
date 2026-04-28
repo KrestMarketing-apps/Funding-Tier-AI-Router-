@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legacy Capital Billable Payout Simulator | Admin &amp; Affiliate Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Inconsolata:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green:   #0f9d8a;
+      --greend:  #0b7d6e;
+      --greenl:  #f0fdf9;
+      --bg:      #f8fafc;
+      --surface: #ffffff;
+      --border:  #e2e8f0;
+      --bord2:   #cbd5e1;
+      --text:    #0f172a;
+      --text2:   #475569;
+      --text3:   #94a3b8;
+      --blue:    #1a6ed8;
+      --amber:   #f59e0b;
+      --dark:    #0f172a;
+      --dark2:   #0b3b50;
+      --dark3:   #0b7d6e;
+    }
+    body { font-family: 'Inter', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"] { -moz-appearance: textfield; }
+    input[type="range"] {
+      -webkit-appearance: none; width: 100%; height: 4px;
+      border-radius: 99px; background: rgba(255,255,255,0.18); outline: none; cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 17px; height: 17px; border-radius: 50%;
+      background: #fff; border: 2px solid var(--green); cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    }
+    input[type="range"]::-moz-range-thumb { width:17px;height:17px;border-radius:50%;background:#fff;border:2px solid var(--green);cursor:pointer; }
+
+    /* ── header ── */
+    .header {
+      background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 45%, var(--dark3) 100%);
+      padding: 16px 24px 20px;
+      box-shadow: 0 4px 24px rgba(15,23,42,0.22);
+    }
+    .htop   { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .hdiv   { width: 1px; height: 28px; background: rgba(255,255,255,0.15); }
+    .htitl  { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.3px; line-height: 1.15; }
+    .hsub   { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; font-weight: 500; }
+
+    .igrid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
+    .igrid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .ilbl   { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.45); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .hdim   { font-size: 11px; color: rgba(255,255,255,0.28); margin-top: 3px; }
+
+    .dual { display: flex; flex-direction: column; gap: 5px; }
+    .drow { display: flex; align-items: center; gap: 6px; }
+    .pwrap{ position: relative; flex: 1; }
+    .pfx  { position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;color:rgba(255,255,255,0.4);pointer-events:none;z-index:1;font-family:'Inconsolata',monospace;font-weight:600; }
+    .sfx  { font-size:13px;color:rgba(255,255,255,0.5);font-family:'Inconsolata',monospace;font-weight:700;white-space:nowrap; }
+    .hfld {
+      width:100%;padding:8px 8px 8px 22px;border-radius:8px;
+      border:0.5px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.10);
+      color:#fff;font-family:'Inconsolata',monospace;font-size:15px;font-weight:700;outline:none;
+      transition:border-color 0.15s;
+    }
+    .hfld.nopfx{padding-left:10px;}
+    .hfld:focus{border-color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.13);}
+
+    .hinput{width:100%;padding:8px 10px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.10);color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;outline:none;}
+    .hinput option{background:#0f172a;}
+
+    /* maint toggle */
+    .mbtns{display:flex;gap:4px;}
+    .mbtn{flex:1;padding:8px 4px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.15s;user-select:none;}
+    .mbtn.active{background:rgba(15,157,138,0.25);border-color:rgba(15,157,138,0.5);color:#5eead4;}
+
+    /* big computed values in header */
+    .hbig{font-family:'Inconsolata',monospace;font-size:22px;font-weight:700;color:#fff;line-height:1;margin-bottom:3px;}
+    .hmult{display:inline-block;font-family:'Inter',sans-serif;font-size:11px;font-weight:800;background:rgba(15,157,138,0.25);color:#5eead4;border:1px solid rgba(15,157,138,0.4);border-radius:6px;padding:2px 8px;margin-left:6px;vertical-align:middle;}
+
+    .accent-bar{height:3px;background:linear-gradient(90deg,var(--green),#0891b2);}
+
+    /* ── content ── */
+    .content{max-width:1100px;margin:0 auto;padding:24px 20px 60px;}
+
+    /* stat cards — exact match to profitabilitybalancer MetricCard */
+    .card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 3px 12px rgba(15,23,42,0.05);}
+    .mcard-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:7px;}
+    .mcard-value{font-size:24px;font-weight:800;color:var(--text);line-height:1.1;}
+    .mcard-sub{font-size:12px;color:var(--text2);margin-top:7px;line-height:1.5;}
+
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+    .mb{margin-bottom:18px;}
+
+    /* ── CHART — exact ProgramChart style from profitabilitybalancer ── */
+    .chart-card{
+      overflow-x:auto;
+      background:#f8fafc;
+      border:1px solid #e2e8f0;
+      border-radius:14px;
+      padding:12px 10px 8px;
+    }
+    svg.pchart{min-width:560px;display:block;}
+
+    /* table */
+    .dtable{width:100%;border-collapse:collapse;font-size:13px;}
+    .dtable th{padding:10px 13px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);color:var(--green);font-weight:800;font-size:12px;text-align:left;white-space:nowrap;background:var(--bg);}
+    .dtable td{padding:10px 13px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);color:var(--text);font-size:13px;}
+    .dtable tr.phase-a td{background:#f0fdf9;}
+    .dtable tr.phase-b td{background:#f8fafc;}
+    .dtable tr.milestone td{font-weight:700;}
+
+    /* callout boxes */
+    .callout{border-radius:12px;padding:14px 16px;border:1px solid;}
+    .callout-green{background:rgba(15,157,138,0.07);border-color:rgba(15,157,138,0.25);}
+    .callout-amber{background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.25);}
+    .callout-blue{background:rgba(26,110,216,0.07);border-color:rgba(26,110,216,0.2);}
+
+    .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;}
+
+    .section-head{font-size:18px;font-weight:800;color:var(--text);margin:0 0 6px;}
+    .section-sub{font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 16px;}
+
+    .disclaimer{font-size:11px;color:var(--text3);line-height:1.7;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:24px;}
+
+    .footer{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:14px;border-top:1px solid var(--border);margin-top:20px;}
+
+    @media(max-width:900px){.g4{grid-template-columns:1fr 1fr;}.igrid4{grid-template-columns:1fr 1fr;}.g2{grid-template-columns:1fr;}}
+    @media(max-width:600px){.g4,.igrid4{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="htop">
+    <!-- Legacy Capital logo — primary mark, upper left -->
+    <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69f13f2e011ebfb8f93239b4.png"
+      alt="Legacy Capital Services"
+      style="height:38px;width:auto;object-fit:contain;flex-shrink:0;display:block">
+    <div class="hdiv"></div>
+    <div style="flex:1">
+      <div class="htitl">Billable Payout Simulator</div>
+      <div class="hsub">Admin &amp; Affiliate Revenue Model · Legacy Capital Services</div>
+    </div>
+    <!-- Funding Tier — secondary watermark right -->
+    <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;opacity:0.5">
+      <span style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:600;letter-spacing:0.3px">Powered by</span>
+      <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png"
+        alt="Funding Tier" style="height:18px;width:auto;object-fit:contain" onerror="this.style.display='none'">
+    </div>
+  </div>
+
+  <!-- Row 1: debt · fee · term · files/month -->
+  <div class="igrid4" style="margin-bottom:14px">
+    <div>
+      <label class="ilbl">Enrolled debt / client</label>
+      <div class="dual">
+        <div class="drow">
+          <div class="pwrap"><span class="pfx">$</span>
+            <input type="number" id="debtField" class="hfld" min="6000" max="500000" step="500" value="20000">
+          </div>
+        </div>
+        <input type="range" id="debtSlider" min="6000" max="100000" step="500" value="20000">
+      </div>
+      <div id="debtHint" class="hdim"></div>
+    </div>
+    <div>
+      <label class="ilbl">Service fee rate</label>
+      <div class="dual">
+        <div class="drow">
+          <div class="pwrap">
+            <input type="number" id="feeField" class="hfld nopfx" min="35" max="49" step="1" value="49">
+          </div>
+          <span class="sfx">%</span>
+        </div>
+        <input type="range" id="feeSlider" min="35" max="49" step="1" value="49">
+      </div>
+      <div class="hdim">40–49% standard · 35–39% higher debt loads</div>
+    </div>
+    <div>
+      <label class="ilbl">Term length</label>
+      <div class="dual">
+        <div class="drow">
+          <div class="pwrap">
+            <input type="number" id="termField" class="hfld nopfx" min="1" max="48" step="1" value="22">
+          </div>
+          <span class="sfx">months</span>
+        </div>
+        <input type="range" id="termSlider" min="1" max="48" step="1" value="22">
+      </div>
+      <div class="hdim">1–48 months</div>
+    </div>
+    <div>
+      <label class="ilbl">Monthly enrollments</label>
+      <div class="dual">
+        <div class="drow">
+          <div class="pwrap">
+            <input type="number" id="filesField" class="hfld nopfx" min="1" max="500" step="1" value="10">
+          </div>
+          <span class="sfx">/ mo</span>
+        </div>
+        <input type="range" id="filesSlider" min="1" max="100" step="1" value="10">
+      </div>
+      <div id="tierHint" class="hdim">Tier 2 (65% pay rate)</div>
+    </div>
+  </div>
+
+  <!-- Row 2: maintenance · computed results -->
+  <div class="igrid4">
+    <div>
+      <label class="ilbl">Maintenance fee</label>
+      <div class="mbtns" id="maintBtns">
+        <div class="mbtn active" data-val="80">$80 / mo</div>
+        <div class="mbtn" data-val="120">$120 / mo</div>
+      </div>
+      <div class="hdim" style="margin-top:6px">First 2 months only (affiliate portion)</div>
+    </div>
+    <div>
+      <label class="ilbl">Client monthly payment</label>
+      <div id="hClientPmt" class="hbig">—</div>
+      <div class="hdim">S-fee + maint + $4 processing</div>
+    </div>
+    <div>
+      <label class="ilbl">Per-client total payout (billable)</label>
+      <div id="hTotalPayout" class="hbig">—</div>
+      <div class="hdim" id="hVsUpfront"></div>
+    </div>
+    <div>
+      <label class="ilbl">Billable vs upfront multiplier</label>
+      <div id="hMultiplier" class="hbig">—</div>
+      <div class="hdim">×more than one-time 8% upfront payout</div>
+    </div>
+  </div>
+</div>
+<div class="accent-bar"></div>
+
+<!-- ══ CONTENT ══ -->
+<div class="content">
+
+  <!-- 4 stat cards -->
+  <div class="g4 mb">
+    <div class="card">
+      <div class="mcard-label">Service fee / month / client</div>
+      <div id="scSfee" class="mcard-value" style="color:var(--green)">—</div>
+      <div id="scSfeeSub" class="mcard-sub"></div>
+    </div>
+    <div class="card">
+      <div class="mcard-label">Month 1–2 payout / client</div>
+      <div id="scM12" class="mcard-value" style="color:var(--green)">—</div>
+      <div class="mcard-sub">100% pass-through + maintenance fee</div>
+    </div>
+    <div class="card">
+      <div class="mcard-label">Month 3+ payout / client / mo</div>
+      <div id="scM3" class="mcard-value" style="color:var(--green)">—</div>
+      <div id="scM3sub" class="mcard-sub"></div>
+    </div>
+    <div class="card">
+      <div class="mcard-label">Steady-state monthly (all cohorts)</div>
+      <div id="scSteady" class="mcard-value" style="color:var(--greend)">—</div>
+      <div id="scSteadySub" class="mcard-sub"></div>
+    </div>
+  </div>
+
+  <!-- Chart 1: Single enrollment cumulative payout — exact ProgramChart style -->
+  <div class="card mb">
+    <h2 class="section-head">Single enrollment — cumulative payout over program term</h2>
+    <p class="section-sub">How much one enrolled client pays out over their full program. Months 1–2 are 100% pass-through plus maintenance fee. From month 3 onward, you receive the pay rate share of the service fee.</p>
+    <div class="chart-card">
+      <svg id="chart1" class="pchart" viewBox="0 0 700 240"></svg>
+    </div>
+    <!-- Milestone row -->
+    <div class="g4" style="margin-top:16px;gap:10px">
+      <div class="card" style="padding:12px 14px">
+        <div class="mcard-label" style="font-size:10px">After month 2</div>
+        <div id="milM2" class="mcard-value" style="font-size:18px;color:var(--green)">—</div>
+        <div class="mcard-sub" style="font-size:11px">End of 100% phase</div>
+      </div>
+      <div class="card" style="padding:12px 14px">
+        <div class="mcard-label" style="font-size:10px">Breaks even vs upfront</div>
+        <div id="milBE" class="mcard-value" style="font-size:18px;color:var(--amber)">—</div>
+        <div class="mcard-sub" style="font-size:11px">Month when billable > upfront</div>
+      </div>
+      <div class="card" style="padding:12px 14px">
+        <div class="mcard-label" style="font-size:10px">At mid-term</div>
+        <div id="milMid" class="mcard-value" style="font-size:18px;color:var(--green)">—</div>
+        <div class="mcard-sub" style="font-size:11px">Halfway through program</div>
+      </div>
+      <div class="card" style="padding:12px 14px">
+        <div class="mcard-label" style="font-size:10px">Full term payout</div>
+        <div id="milFull" class="mcard-value" style="font-size:20px;color:var(--greend);font-weight:900">—</div>
+        <div class="mcard-sub" style="font-size:11px">Total per enrolled client</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 2: Billable vs Upfront comparison -->
+  <div class="card mb">
+    <h2 class="section-head">Billable vs upfront — per enrollment comparison</h2>
+    <p class="section-sub">The billable model compounds over time. The upfront model pays once at enrollment. This chart shows exactly when billable surpasses the one-time upfront payout — and by how much it exceeds it by end of term.</p>
+    <div style="display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text2)">
+        <div style="width:28px;height:3px;background:var(--green);border-radius:99px"></div>Billable model
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text2)">
+        <div style="width:28px;height:2px;background:var(--text3);border-radius:99px;border-top:1px dashed var(--text3)"></div>Upfront (8% one-time)
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--amber)">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--amber)"></div>Break-even month
+      </div>
+    </div>
+    <div class="chart-card">
+      <svg id="chart2" class="pchart" viewBox="0 0 700 240"></svg>
+    </div>
+  </div>
+
+  <!-- Chart 3: Rolling revenue (monthly inflow over time) -->
+  <div class="card mb">
+    <h2 class="section-head">Rolling monthly revenue — continuous enrollment model</h2>
+    <p id="chart3sub" class="section-sub">What happens when you enroll clients every month. As cohorts stack, monthly inflow grows until it reaches steady state — where every month earns the full program value across all active cohorts simultaneously.</p>
+    <div class="chart-card">
+      <svg id="chart3" class="pchart" viewBox="0 0 700 240"></svg>
+    </div>
+    <!-- 3-year comparison -->
+    <div class="g2" style="margin-top:16px;gap:12px">
+      <div class="callout callout-green">
+        <div style="font-size:11px;font-weight:700;color:var(--greend);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Billable model — affiliate revenue over 3 years</div>
+        <div id="py3Billable" style="font-size:24px;font-weight:900;color:var(--greend);font-family:'Inconsolata',monospace">—</div>
+        <div id="py3BillableSub" style="font-size:12px;color:var(--text2);margin-top:4px"></div>
+      </div>
+      <div class="callout callout-blue">
+        <div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Upfront model — affiliate revenue over 3 years</div>
+        <div id="py3Upfront" style="font-size:24px;font-weight:900;color:var(--blue);font-family:'Inconsolata',monospace">—</div>
+        <div id="py3UpfrontSub" style="font-size:12px;color:var(--text2);margin-top:4px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Month by month table -->
+  <div class="card mb">
+    <h2 class="section-head" style="margin-bottom:14px">Per-enrollment month-by-month payout schedule</h2>
+    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
+      <table class="dtable">
+        <thead><tr>
+          <th>Month</th>
+          <th>Phase</th>
+          <th>Pay rate</th>
+          <th>Monthly payout</th>
+          <th>Cumulative payout</th>
+          <th>vs Upfront</th>
+          <th>% of upfront</th>
+        </tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- How the model works -->
+  <div class="card mb">
+    <h2 class="section-head" style="margin-bottom:14px">How the billable payout model works for affiliates</h2>
+    <div style="display:grid;gap:10px">
+      <div class="callout callout-green" style="padding:14px 16px">
+        <div style="font-weight:800;color:var(--greend);font-size:14px;margin-bottom:5px">Months 1 &amp; 2 — 100% pass-through + maintenance fee</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">The affiliate receives 100% of the service fee component plus the maintenance fee ($80 or $120) for the first two months. This front-loads meaningful cash while the program is newest and client retention is highest.</div>
+      </div>
+      <div class="callout callout-green" style="padding:14px 16px">
+        <div style="font-weight:800;color:var(--greend);font-size:14px;margin-bottom:5px">Month 3 onwards — pay rate share of service fee</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">From month 3, the affiliate earns their pay rate (60% for under 100 enrollments/month, 65% for 100+) applied to the monthly service fee installment. Maintenance fees from month 3 onward are allocated to the ELP. Processing fees ($4/month) do not flow to the affiliate.</div>
+      </div>
+      <div class="callout callout-amber" style="padding:14px 16px">
+        <div style="font-weight:800;color:#92400e;font-size:14px;margin-bottom:5px">Pay rate tiers</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">
+          <strong>Tier 1 — 1 to 99 enrollments/month: 60%</strong> of the monthly service fee installment.<br>
+          <strong>Tier 2 — 100+ enrollments/month: 65%</strong> of the monthly service fee installment.
+        </div>
+      </div>
+      <div class="callout callout-blue" style="padding:14px 16px">
+        <div style="font-weight:800;color:var(--blue);font-size:14px;margin-bottom:5px">Why billable beats upfront — the affiliate compounding advantage</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">With an upfront model, your affiliate company earns 8% of enrolled debt once — then the revenue stops. With the billable model, every active client continues generating monthly revenue through their entire program term. Consistent monthly enrollment creates a compounding stack of revenue streams that grows every month until it reaches steady state — where each month's inflow equals the total per-client payout multiplied by your monthly enrollment volume. This is what makes Legacy Capital's model uniquely valuable for affiliate partners building long-term recurring revenue.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This projection is an example of possible revenue payouts and how the math works, for discussion purposes only, and is not a guarantee or promise of performance. Actual performance will depend on multiple factors including but not limited to enrollment numbers, cancellations, NSFs, and rejected payments. This formula only takes into consideration an $80 or $120 monthly maintenance fee and $4 processing fee. Math and formula calculations may be corrected or amended from time to time.
+  </div>
+
+  <div class="footer">
+    <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69f13f2e011ebfb8f93239b4.png"
+      alt="Legacy Capital" style="height:20px;width:auto;object-fit:contain;opacity:0.6" onerror="this.style.display='none'">
+    <span style="font-size:11px;color:var(--text3)">·</span>
+    <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png"
+      alt="Funding Tier" style="height:14px;width:auto;object-fit:contain;opacity:0.35" onerror="this.style.display='none'">
+    <span style="font-size:11px;color:var(--text3)">Legacy Capital Services · Admin &amp; Affiliate Portal · Powered by Funding Tier</span>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+  // ── constants ──
+  const GREEN  = "#0f9d8a";
+  const GREEND = "#0b7d6e";
+  const AMBER  = "#f59e0b";
+  const BLUE   = "#1a6ed8";
+  const GRAY   = "#94a3b8";
+  const PROC_FEE = 4;
+
+  const fmt  = n => new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(n);
+  const fmtD = n => new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
+  const fmtK = n => n>=1000000?"$"+(n/1000000).toFixed(1)+"M":n>=1000?"$"+(n/1000).toFixed(0)+"K":fmt(n);
+  const clamp= (v,lo,hi)=>Math.min(hi,Math.max(lo,v));
+
+  // ── SVG helpers ──
+  function el(tag,attrs){
+    const e=document.createElementNS("http://www.w3.org/2000/svg",tag);
+    for(const[k,v] of Object.entries(attrs)) e.setAttribute(k,v);
+    return e;
+  }
+
+  // ── Tooltip state ──
+  let activeTooltip = null;
+
+  // ── dual field/slider sync ──
+  function linkDual(fId,sId,lo,hi){
+    const f=document.getElementById(fId),s=document.getElementById(sId);
+    f.addEventListener("input",()=>{if(!isNaN(+f.value))s.value=clamp(+f.value,lo,hi);update();});
+    f.addEventListener("blur",()=>{const v=clamp(+f.value||lo,lo,hi);f.value=v;s.value=v;update();});
+    s.addEventListener("input",()=>{f.value=s.value;update();});
+  }
+  linkDual("debtField","debtSlider",6000,500000);
+  linkDual("feeField","feeSlider",35,49);
+  linkDual("termField","termSlider",1,48);
+  linkDual("filesField","filesSlider",1,500);
+
+  // maint fee
+  let maintFee=80;
+  document.getElementById("maintBtns").addEventListener("click",e=>{
+    const b=e.target.closest(".mbtn");if(!b)return;
+    document.querySelectorAll(".mbtn").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");maintFee=+b.dataset.val;update();
+  });
+
+  // ── CORE CALCULATION ──
+  function calcPerEnrollment(debt,feeRate,term,maint,payRate){
+    const sfeeTotal  = debt*(feeRate/100);
+    const sfeeMonthly= sfeeTotal/term;
+    const clientPmt  = sfeeMonthly+maint+PROC_FEE;   // what client pays/month
+    const m12payout  = sfeeMonthly+maint;             // affiliate gets months 1-2
+    const m3payout   = sfeeMonthly*payRate;            // affiliate gets months 3+
+    const totalPayout= 2*m12payout + Math.max(0,term-2)*m3payout;
+    const upfront    = debt*0.08;
+    const multiplier = upfront>0?totalPayout/upfront:0;
+
+    // build month-by-month array
+    const rows=[];
+    let cumPayout=0;
+    for(let m=1;m<=term;m++){
+      const mpay = m<=2 ? m12payout : m3payout;
+      cumPayout += mpay;
+      const pr = m<=2 ? 1.0 : payRate;
+      rows.push({m,mpay,cumPayout,pr});
+    }
+    // find break-even vs upfront
+    const beMonth = rows.find(r=>r.cumPayout>=upfront)?.m ?? null;
+
+    return{sfeeMonthly,clientPmt,m12payout,m3payout,totalPayout,upfront,multiplier,rows,beMonth};
+  }
+
+  // ── THE CHART — replicates ProgramChart from profitabilitybalancer EXACTLY ──
+  function drawProgramChart(svgId,pts,maxY,xTitle,yTitle,notable,extraLines){
+    const svg=document.getElementById(svgId);
+    svg.innerHTML="";
+    const W=700,H=240,PL=90,PB=40,PT=22,PR=24;
+    const effW=W-PL-PR,effH=H-PT-PB;
+    const gx=i=>PL+i/(Math.max(pts.length-1,1))*effW;
+    const gy=v=>H-PB-(v/Math.max(maxY,1))*effH;
+
+    // grid lines + y labels
+    [0,0.25,0.5,0.75,1].forEach((t,i)=>{
+      const yv=H-PB-t*effH;
+      svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:yv,y2:yv,stroke:t===0?"#94a3b8":"#e2e8f0","stroke-width":t===0?1.5:1}));
+      const txt=el("text",{x:PL-8,y:yv+4,"text-anchor":"end","font-size":11,fill:GREEN,"font-weight":600,"font-family":"Inconsolata,monospace"});
+      txt.textContent=fmtK(maxY*t);
+      svg.appendChild(txt);
+    });
+
+    // y axis title
+    const yt=el("text",{x:14,y:H/2,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700,transform:`rotate(-90,14,${H/2})`});
+    yt.textContent=yTitle;svg.appendChild(yt);
+
+    // x axis
+    svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:H-PB,y2:H-PB,stroke:"#94a3b8","stroke-width":1.5}));
+
+    // x title
+    const xt=el("text",{x:PL+effW/2,y:H-6,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700});
+    xt.textContent=xTitle;svg.appendChild(xt);
+
+    // extra reference lines (e.g. upfront flat line)
+    if(extraLines) extraLines.forEach(({y:yv,color,dash,label})=>{
+      const ypos=gy(yv);
+      if(ypos<PT||ypos>H-PB) return;
+      const l=el("line",{x1:PL,x2:W-PR,y1:ypos,y2:ypos,stroke:color||GRAY,"stroke-width":1.5,"stroke-dasharray":dash||"5,4","opacity":0.7});
+      svg.appendChild(l);
+      if(label){
+        const t=el("text",{x:W-PR-4,y:ypos-5,"text-anchor":"end","font-size":9.5,fill:color||GRAY,"font-weight":700});
+        t.textContent=label;svg.appendChild(t);
+      }
+    });
+
+    // area fill
+    const coords=pts.map((p,i)=>`${gx(i)},${gy(p.y)}`).join(" ");
+    svg.appendChild(el("polyline",{points:`${gx(0)},${H-PB} ${coords} ${gx(pts.length-1)},${H-PB}`,fill:GREEN+"18",stroke:"none"}));
+
+    // line
+    svg.appendChild(el("polyline",{points:coords,fill:"none",stroke:GREEN,"stroke-width":3,"stroke-linejoin":"round","stroke-linecap":"round"}));
+
+    // x labels at notable months
+    notable.forEach(({m,label,color})=>{
+      const i=m-1;
+      if(i<0||i>=pts.length) return;
+      const t=el("text",{x:gx(i),y:H-PB+16,"text-anchor":"middle","font-size":10,fill:color||GREEN,"font-weight":700});
+      t.textContent=label||`Mo ${m}`;
+      svg.appendChild(t);
+    });
+
+    // dots + hover + value labels
+    pts.forEach((p,i)=>{
+      const x=gx(i),y=gy(p.y);
+      const isNotable=notable.some(n=>n.m===p.m);
+      const isLast=i===pts.length-1;
+      const isBE=p.isBE;
+      const dotColor=isBE?AMBER:isNotable?GREEND:GREEN;
+      const dotR=isLast||isNotable?5.5:3.5;
+
+      // hit area
+      const hit=el("circle",{cx:x,cy:y,r:11,fill:"transparent",style:"cursor:pointer"});
+      hit.addEventListener("mouseenter",()=>{
+        removeTooltip(svg);
+        const tx=Math.min(Math.max(x,68),W-68);
+        const ty=Math.max(y-56,4);
+        const g=el("g",{class:"tooltip-g","pointer-events":"none"});
+        g.appendChild(el("rect",{x:tx-60,y:ty,width:120,height:46,rx:8,fill:"#0f172a",opacity:0.93}));
+        const l1=el("text",{x:tx,y:ty+15,"text-anchor":"middle","font-size":10,fill:"#94a3b8","font-weight":700,"font-family":"Inconsolata,monospace"});
+        l1.textContent=`MONTH ${p.m} CUMULATIVE`;
+        const l2=el("text",{x:tx,y:ty+35,"text-anchor":"middle","font-size":14,fill:"#fff","font-weight":800,"font-family":"Inconsolata,monospace"});
+        l2.textContent=fmt(p.y);
+        g.appendChild(l1);g.appendChild(l2);
+        svg.appendChild(g);
+      });
+      hit.addEventListener("mouseleave",()=>removeTooltip(svg));
+      svg.appendChild(hit);
+
+      // visible dot
+      const dot=el("circle",{cx:x,cy:y,r:dotR,fill:dotColor,stroke:isBE?"#fff":"none","stroke-width":1.5,"pointer-events":"none"});
+      svg.appendChild(dot);
+
+      // value label at end
+      if(isLast){
+        const t=el("text",{x,y:y-14,"text-anchor":"middle","font-size":11,fill:GREEND,"font-weight":900,"font-family":"Inconsolata,monospace"});
+        t.textContent=fmt(p.y);svg.appendChild(t);
+      }
+      // break-even label
+      if(isBE){
+        const t=el("text",{x,y:y-14,"text-anchor":"middle","font-size":9.5,fill:AMBER,"font-weight":800,"font-family":"Inconsolata,monospace"});
+        t.textContent="Breaks even";svg.appendChild(t);
+      }
+    });
+
+    svg.addEventListener("mouseleave",()=>removeTooltip(svg));
+  }
+
+  function removeTooltip(svg){ const t=svg.querySelector(".tooltip-g"); if(t) svg.removeChild(t); }
+
+  // ── Chart 2: two-line chart (billable + upfront) ──
+  function drawCompareChart(svgId,billablePts,upfrontFlat,beMonth,term){
+    const svg=document.getElementById(svgId);
+    svg.innerHTML="";
+    const W=700,H=240,PL=90,PB=40,PT=22,PR=24;
+    const effW=W-PL-PR,effH=H-PT-PB;
+    const n=billablePts.length;
+    const maxY=Math.max(...billablePts.map(p=>p.y),upfrontFlat)*1.05;
+    const gx=i=>PL+i/(Math.max(n-1,1))*effW;
+    const gy=v=>H-PB-(v/maxY)*effH;
+
+    // grid
+    [0,0.25,0.5,0.75,1].forEach(t=>{
+      const yv=H-PB-t*effH;
+      svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:yv,y2:yv,stroke:t===0?"#94a3b8":"#e2e8f0","stroke-width":t===0?1.5:1}));
+      const txt=el("text",{x:PL-8,y:yv+4,"text-anchor":"end","font-size":11,fill:GREEN,"font-weight":600,"font-family":"Inconsolata,monospace"});
+      txt.textContent=fmtK(maxY*t);svg.appendChild(txt);
+    });
+    const yt=el("text",{x:14,y:H/2,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700,transform:`rotate(-90,14,${H/2})`});
+    yt.textContent="Cumulative revenue";svg.appendChild(yt);
+    svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:H-PB,y2:H-PB,stroke:"#94a3b8","stroke-width":1.5}));
+    const xt=el("text",{x:PL+effW/2,y:H-6,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700});
+    xt.textContent="Program month";svg.appendChild(xt);
+
+    // upfront flat line (dashed gray)
+    const yfUp=gy(upfrontFlat);
+    if(yfUp>=PT&&yfUp<=H-PB){
+      svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:yfUp,y2:yfUp,stroke:GRAY,"stroke-width":1.5,"stroke-dasharray":"5,4",opacity:0.6}));
+      const t=el("text",{x:W-PR-4,y:yfUp-5,"text-anchor":"end","font-size":9.5,fill:GRAY,"font-weight":700,"font-family":"Inconsolata,monospace"});
+      t.textContent=`Upfront ${fmt(upfrontFlat)}`;svg.appendChild(t);
+    }
+
+    // billable area + line
+    const coords=billablePts.map((p,i)=>`${gx(i)},${gy(p.y)}`).join(" ");
+    svg.appendChild(el("polyline",{points:`${gx(0)},${H-PB} ${coords} ${gx(n-1)},${H-PB}`,fill:GREEN+"18",stroke:"none"}));
+    svg.appendChild(el("polyline",{points:coords,fill:"none",stroke:GREEN,"stroke-width":3,"stroke-linejoin":"round","stroke-linecap":"round"}));
+
+    // x labels
+    const step=term<=12?2:term<=24?4:6;
+    billablePts.forEach((p,i)=>{
+      if(p.m%step===0||p.m===1||p.m===term){
+        const t=el("text",{x:gx(i),y:H-PB+16,"text-anchor":"middle","font-size":10,fill:GREEN,"font-weight":700});
+        t.textContent=`Mo ${p.m}`;svg.appendChild(t);
+      }
+    });
+
+    // dots
+    billablePts.forEach((p,i)=>{
+      const x=gx(i),y=gy(p.y);
+      const isBE=p.m===beMonth,isLast=p.m===term;
+      const dot=el("circle",{cx:x,cy:y,r:isBE?6.5:isLast?5.5:3,fill:isBE?AMBER:isLast?GREEND:GREEN,stroke:isBE?"#fff":"none","stroke-width":1.5,"pointer-events":"none"});
+      svg.appendChild(dot);
+      if(isBE){
+        const t=el("text",{x,y:y-12,"text-anchor":"middle","font-size":9.5,fill:AMBER,"font-weight":800,"font-family":"Inconsolata,monospace"});
+        t.textContent=`Mo ${p.m} — breaks even`;svg.appendChild(t);
+      }
+      if(isLast){
+        const t=el("text",{x,y:y-12,"text-anchor":"middle","font-size":10,fill:GREEND,"font-weight":900,"font-family":"Inconsolata,monospace"});
+        t.textContent=fmt(p.y);svg.appendChild(t);
+      }
+
+      // hit area for tooltip
+      const hit=el("circle",{cx:x,cy:y,r:11,fill:"transparent",style:"cursor:pointer"});
+      hit.addEventListener("mouseenter",()=>{
+        removeTooltip(svg);
+        const tx=Math.min(Math.max(x,68),W-68),ty=Math.max(y-56,4);
+        const g=el("g",{class:"tooltip-g","pointer-events":"none"});
+        g.appendChild(el("rect",{x:tx-60,y:ty,width:120,height:46,rx:8,fill:"#0f172a",opacity:0.93}));
+        const l1=el("text",{x:tx,y:ty+15,"text-anchor":"middle","font-size":10,fill:"#94a3b8","font-weight":700,"font-family":"Inconsolata,monospace"});
+        l1.textContent=`MONTH ${p.m} CUMULATIVE`;
+        const l2=el("text",{x:tx,y:ty+35,"text-anchor":"middle","font-size":14,fill:"#fff","font-weight":800,"font-family":"Inconsolata,monospace"});
+        l2.textContent=fmt(p.y);
+        g.appendChild(l1);g.appendChild(l2);svg.appendChild(g);
+      });
+      hit.addEventListener("mouseleave",()=>removeTooltip(svg));
+      svg.appendChild(hit);
+    });
+    svg.addEventListener("mouseleave",()=>removeTooltip(svg));
+  }
+
+  // ── MAIN UPDATE ──
+  function update(){
+    const debt  = +document.getElementById("debtField").value||0;
+    const fee   = +document.getElementById("feeField").value||0;
+    const term  = +document.getElementById("termField").value||0;
+    const files = +document.getElementById("filesField").value||0;
+    const payRate = files>=100 ? 0.65 : 0.60;
+
+    // tier hint
+    document.getElementById("tierHint").textContent = files>=100?"Tier 2 — 65% pay rate":"Tier 1 — 60% pay rate (100+/mo for Tier 2)";
+    document.getElementById("debtHint").textContent = debt>=6000?"":"Min $6,000 required";
+
+    if(!debt||!fee||!term) return;
+
+    const R = calcPerEnrollment(debt,fee,term,maintFee,payRate);
+
+    // header computed
+    document.getElementById("hClientPmt").textContent  = fmtD(R.clientPmt);
+    document.getElementById("hTotalPayout").textContent= fmt(R.totalPayout);
+    document.getElementById("hVsUpfront").textContent  = `vs ${fmt(R.upfront)} upfront (8%)`;
+    document.getElementById("hMultiplier").textContent = R.multiplier.toFixed(2)+"×";
+
+    // stat cards
+    document.getElementById("scSfee").textContent    = fmtD(R.sfeeMonthly)+"/mo";
+    document.getElementById("scSfeeSub").textContent = `${fee}% of ${fmt(debt)} ÷ ${term} months`;
+    document.getElementById("scM12").textContent     = fmtD(R.m12payout);
+    document.getElementById("scM3").textContent      = fmtD(R.m3payout)+"/mo";
+    document.getElementById("scM3sub").textContent   = `${fee}% fee × ${(payRate*100).toFixed(0)}% pay rate`;
+    const steadyMo = files*R.totalPayout;
+    document.getElementById("scSteady").textContent  = fmt(steadyMo)+"/mo";
+    document.getElementById("scSteadySub").textContent= `${files} enrollments × ${fmt(R.totalPayout)}/ea · reached at month ${term}`;
+
+    // milestone cards
+    const m2 = R.rows[1]?.cumPayout||0;
+    const mid = R.rows[Math.floor(term/2)-1]?.cumPayout||0;
+    document.getElementById("milM2").textContent   = fmt(m2);
+    document.getElementById("milBE").textContent   = R.beMonth ? `Month ${R.beMonth}` : "Before Month 1";
+    document.getElementById("milMid").textContent  = fmt(mid);
+    document.getElementById("milFull").textContent = fmt(R.totalPayout);
+
+    // ── Chart 1: single enrollment cumulative ──
+    const c1pts = R.rows.map(r=>({m:r.m,y:r.cumPayout,isBE:r.m===R.beMonth}));
+    const notable1=[
+      {m:1,label:"Mo 1"},
+      {m:2,label:"Mo 2"},
+      ...(R.beMonth&&R.beMonth>2&&R.beMonth<term?[{m:R.beMonth,label:`Mo ${R.beMonth}`,color:AMBER}]:[]),
+      ...(Math.floor(term/2)>2&&Math.floor(term/2)!==R.beMonth?[{m:Math.floor(term/2),label:`Mo ${Math.floor(term/2)}`}]:[]),
+      {m:term,label:`Mo ${term}`},
+    ];
+    drawProgramChart("chart1",c1pts,R.totalPayout*1.05,"Program month","Cumulative payout",notable1,
+      [{y:R.upfront,color:GRAY,dash:"5,4",label:`Upfront ${fmt(R.upfront)}`}]);
+
+    // ── Chart 2: billable vs upfront cumulative comparison ──
+    drawCompareChart("chart2",c1pts,R.upfront,R.beMonth,term);
+
+    // ── Chart 3: rolling monthly revenue (continuous enrollment) ──
+    // monthly inflow at calendar month m = files × cumRev[min(m,term)]
+    const projMonths = Math.min(term*2, 60);
+    const c3pts=[];
+    let cumInflow=0;
+    for(let m=1;m<=projMonths;m++){
+      const activeM=Math.min(m,term);
+      const monthlyInflow=files*(R.rows[activeM-1]?.cumPayout||0);
+      cumInflow+=monthlyInflow;
+      c3pts.push({m,y:cumInflow});
+    }
+    const maxC3=c3pts[c3pts.length-1]?.y||1;
+    const notable3=[
+      {m:1,label:"Mo 1"},
+      {m:term,label:`Mo ${term} — steady state`,color:GREEND},
+      ...(projMonths>term?[{m:projMonths,label:`Mo ${projMonths}`}]:[]),
+    ];
+    drawProgramChart("chart3",c3pts,maxC3*1.05,"Calendar month","Cumulative revenue",notable3);
+
+    // 3-year totals
+    const Y3 = 36;
+    let cumBillable3=0, cumUpfront3=0;
+    for(let m=1;m<=Y3;m++){
+      const activeM=Math.min(m,term);
+      cumBillable3 += files*(R.rows[activeM-1]?.cumPayout||0);
+      cumUpfront3  += files*R.upfront;
+    }
+    document.getElementById("py3Billable").textContent    = fmt(cumBillable3);
+    document.getElementById("py3BillableSub").textContent = `${files} enrollments/mo × ${Y3} months — billable model`;
+    document.getElementById("py3Upfront").textContent     = fmt(cumUpfront3);
+    document.getElementById("py3UpfrontSub").textContent  = `${files} enrollments/mo × ${Y3} months — upfront 8%`;
+
+    document.getElementById("chart3sub").textContent =
+      `What happens when you enroll ${files} client${files!==1?"s":""} every month. Monthly inflow reaches steady state at month ${term}, where it locks in at ${fmt(files*R.totalPayout)}/month.`;
+
+    // ── Table ──
+    const tbody=document.getElementById("tableBody");
+    tbody.innerHTML="";
+    R.rows.forEach(r=>{
+      const tr=document.createElement("tr");
+      const isPhaseA=r.m<=2;
+      const isBE=r.m===R.beMonth;
+      const isLast=r.m===term;
+      tr.className=(isBE||isLast?"milestone ":"")+(isPhaseA?"phase-a":"phase-b");
+      const vsUp=r.cumPayout-R.upfront;
+      const pctOfUp=(r.cumPayout/R.upfront*100).toFixed(1)+"%";
+      tr.innerHTML=`
+        <td style="font-weight:700">${r.m}${isBE?` <span style="font-size:10px;background:#fef9c3;color:#92400e;padding:1px 6px;border-radius:4px;font-weight:700">breaks even</span>`:""}${isLast?` <span style="font-size:10px;background:#f0fdf9;color:${GREEND};padding:1px 6px;border-radius:4px;font-weight:700">final</span>`:""}</td>
+        <td style="color:${isPhaseA?"#0891b2":GREEN};font-weight:600">${isPhaseA?"100% pass-through + maint":`${(r.pr*100).toFixed(0)}% of service fee`}</td>
+        <td style="font-family:'Inconsolata',monospace">${(r.pr*100).toFixed(0)}%</td>
+        <td style="font-family:'Inconsolata',monospace;font-weight:700;color:${GREEN}">${fmtD(r.mpay)}</td>
+        <td style="font-family:'Inconsolata',monospace;font-weight:${isLast?900:700};color:${isLast?GREEND:""}">${fmt(r.cumPayout)}</td>
+        <td style="font-family:'Inconsolata',monospace;color:${vsUp>=0?"#15803d":"#ef4444"};font-weight:700">${vsUp>=0?"+":"-"}${fmt(Math.abs(vsUp))}</td>
+        <td style="font-family:'Inconsolata',monospace;color:${r.cumPayout>=R.upfront?GREEND:GRAY}">${pctOfUp}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById("stateSelect") && null; // no state select in this tool
+  update();
+</script>
+</body>
+</html>
