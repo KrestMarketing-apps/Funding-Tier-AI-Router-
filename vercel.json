@@ -18,6 +18,18 @@
       "destination": "https://funding-tier-profit-engine.vercel.app/commission-simulator/:path*"
     },
     {
+      "source": "/admins/legacy-capital-billable-payout-simulator",
+      "destination": "/admins/legacy-capital-billable-payout-simulator.html"
+    },
+    {
+      "source": "/admins/profit-engine",
+      "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine"
+    },
+    {
+      "source": "/admins/profit-engine/:path*",
+      "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*"
+    },
+    {
       "source": "/profit-engine",
       "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine"
     },
