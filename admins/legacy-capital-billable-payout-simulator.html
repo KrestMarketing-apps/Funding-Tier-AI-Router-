@@ -40,47 +40,56 @@
     }
     input[type="range"]::-moz-range-thumb { width:17px;height:17px;border-radius:50%;background:#fff;border:2px solid var(--green);cursor:pointer; }
 
-    /* ── header ── */
+    /* ── header — sticky compact single strip ── */
     .header {
       background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 45%, var(--dark3) 100%);
-      padding: 16px 24px 20px;
+      padding: 10px 20px 11px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
       box-shadow: 0 4px 24px rgba(15,23,42,0.22);
     }
-    .htop   { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .hdiv   { width: 1px; height: 28px; background: rgba(255,255,255,0.15); }
-    .htitl  { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.3px; line-height: 1.15; }
-    .hsub   { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; font-weight: 500; }
+    /* single flex strip — logo | div | inputs | div | computed */
+    .hstrip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+    .hdiv   { width: 1px; height: 36px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
+    .htitl  { font-size: 13px; font-weight: 800; color: #fff; letter-spacing: -0.2px; line-height: 1.2; white-space: nowrap; }
+    .hsub   { font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 1px; font-weight: 500; white-space: nowrap; }
 
-    .igrid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
-    .igrid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .ilbl   { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.45); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.6px; }
-    .hdim   { font-size: 11px; color: rgba(255,255,255,0.28); margin-top: 3px; }
+    /* each input group */
+    .hgrp   { display: flex; flex-direction: column; gap: 3px; min-width: 80px; }
+    .ilbl   { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.4); display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
 
-    .dual { display: flex; flex-direction: column; gap: 5px; }
-    .drow { display: flex; align-items: center; gap: 6px; }
-    .pwrap{ position: relative; flex: 1; }
-    .pfx  { position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;color:rgba(255,255,255,0.4);pointer-events:none;z-index:1;font-family:'Inconsolata',monospace;font-weight:600; }
-    .sfx  { font-size:13px;color:rgba(255,255,255,0.5);font-family:'Inconsolata',monospace;font-weight:700;white-space:nowrap; }
+    /* field + slider stacked compactly */
+    .dual   { display: flex; flex-direction: column; gap: 3px; }
+    .drow   { display: flex; align-items: center; gap: 4px; }
+    .pwrap  { position: relative; flex: 1; }
+    .pfx    { position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:11px;color:rgba(255,255,255,0.4);pointer-events:none;z-index:1;font-family:'Inconsolata',monospace;font-weight:600; }
+    .sfx    { font-size:11px;color:rgba(255,255,255,0.45);font-family:'Inconsolata',monospace;font-weight:700;white-space:nowrap; }
     .hfld {
-      width:100%;padding:8px 8px 8px 22px;border-radius:8px;
+      width:100%;padding:5px 6px 5px 18px;border-radius:6px;
       border:0.5px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.10);
-      color:#fff;font-family:'Inconsolata',monospace;font-size:15px;font-weight:700;outline:none;
+      color:#fff;font-family:'Inconsolata',monospace;font-size:13px;font-weight:700;outline:none;
       transition:border-color 0.15s;
     }
-    .hfld.nopfx{padding-left:10px;}
-    .hfld:focus{border-color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.13);}
-
-    .hinput{width:100%;padding:8px 10px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.10);color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;outline:none;}
-    .hinput option{background:#0f172a;}
+    .hfld.nopfx{padding-left:7px;}
+    .hfld:focus{border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.13);}
 
     /* maint toggle */
-    .mbtns{display:flex;gap:4px;}
-    .mbtn{flex:1;padding:8px 4px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.15s;user-select:none;}
+    .mbtns{display:flex;gap:3px;}
+    .mbtn{flex:1;padding:5px 6px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:10px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.15s;user-select:none;white-space:nowrap;}
     .mbtn.active{background:rgba(15,157,138,0.25);border-color:rgba(15,157,138,0.5);color:#5eead4;}
 
-    /* big computed values in header */
-    .hbig{font-family:'Inconsolata',monospace;font-size:22px;font-weight:700;color:#fff;line-height:1;margin-bottom:3px;}
-    .hmult{display:inline-block;font-family:'Inter',sans-serif;font-size:11px;font-weight:800;background:rgba(15,157,138,0.25);color:#5eead4;border:1px solid rgba(15,157,138,0.4);border-radius:6px;padding:2px 8px;margin-left:6px;vertical-align:middle;}
+    /* computed value cells */
+    .hbig{font-family:'Inconsolata',monospace;font-size:16px;font-weight:700;color:#fff;line-height:1;white-space:nowrap;}
+    .hdim{display:none;} /* hide all hint text to save space */
+
+    .igrid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;}
+    .igrid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 
     .accent-bar{height:3px;background:linear-gradient(90deg,var(--green),#0891b2);}
 
@@ -136,105 +145,97 @@
 </head>
 <body>
 
-<!-- ══ HEADER ══ -->
+<!-- ══ HEADER — sticky single strip ══ -->
 <div class="header">
-  <div class="htop">
-    <!-- Legacy Capital logo — primary mark, upper left -->
-    <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69f13f2e011ebfb8f93239b4.png"
-      alt="Legacy Capital Services"
-      style="height:38px;width:auto;object-fit:contain;flex-shrink:0;display:block">
-    <div class="hdiv"></div>
-    <div style="flex:1">
-      <div class="htitl">Billable Payout Simulator</div>
-      <div class="hsub">Admin &amp; Affiliate Revenue Model · Legacy Capital Services</div>
-    </div>
-    <!-- Funding Tier — secondary watermark right -->
-    <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;opacity:0.5">
-      <span style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:600;letter-spacing:0.3px">Powered by</span>
-      <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png"
-        alt="Funding Tier" style="height:18px;width:auto;object-fit:contain" onerror="this.style.display='none'">
-    </div>
-  </div>
+  <div class="hstrip">
 
-  <!-- Row 1: debt · fee · term · files/month -->
-  <div class="igrid4" style="margin-bottom:14px">
-    <div>
-      <label class="ilbl">Enrolled debt / client</label>
+    <!-- LC logo -->
+    <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69f13f2e011ebfb8f93239b4.png"
+      alt="Legacy Capital Services" style="height:30px;width:auto;object-fit:contain;flex-shrink:0;display:block">
+    <div class="hdiv"></div>
+    <div style="flex-shrink:0">
+      <div class="htitl">Billable Payout Simulator</div>
+      <div class="hsub">Admin &amp; Affiliate · Legacy Capital Services</div>
+    </div>
+    <div class="hdiv"></div>
+
+    <!-- Enrolled debt -->
+    <div class="hgrp">
+      <label class="ilbl">Enrolled debt</label>
       <div class="dual">
-        <div class="drow">
-          <div class="pwrap"><span class="pfx">$</span>
-            <input type="number" id="debtField" class="hfld" min="6000" max="500000" step="500" value="20000">
-          </div>
-        </div>
+        <div class="drow"><div class="pwrap"><span class="pfx">$</span>
+          <input type="number" id="debtField" class="hfld" min="6000" max="500000" step="500" value="20000">
+        </div></div>
         <input type="range" id="debtSlider" min="6000" max="100000" step="500" value="20000">
       </div>
-      <div id="debtHint" class="hdim"></div>
     </div>
-    <div>
-      <label class="ilbl">Service fee rate</label>
+
+    <!-- Service fee -->
+    <div class="hgrp">
+      <label class="ilbl">Service fee</label>
       <div class="dual">
-        <div class="drow">
-          <div class="pwrap">
-            <input type="number" id="feeField" class="hfld nopfx" min="35" max="49" step="1" value="49">
-          </div>
-          <span class="sfx">%</span>
-        </div>
+        <div class="drow"><div class="pwrap">
+          <input type="number" id="feeField" class="hfld nopfx" min="35" max="49" step="1" value="49">
+        </div><span class="sfx">%</span></div>
         <input type="range" id="feeSlider" min="35" max="49" step="1" value="49">
       </div>
-      <div class="hdim">40–49% standard · 35–39% higher debt loads</div>
     </div>
-    <div>
-      <label class="ilbl">Term length</label>
+
+    <!-- Term -->
+    <div class="hgrp">
+      <label class="ilbl">Term</label>
       <div class="dual">
-        <div class="drow">
-          <div class="pwrap">
-            <input type="number" id="termField" class="hfld nopfx" min="1" max="48" step="1" value="22">
-          </div>
-          <span class="sfx">months</span>
-        </div>
+        <div class="drow"><div class="pwrap">
+          <input type="number" id="termField" class="hfld nopfx" min="1" max="48" step="1" value="22">
+        </div><span class="sfx">mo</span></div>
         <input type="range" id="termSlider" min="1" max="48" step="1" value="22">
       </div>
-      <div class="hdim">1–48 months</div>
     </div>
-    <div>
-      <label class="ilbl">Monthly enrollments</label>
+
+    <!-- Enrollments/mo -->
+    <div class="hgrp">
+      <label class="ilbl" id="tierLbl">Enrollments / mo</label>
       <div class="dual">
-        <div class="drow">
-          <div class="pwrap">
-            <input type="number" id="filesField" class="hfld nopfx" min="1" max="500" step="1" value="10">
-          </div>
-          <span class="sfx">/ mo</span>
-        </div>
+        <div class="drow"><div class="pwrap">
+          <input type="number" id="filesField" class="hfld nopfx" min="1" max="500" step="1" value="10">
+        </div><span class="sfx">/ mo</span></div>
         <input type="range" id="filesSlider" min="1" max="100" step="1" value="10">
       </div>
-      <div id="tierHint" class="hdim">Tier 2 (65% pay rate)</div>
     </div>
-  </div>
 
-  <!-- Row 2: maintenance · computed results -->
-  <div class="igrid4">
-    <div>
-      <label class="ilbl">Maintenance fee</label>
+    <!-- Maintenance fee -->
+    <div class="hgrp" style="min-width:96px">
+      <label class="ilbl">Maint. fee</label>
       <div class="mbtns" id="maintBtns">
-        <div class="mbtn active" data-val="80">$80 / mo</div>
-        <div class="mbtn" data-val="120">$120 / mo</div>
+        <div class="mbtn active" data-val="80">$80</div>
+        <div class="mbtn" data-val="120">$120</div>
       </div>
-      <div class="hdim" style="margin-top:6px">First 2 months only (affiliate portion)</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.28);margin-top:2px;white-space:nowrap">First 2 months · affiliate</div>
     </div>
-    <div>
-      <label class="ilbl">Client monthly payment</label>
+
+    <div class="hdiv"></div>
+
+    <!-- Computed outputs -->
+    <div class="hgrp">
+      <label class="ilbl">Client pmt / mo</label>
       <div id="hClientPmt" class="hbig">—</div>
-      <div class="hdim">S-fee + maint + $4 processing</div>
     </div>
-    <div>
-      <label class="ilbl">Per-client total payout (billable)</label>
-      <div id="hTotalPayout" class="hbig">—</div>
-      <div class="hdim" id="hVsUpfront"></div>
+    <div class="hgrp">
+      <label class="ilbl">Total payout / client</label>
+      <div id="hTotalPayout" class="hbig" style="color:#5eead4">—</div>
+      <div id="hVsUpfront" style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:1px;white-space:nowrap"></div>
     </div>
-    <div>
-      <label class="ilbl">Billable vs upfront multiplier</label>
-      <div id="hMultiplier" class="hbig">—</div>
-      <div class="hdim">×more than one-time 8% upfront payout</div>
+    <div class="hgrp">
+      <label class="ilbl">vs Upfront (8%)</label>
+      <div id="hMultiplier" class="hbig" style="color:#fcd34d">—</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.28);margin-top:1px;white-space:nowrap">× more revenue</div>
+    </div>
+
+    <!-- FT watermark -->
+    <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;opacity:0.38;margin-left:auto">
+      <span style="font-size:9px;color:rgba(255,255,255,0.7);font-weight:600;white-space:nowrap">Powered by</span>
+      <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png"
+        alt="Funding Tier" style="height:13px;width:auto;object-fit:contain" onerror="this.style.display='none'">
     </div>
   </div>
 </div>
@@ -665,8 +666,8 @@
     const payRate = files>=100 ? 0.65 : 0.60;
 
     // tier hint
-    document.getElementById("tierHint").textContent = files>=100?"Tier 2 — 65% pay rate":"Tier 1 — 60% pay rate (100+/mo for Tier 2)";
-    document.getElementById("debtHint").textContent = debt>=6000?"":"Min $6,000 required";
+    const tierLbl=document.getElementById("tierLbl");
+    if(tierLbl) tierLbl.textContent = files>=100?"Enrollments / mo (Tier 2 — 65%)":"Enrollments / mo (Tier 1 — 60%)";
 
     if(!debt||!fee||!term) return;
 
