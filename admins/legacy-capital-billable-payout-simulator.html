@@ -41,29 +41,29 @@
     input[type="range"]::-moz-range-thumb { width:17px;height:17px;border-radius:50%;background:#fff;border:2px solid var(--green);cursor:pointer; }
     .header {
       background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 45%, var(--dark3) 100%);
-      padding: 10px 20px 11px;
+      padding: 13px 20px 14px;
       position: sticky; top: 0; z-index: 50;
       box-shadow: 0 4px 24px rgba(15,23,42,0.22);
     }
     .hstrip { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; }
-    .hdiv   { width: 1px; height: 36px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
+    .hdiv   { width: 1px; height: 44px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
     .htitl  { font-size: 13px; font-weight: 800; color: #fff; letter-spacing: -0.2px; line-height: 1.2; white-space: nowrap; }
     .hsub   { font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 1px; font-weight: 500; white-space: nowrap; }
-    .hgrp   { display: flex; flex-direction: column; gap: 3px; min-width: 105px; }
-    .ilbl   { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.4); display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-    .dual   { display: flex; flex-direction: column; gap: 3px; }
+    .hgrp   { display: flex; flex-direction: column; gap: 4px; min-width: 105px; }
+    .ilbl   { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.55); display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    .dual   { display: flex; flex-direction: column; gap: 4px; }
     .drow   { display: flex; align-items: center; gap: 4px; }
     .pwrap  { position: relative; flex: 1; }
-    .pfx    { position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:11px;color:rgba(255,255,255,0.4);pointer-events:none;z-index:1;font-family:'Inconsolata',monospace;font-weight:600; }
+    .pfx    { position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:11px;color:#475569;pointer-events:none;z-index:1;font-family:'Inconsolata',monospace;font-weight:700; }
     .sfx    { font-size:11px;color:rgba(255,255,255,0.45);font-family:'Inconsolata',monospace;font-weight:700;white-space:nowrap; }
     .hfld {
-      width:100%;padding:6px 8px 6px 20px;border-radius:6px;
-      border:0.5px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.10);
-      color:#fff;font-family:'Inconsolata',monospace;font-size:13px;font-weight:700;outline:none;
-      transition:border-color 0.15s;
+      width:100%;padding:7px 8px 7px 20px;border-radius:6px;
+      border:1.5px solid rgba(255,255,255,0.2);background:#ffffff;
+      color:#0f172a;font-family:'Inconsolata',monospace;font-size:13px;font-weight:800;outline:none;
+      transition:border-color 0.15s, box-shadow 0.15s;
     }
     .hfld.nopfx{padding-left:9px;}
-    .hfld:focus{border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.13);}
+    .hfld:focus{border-color:#0f9d8a;box-shadow:0 0 0 2px rgba(15,157,138,0.25);}
     .mbtns{display:flex;gap:3px;}
     .mbtn{flex:1;padding:5px 6px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:10px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.15s;user-select:none;white-space:nowrap;}
     .mbtn.active{background:rgba(15,157,138,0.25);border-color:rgba(15,157,138,0.5);color:#5eead4;}
@@ -197,17 +197,8 @@
       <label class="ilbl">Total payout / client</label>
       <div id="hTotalPayout" class="hbig" style="color:#5eead4">&#8212;</div>
     </div>
-    <div class="hgrp">
-      <label class="ilbl">vs Upfront (8%)</label>
-      <div id="hMultiplier" class="hbig" style="color:#fcd34d">&#8212;</div>
-      <div style="font-size:9px;color:rgba(255,255,255,0.28);margin-top:1px;white-space:nowrap">&times; more revenue</div>
-    </div>
 
-    <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;opacity:0.38;margin-left:auto">
-      <span style="font-size:9px;color:rgba(255,255,255,0.7);font-weight:600;white-space:nowrap">Powered by</span>
-      <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png"
-        alt="Funding Tier" style="height:13px;width:auto;object-fit:contain" onerror="this.style.display='none'">
-    </div>
+
   </div>
 </div>
 <div class="accent-bar"></div>
@@ -709,7 +700,6 @@
     // ── Header ────────────────────────────────────────────
     document.getElementById("hClientPmt").textContent   = fmtD(R.grossPmt) + (isSplit ? "\u00d72" : "");
     document.getElementById("hTotalPayout").textContent = fmt(R.totalPayout);
-    document.getElementById("hMultiplier").textContent  = R.multiplier.toFixed(2) + "\u00d7";
 
     // ── Deduction card ────────────────────────────────────
     renderDeductCard(R, maintFee, isSplit);
