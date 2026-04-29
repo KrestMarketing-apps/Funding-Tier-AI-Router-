@@ -25,12 +25,12 @@
     input[type="number"] { -moz-appearance: textfield; }
 
     input[type="range"] {
-      -webkit-appearance: none; width: 100%; height: 2px;
-      border-radius: 99px; background: rgba(15,157,138,0.45); outline: none; cursor: pointer;
+      -webkit-appearance: none; width: 100%; height: 3px;
+      border-radius: 99px; background: rgba(15,157,138,0.75); outline: none; cursor: pointer;
     }
     input[type="range"].light       { background: var(--border); }
-    input[type="range"].amber-thumb  { background: rgba(245,158,11,0.5); }
-    input[type="range"].cyan-thumb   { background: rgba(8,145,178,0.5); }
+    input[type="range"].amber-thumb  { background: rgba(245,158,11,0.8); }
+    input[type="range"].cyan-thumb   { background: rgba(8,145,178,0.8); }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%;
       background: #fff; border: 2px solid var(--green); cursor: pointer;
@@ -57,6 +57,8 @@
     .elig  { padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 700; }
 
     .igrid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+    /* single-row 7-col layout — state | debt | fee | term | maint+proc | date | result */
+    .igrid7 { display: grid; grid-template-columns: 0.8fr 1.1fr 0.9fr 0.9fr 0.85fr 0.85fr 1fr; gap: 10px; align-items: start; }
     .ilbl  { font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.5); display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
     .hdim  { font-size: 8px; color: rgba(255,255,255,0.28); margin-top: 1px; }
     .imsg  { font-size: 9px; margin-top: 1px; min-height: 0; font-weight: 500; }
@@ -72,7 +74,7 @@
     .limit-tag.breach { background: rgba(239,68,68,0.25);  color: #fca5a5; }
 
     /* ── DUAL CONTROL — field + slider ── */
-    .dual-control { display: flex; flex-direction: column; gap: 2px; }
+    .dual-control { display: flex; flex-direction: column; gap: 6px; }
     /* slider matches input width exactly */
     .dual-control > input[type="range"] { width: 60%; max-width: 60%; }
     .dual-input-row { display: flex; align-items: center; gap: 3px; }
@@ -218,8 +220,8 @@
 
     </div>
 
-    <!-- Row 1 -->
-    <div class="igrid" style="margin-bottom:6px">
+    <!-- Single input row -->
+    <div class="igrid7">
 
       <!-- State -->
       <div>
@@ -276,27 +278,22 @@
         </div>
         <span id="termLimitTag" class="limit-tag ok" style="margin-top:2px"></span>
       </div>
-    </div>
 
-    <!-- Row 2 -->
-    <div class="igrid">
+      <!-- Maintenance fee dropdown + processing fee note -->
       <div>
-        <label class="ilbl">Maintenance fee</label>
-        <div class="maint-btns" id="maintBtns">
-          <div class="maint-btn active" data-val="80">$80 / mo</div>
-          <div class="maint-btn" data-val="120">$120 / mo</div>
-          <div class="maint-btn" data-val="0">$0</div>
-        </div>
-        <div class="hdim" style="margin-top:1px">$120 for non-married joint account</div>
+        <label class="ilbl" for="maintSelect">Maint. fee</label>
+        <select id="maintSelect" class="hinput">
+          <option value="80">$80 / mo</option>
+          <option value="120">$120 / mo — joint</option>
+          <option value="0">$0 / mo</option>
+        </select>
+        <div class="hdim" style="margin-top:2px">+ $4 processing fee</div>
       </div>
-      <div>
-        <label class="ilbl">Processing fee</label>
-        <div style="font-family:'Inconsolata',monospace;font-size:13px;font-weight:700;color:rgba(255,255,255,0.45);margin-bottom:1px">$4 / mo</div>
-        <div class="hdim">Fixed — applied every month</div>
-      </div>
+
+      <!-- Enrollment date — color-scheme:light so picker works -->
       <div>
         <label class="ilbl" for="enrollDate">Enrollment date</label>
-        <input type="date" id="enrollDate" class="hinput" style="color-scheme:dark">
+        <input type="date" id="enrollDate" class="hinput" style="color-scheme:light">
         <div class="imsg" style="color:var(--green)">Payout dates auto-calculated</div>
       </div>
 
@@ -505,10 +502,8 @@
     linkDual("termField","termSlider",TERM_MIN,TERM_MAX);
 
     let maintFee=80;
-    document.getElementById("maintBtns").addEventListener("click",e=>{
-      const btn=e.target.closest(".maint-btn");if(!btn)return;
-      document.querySelectorAll(".maint-btn").forEach(b=>b.classList.remove("active"));
-      btn.classList.add("active");maintFee=parseInt(btn.dataset.val);update();
+    document.getElementById("maintSelect").addEventListener("change",e=>{
+      maintFee=parseInt(e.target.value); update();
     });
 
     function setLimitTag(id,show,cls,text){
