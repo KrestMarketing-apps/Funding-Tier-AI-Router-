@@ -1,39 +1,55 @@
 export const revenue = {
   name: "Legacy Capital Services Revenue Model",
 
-  // 📊 Core rules
-  minDebt: 6000,
+  // ─── Core rules ────────────────────────────────────────────────────────────
+  minDebt:           6000,
   minMonthlyPayment: 250,
-  maxTerm: 60,
+  maxTerm:           60,
+  draftFee:          4,    // $4 per draft, applied to every payment regardless of phase
 
-  // 💰 Payout models
+  /*
+   * PAYOUT PHASES
+   * ─────────────────────────────────────────────────────────────────────────
+   * Monthly schedule:
+   *   Payments 1–2  → 100% pass-through  (monthlyPayment − $4 draft fee)
+   *   Payments 3+   → tier rate applied  (monthlyPayment − maintFee − $4)
+   *
+   * Split schedule (client drafts twice per month = 2 installments):
+   *   Payments 1–4  → 100% pass-through  (installment − $4 draft fee) × 2/mo
+   *   Payments 5+   → tier rate applied  (installment − maintFee/2 − $4) × 2/mo
+   *
+   * "Pass-through" means the affiliate earns the full net after the draft fee —
+   * no tier rate reduction, no maintenance backout.
+   * ─────────────────────────────────────────────────────────────────────────
+   */
+
+  // ─── Payout models ─────────────────────────────────────────────────────────
   payoutModels: {
     billable: {
-      tier1Rate: 0.60,
-      tier2Rate: 0.65,
-      maxMonths: 60
+      tier1Rate: 0.60,   // < 100 monthly files
+      tier2Rate: 0.65,   // 100+ monthly files
+      maxMonths: 60,
     },
     accelerated: {
-      minTerm: 18,
-      firstWindowRate: 0.90, // months 1–7
-      secondWindowRate: 0.25, // months 8–24
-      maxMonths: 24
-    }
+      minTerm:          18,
+      firstWindowRate:  0.90,  // months 1–7
+      secondWindowRate: 0.25,  // months 8–24
+      maxMonths:        24,
+      firstWindow:      7,
+    },
   },
 
-  // 🧠 Calculate monthly payment
+  // ─── Helpers ───────────────────────────────────────────────────────────────
+
   getMonthlyPayment(totalDebt, termMonths) {
     const debt = Number(totalDebt || 0);
     const term = Number(termMonths || 0);
     if (!debt || !term) return 0;
-
     return debt / term;
   },
 
-  // 🔒 Enforce Legacy constraints
   isValidScenario(totalDebt, termMonths) {
     const monthly = this.getMonthlyPayment(totalDebt, termMonths);
-
     return (
       Number(totalDebt || 0) >= this.minDebt &&
       termMonths > 0 &&
@@ -42,124 +58,200 @@ export const revenue = {
     );
   },
 
-  // 🎯 Get max allowed term based on $250 rule
   getMaxAllowedTerm(totalDebt) {
     const debt = Number(totalDebt || 0);
-
     if (debt < this.minDebt) return 0;
-
-    return Math.min(
-      this.maxTerm,
-      Math.floor(debt / this.minMonthlyPayment)
-    );
+    return Math.min(this.maxTerm, Math.floor(debt / this.minMonthlyPayment));
   },
 
-  // 📊 Tier logic (volume-based)
   getTierRate(monthlyFiles = 1) {
     return Number(monthlyFiles || 0) >= 100
       ? this.payoutModels.billable.tier2Rate
       : this.payoutModels.billable.tier1Rate;
   },
 
-  // 💰 BILLABLE MODEL (most common)
-  calculateBillable({
-    totalDebt,
-    termMonths,
-    monthlyFiles = 1
-  }) {
-    const monthlyPayment = this.getMonthlyPayment(totalDebt, termMonths);
+  // ─── Per-payment net revenue ───────────────────────────────────────────────
+  //
+  // Returns the affiliate revenue for a single MONTHLY period.
+  //
+  // periodIndex : 1-based month number in the program
+  // isSplit     : true = client drafts twice/month (each = monthlyPayment / 2)
+  // maintFee    : maintenance fee per month ($80 or $120)
+  // rate        : the payout rate to apply (tier rate or window rate)
+  //               — ignored for the pass-through phase; always 100% there
+  //
+  netRevenueForPeriod(monthlyPayment, periodIndex, isSplit, maintFee, rate) {
+    const draft       = this.draftFee;          // $4 per draft
+    const draftsPerMo = isSplit ? 2 : 1;
+    const instalment  = monthlyPayment / draftsPerMo;
 
-    if (!this.isValidScenario(totalDebt, termMonths)) {
-      return {
-        eligible: false,
-        reason: "Does not meet Legacy requirements (min debt, payment, or term)"
-      };
+    // Pass-through window: first 2 monthly periods (= first 4 drafts on split)
+    const inPassThrough = periodIndex <= 2;
+
+    if (inPassThrough) {
+      // 100% pass-through — only draft fee deducted, no tier rate applied
+      // Each instalment: (instalment − $4) × 1.00
+      const netPerDraft = instalment - draft;
+      return netPerDraft * draftsPerMo;
     }
 
-    const tierRate = this.getTierRate(monthlyFiles);
-    const eligibleMonths = Math.min(termMonths, this.payoutModels.billable.maxMonths);
-
-    const monthlyRevenue = monthlyPayment * tierRate;
-    const totalRevenue = monthlyRevenue * eligibleMonths;
-
-    return {
-      model: "billable",
-      eligible: true,
-      monthlyPayment,
-      tierRate,
-      eligibleMonths,
-      monthlyRevenue,
-      totalRevenue
-    };
+    // Standard phase: maintenance + draft fee backed out, then rate applied
+    // Monthly:  (payment − maintFee − $4)         × rate
+    // Split:    (payment/2 − maintFee/2 − $4) × 2 × rate
+    const maintPerDraft = maintFee / draftsPerMo;
+    const netPerDraft   = instalment - maintPerDraft - draft;
+    return netPerDraft * draftsPerMo * rate;
   },
 
-  // 🚀 ACCELERATED MODEL (high-front payout)
-  calculateAccelerated({
-    totalDebt,
-    termMonths
-  }) {
-    const monthlyPayment = this.getMonthlyPayment(totalDebt, termMonths);
+  // ─── Build full month-by-month schedule ───────────────────────────────────
+  buildSchedule({ totalDebt, termMonths, payoutModel = "billable", monthlyFiles = 1, isSplit = false, maintFee = 80 }) {
+    if (!this.isValidScenario(totalDebt, termMonths)) return [];
 
-    if (!this.isValidScenario(totalDebt, termMonths)) {
-      return {
-        eligible: false,
-        reason: "Does not meet Legacy requirements"
-      };
-    }
+    const mp  = this.getMonthlyPayment(totalDebt, termMonths);
+    const rows = [];
+    let cumRev = 0;
 
-    if (termMonths < this.payoutModels.accelerated.minTerm) {
-      return {
-        eligible: false,
-        reason: "Accelerated model requires minimum 18-month term"
-      };
-    }
+    for (let mo = 1; mo <= termMonths; mo++) {
+      let rate;
+      let phase;
 
-    const firstMonths = Math.min(termMonths, 7);
-    const secondMonths = Math.max(
-      0,
-      Math.min(termMonths, this.payoutModels.accelerated.maxMonths) - 7
-    );
+      if (mo <= 2) {
+        // Pass-through — rate is effectively 1.0 but netRevenueForPeriod handles it
+        rate  = 1.0;
+        phase = "pass-through";
+      } else if (payoutModel === "accelerated") {
+        if (mo <= this.payoutModels.accelerated.firstWindow) {
+          rate  = this.payoutModels.accelerated.firstWindowRate;
+          phase = "accelerated-first";
+        } else if (mo <= this.payoutModels.accelerated.maxMonths) {
+          rate  = this.payoutModels.accelerated.secondWindowRate;
+          phase = "accelerated-second";
+        } else {
+          rate  = 0;
+          phase = "accelerated-expired";
+        }
+      } else {
+        rate  = this.getTierRate(monthlyFiles);
+        phase = "billable";
+      }
 
-    const firstRevenue =
-      monthlyPayment *
-      this.payoutModels.accelerated.firstWindowRate *
-      firstMonths;
+      const rev = this.netRevenueForPeriod(mp, mo, isSplit, maintFee, rate);
+      cumRev += rev;
 
-    const secondRevenue =
-      monthlyPayment *
-      this.payoutModels.accelerated.secondWindowRate *
-      secondMonths;
-
-    return {
-      model: "accelerated",
-      eligible: true,
-      monthlyPayment,
-      firstMonths,
-      secondMonths,
-      firstRevenue,
-      secondRevenue,
-      totalRevenue: firstRevenue + secondRevenue
-    };
-  },
-
-  // 🧠 MASTER CALCULATOR
-  calculate({
-    totalDebt,
-    termMonths,
-    payoutModel = "billable",
-    monthlyFiles = 1
-  }) {
-    if (payoutModel === "accelerated") {
-      return this.calculateAccelerated({
-        totalDebt,
-        termMonths
+      rows.push({
+        month:            mo,
+        phase,
+        grossPayment:     mp,
+        netRevenue:       rev,
+        cumulativeRevenue: cumRev,
+        rate,
+        isSplit,
+        draftsPerMonth:   isSplit ? 2 : 1,
       });
     }
 
-    return this.calculateBillable({
-      totalDebt,
-      termMonths,
-      monthlyFiles
-    });
-  }
+    return rows;
+  },
+
+  // ─── BILLABLE MODEL ────────────────────────────────────────────────────────
+  calculateBillable({ totalDebt, termMonths, monthlyFiles = 1, isSplit = false, maintFee = 80 }) {
+    if (!this.isValidScenario(totalDebt, termMonths)) {
+      return { eligible: false, reason: "Does not meet Legacy requirements (min debt, payment, or term)" };
+    }
+
+    const mp         = this.getMonthlyPayment(totalDebt, termMonths);
+    const tierRate   = this.getTierRate(monthlyFiles);
+    const schedule   = this.buildSchedule({ totalDebt, termMonths, payoutModel: "billable", monthlyFiles, isSplit, maintFee });
+    const totalRevenue = schedule.reduce((s, r) => s + r.netRevenue, 0);
+
+    // Pass-through months: first 2 full months regardless of split
+    const passMonths  = Math.min(2, termMonths);
+    const draft       = this.draftFee;
+    const draftsPerMo = isSplit ? 2 : 1;
+    const instalment  = mp / draftsPerMo;
+
+    const p1p2Revenue = passMonths * (instalment - draft) * draftsPerMo;  // 100% net
+    const stdRevenue  = totalRevenue - p1p2Revenue;                       // tier-rated portion
+
+    return {
+      model:          "billable",
+      eligible:       true,
+      isSplit,
+      monthlyPayment: mp,
+      tierRate,
+      maintFee,
+      passThrough: {
+        months:        passMonths,
+        revenuePerMonth: (instalment - draft) * draftsPerMo,
+        totalRevenue:  p1p2Revenue,
+        note:          "100% pass-through — draft fee only deducted",
+      },
+      standard: {
+        months:        Math.max(0, termMonths - passMonths),
+        rateApplied:   tierRate,
+        totalRevenue:  stdRevenue,
+        note:          `${(tierRate * 100).toFixed(0)}% of net after maint + draft backout`,
+      },
+      schedule,
+      totalRevenue,
+    };
+  },
+
+  // ─── ACCELERATED MODEL ─────────────────────────────────────────────────────
+  calculateAccelerated({ totalDebt, termMonths, isSplit = false, maintFee = 80 }) {
+    if (!this.isValidScenario(totalDebt, termMonths)) {
+      return { eligible: false, reason: "Does not meet Legacy requirements" };
+    }
+    if (termMonths < this.payoutModels.accelerated.minTerm) {
+      return { eligible: false, reason: "Accelerated model requires minimum 18-month term" };
+    }
+
+    const mp       = this.getMonthlyPayment(totalDebt, termMonths);
+    const acc      = this.payoutModels.accelerated;
+    const schedule = this.buildSchedule({ totalDebt, termMonths, payoutModel: "accelerated", isSplit, maintFee });
+
+    const passRows   = schedule.filter(r => r.phase === "pass-through");
+    const firstRows  = schedule.filter(r => r.phase === "accelerated-first");
+    const secondRows = schedule.filter(r => r.phase === "accelerated-second");
+
+    const passRevenue   = passRows.reduce((s, r)  => s + r.netRevenue, 0);
+    const firstRevenue  = firstRows.reduce((s, r) => s + r.netRevenue, 0);
+    const secondRevenue = secondRows.reduce((s, r) => s + r.netRevenue, 0);
+    const totalRevenue  = passRevenue + firstRevenue + secondRevenue;
+
+    return {
+      model:          "accelerated",
+      eligible:       true,
+      isSplit,
+      monthlyPayment: mp,
+      maintFee,
+      passThrough: {
+        months:       passRows.length,
+        totalRevenue: passRevenue,
+        note:         "100% pass-through — draft fee only deducted",
+      },
+      firstWindow: {
+        months:       firstRows.length,
+        rate:         acc.firstWindowRate,
+        totalRevenue: firstRevenue,
+        note:         `${(acc.firstWindowRate * 100).toFixed(0)}% of net (months 3–${2 + firstRows.length})`,
+      },
+      secondWindow: {
+        months:       secondRows.length,
+        rate:         acc.secondWindowRate,
+        totalRevenue: secondRevenue,
+        note:         `${(acc.secondWindowRate * 100).toFixed(0)}% of net (months ${2 + firstRows.length + 1}–${2 + firstRows.length + secondRows.length})`,
+      },
+      schedule,
+      totalRevenue,
+    };
+  },
+
+  // ─── MASTER CALCULATOR ─────────────────────────────────────────────────────
+  calculate({ totalDebt, termMonths, payoutModel = "billable", monthlyFiles = 1, isSplit = false, maintFee = 80 }) {
+    if (payoutModel === "accelerated") {
+      return this.calculateAccelerated({ totalDebt, termMonths, isSplit, maintFee });
+    }
+    return this.calculateBillable({ totalDebt, termMonths, monthlyFiles, isSplit, maintFee });
+  },
 };
