@@ -26,7 +26,7 @@
 
     input[type="range"] {
       -webkit-appearance: none; width: 100%; height: 3px;
-      border-radius: 99px; background: rgba(255,255,255,0.15); outline: none; cursor: pointer;
+      border-radius: 99px; background: rgba(255,255,255,0.18); outline: none; cursor: pointer;
     }
     input[type="range"].light { background: var(--border); }
     input[type="range"]::-webkit-slider-thumb {
@@ -42,6 +42,7 @@
       background: #fff; border: 2px solid var(--green); cursor: pointer;
     }
 
+    /* ── HEADER ── */
     .header {
       background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 50%, var(--dark3) 100%);
       padding: 18px 24px 22px; position: sticky; top: 0; z-index: 50;
@@ -54,11 +55,10 @@
     .elig  { padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 700; }
 
     .igrid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
-    .ilbl  { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.45); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .ilbl  { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.55); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
     .hdim  { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 3px; }
     .imsg  { font-size: 11px; margin-top: 4px; min-height: 16px; font-weight: 500; }
 
-    /* floor/limit badge shown below each constrained input */
     .limit-tag {
       display: inline-flex; align-items: center; gap: 4px;
       margin-top: 5px; padding: 3px 8px; border-radius: 5px;
@@ -69,34 +69,72 @@
     .limit-tag.warn   { background: rgba(245,158,11,0.25); color: #fcd34d; }
     .limit-tag.breach { background: rgba(239,68,68,0.25);  color: #fca5a5; }
 
-    /* dual field + slider */
+    /* ── DUAL CONTROL — field + slider ── */
     .dual-control { display: flex; flex-direction: column; gap: 5px; }
     .dual-input-row { display: flex; align-items: center; gap: 6px; }
-    .dual-prefix-wrap { position: relative; flex: 1; }
-    .dual-prefix  { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 13px; color: rgba(255,255,255,0.4); pointer-events: none; z-index: 1; font-family: 'Inconsolata', monospace; font-weight: 600; }
-    .dual-suffix  { font-size: 13px; color: rgba(255,255,255,0.5); font-family: 'Inconsolata', monospace; font-weight: 700; white-space: nowrap; }
+
+    /*
+      WIDTH REDUCTION: inputs are 75% of their grid column.
+      The prefix-wrap now takes 75% of the row instead of flex:1 (100%).
+      Sliders remain 100% — spanning the full column looks intentional.
+    */
+    .dual-prefix-wrap {
+      position: relative;
+      flex: 0 0 75%;        /* ← 25% narrower than the original flex:1 */
+      max-width: 75%;
+    }
+    .dual-prefix  {
+      position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+      font-size: 13px; pointer-events: none; z-index: 1;
+      font-family: 'Inconsolata', monospace; font-weight: 700;
+      /* dark because input bg is now white */
+      color: #475569;
+    }
+    .dual-suffix  { font-size: 13px; color: rgba(255,255,255,0.55); font-family: 'Inconsolata', monospace; font-weight: 700; white-space: nowrap; }
+
+    /* ── INPUT FIELDS — white bg, black bold text ── */
     .hfield {
-      width: 100%; padding: 8px 8px 8px 22px; border-radius: 7px;
-      border: 0.5px solid rgba(255,255,255,0.22); background: rgba(255,255,255,0.1);
-      color: #fff; font-family: 'Inconsolata', monospace; font-size: 15px; font-weight: 700;
-      outline: none; transition: border-color 0.15s, background 0.15s;
+      width: 100%;
+      padding: 8px 8px 8px 22px;
+      border-radius: 7px;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      background: #ffffff;
+      color: #0f172a;
+      font-family: 'Inconsolata', monospace;
+      font-size: 15px;
+      font-weight: 800;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
     .hfield.no-prefix { padding-left: 10px; }
-    .hfield:focus           { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.13); }
-    .hfield.green-focus:focus  { border-color: #0f9d8a; }
-    .hfield.amber-focus:focus  { border-color: var(--amber); }
-    .hfield.cyan-focus:focus   { border-color: var(--cyan); }
-    .hfield.field-breach { border-color: #f87171 !important; background: rgba(239,68,68,0.12) !important; }
+    .hfield:focus            { border-color: rgba(255,255,255,0.4); box-shadow: 0 0 0 2px rgba(255,255,255,0.12); }
+    .hfield.green-focus:focus{ border-color: var(--green); box-shadow: 0 0 0 2px rgba(15,157,138,0.25); }
+    .hfield.amber-focus:focus{ border-color: var(--amber); box-shadow: 0 0 0 2px rgba(245,158,11,0.22); }
+    .hfield.cyan-focus:focus { border-color: var(--cyan);  box-shadow: 0 0 0 2px rgba(8,145,178,0.22); }
+    /* breach: red tint over white background */
+    .hfield.field-breach { border-color: #f87171 !important; background: #fff5f5 !important; color: #b91c1c !important; }
 
-    .hinput { width: 100%; padding: 8px 10px; border-radius: 7px; border: 0.5px solid rgba(255,255,255,0.22); background: rgba(255,255,255,0.1); color: #fff; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 500; outline: none; }
-    .hinput option { background: #0f172a; }
-    .hinput:focus  { border-color: rgba(255,255,255,0.5); }
+    /* ── SELECT / DATE — also white + dark text ── */
+    .hinput {
+      width: 75%;   /* ← 25% narrower */
+      padding: 8px 10px;
+      border-radius: 7px;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      background: #ffffff;
+      color: #0f172a;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .hinput option { background: #0f172a; color: #fff; }
+    .hinput:focus  { border-color: var(--green); box-shadow: 0 0 0 2px rgba(15,157,138,0.22); }
 
     .maint-btns { display: flex; gap: 4px; }
     .maint-btn  { flex: 1; padding: 8px 4px; border-radius: 7px; border: 0.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.55); font-family: 'Inconsolata', monospace; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.15s; user-select: none; }
     .maint-btn.active { background: rgba(245,158,11,0.25); border-color: rgba(245,158,11,0.5); color: #fcd34d; }
 
-    /* big payment result */
     .pmt-result-wrap { position: relative; }
     .pmt-giant { font-family: 'Inconsolata', monospace; font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; transition: color 0.2s; }
     .pmt-sub   { font-size: 11px; transition: color 0.2s; }
@@ -171,7 +209,7 @@
         alt="Legacy Capital" style="height:22px;width:auto;object-fit:contain" onerror="this.style.display='none'">
       <div>
         <div class="htitl">Legacy Capital Agent Commission Calculator</div>
-        <div class="hsub">Enrollment agent deal calculator · Funding Tier</div>
+        <div class="hsub">Enrollment agent deal calculator &middot; Funding Tier</div>
       </div>
       <div style="margin-left:auto">
         <span id="eligBadge" class="elig" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.2)">Enter details</span>
@@ -202,7 +240,6 @@
           <input type="range" id="debtSlider" min="6000" max="80000" step="500" value="20000">
         </div>
         <div id="debtMsg" class="imsg" style="color:rgba(255,255,255,0.45)"></div>
-        <!-- dynamic floor tag -->
         <span id="debtLimitTag" class="limit-tag ok" style="display:none"></span>
       </div>
 
@@ -219,7 +256,6 @@
           </div>
           <input type="range" id="feeSlider" min="35" max="49" step="1" value="49" class="amber-thumb">
         </div>
-        <!-- dynamic floor tag -->
         <span id="feeLimitTag" class="limit-tag ok" style="margin-top:5px"></span>
       </div>
 
@@ -236,7 +272,6 @@
           </div>
           <input type="range" id="termSlider" min="1" max="60" step="1" value="12" class="cyan-thumb">
         </div>
-        <!-- dynamic ceiling tag -->
         <span id="termLimitTag" class="limit-tag ok" style="margin-top:5px"></span>
       </div>
     </div>
@@ -266,9 +301,8 @@
       <!-- Computed monthly payment -->
       <div class="pmt-result-wrap">
         <label class="ilbl">Client monthly payment</label>
-        <div id="pmtGiant" class="pmt-giant" style="color:#fff">—</div>
+        <div id="pmtGiant" class="pmt-giant" style="color:#fff">&#8212;</div>
         <div id="pmtSub" class="pmt-sub" style="color:rgba(255,255,255,0.3)"></div>
-        <!-- floor notice inline with result -->
         <div id="pmtFloorNotice" style="display:none;margin-top:6px;background:rgba(239,68,68,0.18);border:1px solid rgba(239,68,68,0.4);border-radius:7px;padding:7px 10px">
           <div style="font-size:11px;font-weight:700;color:#fca5a5">Below $250 minimum</div>
           <div id="pmtFloorFix" style="font-size:10px;color:rgba(255,255,255,0.45);margin-top:2px;line-height:1.5"></div>
@@ -355,12 +389,12 @@
 
       <!-- Timeline -->
       <div class="mb card">
-        <div class="clbl">Deal timeline — client payments &amp; agent payouts</div>
+        <div class="clbl">Deal timeline &mdash; client payments &amp; agent payouts</div>
         <div id="timeline" class="timeline"></div>
       </div>
     </div>
 
-    <!-- Schedule table — always visible -->
+    <!-- Schedule table -->
     <div class="card mb">
       <div class="clbl">Full commission schedule</div>
       <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border)">
@@ -372,7 +406,7 @@
           <tbody id="schedBody"></tbody>
         </table>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px">* Band L1 ($6K–$9.9K): $150 flat, paid in full at payment 2. No second payout.</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">* Band L1 ($6K&ndash;$9.9K): $150 flat, paid in full at payment 2. No second payout.</div>
     </div>
 
     <!-- QC + Checklist -->
@@ -380,10 +414,10 @@
       <div class="card">
         <div class="clbl">QC call requirements</div>
         <div style="margin-bottom:10px">
-          <div class="qc-row"><span style="font-size:11px;color:var(--text2)">QC hours</span>        <span style="font-size:12px;font-weight:500">Mon–Fri · 8 AM – 5 PM PT</span></div>
+          <div class="qc-row"><span style="font-size:11px;color:var(--text2)">QC hours</span>        <span style="font-size:12px;font-weight:500">Mon&ndash;Fri &middot; 8 AM &ndash; 5 PM PT</span></div>
           <div class="qc-row"><span style="font-size:11px;color:var(--text2)">Same-day cutoff</span> <span style="font-size:12px;font-weight:700;color:var(--amber)">3:30 PM PT</span></div>
           <div class="qc-row"><span style="font-size:11px;color:var(--text2)">Max safe delay</span>  <span style="font-size:12px;font-weight:500">24 hrs (high fallout after 48h)</span></div>
-          <div class="qc-row"><span style="font-size:11px;color:var(--text2)">After cutoff</span>    <span style="font-size:12px;font-weight:500">Save file → next business day</span></div>
+          <div class="qc-row"><span style="font-size:11px;color:var(--text2)">After cutoff</span>    <span style="font-size:12px;font-weight:500">Save file &rarr; next business day</span></div>
         </div>
         <div class="warnbox">Never promise same-day QC after 3:30 PM PT</div>
       </div>
@@ -411,13 +445,13 @@
       <div class="scriptbox">
         <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Opening script</div>
         <div style="font-size:13px;color:var(--text2);font-style:italic;line-height:1.65">
-          "Based on your situation, we may have a legal service program that could help address your accounts — but before I explain it, I need your permission to go over those details. Are you okay hearing more?"
+          &ldquo;Based on your situation, we may have a legal service program that could help address your accounts &mdash; but before I explain it, I need your permission to go over those details. Are you okay hearing more?&rdquo;
         </div>
       </div>
       <div class="footer">
         <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png"
           alt="Funding Tier" style="height:16px;width:auto;object-fit:contain;opacity:0.35" onerror="this.style.display='none'">
-        <span style="font-size:11px;color:var(--text3)">Funding Tier · Agent Tools</span>
+        <span style="font-size:11px;color:var(--text3)">Funding Tier &middot; Agent Tools</span>
       </div>
     </div>
 
@@ -425,19 +459,18 @@
 
   <script>
     const BANDS=[
-      {code:"L1",label:"Band L1",range:"$6,000 – $9,999",   min:6000, max:9999,    total:150,p2:150,p4:0  },
-      {code:"L2",label:"Band L2",range:"$10,000 – $14,999", min:10000,max:14999,   total:225,p2:175,p4:50 },
-      {code:"L3",label:"Band L3",range:"$15,000 – $19,999", min:15000,max:19999,   total:275,p2:200,p4:75 },
-      {code:"L4",label:"Band L4",range:"$20,000 – $24,999", min:20000,max:24999,   total:350,p2:250,p4:100},
-      {code:"L5",label:"Band L5",range:"$25,000 – $29,999", min:25000,max:29999,   total:400,p2:300,p4:100},
-      {code:"L6",label:"Band L6",range:"$30,000 – $49,999", min:30000,max:49999,   total:500,p2:375,p4:125},
-      {code:"L7",label:"Band L7",range:"$50,000+",          min:50000,max:Infinity,total:600,p2:450,p4:150},
+      {code:"L1",label:"Band L1",range:"$6,000 \u2013 $9,999",   min:6000, max:9999,    total:150,p2:150,p4:0  },
+      {code:"L2",label:"Band L2",range:"$10,000 \u2013 $14,999", min:10000,max:14999,   total:225,p2:175,p4:50 },
+      {code:"L3",label:"Band L3",range:"$15,000 \u2013 $19,999", min:15000,max:19999,   total:275,p2:200,p4:75 },
+      {code:"L4",label:"Band L4",range:"$20,000 \u2013 $24,999", min:20000,max:24999,   total:350,p2:250,p4:100},
+      {code:"L5",label:"Band L5",range:"$25,000 \u2013 $29,999", min:25000,max:29999,   total:400,p2:300,p4:100},
+      {code:"L6",label:"Band L6",range:"$30,000 \u2013 $49,999", min:30000,max:49999,   total:500,p2:375,p4:125},
+      {code:"L7",label:"Band L7",range:"$50,000+",               min:50000,max:Infinity,total:600,p2:450,p4:150},
     ];
     const BLOCKED=["ID","ND","GA"];
     const STATES=["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
-    const PROC_FEE=4;
-    const MIN_PMT=250;
-    const FEE_MIN=35, FEE_MAX=49, TERM_MIN=1, TERM_MAX=60, DEBT_MIN=6000;
+    const PROC_FEE=4, MIN_PMT=250;
+    const FEE_MIN=35,FEE_MAX=49,TERM_MIN=1,TERM_MAX=60,DEBT_MIN=6000;
 
     const fmt    =n=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(n);
     const addMo  =(d,n)=>{const r=new Date(d);r.setMonth(r.getMonth()+n);return r;};
@@ -446,100 +479,58 @@
     const getBand=debt=>BANDS.find(b=>debt>=b.min&&debt<=b.max)||null;
     const clamp  =(v,lo,hi)=>Math.min(hi,Math.max(lo,v));
 
-    // ── $250 floor constraint helpers ──
-    // Monthly payment = (debt × feeRate/100 / term) + maint + PROC_FEE
-    // For payment ≥ MIN_PMT:  debtComponent = MIN_PMT - maint - PROC_FEE
-    const minDebtComp=(maint)=>Math.max(0, MIN_PMT-maint-PROC_FEE);
-
-    // Max term allowed so payment stays ≥ $250
-    const maxTermFor=(debt,feeRate,maint)=>{
-      const md=minDebtComp(maint);
-      if(md<=0) return TERM_MAX; // fees alone cover $250
-      const debtTotal=debt*(feeRate/100);
-      return clamp(Math.floor(debtTotal/md), TERM_MIN, TERM_MAX);
-    };
-
-    // Min fee rate required for payment ≥ $250 at given term
-    const minFeeFor=(debt,term,maint)=>{
-      const md=minDebtComp(maint);
-      if(md<=0||debt<=0) return FEE_MIN;
-      const minRate=(md*term*100)/debt;
-      return clamp(Math.ceil(minRate*10)/10, FEE_MIN, FEE_MAX);
-    };
-
-    // Min debt required for payment ≥ $250 at given fee and term
-    const minDebtFor=(feeRate,term,maint)=>{
-      const md=minDebtComp(maint);
-      if(md<=0||feeRate<=0) return DEBT_MIN;
-      const minD=(md*term*100)/feeRate;
-      return Math.max(DEBT_MIN, Math.ceil(minD/100)*100);
-    };
+    const minDebtComp=(maint)=>Math.max(0,MIN_PMT-maint-PROC_FEE);
+    const maxTermFor =(debt,feeRate,maint)=>{const md=minDebtComp(maint);if(md<=0)return TERM_MAX;return clamp(Math.floor(debt*(feeRate/100)/md),TERM_MIN,TERM_MAX);};
+    const minFeeFor  =(debt,term,maint)=>{const md=minDebtComp(maint);if(md<=0||debt<=0)return FEE_MIN;return clamp(Math.ceil((md*term*100/debt)*10)/10,FEE_MIN,FEE_MAX);};
+    const minDebtFor =(feeRate,term,maint)=>{const md=minDebtComp(maint);if(md<=0||feeRate<=0)return DEBT_MIN;return Math.max(DEBT_MIN,Math.ceil((md*term*100/feeRate)/100)*100);};
 
     // state select
     const sel=document.getElementById("stateSelect");
-    [{value:"",text:"Select state…"},...STATES.map(s=>({value:s,text:s+(BLOCKED.includes(s)?" (not available)":"")}))].forEach(({value,text})=>{
+    [{value:"",text:"Select state\u2026"},...STATES.map(s=>({value:s,text:s+(BLOCKED.includes(s)?" (not available)":"")}))].forEach(({value,text})=>{
       const o=document.createElement("option");o.value=value;o.textContent=text;sel.appendChild(o);
     });
     document.getElementById("enrollDate").value=new Date().toISOString().split("T")[0];
 
-    // ── dual sync: field ↔ slider ──
     function linkDual(fieldId,sliderId,absMin,absMax){
       const field=document.getElementById(fieldId);
       const slider=document.getElementById(sliderId);
-      field.addEventListener("input",()=>{
-        const v=parseFloat(field.value);
-        if(!isNaN(v)) slider.value=clamp(v,absMin,absMax);
-        update();
-      });
-      field.addEventListener("blur",()=>{
-        const v=parseFloat(field.value)||absMin;
-        const c=clamp(v,absMin,absMax);
-        field.value=c; slider.value=c;
-        update();
-      });
-      slider.addEventListener("input",()=>{ field.value=slider.value; update(); });
+      field.addEventListener("input",()=>{const v=parseFloat(field.value);if(!isNaN(v))slider.value=clamp(v,absMin,absMax);update();});
+      field.addEventListener("blur",()=>{const v=parseFloat(field.value)||absMin;const c=clamp(v,absMin,absMax);field.value=c;slider.value=c;update();});
+      slider.addEventListener("input",()=>{field.value=slider.value;update();});
     }
     linkDual("debtField","debtSlider",DEBT_MIN,500000);
-    linkDual("feeField", "feeSlider", FEE_MIN, FEE_MAX);
+    linkDual("feeField","feeSlider",FEE_MIN,FEE_MAX);
     linkDual("termField","termSlider",TERM_MIN,TERM_MAX);
 
-    // maint fee
     let maintFee=80;
     document.getElementById("maintBtns").addEventListener("click",e=>{
-      const btn=e.target.closest(".maint-btn");
-      if(!btn)return;
+      const btn=e.target.closest(".maint-btn");if(!btn)return;
       document.querySelectorAll(".maint-btn").forEach(b=>b.classList.remove("active"));
-      btn.classList.add("active");
-      maintFee=parseInt(btn.dataset.val);
-      update();
+      btn.classList.add("active");maintFee=parseInt(btn.dataset.val);update();
     });
 
-    // limit tag helper
     function setLimitTag(id,show,cls,text){
       const el=document.getElementById(id);
       el.style.display=show?"inline-flex":"none";
-      el.className="limit-tag "+cls;
-      el.textContent=text;
+      el.className="limit-tag "+cls;el.textContent=text;
     }
 
-    // schedule table
     document.getElementById("schedBody").innerHTML=BANDS.map(b=>
       `<tr class="band-row" id="row-${b.code}">
         <td style="font-family:'Inconsolata',monospace;font-weight:700;font-size:13px;color:var(--cyan)">${b.label}<span id="pill-${b.code}"></span></td>
         <td style="color:var(--text2);font-size:12px">${b.range}</td>
         <td style="font-family:'Inconsolata',monospace;font-weight:600;color:var(--cyan)">${fmt(b.p2)}</td>
-        <td style="font-family:'Inconsolata',monospace;font-weight:600;color:${b.p4>0?"var(--cyan)":"var(--text3)"}">${b.p4>0?fmt(b.p4):"—"}</td>
+        <td style="font-family:'Inconsolata',monospace;font-weight:600;color:${b.p4>0?"var(--cyan)":"var(--text3)"}">${b.p4>0?fmt(b.p4):"\u2014"}</td>
         <td style="font-family:'Inconsolata',monospace;font-weight:700;font-size:14px;color:var(--green)">${fmt(b.total)}</td>
         <td style="font-size:11px;color:var(--text3)">${b.p4===0?"Full at P2":"Split P2 + P4"}</td>
       </tr>`).join("");
 
-    // checklist
     const CKS=[
       {k:"calls", t:"Disclosed: law firm cannot stop all creditor calls"},
       {k:"paying",t:"Disclosed: client decides whether to stop paying creditors"},
       {k:"sued",  t:"Disclosed: client may still be sued"},
       {k:"credit",t:"Disclosed: may negatively impact their credit"},
-      {k:"bank",  t:"Bank account verified — ACH confirmed"},
+      {k:"bank",  t:"Bank account verified \u2014 ACH confirmed"},
       {k:"qc",    t:"QC call scheduled within allowed window"},
     ];
     const ckS={};CKS.forEach(c=>ckS[c.k]=false);
@@ -560,15 +551,14 @@
     renderCK();
 
     ["guarantee","erase your debt","cannot be sued","credit repair","pre-approved","we are attorneys"].forEach(p=>{
-      const s=document.createElement("span");s.className="pill phrase-d";s.style.fontFamily="'Inconsolata',monospace";s.textContent=`"${p}"`;
+      const s=document.createElement("span");s.className="pill phrase-d";s.style.fontFamily="'Inconsolata',monospace";s.textContent=`\u201c${p}\u201d`;
       document.getElementById("prohibList").appendChild(s);
     });
     ["may help resolve accounts","results vary","law firm will review","not a loan","not credit repair"].forEach(p=>{
-      const s=document.createElement("span");s.className="pill phrase-s";s.style.fontFamily="'Inconsolata',monospace";s.textContent=`"${p}"`;
+      const s=document.createElement("span");s.className="pill phrase-s";s.style.fontFamily="'Inconsolata',monospace";s.textContent=`\u201c${p}\u201d`;
       document.getElementById("approvedList").appendChild(s);
     });
 
-    // ── MAIN UPDATE ──
     function update(){
       const stateVal =document.getElementById("stateSelect").value;
       const debt     =parseFloat(document.getElementById("debtField").value)||0;
@@ -581,74 +571,43 @@
       const debtOk =debt>=DEBT_MIN;
       const band   =getBand(debt);
 
-      // ── compute constraints ──
-      const mxTerm   = maxTermFor(debt, feeRate, maintFee);   // max term for $250
-      const mnFee    = minFeeFor(debt, term, maintFee);        // min fee% for $250
-      const mnDebt   = minDebtFor(feeRate, term, maintFee);    // min debt for $250
+      const mxTerm=maxTermFor(debt,feeRate,maintFee);
+      const mnFee =minFeeFor(debt,term,maintFee);
+      const mnDebt=minDebtFor(feeRate,term,maintFee);
 
-      const termOk   = term <= mxTerm;
-      const feeOk    = feeRate >= mnFee;
-      const debtFloorOk = debt >= mnDebt;
+      const termOk    =term<=mxTerm;
+      const feeOk     =feeRate>=mnFee;
+      const debtFloorOk=debt>=mnDebt;
 
-      // ── update slider dynamics ──
-      // Term: hard-cap slider max so you can't drag past the valid ceiling
       const termSlider=document.getElementById("termSlider");
       termSlider.max=mxTerm;
-      if(parseInt(termSlider.value)>mxTerm){
-        termSlider.value=mxTerm;
-        document.getElementById("termField").value=mxTerm;
-      }
-      // Fee: hard-floor slider min so you can't drag below the valid floor
+      if(parseInt(termSlider.value)>mxTerm){termSlider.value=mxTerm;document.getElementById("termField").value=mxTerm;}
       const feeSlider=document.getElementById("feeSlider");
       feeSlider.min=Math.ceil(mnFee);
-      if(parseFloat(feeSlider.value)<mnFee){
-        feeSlider.value=Math.ceil(mnFee);
-        document.getElementById("feeField").value=Math.ceil(mnFee);
-      }
+      if(parseFloat(feeSlider.value)<mnFee){feeSlider.value=Math.ceil(mnFee);document.getElementById("feeField").value=Math.ceil(mnFee);}
 
-      // ── limit tags ──
-      // Term ceiling
       if(debtOk&&feeRate>0){
         const atLimit=term>=mxTerm;
-        setLimitTag("termLimitTag",true,
-          !termOk?"breach":atLimit?"warn":"ok",
-          !termOk?`⚠ Exceeds max — reduce to ${mxTerm} mo`:
-          atLimit?`▲ Max for this deal: ${mxTerm} mo`:
-          `Max for this deal: ${mxTerm} mo`);
-      } else {
-        setLimitTag("termLimitTag",false,"ok","");
-      }
+        setLimitTag("termLimitTag",true,!termOk?"breach":atLimit?"warn":"ok",
+          !termOk?`\u26a0 Exceeds max \u2014 reduce to ${mxTerm} mo`:atLimit?`\u25b2 Max for this deal: ${mxTerm} mo`:`Max for this deal: ${mxTerm} mo`);
+      } else setLimitTag("termLimitTag",false,"ok","");
 
-      // Fee floor
       if(debtOk&&term>0){
         const atFloor=feeRate<=mnFee+1;
-        setLimitTag("feeLimitTag",true,
-          !feeOk?"breach":atFloor?"warn":"ok",
-          !feeOk?`⚠ Below floor — min ${mnFee.toFixed(1)}% for this deal`:
-          atFloor?`▼ Floor for this deal: ${mnFee.toFixed(1)}%`:
-          `Floor for this deal: ${mnFee.toFixed(1)}%`);
-      } else {
-        setLimitTag("feeLimitTag",false,"ok","");
-      }
+        setLimitTag("feeLimitTag",true,!feeOk?"breach":atFloor?"warn":"ok",
+          !feeOk?`\u26a0 Below floor \u2014 min ${mnFee.toFixed(1)}% for this deal`:atFloor?`\u25bc Floor for this deal: ${mnFee.toFixed(1)}%`:`Floor for this deal: ${mnFee.toFixed(1)}%`);
+      } else setLimitTag("feeLimitTag",false,"ok","");
 
-      // Debt floor (from $250 constraint)
       if(term>0&&feeRate>0&&mnDebt>DEBT_MIN){
         const atFloor=debt<=mnDebt+500;
-        setLimitTag("debtLimitTag",true,
-          !debtFloorOk?"breach":atFloor?"warn":"ok",
-          !debtFloorOk?`⚠ Below floor — need ${fmt(mnDebt)} for $250/mo`:
-          atFloor?`▼ Min for $250/mo: ${fmt(mnDebt)}`:
-          `Min for $250/mo: ${fmt(mnDebt)}`);
-      } else {
-        setLimitTag("debtLimitTag",false,"ok","");
-      }
+        setLimitTag("debtLimitTag",true,!debtFloorOk?"breach":atFloor?"warn":"ok",
+          !debtFloorOk?`\u26a0 Below floor \u2014 need ${fmt(mnDebt)} for $250/mo`:atFloor?`\u25bc Min for $250/mo: ${fmt(mnDebt)}`:`Min for $250/mo: ${fmt(mnDebt)}`);
+      } else setLimitTag("debtLimitTag",false,"ok","");
 
-      // Field breach styling
       document.getElementById("termField").classList.toggle("field-breach",!termOk&&term>0);
-      document.getElementById("feeField").classList.toggle("field-breach", !feeOk&&feeRate>0);
+      document.getElementById("feeField").classList.toggle("field-breach",!feeOk&&feeRate>0);
       document.getElementById("debtField").classList.toggle("field-breach",!debtFloorOk&&debt>0);
 
-      // ── payment calc ──
       const debtComp  =term>0?Math.round((debt*(feeRate/100))/term):0;
       const feesComp  =maintFee+PROC_FEE;
       const monthlyPmt=debtComp+feesComp;
@@ -658,81 +617,54 @@
       const savingsPct=debt>0?savings/debt:0;
       const eligible  =stateOk&&debtOk&&pmtOk&&termOk&&feeOk;
 
-      // ── state msg ──
       const sm=document.getElementById("stateMsg");
       if(blocked){sm.style.color="#ef4444";sm.textContent=`Not available in ${stateVal}`;}
       else if(stateOk){sm.style.color="#0f9d8a";sm.textContent="State eligible";}
       else sm.textContent="";
 
-      // ── debt msg ──
       const dm=document.getElementById("debtMsg");
       if(debt>0&&debt<4000){dm.style.color="#ef4444";dm.textContent="Min $6,000 required for Legacy Capital";}
       else if(debt>=4000&&debt<6000){dm.style.color="#0891b2";dm.textContent="Consider Consumer Shield (min $4K)";}
-      else if(debtOk&&band){dm.style.color="#0f9d8a";dm.textContent=`${band.label} — ${band.range}`;}
+      else if(debtOk&&band){dm.style.color="#0f9d8a";dm.textContent=`${band.label} \u2014 ${band.range}`;}
       else dm.textContent="";
 
-      // ── header payment result ──
       const pg=document.getElementById("pmtGiant");
       const ps=document.getElementById("pmtSub");
       const pf=document.getElementById("pmtFloorNotice");
       const pff=document.getElementById("pmtFloorFix");
-
       if(debtOk&&term>0&&feeRate>0){
-        pg.textContent=fmt(monthlyPmt);
-        pg.style.color=pmtOk?"#fff":"#fca5a5";
-        if(pmtOk){
-          ps.style.color="rgba(255,255,255,0.3)";
-          ps.textContent=`${fmt(debtComp)} debt + ${fmt(feesComp)} fees`;
-          pf.style.display="none";
-        } else {
-          ps.textContent="";
-          pf.style.display="block";
-          // build actionable fix suggestions
+        pg.textContent=fmt(monthlyPmt);pg.style.color=pmtOk?"#fff":"#fca5a5";
+        if(pmtOk){ps.style.color="rgba(255,255,255,0.3)";ps.textContent=`${fmt(debtComp)} debt + ${fmt(feesComp)} fees`;pf.style.display="none";}
+        else{ps.textContent="";pf.style.display="block";
           const fixes=[];
-          if(mxTerm<term)  fixes.push(`Reduce term to ${mxTerm} months or less`);
+          if(mxTerm<term)   fixes.push(`Reduce term to ${mxTerm} months or less`);
           if(mnFee>feeRate) fixes.push(`Raise fee rate to ${Math.ceil(mnFee)}% or higher`);
-          if(mnDebt>debt)  fixes.push(`Increase debt to ${fmt(mnDebt)} or more`);
-          if(maintFee<120) fixes.push("Switch to $80 or $120 maintenance fee");
-          pff.textContent=fixes.length?fixes.join(" · "):"Adjust term, fee rate, or debt to reach $250/mo";
+          if(mnDebt>debt)   fixes.push(`Increase debt to ${fmt(mnDebt)} or more`);
+          pff.textContent=fixes.length?fixes.join(" \u00b7 "):"Adjust term, fee rate, or debt to reach $250/mo";
         }
-      } else {
-        pg.textContent="—";pg.style.color="rgba(255,255,255,0.4)";
-        ps.textContent="";pf.style.display="none";
-      }
+      } else {pg.textContent="\u2014";pg.style.color="rgba(255,255,255,0.4)";ps.textContent="";pf.style.display="none";}
 
-      // ── badge ──
       const badge=document.getElementById("eligBadge");
-      if(!stateVal){
-        badge.style.cssText="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.2)";
-        badge.textContent="Enter details";
-      } else if(eligible){
-        badge.style.cssText="background:rgba(15,157,138,0.25);color:#5eead4;border:1px solid rgba(15,157,138,0.5)";
-        badge.textContent="Eligible";
-      } else {
-        badge.style.cssText="background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.4)";
-        badge.textContent="Ineligible";
-      }
+      if(!stateVal){badge.style.cssText="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.2)";badge.textContent="Enter details";}
+      else if(eligible){badge.style.cssText="background:rgba(15,157,138,0.25);color:#5eead4;border:1px solid rgba(15,157,138,0.5)";badge.textContent="Eligible";}
+      else{badge.style.cssText="background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.4)";badge.textContent="Ineligible";}
 
       const ms=document.getElementById("mainSection");
       if(!debtOk||!band||term===0||!pmtOk){ms.classList.add("hidden");return;}
       ms.classList.remove("hidden");
 
-      // stat cards
       document.getElementById("sc-pmt").textContent      =fmt(monthlyPmt);
       document.getElementById("sc-pmt-sub").textContent  =`${term}-month program`;
       document.getElementById("sc-cost").textContent     =fmt(totalCost);
-      document.getElementById("sc-cost-sub").textContent =`${fmt(monthlyPmt)} × ${term} months`;
-      document.getElementById("sc-sav").textContent      =savings>0?fmt(savings):"—";
+      document.getElementById("sc-cost-sub").textContent =`${fmt(monthlyPmt)} \u00d7 ${term} months`;
+      document.getElementById("sc-sav").textContent      =savings>0?fmt(savings):"\u2014";
       document.getElementById("sc-sav-sub").textContent  =savings>0?`vs. ${fmt(debt)} enrolled debt`:"";
-      document.getElementById("sc-savpct").textContent   =savings>0?(savingsPct*100).toFixed(1)+"%":"—";
+      document.getElementById("sc-savpct").textContent   =savings>0?(savingsPct*100).toFixed(1)+"%":"\u2014";
       document.getElementById("sc-savpct-sub").textContent=savings>0?"of enrolled debt":"";
 
-      // band
       document.getElementById("bandLabel").textContent=band.label;
       document.getElementById("bandRange").textContent=band.range+" enrolled debt";
       document.getElementById("bandTotal").textContent=fmt(band.total);
-
-      // breakdown
       document.getElementById("mb-debt").textContent    =fmt(debt);
       document.getElementById("mb-feerate").textContent =feeRate+"%";
       document.getElementById("mb-term").textContent    =term+" months";
@@ -746,7 +678,6 @@
       document.getElementById("debtBarPct").textContent=`${dPct}% debt (${fmt(debtComp)}/mo)`;
       document.getElementById("feesBarPct").textContent=`${100-dPct}% fees (${fmt(feesComp)}/mo)`;
 
-      // payouts
       const enrollDate=enrollVal?new Date(enrollVal+"T12:00:00"):new Date();
       const agentP2=set20(addMo(enrollDate,3));
       const agentP4=set20(addMo(enrollDate,5));
@@ -767,10 +698,9 @@
         <div class="pbox" style="background:#f0fdf4;border:1px solid #86efac">
           <div class="pbox-label" style="color:#15803d">Single payout</div>
           <div style="font-size:15px;font-weight:700;color:#15803d">${fmt(band.total)} at P2</div>
-          <div class="pbox-sub" style="margin-top:6px">No second milestone — faster cash</div>
+          <div class="pbox-sub" style="margin-top:6px">No second milestone &mdash; faster cash</div>
         </div>`}`;
 
-      // timeline
       const p1=addMo(enrollDate,1),p2=addMo(enrollDate,2),p4=addMo(enrollDate,4);
       const steps=band.p4>0?[
         {label:"Enrolled",                  sub:"Month 0",        date:fmtDate(enrollDate),type:"enroll" },
