@@ -228,7 +228,7 @@
     <div class="card">
       <div class="mcard-label">P1&ndash;2 affiliate payout / mo</div>
       <div id="scM12" class="mcard-value" style="color:var(--green)">&#8212;</div>
-      <div id="scM12sub" class="mcard-sub">Draft fee deducted &middot; pay rate applied</div>
+      <div id="scM12sub" class="mcard-sub">100% pass-through &middot; draft fee only</div>
     </div>
     <div class="card">
       <div class="mcard-label">P3+ affiliate payout / mo</div>
@@ -341,11 +341,13 @@
     <div style="display:grid;gap:10px">
 
       <div class="callout callout-green" style="padding:14px 16px">
-        <div style="font-weight:800;color:var(--greend);font-size:14px;margin-bottom:5px">Payments 1 &amp; 2 &mdash; draft fee deducted only</div>
+        <div style="font-weight:800;color:var(--greend);font-size:14px;margin-bottom:5px">Payments 1 &amp; 2 &mdash; 100% pass-through (draft fee only)</div>
         <div style="font-size:13px;color:var(--text2);line-height:1.7">
-          For the first two payments, only the <strong>$4 draft/processing fee</strong> is backed out before calculating affiliate revenue.
-          Monthly schedule: deduct <strong>$4</strong>. Split schedule: deduct <strong>$4 &times; 2 = $8</strong> (one per installment).
-          The remaining net amount is multiplied by the pay rate tier to arrive at the affiliate payout.
+          The first two full payments are <strong>100% pass-through</strong> to the affiliate — no tier rate reduction, no maintenance backout.
+          Only the <strong>$4 draft fee</strong> is deducted per draft before the affiliate receives the full net amount.
+          Monthly: deduct <strong>$4 &rarr; affiliate earns 100% of remaining net</strong>.
+          Split: deduct <strong>$4 &times; 2 = $8/mo &rarr; affiliate earns 100% of remaining net</strong> (one draft fee per installment).
+          The tier pay rate (60% or 65%) does <em>not</em> apply until payment 3.
         </div>
       </div>
 
@@ -380,7 +382,7 @@
   </div>
 
   <div class="disclaimer">
-    <strong>Disclaimer:</strong> This projection is an example of possible revenue payouts and how the math works, for discussion purposes only, and is not a guarantee or promise of performance. Actual performance will depend on multiple factors including but not limited to enrollment numbers, cancellations, NSFs, and rejected payments. Deduction schedule: $4 draft fee on all payments; maintenance fee ($80 or $120) and draft fee both backed out from payment 3 onward; split schedules apply deductions per installment &times; 2. Math and formula calculations may be corrected or amended from time to time.
+    <strong>Disclaimer:</strong> This projection is an example of possible revenue payouts and how the math works, for discussion purposes only, and is not a guarantee or promise of performance. Actual performance will depend on multiple factors including but not limited to enrollment numbers, cancellations, NSFs, and rejected payments. Deduction schedule: payments 1&ndash;2 are 100% pass-through after $4 draft fee (no tier rate reduction); from payment 3 onward, maintenance fee ($80 or $120) and $4 draft fee are backed out before the tier pay rate (60%/65%) is applied; split schedules apply deductions per installment &times; 2. Math and formula calculations may be corrected or amended from time to time.
   </div>
 
   <div class="footer">
@@ -487,11 +489,14 @@
     let cumPayout = 0;
 
     for(let m = 1; m <= term; m++){
-      const deduction = m <= 2 ? earlyDeduct : lateDeduct;
-      const net       = grossPmt - deduction;
-      const mpay      = net * payRate;
-      cumPayout      += mpay;
-      rows.push({ m, grossPmt, deduction, net, mpay, cumPayout, payRate });
+      const deduction  = m <= 2 ? earlyDeduct : lateDeduct;
+      const net        = grossPmt - deduction;
+      // P1-2: 100% pass-through — full net, no tier rate reduction
+      // P3+:  tier rate applied to net after maint + draft backout
+      const effectRate = m <= 2 ? 1.0 : payRate;
+      const mpay       = net * effectRate;
+      cumPayout       += mpay;
+      rows.push({ m, grossPmt, deduction, net, mpay, cumPayout, payRate: effectRate });
     }
 
     const totalPayout = cumPayout;
@@ -521,7 +526,7 @@
         <div class="deduct-val">&minus;${fmtD(phaseADeduct)} / month</div>
         <div class="deduct-sub">
           ${split ? `2 drafts &times; $4 = $8/mo` : `1 draft &times; $4 = $4/mo`}<br>
-          Net eligible: <strong>${fmtD(netA)}</strong> &times; ${(R.payRate*100).toFixed(0)}% = <strong>${fmtD(netA * R.payRate)}/mo</strong>
+          100% pass-through &mdash; affiliate earns full net: <strong>${fmtD(netA)}/mo</strong>
         </div>
       </div>
       <div class="deduct-box late">
@@ -710,7 +715,7 @@
       ? `2 drafts of ${fmtD(R.grossPmt/2)} each (${fee}% fee + $${maintFee} maint + $${PROC_FEE}/draft)`
       : `${fee}% of ${fmt(debt)} \u00f7 ${term} months + $${maintFee} + $${PROC_FEE}`;
     document.getElementById("scM12").textContent    = fmtD(R.m12payout) + "/mo";
-    document.getElementById("scM12sub").textContent = `\u2212${fmtD(R.earlyDeduct)} draft fee \u00d7 ${(payRate*100).toFixed(0)}% pay rate`;
+    document.getElementById("scM12sub").textContent = `100% pass\u2011through \u2014 \u2212${fmtD(R.earlyDeduct)} draft fee only`;
     document.getElementById("scM3").textContent     = fmtD(R.m3payout) + "/mo";
     document.getElementById("scM3sub").textContent  = `\u2212${fmtD(R.lateDeduct)} (maint+draft) \u00d7 ${(payRate*100).toFixed(0)}% pay rate`;
     const steadyMo = files * R.totalPayout;
@@ -786,7 +791,7 @@
       tr.className = (isBE||isLast ? "milestone " : "") + (isKink ? "phase-kink" : isP12 ? "phase-a" : "phase-b");
 
       const phaseLabel = isP12
-        ? `<span style="color:#0891b2;font-weight:700">P1\u20132 \u2014 draft fee only</span>`
+        ? `<span style="color:#0891b2;font-weight:700">P1\u20132 \u2014 100% pass-through</span>`
         : `<span style="color:${GREEN};font-weight:700">P3+ \u2014 maint + draft</span>`;
 
       const moBadges = [
