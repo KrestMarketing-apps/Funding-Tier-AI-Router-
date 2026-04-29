@@ -25,44 +25,46 @@
     input[type="number"] { -moz-appearance: textfield; }
 
     input[type="range"] {
-      -webkit-appearance: none; width: 100%; height: 3px;
-      border-radius: 99px; background: rgba(255,255,255,0.18); outline: none; cursor: pointer;
+      -webkit-appearance: none; width: 100%; height: 2px;
+      border-radius: 99px; background: rgba(15,157,138,0.45); outline: none; cursor: pointer;
     }
-    input[type="range"].light { background: var(--border); }
+    input[type="range"].light       { background: var(--border); }
+    input[type="range"].amber-thumb  { background: rgba(245,158,11,0.5); }
+    input[type="range"].cyan-thumb   { background: rgba(8,145,178,0.5); }
     input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+      -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%;
       background: #fff; border: 2px solid var(--green); cursor: pointer;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
     }
     input[type="range"].amber-thumb::-webkit-slider-thumb { border-color: var(--amber); }
     input[type="range"].cyan-thumb::-webkit-slider-thumb  { border-color: var(--cyan); }
     input[type="range"].red-thumb::-webkit-slider-thumb   { border-color: #f87171; }
     input[type="range"]::-moz-range-thumb {
-      width: 16px; height: 16px; border-radius: 50%;
+      width: 13px; height: 13px; border-radius: 50%;
       background: #fff; border: 2px solid var(--green); cursor: pointer;
     }
 
     /* ── HEADER ── */
     .header {
       background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 50%, var(--dark3) 100%);
-      padding: 18px 24px 22px; position: sticky; top: 0; z-index: 50;
+      padding: 8px 16px 10px; position: sticky; top: 0; z-index: 50;
       box-shadow: 0 4px 24px rgba(15,23,42,0.22);
     }
-    .htop  { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
-    .hdiv  { width: 1px; height: 26px; background: rgba(255,255,255,0.15); }
-    .htitl { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -0.3px; line-height: 1.1; }
-    .hsub  { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 3px; font-weight: 500; }
+    .htop  { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .hdiv  { width: 1px; height: 16px; background: rgba(255,255,255,0.15); }
+    .htitl { font-size: 12px; font-weight: 700; color: #fff; letter-spacing: -0.2px; line-height: 1.1; }
+    .hsub  { font-size: 9px; color: rgba(255,255,255,0.35); margin-top: 1px; font-weight: 500; }
     .elig  { padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 700; }
 
-    .igrid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
-    .ilbl  { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.55); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
-    .hdim  { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 3px; }
-    .imsg  { font-size: 11px; margin-top: 4px; min-height: 16px; font-weight: 500; }
+    .igrid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+    .ilbl  { font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.5); display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .hdim  { font-size: 8px; color: rgba(255,255,255,0.28); margin-top: 1px; }
+    .imsg  { font-size: 9px; margin-top: 1px; min-height: 0; font-weight: 500; }
 
     .limit-tag {
       display: inline-flex; align-items: center; gap: 4px;
-      margin-top: 5px; padding: 3px 8px; border-radius: 5px;
-      font-size: 10px; font-weight: 700; font-family: 'Inconsolata', monospace;
+      margin-top: 2px; padding: 2px 5px; border-radius: 4px;
+      font-size: 8px; font-weight: 700; font-family: 'Inconsolata', monospace;
       transition: all 0.2s;
     }
     .limit-tag.ok     { background: rgba(15,157,138,0.2);  color: #5eead4; }
@@ -70,43 +72,45 @@
     .limit-tag.breach { background: rgba(239,68,68,0.25);  color: #fca5a5; }
 
     /* ── DUAL CONTROL — field + slider ── */
-    .dual-control { display: flex; flex-direction: column; gap: 5px; }
-    .dual-input-row { display: flex; align-items: center; gap: 6px; }
+    .dual-control { display: flex; flex-direction: column; gap: 2px; }
+    /* slider matches input width exactly */
+    .dual-control > input[type="range"] { width: 60%; max-width: 60%; }
+    .dual-input-row { display: flex; align-items: center; gap: 3px; }
 
     /*
-      WIDTH REDUCTION: inputs are 75% of their grid column.
-      The prefix-wrap now takes 75% of the row instead of flex:1 (100%).
+      WIDTH REDUCTION: inputs are 60% of their grid column.
+      The prefix-wrap now takes 60% of the row instead of flex:1 (100%).
       Sliders remain 100% — spanning the full column looks intentional.
     */
     .dual-prefix-wrap {
       position: relative;
-      flex: 0 0 75%;        /* ← 25% narrower than the original flex:1 */
-      max-width: 75%;
+      flex: 0 0 60%;        /* ← 40% narrower than the original flex:1 */
+      max-width: 60%;
     }
     .dual-prefix  {
-      position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
-      font-size: 13px; pointer-events: none; z-index: 1;
+      position: absolute; left: 6px; top: 50%; transform: translateY(-50%);
+      font-size: 10px; pointer-events: none; z-index: 1;
       font-family: 'Inconsolata', monospace; font-weight: 700;
       /* dark because input bg is now white */
       color: #475569;
     }
-    .dual-suffix  { font-size: 13px; color: rgba(255,255,255,0.55); font-family: 'Inconsolata', monospace; font-weight: 700; white-space: nowrap; }
+    .dual-suffix  { font-size: 10px; color: rgba(255,255,255,0.55); font-family: 'Inconsolata', monospace; font-weight: 700; white-space: nowrap; }
 
     /* ── INPUT FIELDS — white bg, black bold text ── */
     .hfield {
       width: 100%;
-      padding: 8px 8px 8px 22px;
-      border-radius: 7px;
+      padding: 4px 5px 4px 14px;
+      border-radius: 5px;
       border: 1.5px solid rgba(255,255,255,0.2);
       background: #ffffff;
       color: #0f172a;
       font-family: 'Inconsolata', monospace;
-      font-size: 15px;
+      font-size: 12px;
       font-weight: 800;
       outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .hfield.no-prefix { padding-left: 10px; }
+    .hfield.no-prefix { padding-left: 7px; }
     .hfield:focus            { border-color: rgba(255,255,255,0.4); box-shadow: 0 0 0 2px rgba(255,255,255,0.12); }
     .hfield.green-focus:focus{ border-color: var(--green); box-shadow: 0 0 0 2px rgba(15,157,138,0.25); }
     .hfield.amber-focus:focus{ border-color: var(--amber); box-shadow: 0 0 0 2px rgba(245,158,11,0.22); }
@@ -116,14 +120,14 @@
 
     /* ── SELECT / DATE — also white + dark text ── */
     .hinput {
-      width: 75%;   /* ← 25% narrower */
-      padding: 8px 10px;
-      border-radius: 7px;
+      width: 60%;   /* ← 40% narrower */
+      padding: 4px 7px;
+      border-radius: 5px;
       border: 1.5px solid rgba(255,255,255,0.2);
       background: #ffffff;
       color: #0f172a;
       font-family: 'Syne', sans-serif;
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 700;
       outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
@@ -131,13 +135,13 @@
     .hinput option { background: #0f172a; color: #fff; }
     .hinput:focus  { border-color: var(--green); box-shadow: 0 0 0 2px rgba(15,157,138,0.22); }
 
-    .maint-btns { display: flex; gap: 4px; }
-    .maint-btn  { flex: 1; padding: 8px 4px; border-radius: 7px; border: 0.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.55); font-family: 'Inconsolata', monospace; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.15s; user-select: none; }
+    .maint-btns { display: flex; gap: 3px; }
+    .maint-btn  { flex: 1; padding: 4px 3px; border-radius: 5px; border: 0.5px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.55); font-family: 'Inconsolata', monospace; font-size: 10px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.15s; user-select: none; }
     .maint-btn.active { background: rgba(245,158,11,0.25); border-color: rgba(245,158,11,0.5); color: #fcd34d; }
 
     .pmt-result-wrap { position: relative; }
-    .pmt-giant { font-family: 'Inconsolata', monospace; font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; transition: color 0.2s; }
-    .pmt-sub   { font-size: 11px; transition: color 0.2s; }
+    .pmt-giant { font-family: 'Inconsolata', monospace; font-size: 17px; font-weight: 700; line-height: 1; margin-bottom: 1px; transition: color 0.2s; }
+    .pmt-sub   { font-size: 9px; transition: color 0.2s; }
 
     .accent-bar { height: 3px; background: linear-gradient(90deg, var(--green), var(--cyan)); }
 
@@ -203,21 +207,19 @@
   <div class="header">
     <div class="htop">
       <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png"
-        alt="Funding Tier" style="height:26px;width:auto;object-fit:contain" onerror="this.style.display='none'">
+        alt="Funding Tier" style="height:18px;width:auto;object-fit:contain" onerror="this.style.display='none'">
       <div class="hdiv"></div>
       <img src="https://raw.githubusercontent.com/KrestMarketing-apps/Funding-Tier-AI-Router-/d349d3eb7a633a4638a7f595a783e1da09bf4e7c/src/assets/logos/legacy-logo.png"
-        alt="Legacy Capital" style="height:22px;width:auto;object-fit:contain" onerror="this.style.display='none'">
+        alt="Legacy Capital" style="height:16px;width:auto;object-fit:contain" onerror="this.style.display='none'">
       <div>
         <div class="htitl">Legacy Capital Agent Commission Calculator</div>
         <div class="hsub">Enrollment agent deal calculator &middot; Funding Tier</div>
       </div>
-      <div style="margin-left:auto">
-        <span id="eligBadge" class="elig" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.2)">Enter details</span>
-      </div>
+
     </div>
 
     <!-- Row 1 -->
-    <div class="igrid" style="margin-bottom:14px">
+    <div class="igrid" style="margin-bottom:6px">
 
       <!-- State -->
       <div>
@@ -256,7 +258,7 @@
           </div>
           <input type="range" id="feeSlider" min="35" max="49" step="1" value="49" class="amber-thumb">
         </div>
-        <span id="feeLimitTag" class="limit-tag ok" style="margin-top:5px"></span>
+        <span id="feeLimitTag" class="limit-tag ok" style="margin-top:2px"></span>
       </div>
 
       <!-- Term length -->
@@ -272,7 +274,7 @@
           </div>
           <input type="range" id="termSlider" min="1" max="60" step="1" value="12" class="cyan-thumb">
         </div>
-        <span id="termLimitTag" class="limit-tag ok" style="margin-top:5px"></span>
+        <span id="termLimitTag" class="limit-tag ok" style="margin-top:2px"></span>
       </div>
     </div>
 
@@ -285,11 +287,11 @@
           <div class="maint-btn" data-val="120">$120 / mo</div>
           <div class="maint-btn" data-val="0">$0</div>
         </div>
-        <div class="hdim" style="margin-top:6px">$120 for non-married joint account</div>
+        <div class="hdim" style="margin-top:1px">$120 for non-married joint account</div>
       </div>
       <div>
         <label class="ilbl">Processing fee</label>
-        <div style="font-family:'Inconsolata',monospace;font-size:20px;font-weight:700;color:rgba(255,255,255,0.45);margin-bottom:4px">$4 / mo</div>
+        <div style="font-family:'Inconsolata',monospace;font-size:13px;font-weight:700;color:rgba(255,255,255,0.45);margin-bottom:1px">$4 / mo</div>
         <div class="hdim">Fixed — applied every month</div>
       </div>
       <div>
@@ -303,9 +305,9 @@
         <label class="ilbl">Client monthly payment</label>
         <div id="pmtGiant" class="pmt-giant" style="color:#fff">&#8212;</div>
         <div id="pmtSub" class="pmt-sub" style="color:rgba(255,255,255,0.3)"></div>
-        <div id="pmtFloorNotice" style="display:none;margin-top:6px;background:rgba(239,68,68,0.18);border:1px solid rgba(239,68,68,0.4);border-radius:7px;padding:7px 10px">
-          <div style="font-size:11px;font-weight:700;color:#fca5a5">Below $250 minimum</div>
-          <div id="pmtFloorFix" style="font-size:10px;color:rgba(255,255,255,0.45);margin-top:2px;line-height:1.5"></div>
+        <div id="pmtFloorNotice" style="display:none;margin-top:3px;background:rgba(239,68,68,0.18);border:1px solid rgba(239,68,68,0.4);border-radius:5px;padding:4px 7px">
+          <div style="font-size:9px;font-weight:700;color:#fca5a5">Below $250 minimum</div>
+          <div id="pmtFloorFix" style="font-size:8px;color:rgba(255,255,255,0.45);margin-top:1px;line-height:1.4"></div>
         </div>
       </div>
     </div>
@@ -644,10 +646,7 @@
         }
       } else {pg.textContent="\u2014";pg.style.color="rgba(255,255,255,0.4)";ps.textContent="";pf.style.display="none";}
 
-      const badge=document.getElementById("eligBadge");
-      if(!stateVal){badge.style.cssText="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.2)";badge.textContent="Enter details";}
-      else if(eligible){badge.style.cssText="background:rgba(15,157,138,0.25);color:#5eead4;border:1px solid rgba(15,157,138,0.5)";badge.textContent="Eligible";}
-      else{badge.style.cssText="background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.4)";badge.textContent="Ineligible";}
+      // eligBadge removed from UI — no-op
 
       const ms=document.getElementById("mainSection");
       if(!debtOk||!band||term===0||!pmtOk){ms.classList.add("hidden");return;}
