@@ -39,32 +39,18 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.18);
     }
     input[type="range"]::-moz-range-thumb { width:17px;height:17px;border-radius:50%;background:#fff;border:2px solid var(--green);cursor:pointer; }
-
-    /* ── header — sticky compact single strip ── */
     .header {
       background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 45%, var(--dark3) 100%);
       padding: 10px 20px 11px;
-      position: sticky;
-      top: 0;
-      z-index: 50;
+      position: sticky; top: 0; z-index: 50;
       box-shadow: 0 4px 24px rgba(15,23,42,0.22);
     }
-    /* single flex strip — logo | div | inputs | div | computed */
-    .hstrip {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: nowrap;
-    }
+    .hstrip { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; }
     .hdiv   { width: 1px; height: 36px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
     .htitl  { font-size: 13px; font-weight: 800; color: #fff; letter-spacing: -0.2px; line-height: 1.2; white-space: nowrap; }
     .hsub   { font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 1px; font-weight: 500; white-space: nowrap; }
-
-    /* each input group */
     .hgrp   { display: flex; flex-direction: column; gap: 3px; min-width: 105px; }
     .ilbl   { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.4); display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-
-    /* field + slider stacked compactly */
     .dual   { display: flex; flex-direction: column; gap: 3px; }
     .drow   { display: flex; align-items: center; gap: 4px; }
     .pwrap  { position: relative; flex: 1; }
@@ -78,84 +64,61 @@
     }
     .hfld.nopfx{padding-left:9px;}
     .hfld:focus{border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.13);}
-
-    /* maint toggle */
     .mbtns{display:flex;gap:3px;}
     .mbtn{flex:1;padding:5px 6px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:10px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.15s;user-select:none;white-space:nowrap;}
     .mbtn.active{background:rgba(15,157,138,0.25);border-color:rgba(15,157,138,0.5);color:#5eead4;}
-
-    /* computed value cells */
+    .mbtn.active-amber{background:rgba(245,158,11,0.2);border-color:rgba(245,158,11,0.45);color:#fcd34d;}
     .hbig{font-family:'Inconsolata',monospace;font-size:17px;font-weight:700;color:#fff;line-height:1;white-space:nowrap;}
-    .hdim{display:none;} /* hide all hint text to save space */
-
-    .igrid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;}
-    .igrid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-
     .accent-bar{height:3px;background:linear-gradient(90deg,var(--green),#0891b2);}
-
-    /* ── content ── */
     .content{max-width:1100px;margin:0 auto;padding:24px 20px 60px;}
-
-    /* stat cards — exact match to profitabilitybalancer MetricCard */
     .card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 3px 12px rgba(15,23,42,0.05);}
     .mcard-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:7px;}
     .mcard-value{font-size:24px;font-weight:800;color:var(--text);line-height:1.1;}
     .mcard-sub{font-size:12px;color:var(--text2);margin-top:7px;line-height:1.5;}
-
     .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+    .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
     .g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
     .mb{margin-bottom:18px;}
-
-    /* ── CHART — exact ProgramChart style from profitabilitybalancer ── */
-    .chart-card{
-      overflow-x:auto;
-      background:#f8fafc;
-      border:1px solid #e2e8f0;
-      border-radius:14px;
-      padding:12px 10px 8px;
-    }
+    .chart-card{ overflow-x:auto; background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px 10px 8px; }
     svg.pchart{min-width:560px;display:block;}
-
-    /* table */
     .dtable{width:100%;border-collapse:collapse;font-size:13px;}
     .dtable th{padding:10px 13px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);color:var(--green);font-weight:800;font-size:12px;text-align:left;white-space:nowrap;background:var(--bg);}
     .dtable td{padding:10px 13px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);color:var(--text);font-size:13px;}
     .dtable tr.phase-a td{background:#f0fdf9;}
     .dtable tr.phase-b td{background:#f8fafc;}
+    .dtable tr.phase-kink td{background:#fffbeb;}
     .dtable tr.milestone td{font-weight:700;}
-
-    /* callout boxes */
     .callout{border-radius:12px;padding:14px 16px;border:1px solid;}
     .callout-green{background:rgba(15,157,138,0.07);border-color:rgba(15,157,138,0.25);}
     .callout-amber{background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.25);}
     .callout-blue{background:rgba(26,110,216,0.07);border-color:rgba(26,110,216,0.2);}
-
+    .callout-red{background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.2);}
     .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;}
-
     .section-head{font-size:18px;font-weight:800;color:var(--text);margin:0 0 6px;}
     .section-sub{font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 16px;}
-
+    .deduct-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+    .deduct-box{background:#fffbeb;border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:12px 14px;}
+    .deduct-box.late{background:#fef2f2;border-color:rgba(239,68,68,0.25);}
+    .deduct-lbl{font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;}
+    .deduct-lbl.late{color:#b91c1c;}
+    .deduct-val{font-size:16px;font-weight:900;color:#0f172a;font-family:'Inconsolata',monospace;}
+    .deduct-sub{font-size:11px;color:#64748b;margin-top:3px;line-height:1.5;}
     .disclaimer{font-size:11px;color:var(--text3);line-height:1.7;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:24px;}
-
     .footer{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:14px;border-top:1px solid var(--border);margin-top:20px;}
-
-    @media(max-width:900px){.g4{grid-template-columns:1fr 1fr;}.igrid4{grid-template-columns:1fr 1fr;}.g2{grid-template-columns:1fr;}}
-    @media(max-width:600px){.g4,.igrid4{grid-template-columns:1fr;}}
+    @media(max-width:900px){.g4{grid-template-columns:1fr 1fr;}.g3{grid-template-columns:1fr 1fr;}.g2{grid-template-columns:1fr;}}
+    @media(max-width:600px){.g4,.g3,.g2{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
 
-<!-- ══ HEADER — sticky single strip ══ -->
 <div class="header">
   <div class="hstrip">
-
-    <!-- LC logo -->
     <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69f13f2e011ebfb8f93239b4.png"
       alt="Legacy Capital Services" style="height:30px;width:auto;object-fit:contain;flex-shrink:0;display:block">
     <div class="hdiv"></div>
     <div style="flex-shrink:0">
       <div class="htitl">Billable Payout Simulator</div>
-      <div class="hsub">Admin &amp; Affiliate · Legacy Capital Services</div>
+      <div class="hsub">Admin &amp; Affiliate &middot; Legacy Capital Services</div>
     </div>
     <div class="hdiv"></div>
 
@@ -210,28 +173,36 @@
         <div class="mbtn active" data-val="80">$80</div>
         <div class="mbtn" data-val="120">$120</div>
       </div>
-      <div style="font-size:9px;color:rgba(255,255,255,0.28);margin-top:2px;white-space:nowrap">First 2 months · affiliate</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.28);margin-top:2px;white-space:nowrap">Backed out P3+ &middot; affiliate</div>
+    </div>
+
+    <!-- Payment schedule -->
+    <div class="hgrp" style="min-width:130px">
+      <label class="ilbl">Payment schedule</label>
+      <div class="mbtns" id="splitBtns">
+        <div class="mbtn active" data-val="monthly">Monthly</div>
+        <div class="mbtn" data-val="split">Split</div>
+      </div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.28);margin-top:2px;white-space:nowrap">Split = 2 drafts &times; half payment</div>
     </div>
 
     <div class="hdiv"></div>
 
-    <!-- Computed outputs -->
+    <!-- Computed -->
     <div class="hgrp">
       <label class="ilbl">Client pmt / mo</label>
-      <div id="hClientPmt" class="hbig">—</div>
+      <div id="hClientPmt" class="hbig">&#8212;</div>
     </div>
     <div class="hgrp">
       <label class="ilbl">Total payout / client</label>
-      <div id="hTotalPayout" class="hbig" style="color:#5eead4">—</div>
-      <div id="hVsUpfront" style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:1px;white-space:nowrap"></div>
+      <div id="hTotalPayout" class="hbig" style="color:#5eead4">&#8212;</div>
     </div>
     <div class="hgrp">
       <label class="ilbl">vs Upfront (8%)</label>
-      <div id="hMultiplier" class="hbig" style="color:#fcd34d">—</div>
-      <div style="font-size:9px;color:rgba(255,255,255,0.28);margin-top:1px;white-space:nowrap">× more revenue</div>
+      <div id="hMultiplier" class="hbig" style="color:#fcd34d">&#8212;</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.28);margin-top:1px;white-space:nowrap">&times; more revenue</div>
     </div>
 
-    <!-- FT watermark -->
     <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;opacity:0.38;margin-left:auto">
       <span style="font-size:9px;color:rgba(255,255,255,0.7);font-weight:600;white-space:nowrap">Powered by</span>
       <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png"
@@ -241,75 +212,86 @@
 </div>
 <div class="accent-bar"></div>
 
-<!-- ══ CONTENT ══ -->
 <div class="content">
+
+  <!-- Deduction callout -->
+  <div class="card mb" id="deductCard">
+    <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:12px">Active Deduction Schedule</div>
+    <div class="deduct-grid" id="deductGrid">
+      <!-- filled by JS -->
+    </div>
+    <div style="font-size:12px;color:#64748b;line-height:1.7;font-weight:500">
+      Deductions are applied to the client's gross monthly payment <strong>before</strong> the pay rate is applied.
+      The affiliate earns <strong>(gross payment &minus; deductions) &times; pay rate</strong> each month.
+      For split schedules, deductions occur twice (once per installment) — amounts shown are the monthly equivalent.
+    </div>
+  </div>
 
   <!-- 4 stat cards -->
   <div class="g4 mb">
     <div class="card">
-      <div class="mcard-label">Service fee / month / client</div>
-      <div id="scSfee" class="mcard-value" style="color:var(--green)">—</div>
-      <div id="scSfeeSub" class="mcard-sub"></div>
+      <div class="mcard-label">Client payment / month</div>
+      <div id="scClientPmt" class="mcard-value" style="color:var(--green)">&#8212;</div>
+      <div id="scClientPmtSub" class="mcard-sub"></div>
     </div>
     <div class="card">
-      <div class="mcard-label">Month 1–2 payout / client</div>
-      <div id="scM12" class="mcard-value" style="color:var(--green)">—</div>
-      <div class="mcard-sub">100% pass-through + maintenance fee</div>
+      <div class="mcard-label">P1&ndash;2 affiliate payout / mo</div>
+      <div id="scM12" class="mcard-value" style="color:var(--green)">&#8212;</div>
+      <div id="scM12sub" class="mcard-sub">Draft fee deducted &middot; pay rate applied</div>
     </div>
     <div class="card">
-      <div class="mcard-label">Month 3+ payout / client / mo</div>
-      <div id="scM3" class="mcard-value" style="color:var(--green)">—</div>
+      <div class="mcard-label">P3+ affiliate payout / mo</div>
+      <div id="scM3" class="mcard-value" style="color:var(--green)">&#8212;</div>
       <div id="scM3sub" class="mcard-sub"></div>
     </div>
     <div class="card">
       <div class="mcard-label">Steady-state monthly (all cohorts)</div>
-      <div id="scSteady" class="mcard-value" style="color:var(--greend)">—</div>
+      <div id="scSteady" class="mcard-value" style="color:var(--greend)">&#8212;</div>
       <div id="scSteadySub" class="mcard-sub"></div>
     </div>
   </div>
 
-  <!-- Chart 1: Single enrollment cumulative payout — exact ProgramChart style -->
+  <!-- Chart 1 -->
   <div class="card mb">
-    <h2 class="section-head">Single enrollment — cumulative payout over program term</h2>
-    <p class="section-sub">How much one enrolled client pays out over their full program. Months 1–2 are 100% pass-through plus maintenance fee. From month 3 onward, you receive the pay rate share of the service fee.</p>
+    <h2 class="section-head">Single enrollment &mdash; cumulative payout over program term</h2>
+    <p class="section-sub" id="chart1sub">Cumulative affiliate revenue from one enrolled client. The dashed line marks when the billable model surpasses the equivalent upfront 8% payout.</p>
     <div class="chart-card">
       <svg id="chart1" class="pchart" viewBox="0 0 700 240"></svg>
     </div>
-    <!-- Milestone row -->
     <div class="g4" style="margin-top:16px;gap:10px">
       <div class="card" style="padding:12px 14px">
-        <div class="mcard-label" style="font-size:10px">After month 2</div>
-        <div id="milM2" class="mcard-value" style="font-size:18px;color:var(--green)">—</div>
-        <div class="mcard-sub" style="font-size:11px">End of 100% phase</div>
+        <div class="mcard-label" style="font-size:10px">After payment 2</div>
+        <div id="milM2" class="mcard-value" style="font-size:18px;color:var(--green)">&#8212;</div>
+        <div class="mcard-sub" style="font-size:11px">End of early-deduction phase</div>
       </div>
       <div class="card" style="padding:12px 14px">
         <div class="mcard-label" style="font-size:10px">Breaks even vs upfront</div>
-        <div id="milBE" class="mcard-value" style="font-size:18px;color:var(--amber)">—</div>
-        <div class="mcard-sub" style="font-size:11px">Month when billable > upfront</div>
+        <div id="milBE" class="mcard-value" style="font-size:18px;color:var(--amber)">&#8212;</div>
+        <div class="mcard-sub" style="font-size:11px">Month billable &gt; upfront 8%</div>
       </div>
       <div class="card" style="padding:12px 14px">
         <div class="mcard-label" style="font-size:10px">At mid-term</div>
-        <div id="milMid" class="mcard-value" style="font-size:18px;color:var(--green)">—</div>
+        <div id="milMid" class="mcard-value" style="font-size:18px;color:var(--green)">&#8212;</div>
         <div class="mcard-sub" style="font-size:11px">Halfway through program</div>
       </div>
       <div class="card" style="padding:12px 14px">
         <div class="mcard-label" style="font-size:10px">Full term payout</div>
-        <div id="milFull" class="mcard-value" style="font-size:20px;color:var(--greend);font-weight:900">—</div>
+        <div id="milFull" class="mcard-value" style="font-size:20px;color:var(--greend);font-weight:900">&#8212;</div>
         <div class="mcard-sub" style="font-size:11px">Total per enrolled client</div>
       </div>
     </div>
   </div>
 
-  <!-- Chart 2: Billable vs Upfront comparison -->
+  <!-- Chart 2 -->
   <div class="card mb">
-    <h2 class="section-head">Billable vs upfront — per enrollment comparison</h2>
-    <p class="section-sub">The billable model compounds over time. The upfront model pays once at enrollment. This chart shows exactly when billable surpasses the one-time upfront payout — and by how much it exceeds it by end of term.</p>
+    <h2 class="section-head">Billable vs upfront &mdash; per enrollment comparison</h2>
+    <p class="section-sub">The billable model compounds over time. The upfront model pays once at enrollment. This chart shows exactly when billable surpasses the one-time upfront payout.</p>
     <div style="display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap">
       <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text2)">
         <div style="width:28px;height:3px;background:var(--green);border-radius:99px"></div>Billable model
       </div>
       <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text2)">
-        <div style="width:28px;height:2px;background:var(--text3);border-radius:99px;border-top:1px dashed var(--text3)"></div>Upfront (8% one-time)
+        <div style="width:28px;height:2px;background:var(--text3);border-radius:99px"></div>Upfront (8% one-time)
       </div>
       <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--amber)">
         <div style="width:10px;height:10px;border-radius:50%;background:var(--amber)"></div>Break-even month
@@ -320,29 +302,28 @@
     </div>
   </div>
 
-  <!-- Chart 3: Rolling revenue (monthly inflow over time) -->
+  <!-- Chart 3 -->
   <div class="card mb">
-    <h2 class="section-head">Rolling monthly revenue — continuous enrollment model</h2>
-    <p id="chart3sub" class="section-sub">What happens when you enroll clients every month. As cohorts stack, monthly inflow grows until it reaches steady state — where every month earns the full program value across all active cohorts simultaneously.</p>
+    <h2 class="section-head">Rolling monthly revenue &mdash; continuous enrollment model</h2>
+    <p id="chart3sub" class="section-sub">What happens when you enroll clients every month. As cohorts stack, monthly inflow grows until steady state.</p>
     <div class="chart-card">
       <svg id="chart3" class="pchart" viewBox="0 0 700 240"></svg>
     </div>
-    <!-- 3-year comparison -->
     <div class="g2" style="margin-top:16px;gap:12px">
       <div class="callout callout-green">
-        <div style="font-size:11px;font-weight:700;color:var(--greend);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Billable model — affiliate revenue over 3 years</div>
-        <div id="py3Billable" style="font-size:24px;font-weight:900;color:var(--greend);font-family:'Inconsolata',monospace">—</div>
+        <div style="font-size:11px;font-weight:700;color:var(--greend);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Billable model &mdash; affiliate revenue over 3 years</div>
+        <div id="py3Billable" style="font-size:24px;font-weight:900;color:var(--greend);font-family:'Inconsolata',monospace">&#8212;</div>
         <div id="py3BillableSub" style="font-size:12px;color:var(--text2);margin-top:4px"></div>
       </div>
       <div class="callout callout-blue">
-        <div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Upfront model — affiliate revenue over 3 years</div>
-        <div id="py3Upfront" style="font-size:24px;font-weight:900;color:var(--blue);font-family:'Inconsolata',monospace">—</div>
+        <div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Upfront model &mdash; affiliate revenue over 3 years</div>
+        <div id="py3Upfront" style="font-size:24px;font-weight:900;color:var(--blue);font-family:'Inconsolata',monospace">&#8212;</div>
         <div id="py3UpfrontSub" style="font-size:12px;color:var(--text2);margin-top:4px"></div>
       </div>
     </div>
   </div>
 
-  <!-- Month by month table -->
+  <!-- Table -->
   <div class="card mb">
     <h2 class="section-head" style="margin-bottom:14px">Per-enrollment month-by-month payout schedule</h2>
     <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
@@ -350,83 +331,112 @@
         <thead><tr>
           <th>Month</th>
           <th>Phase</th>
+          <th>Gross payment</th>
+          <th>Deduction</th>
+          <th>Net eligible</th>
           <th>Pay rate</th>
           <th>Monthly payout</th>
           <th>Cumulative payout</th>
-          <th>vs Upfront</th>
-          <th>% of upfront</th>
+          <th>vs Upfront (8%)</th>
         </tr></thead>
         <tbody id="tableBody"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- How the model works -->
+  <!-- How model works -->
   <div class="card mb">
-    <h2 class="section-head" style="margin-bottom:14px">How the billable payout model works for affiliates</h2>
+    <h2 class="section-head" style="margin-bottom:14px">How the deduction &amp; payout model works</h2>
     <div style="display:grid;gap:10px">
+
       <div class="callout callout-green" style="padding:14px 16px">
-        <div style="font-weight:800;color:var(--greend);font-size:14px;margin-bottom:5px">Months 1 &amp; 2 — 100% pass-through + maintenance fee</div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.7">The affiliate receives 100% of the service fee component plus the maintenance fee ($80 or $120) for the first two months. This front-loads meaningful cash while the program is newest and client retention is highest.</div>
-      </div>
-      <div class="callout callout-green" style="padding:14px 16px">
-        <div style="font-weight:800;color:var(--greend);font-size:14px;margin-bottom:5px">Month 3 onwards — pay rate share of service fee</div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.7">From month 3, the affiliate earns their pay rate (60% for under 100 enrollments/month, 65% for 100+) applied to the monthly service fee installment. Maintenance fees from month 3 onward are allocated to the ELP. Processing fees ($4/month) do not flow to the affiliate.</div>
-      </div>
-      <div class="callout callout-amber" style="padding:14px 16px">
-        <div style="font-weight:800;color:#92400e;font-size:14px;margin-bottom:5px">Pay rate tiers</div>
+        <div style="font-weight:800;color:var(--greend);font-size:14px;margin-bottom:5px">Payments 1 &amp; 2 &mdash; draft fee deducted only</div>
         <div style="font-size:13px;color:var(--text2);line-height:1.7">
-          <strong>Tier 1 — 1 to 99 enrollments/month: 60%</strong> of the monthly service fee installment.<br>
-          <strong>Tier 2 — 100+ enrollments/month: 65%</strong> of the monthly service fee installment.
+          For the first two payments, only the <strong>$4 draft/processing fee</strong> is backed out before calculating affiliate revenue.
+          Monthly schedule: deduct <strong>$4</strong>. Split schedule: deduct <strong>$4 &times; 2 = $8</strong> (one per installment).
+          The remaining net amount is multiplied by the pay rate tier to arrive at the affiliate payout.
         </div>
       </div>
-      <div class="callout callout-blue" style="padding:14px 16px">
-        <div style="font-weight:800;color:var(--blue);font-size:14px;margin-bottom:5px">Why billable beats upfront — the affiliate compounding advantage</div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.7">With an upfront model, your affiliate company earns 8% of enrolled debt once — then the revenue stops. With the billable model, every active client continues generating monthly revenue through their entire program term. Consistent monthly enrollment creates a compounding stack of revenue streams that grows every month until it reaches steady state — where each month's inflow equals the total per-client payout multiplied by your monthly enrollment volume. This is what makes Legacy Capital's model uniquely valuable for affiliate partners building long-term recurring revenue.</div>
+
+      <div class="callout callout-amber" style="padding:14px 16px">
+        <div style="font-weight:800;color:#92400e;font-size:14px;margin-bottom:5px">Payments 3+ &mdash; maintenance backout + draft fee</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">
+          From payment 3 onward, <strong>both the maintenance fee and the draft fee</strong> are backed out before the pay rate is applied.
+          Monthly: deduct <strong>$80 (or $120) + $4 = $84 (or $124)</strong>.
+          Split: deduct <strong>($40/$60 + $4) &times; 2 = $88 (or $128)</strong> per month — each of the two installments backs out half the maintenance fee plus the $4 draft fee.
+          This applies from payment 3 through payment 48, and continues the same rate beyond payment 48 if the term extends.
+        </div>
       </div>
+
+      <div class="callout callout-green" style="padding:14px 16px">
+        <div style="font-weight:800;color:var(--greend);font-size:14px;margin-bottom:5px">Pay rate tiers &mdash; applied to net eligible amount every month</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">
+          <strong>Tier 1 &mdash; 1 to 99 enrollments/month: 60%</strong> of net eligible amount.<br>
+          <strong>Tier 2 &mdash; 100+ enrollments/month: 65%</strong> of net eligible amount.<br>
+          The pay rate applies to <em>every</em> payment, including payments 1 and 2. Only the deduction differs between phases.
+        </div>
+      </div>
+
+      <div class="callout callout-blue" style="padding:14px 16px">
+        <div style="font-weight:800;color:var(--blue);font-size:14px;margin-bottom:5px">Why billable beats upfront &mdash; the affiliate compounding advantage</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">
+          An upfront model earns 8% of enrolled debt once &mdash; then stops. The billable model generates monthly revenue for the full program term on every active client.
+          Consistent monthly enrollment creates a compounding stack of revenue streams that grows every month until steady state, where each month's inflow equals the total per-client payout multiplied by your enrollment volume.
+        </div>
+      </div>
+
     </div>
   </div>
 
   <div class="disclaimer">
-    <strong>Disclaimer:</strong> This projection is an example of possible revenue payouts and how the math works, for discussion purposes only, and is not a guarantee or promise of performance. Actual performance will depend on multiple factors including but not limited to enrollment numbers, cancellations, NSFs, and rejected payments. This formula only takes into consideration an $80 or $120 monthly maintenance fee and $4 processing fee. Math and formula calculations may be corrected or amended from time to time.
+    <strong>Disclaimer:</strong> This projection is an example of possible revenue payouts and how the math works, for discussion purposes only, and is not a guarantee or promise of performance. Actual performance will depend on multiple factors including but not limited to enrollment numbers, cancellations, NSFs, and rejected payments. Deduction schedule: $4 draft fee on all payments; maintenance fee ($80 or $120) and draft fee both backed out from payment 3 onward; split schedules apply deductions per installment &times; 2. Math and formula calculations may be corrected or amended from time to time.
   </div>
 
   <div class="footer">
     <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69f13f2e011ebfb8f93239b4.png"
       alt="Legacy Capital" style="height:20px;width:auto;object-fit:contain;opacity:0.6" onerror="this.style.display='none'">
-    <span style="font-size:11px;color:var(--text3)">·</span>
+    <span style="font-size:11px;color:var(--text3)">&middot;</span>
     <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png"
       alt="Funding Tier" style="height:14px;width:auto;object-fit:contain;opacity:0.35" onerror="this.style.display='none'">
-    <span style="font-size:11px;color:var(--text3)">Legacy Capital Services · Admin &amp; Affiliate Portal · Powered by Funding Tier</span>
+    <span style="font-size:11px;color:var(--text3)">Legacy Capital Services &middot; Admin &amp; Affiliate Portal &middot; Powered by Funding Tier</span>
   </div>
 
-</div><!-- /content -->
+</div>
 
 <script>
-  // ── constants ──
+  // ── constants ──────────────────────────────────────────────
   const GREEN  = "#0f9d8a";
   const GREEND = "#0b7d6e";
   const AMBER  = "#f59e0b";
   const BLUE   = "#1a6ed8";
   const GRAY   = "#94a3b8";
-  const PROC_FEE = 4;
+  const RED    = "#ef4444";
+
+  // Deduction rules
+  // Monthly  P1-2 : -$4
+  // Monthly  P3+  : -(maintFee + $4)
+  // Split    P1-2 : -($4 × 2) = -$8
+  // Split    P3+  : -((maintFee/2 + $4) × 2) = -(maintFee + $8)
+
+  const PROC_FEE = 4; // per draft
 
   const fmt  = n => new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(n);
   const fmtD = n => new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
   const fmtK = n => n>=1000000?"$"+(n/1000000).toFixed(1)+"M":n>=1000?"$"+(n/1000).toFixed(0)+"K":fmt(n);
   const clamp= (v,lo,hi)=>Math.min(hi,Math.max(lo,v));
 
-  // ── SVG helpers ──
+  // ── state ──────────────────────────────────────────────────
+  let maintFee = 80;
+  let isSplit  = false;
+
+  // ── SVG helper ────────────────────────────────────────────
   function el(tag,attrs){
     const e=document.createElementNS("http://www.w3.org/2000/svg",tag);
     for(const[k,v] of Object.entries(attrs)) e.setAttribute(k,v);
     return e;
   }
 
-  // ── Tooltip state ──
-  let activeTooltip = null;
-
-  // ── dual field/slider sync ──
+  // ── dual field/slider sync ────────────────────────────────
   function linkDual(fId,sId,lo,hi){
     const f=document.getElementById(fId),s=document.getElementById(sId);
     f.addEventListener("input",()=>{if(!isNaN(+f.value))s.value=clamp(+f.value,lo,hi);update();});
@@ -438,43 +448,111 @@
   linkDual("termField","termSlider",1,48);
   linkDual("filesField","filesSlider",1,500);
 
-  // maint fee
-  let maintFee=80;
+  // maintenance fee toggle
   document.getElementById("maintBtns").addEventListener("click",e=>{
     const b=e.target.closest(".mbtn");if(!b)return;
-    document.querySelectorAll(".mbtn").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll("#maintBtns .mbtn").forEach(x=>x.classList.remove("active"));
     b.classList.add("active");maintFee=+b.dataset.val;update();
   });
 
-  // ── CORE CALCULATION ──
-  function calcPerEnrollment(debt,feeRate,term,maint,payRate){
-    const sfeeTotal  = debt*(feeRate/100);
-    const sfeeMonthly= sfeeTotal/term;
-    const clientPmt  = sfeeMonthly+maint+PROC_FEE;
-    const m12payout  = sfeeMonthly+maint;
-    const m3payout   = sfeeMonthly*payRate;
-    const totalPayout= 2*m12payout + Math.max(0,term-2)*m3payout;
-    const upfront    = debt*0.08;
-    const multiplier = upfront>0?totalPayout/upfront:0;
+  // payment schedule toggle
+  document.getElementById("splitBtns").addEventListener("click",e=>{
+    const b=e.target.closest(".mbtn");if(!b)return;
+    document.querySelectorAll("#splitBtns .mbtn").forEach(x=>x.classList.remove("active","active-amber"));
+    if(b.dataset.val==="split"){b.classList.add("active-amber");}else{b.classList.add("active");}
+    isSplit = b.dataset.val === "split";
+    update();
+  });
 
-    const rows=[];
-    let cumPayout=0;
-    for(let m=1;m<=term;m++){
-      const mpay = m<=2 ? m12payout : m3payout;
-      cumPayout += mpay;
-      const pr = m<=2 ? 1.0 : payRate;
-      rows.push({m,mpay,cumPayout,pr});
+  // ── CORE CALCULATION ──────────────────────────────────────
+  //
+  // Gross monthly payment = sfeeMonthly + maintFee + procFeeMonthly
+  //   Monthly : procFeeMonthly = $4   (one draft)
+  //   Split   : procFeeMonthly = $8   (two drafts × $4)
+  //
+  // Net eligible per month = gross - deduction
+  //   Monthly P1-2 : gross - $4
+  //   Monthly P3+  : gross - (maintFee + $4)
+  //   Split   P1-2 : gross - $8
+  //   Split   P3+  : gross - (maintFee + $8)
+  //
+  // Affiliate payout = net × payRate  (every month, both phases)
+
+  function calcPerEnrollment(debt, feeRate, term, maint, payRate, split){
+    const sfeeTotal    = debt * (feeRate / 100);
+    const sfeeMonthly  = sfeeTotal / term;
+    const procMonthly  = split ? PROC_FEE * 2 : PROC_FEE;          // $8 split / $4 monthly
+    const grossPmt     = sfeeMonthly + maint + procMonthly;
+
+    // Early (P1-2): back out draft fee only
+    const earlyDeduct  = procMonthly;                                // $4 or $8
+
+    // Late (P3+): back out maint + draft fee
+    // Split: (maint/2 + $4) × 2 = maint + $8
+    const lateDeduct   = split ? (maint + PROC_FEE * 2) : (maint + PROC_FEE);
+
+    const upfront = debt * 0.08;
+    const rows    = [];
+    let cumPayout = 0;
+
+    for(let m = 1; m <= term; m++){
+      const deduction = m <= 2 ? earlyDeduct : lateDeduct;
+      const net       = grossPmt - deduction;
+      const mpay      = net * payRate;
+      cumPayout      += mpay;
+      rows.push({ m, grossPmt, deduction, net, mpay, cumPayout, payRate });
     }
-    const beMonth = rows.find(r=>r.cumPayout>=upfront)?.m ?? null;
 
-    return{sfeeMonthly,clientPmt,m12payout,m3payout,totalPayout,upfront,multiplier,rows,beMonth};
+    const totalPayout = cumPayout;
+    const multiplier  = upfront > 0 ? totalPayout / upfront : 0;
+    const beMonth     = rows.find(r => r.cumPayout >= upfront)?.m ?? null;
+
+    return {
+      sfeeMonthly, grossPmt, procMonthly,
+      earlyDeduct, lateDeduct,
+      m12payout : rows[0]?.mpay   || 0,
+      m3payout  : rows[2]?.mpay   || 0,
+      totalPayout, upfront, multiplier, rows, beMonth
+    };
   }
 
-  function drawProgramChart(svgId,pts,maxY,xTitle,yTitle,notable,extraLines){
-    const svg=document.getElementById(svgId);
-    svg.innerHTML="";
+  // ── DEDUCTION CALLOUT ─────────────────────────────────────
+  function renderDeductCard(R, maint, split){
+    const grid = document.getElementById("deductGrid");
+    const phaseADeduct = R.earlyDeduct;
+    const phaseBDeduct = R.lateDeduct;
+    const netA = R.grossPmt - phaseADeduct;
+    const netB = R.grossPmt - phaseBDeduct;
+
+    grid.innerHTML = `
+      <div class="deduct-box">
+        <div class="deduct-lbl">Payments 1&ndash;2 &mdash; Draft fee only</div>
+        <div class="deduct-val">&minus;${fmtD(phaseADeduct)} / month</div>
+        <div class="deduct-sub">
+          ${split ? `2 drafts &times; $4 = $8/mo` : `1 draft &times; $4 = $4/mo`}<br>
+          Net eligible: <strong>${fmtD(netA)}</strong> &times; ${(R.payRate*100).toFixed(0)}% = <strong>${fmtD(netA * R.payRate)}/mo</strong>
+        </div>
+      </div>
+      <div class="deduct-box late">
+        <div class="deduct-lbl late">Payments 3+ &mdash; Maintenance + draft fee</div>
+        <div class="deduct-val">&minus;${fmtD(phaseBDeduct)} / month</div>
+        <div class="deduct-sub">
+          ${split
+            ? `($${maint/2} maint + $4 draft) &times; 2 drafts = $${maint+8}/mo`
+            : `$${maint} maint + $4 draft = $${maint+4}/mo`
+          }<br>
+          Net eligible: <strong>${fmtD(netB)}</strong> &times; ${(R.payRate*100).toFixed(0)}% = <strong>${fmtD(netB * R.payRate)}/mo</strong>
+        </div>
+      </div>`;
+  }
+
+  // ── CHART HELPERS ─────────────────────────────────────────
+  function removeTooltip(svg){ const t=svg.querySelector(".tooltip-g"); if(t) svg.removeChild(t); }
+
+  function drawProgramChart(svgId, pts, maxY, xTitle, yTitle, notable, extraLines){
+    const svg=document.getElementById(svgId); svg.innerHTML="";
     const W=700,H=240,PL=90,PB=40,PT=22,PR=24;
-    const effW=W-PL-PR,effH=H-PT-PB;
+    const effW=W-PL-PR, effH=H-PT-PB;
     const gx=i=>PL+i/(Math.max(pts.length-1,1))*effW;
     const gy=v=>H-PB-(v/Math.max(maxY,1))*effH;
 
@@ -482,39 +560,39 @@
       const yv=H-PB-t*effH;
       svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:yv,y2:yv,stroke:t===0?"#94a3b8":"#e2e8f0","stroke-width":t===0?1.5:1}));
       const txt=el("text",{x:PL-8,y:yv+4,"text-anchor":"end","font-size":11,fill:GREEN,"font-weight":600,"font-family":"Inconsolata,monospace"});
-      txt.textContent=fmtK(maxY*t);
-      svg.appendChild(txt);
+      txt.textContent=fmtK(maxY*t); svg.appendChild(txt);
     });
-
     const yt=el("text",{x:14,y:H/2,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700,transform:`rotate(-90,14,${H/2})`});
-    yt.textContent=yTitle;svg.appendChild(yt);
-
+    yt.textContent=yTitle; svg.appendChild(yt);
     svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:H-PB,y2:H-PB,stroke:"#94a3b8","stroke-width":1.5}));
-
     const xt=el("text",{x:PL+effW/2,y:H-6,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700});
-    xt.textContent=xTitle;svg.appendChild(xt);
+    xt.textContent=xTitle; svg.appendChild(xt);
 
     if(extraLines) extraLines.forEach(({y:yv,color,dash,label})=>{
       const ypos=gy(yv);
       if(ypos<PT||ypos>H-PB) return;
-      const l=el("line",{x1:PL,x2:W-PR,y1:ypos,y2:ypos,stroke:color||GRAY,"stroke-width":1.5,"stroke-dasharray":dash||"5,4","opacity":0.7});
-      svg.appendChild(l);
-      if(label){
-        const t=el("text",{x:W-PR-4,y:ypos-5,"text-anchor":"end","font-size":9.5,fill:color||GRAY,"font-weight":700});
-        t.textContent=label;svg.appendChild(t);
-      }
+      svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:ypos,y2:ypos,stroke:color||GRAY,"stroke-width":1.5,"stroke-dasharray":dash||"5,4","opacity":0.7}));
+      if(label){const t=el("text",{x:W-PR-4,y:ypos-5,"text-anchor":"end","font-size":9.5,fill:color||GRAY,"font-weight":700});t.textContent=label;svg.appendChild(t);}
     });
+
+    // Phase region: shade P1-2 in green, P3+ slightly amber
+    if(pts.length>2){
+      const x2=gx(1), x3=gx(2);
+      svg.appendChild(el("rect",{x:PL,y:PT,width:x2-PL+1,height:H-PB-PT,fill:GREEN+"08"}));
+      // Kink line at payment 3
+      svg.appendChild(el("line",{x1:x3,y1:PT,x2:x3,y2:H-PB,stroke:AMBER,"stroke-width":1.5,"stroke-dasharray":"4,3",opacity:0.7}));
+      const klbl=el("text",{x:x3+3,y:PT+11,"font-size":8.5,fill:AMBER,"font-weight":700});
+      klbl.textContent="P3 backout"; svg.appendChild(klbl);
+    }
 
     const coords=pts.map((p,i)=>`${gx(i)},${gy(p.y)}`).join(" ");
     svg.appendChild(el("polyline",{points:`${gx(0)},${H-PB} ${coords} ${gx(pts.length-1)},${H-PB}`,fill:GREEN+"18",stroke:"none"}));
     svg.appendChild(el("polyline",{points:coords,fill:"none",stroke:GREEN,"stroke-width":3,"stroke-linejoin":"round","stroke-linecap":"round"}));
 
     notable.forEach(({m,label,color})=>{
-      const i=m-1;
-      if(i<0||i>=pts.length) return;
+      const i=m-1; if(i<0||i>=pts.length)return;
       const t=el("text",{x:gx(i),y:H-PB+16,"text-anchor":"middle","font-size":10,fill:color||GREEN,"font-weight":700});
-      t.textContent=label||`Mo ${m}`;
-      svg.appendChild(t);
+      t.textContent=label||`Mo ${m}`; svg.appendChild(t);
     });
 
     pts.forEach((p,i)=>{
@@ -522,103 +600,12 @@
       const isNotable=notable.some(n=>n.m===p.m);
       const isLast=i===pts.length-1;
       const isBE=p.isBE;
-      const dotColor=isBE?AMBER:isNotable?GREEND:GREEN;
+      const dotC=isBE?AMBER:isNotable?GREEND:GREEN;
       const dotR=isLast||isNotable?5.5:3.5;
-
       const hit=el("circle",{cx:x,cy:y,r:11,fill:"transparent",style:"cursor:pointer"});
       hit.addEventListener("mouseenter",()=>{
         removeTooltip(svg);
-        const tx=Math.min(Math.max(x,68),W-68);
-        const ty=Math.max(y-56,4);
-        const g=el("g",{class:"tooltip-g","pointer-events":"none"});
-        g.appendChild(el("rect",{x:tx-60,y:ty,width:120,height:46,rx:8,fill:"#0f172a",opacity:0.93}));
-        const l1=el("text",{x:tx,y:ty+15,"text-anchor":"middle","font-size":10,fill:"#94a3b8","font-weight":700,"font-family":"Inconsolata,monospace"});
-        l1.textContent=`MONTH ${p.m} CUMULATIVE`;
-        const l2=el("text",{x:tx,y:ty+35,"text-anchor":"middle","font-size":14,fill:"#fff","font-weight":800,"font-family":"Inconsolata,monospace"});
-        l2.textContent=fmt(p.y);
-        g.appendChild(l1);g.appendChild(l2);
-        svg.appendChild(g);
-      });
-      hit.addEventListener("mouseleave",()=>removeTooltip(svg));
-      svg.appendChild(hit);
-
-      const dot=el("circle",{cx:x,cy:y,r:dotR,fill:dotColor,stroke:isBE?"#fff":"none","stroke-width":1.5,"pointer-events":"none"});
-      svg.appendChild(dot);
-
-      if(isLast){
-        const t=el("text",{x,y:y-14,"text-anchor":"middle","font-size":11,fill:GREEND,"font-weight":900,"font-family":"Inconsolata,monospace"});
-        t.textContent=fmt(p.y);svg.appendChild(t);
-      }
-      if(isBE){
-        const t=el("text",{x,y:y-14,"text-anchor":"middle","font-size":9.5,fill:AMBER,"font-weight":800,"font-family":"Inconsolata,monospace"});
-        t.textContent="Breaks even";svg.appendChild(t);
-      }
-    });
-
-    svg.addEventListener("mouseleave",()=>removeTooltip(svg));
-  }
-
-  function removeTooltip(svg){ const t=svg.querySelector(".tooltip-g"); if(t) svg.removeChild(t); }
-
-  function drawCompareChart(svgId,billablePts,upfrontFlat,beMonth,term){
-    const svg=document.getElementById(svgId);
-    svg.innerHTML="";
-    const W=700,H=240,PL=90,PB=40,PT=22,PR=24;
-    const effW=W-PL-PR,effH=H-PT-PB;
-    const n=billablePts.length;
-    const maxY=Math.max(...billablePts.map(p=>p.y),upfrontFlat)*1.05;
-    const gx=i=>PL+i/(Math.max(n-1,1))*effW;
-    const gy=v=>H-PB-(v/maxY)*effH;
-
-    [0,0.25,0.5,0.75,1].forEach(t=>{
-      const yv=H-PB-t*effH;
-      svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:yv,y2:yv,stroke:t===0?"#94a3b8":"#e2e8f0","stroke-width":t===0?1.5:1}));
-      const txt=el("text",{x:PL-8,y:yv+4,"text-anchor":"end","font-size":11,fill:GREEN,"font-weight":600,"font-family":"Inconsolata,monospace"});
-      txt.textContent=fmtK(maxY*t);svg.appendChild(txt);
-    });
-    const yt=el("text",{x:14,y:H/2,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700,transform:`rotate(-90,14,${H/2})`});
-    yt.textContent="Cumulative revenue";svg.appendChild(yt);
-    svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:H-PB,y2:H-PB,stroke:"#94a3b8","stroke-width":1.5}));
-    const xt=el("text",{x:PL+effW/2,y:H-6,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700});
-    xt.textContent="Program month";svg.appendChild(xt);
-
-    const yfUp=gy(upfrontFlat);
-    if(yfUp>=PT&&yfUp<=H-PB){
-      svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:yfUp,y2:yfUp,stroke:GRAY,"stroke-width":1.5,"stroke-dasharray":"5,4",opacity:0.6}));
-      const t=el("text",{x:W-PR-4,y:yfUp-5,"text-anchor":"end","font-size":9.5,fill:GRAY,"font-weight":700,"font-family":"Inconsolata,monospace"});
-      t.textContent=`Upfront ${fmt(upfrontFlat)}`;svg.appendChild(t);
-    }
-
-    const coords=billablePts.map((p,i)=>`${gx(i)},${gy(p.y)}`).join(" ");
-    svg.appendChild(el("polyline",{points:`${gx(0)},${H-PB} ${coords} ${gx(n-1)},${H-PB}`,fill:GREEN+"18",stroke:"none"}));
-    svg.appendChild(el("polyline",{points:coords,fill:"none",stroke:GREEN,"stroke-width":3,"stroke-linejoin":"round","stroke-linecap":"round"}));
-
-    const step=term<=12?2:term<=24?4:6;
-    billablePts.forEach((p,i)=>{
-      if(p.m%step===0||p.m===1||p.m===term){
-        const t=el("text",{x:gx(i),y:H-PB+16,"text-anchor":"middle","font-size":10,fill:GREEN,"font-weight":700});
-        t.textContent=`Mo ${p.m}`;svg.appendChild(t);
-      }
-    });
-
-    billablePts.forEach((p,i)=>{
-      const x=gx(i),y=gy(p.y);
-      const isBE=p.m===beMonth,isLast=p.m===term;
-      const dot=el("circle",{cx:x,cy:y,r:isBE?6.5:isLast?5.5:3,fill:isBE?AMBER:isLast?GREEND:GREEN,stroke:isBE?"#fff":"none","stroke-width":1.5,"pointer-events":"none"});
-      svg.appendChild(dot);
-      if(isBE){
-        const t=el("text",{x,y:y-12,"text-anchor":"middle","font-size":9.5,fill:AMBER,"font-weight":800,"font-family":"Inconsolata,monospace"});
-        t.textContent=`Mo ${p.m} — breaks even`;svg.appendChild(t);
-      }
-      if(isLast){
-        const t=el("text",{x,y:y-12,"text-anchor":"middle","font-size":10,fill:GREEND,"font-weight":900,"font-family":"Inconsolata,monospace"});
-        t.textContent=fmt(p.y);svg.appendChild(t);
-      }
-
-      const hit=el("circle",{cx:x,cy:y,r:11,fill:"transparent",style:"cursor:pointer"});
-      hit.addEventListener("mouseenter",()=>{
-        removeTooltip(svg);
-        const tx=Math.min(Math.max(x,68),W-68),ty=Math.max(y-56,4);
+        const tx=Math.min(Math.max(x,68),W-68), ty=Math.max(y-56,4);
         const g=el("g",{class:"tooltip-g","pointer-events":"none"});
         g.appendChild(el("rect",{x:tx-60,y:ty,width:120,height:46,rx:8,fill:"#0f172a",opacity:0.93}));
         const l1=el("text",{x:tx,y:ty+15,"text-anchor":"middle","font-size":10,fill:"#94a3b8","font-weight":700,"font-family":"Inconsolata,monospace"});
@@ -629,113 +616,209 @@
       });
       hit.addEventListener("mouseleave",()=>removeTooltip(svg));
       svg.appendChild(hit);
+      svg.appendChild(el("circle",{cx:x,cy:y,r:dotR,fill:dotC,stroke:isBE?"#fff":"none","stroke-width":1.5,"pointer-events":"none"}));
+      if(isLast){
+        const t=el("text",{x,y:y-14,"text-anchor":"middle","font-size":11,fill:GREEND,"font-weight":900,"font-family":"Inconsolata,monospace"});
+        t.textContent=fmt(p.y); svg.appendChild(t);
+      }
+      if(isBE){
+        const t=el("text",{x,y:y-14,"text-anchor":"middle","font-size":9.5,fill:AMBER,"font-weight":800,"font-family":"Inconsolata,monospace"});
+        t.textContent="Breaks even"; svg.appendChild(t);
+      }
     });
     svg.addEventListener("mouseleave",()=>removeTooltip(svg));
   }
 
+  function drawCompareChart(svgId, billablePts, upfrontFlat, beMonth, term){
+    const svg=document.getElementById(svgId); svg.innerHTML="";
+    const W=700,H=240,PL=90,PB=40,PT=22,PR=24;
+    const effW=W-PL-PR, effH=H-PT-PB;
+    const n=billablePts.length;
+    const maxY=Math.max(...billablePts.map(p=>p.y),upfrontFlat)*1.05;
+    const gx=i=>PL+i/(Math.max(n-1,1))*effW;
+    const gy=v=>H-PB-(v/maxY)*effH;
+
+    [0,0.25,0.5,0.75,1].forEach(t=>{
+      const yv=H-PB-t*effH;
+      svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:yv,y2:yv,stroke:t===0?"#94a3b8":"#e2e8f0","stroke-width":t===0?1.5:1}));
+      const txt=el("text",{x:PL-8,y:yv+4,"text-anchor":"end","font-size":11,fill:GREEN,"font-weight":600,"font-family":"Inconsolata,monospace"});
+      txt.textContent=fmtK(maxY*t); svg.appendChild(txt);
+    });
+    const yt=el("text",{x:14,y:H/2,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700,transform:`rotate(-90,14,${H/2})`});
+    yt.textContent="Cumulative revenue"; svg.appendChild(yt);
+    svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:H-PB,y2:H-PB,stroke:"#94a3b8","stroke-width":1.5}));
+    const xt=el("text",{x:PL+effW/2,y:H-6,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700});
+    xt.textContent="Program month"; svg.appendChild(xt);
+
+    const yfUp=gy(upfrontFlat);
+    if(yfUp>=PT&&yfUp<=H-PB){
+      svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:yfUp,y2:yfUp,stroke:GRAY,"stroke-width":1.5,"stroke-dasharray":"5,4",opacity:0.6}));
+      const t=el("text",{x:W-PR-4,y:yfUp-5,"text-anchor":"end","font-size":9.5,fill:GRAY,"font-weight":700,"font-family":"Inconsolata,monospace"});
+      t.textContent=`Upfront ${fmt(upfrontFlat)}`; svg.appendChild(t);
+    }
+
+    const coords=billablePts.map((p,i)=>`${gx(i)},${gy(p.y)}`).join(" ");
+    svg.appendChild(el("polyline",{points:`${gx(0)},${H-PB} ${coords} ${gx(n-1)},${H-PB}`,fill:GREEN+"18",stroke:"none"}));
+    svg.appendChild(el("polyline",{points:coords,fill:"none",stroke:GREEN,"stroke-width":3,"stroke-linejoin":"round","stroke-linecap":"round"}));
+
+    const step=term<=12?2:term<=24?4:6;
+    billablePts.forEach((p,i)=>{
+      if(p.m%step===0||p.m===1||p.m===term){
+        const t=el("text",{x:gx(i),y:H-PB+16,"text-anchor":"middle","font-size":10,fill:GREEN,"font-weight":700});
+        t.textContent=`Mo ${p.m}`; svg.appendChild(t);
+      }
+    });
+    billablePts.forEach((p,i)=>{
+      const x=gx(i),y=gy(p.y);
+      const isBE=p.m===beMonth, isLast=p.m===term;
+      svg.appendChild(el("circle",{cx:x,cy:y,r:isBE?6.5:isLast?5.5:3,fill:isBE?AMBER:isLast?GREEND:GREEN,stroke:isBE?"#fff":"none","stroke-width":1.5,"pointer-events":"none"}));
+      if(isBE){const t=el("text",{x,y:y-12,"text-anchor":"middle","font-size":9.5,fill:AMBER,"font-weight":800,"font-family":"Inconsolata,monospace"});t.textContent=`Mo ${p.m} \u2014 breaks even`;svg.appendChild(t);}
+      if(isLast){const t=el("text",{x,y:y-12,"text-anchor":"middle","font-size":10,fill:GREEND,"font-weight":900,"font-family":"Inconsolata,monospace"});t.textContent=fmt(p.y);svg.appendChild(t);}
+      const hit=el("circle",{cx:x,cy:y,r:11,fill:"transparent",style:"cursor:pointer"});
+      hit.addEventListener("mouseenter",()=>{
+        removeTooltip(svg);
+        const tx=Math.min(Math.max(x,68),W-68), ty=Math.max(y-56,4);
+        const g=el("g",{class:"tooltip-g","pointer-events":"none"});
+        g.appendChild(el("rect",{x:tx-60,y:ty,width:120,height:46,rx:8,fill:"#0f172a",opacity:0.93}));
+        const l1=el("text",{x:tx,y:ty+15,"text-anchor":"middle","font-size":10,fill:"#94a3b8","font-weight":700,"font-family":"Inconsolata,monospace"});l1.textContent=`MONTH ${p.m} CUMULATIVE`;
+        const l2=el("text",{x:tx,y:ty+35,"text-anchor":"middle","font-size":14,fill:"#fff","font-weight":800,"font-family":"Inconsolata,monospace"});l2.textContent=fmt(p.y);
+        g.appendChild(l1);g.appendChild(l2);svg.appendChild(g);
+      });
+      hit.addEventListener("mouseleave",()=>removeTooltip(svg));
+      svg.appendChild(hit);
+    });
+    svg.addEventListener("mouseleave",()=>removeTooltip(svg));
+  }
+
+  // ── MAIN UPDATE ───────────────────────────────────────────
   function update(){
-    const debt  = +document.getElementById("debtField").value||0;
-    const fee   = +document.getElementById("feeField").value||0;
-    const term  = +document.getElementById("termField").value||0;
-    const files = +document.getElementById("filesField").value||0;
-    const payRate = files>=100 ? 0.65 : 0.60;
-
-    const tierLbl=document.getElementById("tierLbl");
-    if(tierLbl) tierLbl.textContent = files>=100?"Enrollments / mo (Tier 2 — 65%)":"Enrollments / mo (Tier 1 — 60%)";
-
+    const debt  = +document.getElementById("debtField").value  || 0;
+    const fee   = +document.getElementById("feeField").value   || 0;
+    const term  = +document.getElementById("termField").value  || 0;
+    const files = +document.getElementById("filesField").value || 0;
     if(!debt||!fee||!term) return;
 
-    const R = calcPerEnrollment(debt,fee,term,maintFee,payRate);
+    const payRate = files >= 100 ? 0.65 : 0.60;
 
-    document.getElementById("hClientPmt").textContent  = fmtD(R.clientPmt);
-    document.getElementById("hTotalPayout").textContent= fmt(R.totalPayout);
-    document.getElementById("hVsUpfront").textContent  = `vs ${fmt(R.upfront)} upfront (8%)`;
-    document.getElementById("hMultiplier").textContent = R.multiplier.toFixed(2)+"×";
+    // Tier label
+    const tierLbl = document.getElementById("tierLbl");
+    if(tierLbl) tierLbl.textContent = files>=100 ? "Enrollments / mo (Tier 2 \u2014 65%)" : "Enrollments / mo (Tier 1 \u2014 60%)";
 
-    document.getElementById("scSfee").textContent    = fmtD(R.sfeeMonthly)+"/mo";
-    document.getElementById("scSfeeSub").textContent = `${fee}% of ${fmt(debt)} ÷ ${term} months`;
-    document.getElementById("scM12").textContent     = fmtD(R.m12payout);
-    document.getElementById("scM3").textContent      = fmtD(R.m3payout)+"/mo";
-    document.getElementById("scM3sub").textContent   = `${fee}% fee × ${(payRate*100).toFixed(0)}% pay rate`;
-    const steadyMo = files*R.totalPayout;
-    document.getElementById("scSteady").textContent  = fmt(steadyMo)+"/mo";
-    document.getElementById("scSteadySub").textContent= `${files} enrollments × ${fmt(R.totalPayout)}/ea · reached at month ${term}`;
+    const R = calcPerEnrollment(debt, fee, term, maintFee, payRate, isSplit);
 
-    const m2 = R.rows[1]?.cumPayout||0;
-    const mid = R.rows[Math.floor(term/2)-1]?.cumPayout||0;
-    document.getElementById("milM2").textContent   = fmt(m2);
-    document.getElementById("milBE").textContent   = R.beMonth ? `Month ${R.beMonth}` : "Before Month 1";
-    document.getElementById("milMid").textContent  = fmt(mid);
+    // ── Header ────────────────────────────────────────────
+    document.getElementById("hClientPmt").textContent   = fmtD(R.grossPmt) + (isSplit ? "\u00d72" : "");
+    document.getElementById("hTotalPayout").textContent = fmt(R.totalPayout);
+    document.getElementById("hMultiplier").textContent  = R.multiplier.toFixed(2) + "\u00d7";
+
+    // ── Deduction card ────────────────────────────────────
+    renderDeductCard(R, maintFee, isSplit);
+
+    // ── Stat cards ────────────────────────────────────────
+    document.getElementById("scClientPmt").textContent    = fmtD(R.grossPmt);
+    document.getElementById("scClientPmtSub").textContent = isSplit
+      ? `2 drafts of ${fmtD(R.grossPmt/2)} each (${fee}% fee + $${maintFee} maint + $${PROC_FEE}/draft)`
+      : `${fee}% of ${fmt(debt)} \u00f7 ${term} months + $${maintFee} + $${PROC_FEE}`;
+    document.getElementById("scM12").textContent    = fmtD(R.m12payout) + "/mo";
+    document.getElementById("scM12sub").textContent = `\u2212${fmtD(R.earlyDeduct)} draft fee \u00d7 ${(payRate*100).toFixed(0)}% pay rate`;
+    document.getElementById("scM3").textContent     = fmtD(R.m3payout) + "/mo";
+    document.getElementById("scM3sub").textContent  = `\u2212${fmtD(R.lateDeduct)} (maint+draft) \u00d7 ${(payRate*100).toFixed(0)}% pay rate`;
+    const steadyMo = files * R.totalPayout;
+    document.getElementById("scSteady").textContent    = fmt(steadyMo) + "/mo";
+    document.getElementById("scSteadySub").textContent = `${files} enrollments \u00d7 ${fmt(R.totalPayout)}/ea \u00b7 reached at month ${term}`;
+
+    // ── Milestones ────────────────────────────────────────
+    const m2val  = R.rows[1]?.cumPayout || 0;
+    const midval = R.rows[Math.floor(term/2)-1]?.cumPayout || 0;
+    document.getElementById("milM2").textContent   = fmt(m2val);
+    document.getElementById("milBE").textContent   = R.beMonth ? `Month ${R.beMonth}` : "Within Month 1";
+    document.getElementById("milMid").textContent  = fmt(midval);
     document.getElementById("milFull").textContent = fmt(R.totalPayout);
 
-    const c1pts = R.rows.map(r=>({m:r.m,y:r.cumPayout,isBE:r.m===R.beMonth}));
-    const notable1=[
-      {m:1,label:"Mo 1"},
-      {m:2,label:"Mo 2"},
-      ...(R.beMonth&&R.beMonth>2&&R.beMonth<term?[{m:R.beMonth,label:`Mo ${R.beMonth}`,color:AMBER}]:[]),
-      ...(Math.floor(term/2)>2&&Math.floor(term/2)!==R.beMonth?[{m:Math.floor(term/2),label:`Mo ${Math.floor(term/2)}`}]:[]),
-      {m:term,label:`Mo ${term}`},
+    // ── Chart 1 ───────────────────────────────────────────
+    const c1pts = R.rows.map(r => ({ m:r.m, y:r.cumPayout, isBE:r.m===R.beMonth }));
+    const notable1 = [
+      {m:1, label:"P1"},
+      {m:2, label:"P2"},
+      ...(R.beMonth&&R.beMonth>2&&R.beMonth<term ? [{m:R.beMonth, label:`Mo ${R.beMonth}`, color:AMBER}] : []),
+      ...(Math.floor(term/2)>2 && Math.floor(term/2)!==R.beMonth ? [{m:Math.floor(term/2),label:`Mo ${Math.floor(term/2)}`}] : []),
+      {m:term, label:`Mo ${term}`},
     ];
-    drawProgramChart("chart1",c1pts,R.totalPayout*1.05,"Program month","Cumulative payout",notable1,
-      [{y:R.upfront,color:GRAY,dash:"5,4",label:`Upfront ${fmt(R.upfront)}`}]);
+    drawProgramChart("chart1", c1pts, R.totalPayout*1.05, "Program month", "Cumulative payout", notable1,
+      [{y:R.upfront, color:GRAY, dash:"5,4", label:`Upfront ${fmt(R.upfront)}`}]);
 
-    drawCompareChart("chart2",c1pts,R.upfront,R.beMonth,term);
+    // ── Chart 2 ───────────────────────────────────────────
+    drawCompareChart("chart2", c1pts, R.upfront, R.beMonth, term);
 
+    // ── Chart 3 ───────────────────────────────────────────
     const projMonths = Math.min(term*2, 60);
-    const c3pts=[];
-    let cumInflow=0;
+    const c3pts = [];
+    let cumInflow = 0;
     for(let m=1;m<=projMonths;m++){
-      const activeM=Math.min(m,term);
-      const monthlyInflow=files*(R.rows[activeM-1]?.cumPayout||0);
-      cumInflow+=monthlyInflow;
-      c3pts.push({m,y:cumInflow});
+      const activeM = Math.min(m, term);
+      cumInflow += files * (R.rows[activeM-1]?.cumPayout || 0);
+      c3pts.push({m, y:cumInflow});
     }
-    const maxC3=c3pts[c3pts.length-1]?.y||1;
-    const notable3=[
-      {m:1,label:"Mo 1"},
-      {m:term,label:`Mo ${term} — steady state`,color:GREEND},
-      ...(projMonths>term?[{m:projMonths,label:`Mo ${projMonths}`}]:[]),
+    const maxC3 = c3pts[c3pts.length-1]?.y || 1;
+    const notable3 = [
+      {m:1, label:"Mo 1"},
+      {m:term, label:`Mo ${term} \u2014 steady state`, color:GREEND},
+      ...(projMonths>term ? [{m:projMonths, label:`Mo ${projMonths}`}] : []),
     ];
-    drawProgramChart("chart3",c3pts,maxC3*1.05,"Calendar month","Cumulative revenue",notable3);
+    drawProgramChart("chart3", c3pts, maxC3*1.05, "Calendar month", "Cumulative revenue", notable3);
+    document.getElementById("chart3sub").textContent =
+      `What happens when you enroll ${files} client${files!==1?"s":""} every month. Monthly inflow reaches steady state at month ${term}, locking in at ${fmt(files*R.totalPayout)}/month.`;
 
+    // ── 3-year comparison ─────────────────────────────────
     const Y3 = 36;
     let cumBillable3=0, cumUpfront3=0;
     for(let m=1;m<=Y3;m++){
-      const activeM=Math.min(m,term);
-      cumBillable3 += files*(R.rows[activeM-1]?.cumPayout||0);
-      cumUpfront3  += files*R.upfront;
+      const activeM = Math.min(m, term);
+      cumBillable3 += files * (R.rows[activeM-1]?.cumPayout || 0);
+      cumUpfront3  += files * R.upfront;
     }
     document.getElementById("py3Billable").textContent    = fmt(cumBillable3);
-    document.getElementById("py3BillableSub").textContent = `${files} enrollments/mo × ${Y3} months — billable model`;
+    document.getElementById("py3BillableSub").textContent = `${files} enrollments/mo \u00d7 ${Y3} months \u2014 billable model`;
     document.getElementById("py3Upfront").textContent     = fmt(cumUpfront3);
-    document.getElementById("py3UpfrontSub").textContent  = `${files} enrollments/mo × ${Y3} months — upfront 8%`;
+    document.getElementById("py3UpfrontSub").textContent  = `${files} enrollments/mo \u00d7 ${Y3} months \u2014 upfront 8%`;
 
-    document.getElementById("chart3sub").textContent =
-      `What happens when you enroll ${files} client${files!==1?"s":""} every month. Monthly inflow reaches steady state at month ${term}, where it locks in at ${fmt(files*R.totalPayout)}/month.`;
+    // ── Table ─────────────────────────────────────────────
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+    R.rows.forEach(r => {
+      const tr   = document.createElement("tr");
+      const isBE = r.m === R.beMonth;
+      const isLast = r.m === term;
+      const isKink = r.m === 3;      // first month full backout applies
+      const isP12  = r.m <= 2;
+      const vsUp   = r.cumPayout - R.upfront;
 
-    const tbody=document.getElementById("tableBody");
-    tbody.innerHTML="";
-    R.rows.forEach(r=>{
-      const tr=document.createElement("tr");
-      const isPhaseA=r.m<=2;
-      const isBE=r.m===R.beMonth;
-      const isLast=r.m===term;
-      tr.className=(isBE||isLast?"milestone ":"")+(isPhaseA?"phase-a":"phase-b");
-      const vsUp=r.cumPayout-R.upfront;
-      const pctOfUp=(r.cumPayout/R.upfront*100).toFixed(1)+"%";
-      tr.innerHTML=`
-        <td style="font-weight:700">${r.m}${isBE?` <span style="font-size:10px;background:#fef9c3;color:#92400e;padding:1px 6px;border-radius:4px;font-weight:700">breaks even</span>`:""}${isLast?` <span style="font-size:10px;background:#f0fdf9;color:${GREEND};padding:1px 6px;border-radius:4px;font-weight:700">final</span>`:""}</td>
-        <td style="color:${isPhaseA?"#0891b2":GREEN};font-weight:600">${isPhaseA?"100% pass-through + maint":`${(r.pr*100).toFixed(0)}% of service fee`}</td>
-        <td style="font-family:'Inconsolata',monospace">${(r.pr*100).toFixed(0)}%</td>
+      tr.className = (isBE||isLast ? "milestone " : "") + (isKink ? "phase-kink" : isP12 ? "phase-a" : "phase-b");
+
+      const phaseLabel = isP12
+        ? `<span style="color:#0891b2;font-weight:700">P1\u20132 \u2014 draft fee only</span>`
+        : `<span style="color:${GREEN};font-weight:700">P3+ \u2014 maint + draft</span>`;
+
+      const moBadges = [
+        isBE   ? `<span style="font-size:10px;background:#fef9c3;color:#92400e;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:4px">breaks even</span>` : "",
+        isKink ? `<span style="font-size:10px;background:#fffbeb;color:#b45309;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:4px">backout starts</span>` : "",
+        isLast ? `<span style="font-size:10px;background:#f0fdf9;color:${GREEND};padding:1px 6px;border-radius:4px;font-weight:700;margin-left:4px">final</span>` : "",
+      ].join("");
+
+      tr.innerHTML = `
+        <td style="font-weight:700">${r.m}${moBadges}</td>
+        <td>${phaseLabel}</td>
+        <td style="font-family:'Inconsolata',monospace">${fmtD(r.grossPmt)}</td>
+        <td style="font-family:'Inconsolata',monospace;color:${r.m<=2?"#d97706":RED};font-weight:700">\u2212${fmtD(r.deduction)}</td>
+        <td style="font-family:'Inconsolata',monospace;font-weight:700">${fmtD(r.net)}</td>
+        <td style="font-family:'Inconsolata',monospace">${(r.payRate*100).toFixed(0)}%</td>
         <td style="font-family:'Inconsolata',monospace;font-weight:700;color:${GREEN}">${fmtD(r.mpay)}</td>
         <td style="font-family:'Inconsolata',monospace;font-weight:${isLast?900:700};color:${isLast?GREEND:""}">${fmt(r.cumPayout)}</td>
-        <td style="font-family:'Inconsolata',monospace;color:${vsUp>=0?"#15803d":"#ef4444"};font-weight:700">${vsUp>=0?"+":"-"}${fmt(Math.abs(vsUp))}</td>
-        <td style="font-family:'Inconsolata',monospace;color:${r.cumPayout>=R.upfront?GREEND:GRAY}">${pctOfUp}</td>`;
+        <td style="font-family:'Inconsolata',monospace;color:${vsUp>=0?"#15803d":RED};font-weight:700">${vsUp>=0?"+":"-"}${fmt(Math.abs(vsUp))}</td>`;
       tbody.appendChild(tr);
     });
   }
 
-  document.getElementById("stateSelect") && null;
   update();
 </script>
 </body>
