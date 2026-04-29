@@ -53,7 +53,7 @@
     .hstrip {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
       flex-wrap: nowrap;
     }
     .hdiv   { width: 1px; height: 36px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
@@ -61,7 +61,7 @@
     .hsub   { font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 1px; font-weight: 500; white-space: nowrap; }
 
     /* each input group */
-    .hgrp   { display: flex; flex-direction: column; gap: 3px; min-width: 80px; }
+    .hgrp   { display: flex; flex-direction: column; gap: 3px; min-width: 105px; }
     .ilbl   { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.4); display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
 
     /* field + slider stacked compactly */
@@ -71,12 +71,12 @@
     .pfx    { position:absolute;left:7px;top:50%;transform:translateY(-50%);font-size:11px;color:rgba(255,255,255,0.4);pointer-events:none;z-index:1;font-family:'Inconsolata',monospace;font-weight:600; }
     .sfx    { font-size:11px;color:rgba(255,255,255,0.45);font-family:'Inconsolata',monospace;font-weight:700;white-space:nowrap; }
     .hfld {
-      width:100%;padding:5px 6px 5px 18px;border-radius:6px;
+      width:100%;padding:6px 8px 6px 20px;border-radius:6px;
       border:0.5px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.10);
       color:#fff;font-family:'Inconsolata',monospace;font-size:13px;font-weight:700;outline:none;
       transition:border-color 0.15s;
     }
-    .hfld.nopfx{padding-left:7px;}
+    .hfld.nopfx{padding-left:9px;}
     .hfld:focus{border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.13);}
 
     /* maint toggle */
@@ -85,7 +85,7 @@
     .mbtn.active{background:rgba(15,157,138,0.25);border-color:rgba(15,157,138,0.5);color:#5eead4;}
 
     /* computed value cells */
-    .hbig{font-family:'Inconsolata',monospace;font-size:16px;font-weight:700;color:#fff;line-height:1;white-space:nowrap;}
+    .hbig{font-family:'Inconsolata',monospace;font-size:17px;font-weight:700;color:#fff;line-height:1;white-space:nowrap;}
     .hdim{display:none;} /* hide all hint text to save space */
 
     .igrid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;}
@@ -204,7 +204,7 @@
     </div>
 
     <!-- Maintenance fee -->
-    <div class="hgrp" style="min-width:96px">
+    <div class="hgrp" style="min-width:115px">
       <label class="ilbl">Maint. fee</label>
       <div class="mbtns" id="maintBtns">
         <div class="mbtn active" data-val="80">$80</div>
@@ -450,14 +450,13 @@
   function calcPerEnrollment(debt,feeRate,term,maint,payRate){
     const sfeeTotal  = debt*(feeRate/100);
     const sfeeMonthly= sfeeTotal/term;
-    const clientPmt  = sfeeMonthly+maint+PROC_FEE;   // what client pays/month
-    const m12payout  = sfeeMonthly+maint;             // affiliate gets months 1-2
-    const m3payout   = sfeeMonthly*payRate;            // affiliate gets months 3+
+    const clientPmt  = sfeeMonthly+maint+PROC_FEE;
+    const m12payout  = sfeeMonthly+maint;
+    const m3payout   = sfeeMonthly*payRate;
     const totalPayout= 2*m12payout + Math.max(0,term-2)*m3payout;
     const upfront    = debt*0.08;
     const multiplier = upfront>0?totalPayout/upfront:0;
 
-    // build month-by-month array
     const rows=[];
     let cumPayout=0;
     for(let m=1;m<=term;m++){
@@ -466,13 +465,11 @@
       const pr = m<=2 ? 1.0 : payRate;
       rows.push({m,mpay,cumPayout,pr});
     }
-    // find break-even vs upfront
     const beMonth = rows.find(r=>r.cumPayout>=upfront)?.m ?? null;
 
     return{sfeeMonthly,clientPmt,m12payout,m3payout,totalPayout,upfront,multiplier,rows,beMonth};
   }
 
-  // ── THE CHART — replicates ProgramChart from profitabilitybalancer EXACTLY ──
   function drawProgramChart(svgId,pts,maxY,xTitle,yTitle,notable,extraLines){
     const svg=document.getElementById(svgId);
     svg.innerHTML="";
@@ -481,7 +478,6 @@
     const gx=i=>PL+i/(Math.max(pts.length-1,1))*effW;
     const gy=v=>H-PB-(v/Math.max(maxY,1))*effH;
 
-    // grid lines + y labels
     [0,0.25,0.5,0.75,1].forEach((t,i)=>{
       const yv=H-PB-t*effH;
       svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:yv,y2:yv,stroke:t===0?"#94a3b8":"#e2e8f0","stroke-width":t===0?1.5:1}));
@@ -490,18 +486,14 @@
       svg.appendChild(txt);
     });
 
-    // y axis title
     const yt=el("text",{x:14,y:H/2,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700,transform:`rotate(-90,14,${H/2})`});
     yt.textContent=yTitle;svg.appendChild(yt);
 
-    // x axis
     svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:H-PB,y2:H-PB,stroke:"#94a3b8","stroke-width":1.5}));
 
-    // x title
     const xt=el("text",{x:PL+effW/2,y:H-6,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700});
     xt.textContent=xTitle;svg.appendChild(xt);
 
-    // extra reference lines (e.g. upfront flat line)
     if(extraLines) extraLines.forEach(({y:yv,color,dash,label})=>{
       const ypos=gy(yv);
       if(ypos<PT||ypos>H-PB) return;
@@ -513,14 +505,10 @@
       }
     });
 
-    // area fill
     const coords=pts.map((p,i)=>`${gx(i)},${gy(p.y)}`).join(" ");
     svg.appendChild(el("polyline",{points:`${gx(0)},${H-PB} ${coords} ${gx(pts.length-1)},${H-PB}`,fill:GREEN+"18",stroke:"none"}));
-
-    // line
     svg.appendChild(el("polyline",{points:coords,fill:"none",stroke:GREEN,"stroke-width":3,"stroke-linejoin":"round","stroke-linecap":"round"}));
 
-    // x labels at notable months
     notable.forEach(({m,label,color})=>{
       const i=m-1;
       if(i<0||i>=pts.length) return;
@@ -529,7 +517,6 @@
       svg.appendChild(t);
     });
 
-    // dots + hover + value labels
     pts.forEach((p,i)=>{
       const x=gx(i),y=gy(p.y);
       const isNotable=notable.some(n=>n.m===p.m);
@@ -538,7 +525,6 @@
       const dotColor=isBE?AMBER:isNotable?GREEND:GREEN;
       const dotR=isLast||isNotable?5.5:3.5;
 
-      // hit area
       const hit=el("circle",{cx:x,cy:y,r:11,fill:"transparent",style:"cursor:pointer"});
       hit.addEventListener("mouseenter",()=>{
         removeTooltip(svg);
@@ -556,16 +542,13 @@
       hit.addEventListener("mouseleave",()=>removeTooltip(svg));
       svg.appendChild(hit);
 
-      // visible dot
       const dot=el("circle",{cx:x,cy:y,r:dotR,fill:dotColor,stroke:isBE?"#fff":"none","stroke-width":1.5,"pointer-events":"none"});
       svg.appendChild(dot);
 
-      // value label at end
       if(isLast){
         const t=el("text",{x,y:y-14,"text-anchor":"middle","font-size":11,fill:GREEND,"font-weight":900,"font-family":"Inconsolata,monospace"});
         t.textContent=fmt(p.y);svg.appendChild(t);
       }
-      // break-even label
       if(isBE){
         const t=el("text",{x,y:y-14,"text-anchor":"middle","font-size":9.5,fill:AMBER,"font-weight":800,"font-family":"Inconsolata,monospace"});
         t.textContent="Breaks even";svg.appendChild(t);
@@ -577,7 +560,6 @@
 
   function removeTooltip(svg){ const t=svg.querySelector(".tooltip-g"); if(t) svg.removeChild(t); }
 
-  // ── Chart 2: two-line chart (billable + upfront) ──
   function drawCompareChart(svgId,billablePts,upfrontFlat,beMonth,term){
     const svg=document.getElementById(svgId);
     svg.innerHTML="";
@@ -588,7 +570,6 @@
     const gx=i=>PL+i/(Math.max(n-1,1))*effW;
     const gy=v=>H-PB-(v/maxY)*effH;
 
-    // grid
     [0,0.25,0.5,0.75,1].forEach(t=>{
       const yv=H-PB-t*effH;
       svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:yv,y2:yv,stroke:t===0?"#94a3b8":"#e2e8f0","stroke-width":t===0?1.5:1}));
@@ -601,7 +582,6 @@
     const xt=el("text",{x:PL+effW/2,y:H-6,"text-anchor":"middle","font-size":11,fill:GREEN,"font-weight":700});
     xt.textContent="Program month";svg.appendChild(xt);
 
-    // upfront flat line (dashed gray)
     const yfUp=gy(upfrontFlat);
     if(yfUp>=PT&&yfUp<=H-PB){
       svg.appendChild(el("line",{x1:PL,x2:W-PR,y1:yfUp,y2:yfUp,stroke:GRAY,"stroke-width":1.5,"stroke-dasharray":"5,4",opacity:0.6}));
@@ -609,12 +589,10 @@
       t.textContent=`Upfront ${fmt(upfrontFlat)}`;svg.appendChild(t);
     }
 
-    // billable area + line
     const coords=billablePts.map((p,i)=>`${gx(i)},${gy(p.y)}`).join(" ");
     svg.appendChild(el("polyline",{points:`${gx(0)},${H-PB} ${coords} ${gx(n-1)},${H-PB}`,fill:GREEN+"18",stroke:"none"}));
     svg.appendChild(el("polyline",{points:coords,fill:"none",stroke:GREEN,"stroke-width":3,"stroke-linejoin":"round","stroke-linecap":"round"}));
 
-    // x labels
     const step=term<=12?2:term<=24?4:6;
     billablePts.forEach((p,i)=>{
       if(p.m%step===0||p.m===1||p.m===term){
@@ -623,7 +601,6 @@
       }
     });
 
-    // dots
     billablePts.forEach((p,i)=>{
       const x=gx(i),y=gy(p.y);
       const isBE=p.m===beMonth,isLast=p.m===term;
@@ -638,7 +615,6 @@
         t.textContent=fmt(p.y);svg.appendChild(t);
       }
 
-      // hit area for tooltip
       const hit=el("circle",{cx:x,cy:y,r:11,fill:"transparent",style:"cursor:pointer"});
       hit.addEventListener("mouseenter",()=>{
         removeTooltip(svg);
@@ -657,7 +633,6 @@
     svg.addEventListener("mouseleave",()=>removeTooltip(svg));
   }
 
-  // ── MAIN UPDATE ──
   function update(){
     const debt  = +document.getElementById("debtField").value||0;
     const fee   = +document.getElementById("feeField").value||0;
@@ -665,7 +640,6 @@
     const files = +document.getElementById("filesField").value||0;
     const payRate = files>=100 ? 0.65 : 0.60;
 
-    // tier hint
     const tierLbl=document.getElementById("tierLbl");
     if(tierLbl) tierLbl.textContent = files>=100?"Enrollments / mo (Tier 2 — 65%)":"Enrollments / mo (Tier 1 — 60%)";
 
@@ -673,13 +647,11 @@
 
     const R = calcPerEnrollment(debt,fee,term,maintFee,payRate);
 
-    // header computed
     document.getElementById("hClientPmt").textContent  = fmtD(R.clientPmt);
     document.getElementById("hTotalPayout").textContent= fmt(R.totalPayout);
     document.getElementById("hVsUpfront").textContent  = `vs ${fmt(R.upfront)} upfront (8%)`;
     document.getElementById("hMultiplier").textContent = R.multiplier.toFixed(2)+"×";
 
-    // stat cards
     document.getElementById("scSfee").textContent    = fmtD(R.sfeeMonthly)+"/mo";
     document.getElementById("scSfeeSub").textContent = `${fee}% of ${fmt(debt)} ÷ ${term} months`;
     document.getElementById("scM12").textContent     = fmtD(R.m12payout);
@@ -689,7 +661,6 @@
     document.getElementById("scSteady").textContent  = fmt(steadyMo)+"/mo";
     document.getElementById("scSteadySub").textContent= `${files} enrollments × ${fmt(R.totalPayout)}/ea · reached at month ${term}`;
 
-    // milestone cards
     const m2 = R.rows[1]?.cumPayout||0;
     const mid = R.rows[Math.floor(term/2)-1]?.cumPayout||0;
     document.getElementById("milM2").textContent   = fmt(m2);
@@ -697,7 +668,6 @@
     document.getElementById("milMid").textContent  = fmt(mid);
     document.getElementById("milFull").textContent = fmt(R.totalPayout);
 
-    // ── Chart 1: single enrollment cumulative ──
     const c1pts = R.rows.map(r=>({m:r.m,y:r.cumPayout,isBE:r.m===R.beMonth}));
     const notable1=[
       {m:1,label:"Mo 1"},
@@ -709,11 +679,8 @@
     drawProgramChart("chart1",c1pts,R.totalPayout*1.05,"Program month","Cumulative payout",notable1,
       [{y:R.upfront,color:GRAY,dash:"5,4",label:`Upfront ${fmt(R.upfront)}`}]);
 
-    // ── Chart 2: billable vs upfront cumulative comparison ──
     drawCompareChart("chart2",c1pts,R.upfront,R.beMonth,term);
 
-    // ── Chart 3: rolling monthly revenue (continuous enrollment) ──
-    // monthly inflow at calendar month m = files × cumRev[min(m,term)]
     const projMonths = Math.min(term*2, 60);
     const c3pts=[];
     let cumInflow=0;
@@ -731,7 +698,6 @@
     ];
     drawProgramChart("chart3",c3pts,maxC3*1.05,"Calendar month","Cumulative revenue",notable3);
 
-    // 3-year totals
     const Y3 = 36;
     let cumBillable3=0, cumUpfront3=0;
     for(let m=1;m<=Y3;m++){
@@ -747,7 +713,6 @@
     document.getElementById("chart3sub").textContent =
       `What happens when you enroll ${files} client${files!==1?"s":""} every month. Monthly inflow reaches steady state at month ${term}, where it locks in at ${fmt(files*R.totalPayout)}/month.`;
 
-    // ── Table ──
     const tbody=document.getElementById("tableBody");
     tbody.innerHTML="";
     R.rows.forEach(r=>{
@@ -770,7 +735,7 @@
     });
   }
 
-  document.getElementById("stateSelect") && null; // no state select in this tool
+  document.getElementById("stateSelect") && null;
   update();
 </script>
 </body>
