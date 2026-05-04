@@ -396,6 +396,7 @@ body{top:0!important;}
     <div style="padding:20px 20px 16px;border-bottom:2px solid var(--g);">
       <div style="font-size:17px;font-weight:900;color:var(--dk);margin-bottom:4px;">Program vs Current Financial Situation</div>
       <p style="font-size:13px;color:#64748b;font-weight:500;">Continuing minimum payments is almost always the most expensive long-term path.</p>
+      <div id="programChoiceBox" style="display:none;margin-top:14px;padding:12px;border:1.5px solid var(--br);border-radius:12px;background:var(--bg);"></div>
     </div>
     <div style="padding:20px;overflow-x:auto;">
       <table class="cmp">
@@ -447,18 +448,18 @@ body{top:0!important;}
     </div>
   </div>
 
-  <!-- FULL WIDTH: Legacy Capital Services Programs - collapsible accordion -->
+  <!-- FULL WIDTH: Legacy / Elite Legal Practice (ELP) Programs - collapsible accordion -->
   <div class="card workspace-full" id="legacyProgramCard" style="display:none;padding:0;overflow:hidden;">
     <button class="acc-btn" id="legacyProgBtn" onclick="toggleAcc('legacyProgBody','legacyProgBtn')" style="padding:18px 20px;font-size:15px;font-weight:900;border-radius:16px;background:#fff;">
       <span style="display:flex;align-items:center;gap:10px;">
         <div class="logo-sm" style="width:50px;height:26px;"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69e1c95dc56ad279084b3141.png" alt="Legacy" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:8px;font-weight:800;color:#6d28d9;\\'>LCS</span>';"/></div>
-        <span>Legacy Capital Services Programs</span>
+        <span>Legacy / Elite Legal Practice (ELP) Programs</span>
       </span>
       <span class="acc-chevron">&#8964;</span>
     </button>
     <div class="acc-body" id="legacyProgBody" style="border-top:1px solid var(--br);padding:20px;">
       <div id="legacyActiveDetail" style="margin-bottom:20px;"></div>
-      <div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px;">All Commission Bands</div>
+      <div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px;">All Agent Commission Bands</div>
       <div id="legacyBandGrid" class="lc-band-grid"></div>
     </div>
   </div>
@@ -481,15 +482,15 @@ body{top:0!important;}
            style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:12px;background:#0b1f47;border:1.5px solid #c9a84c;text-decoration:none;cursor:pointer;transition:background .15s;"
            onmouseover="this.style.background='#0f2a5e'" onmouseout="this.style.background='#0b1f47'">
           <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:34px;height:34px;border-radius:8px;background:rgba(201,168,76,0.15);border:1px solid #c9a84c;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <div style="width:34px;height:34px;border-radius:8px;background:rgba(15,157,138,0.08);border:1px solid rgba(15,157,138,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0f9d8a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <div>
-              <div style="font-size:12px;font-weight:900;color:#c9a84c;letter-spacing:.01em;line-height:1.2;">Legacy Capital / Elite Legal</div>
-              <div style="font-size:10px;color:#ffffff;font-weight:900;margin-top:2px;letter-spacing:.04em;text-transform:uppercase;">Affiliate Support &#8599;</div>
+              <div style="font-size:12px;font-weight:900;color:#0f172a;letter-spacing:.01em;line-height:1.2;">Legacy / Elite Legal Practice (ELP)</div>
+              <div style="font-size:10px;color:#0b7d6e;font-weight:900;margin-top:2px;letter-spacing:.04em;text-transform:uppercase;">Affiliate Support &#8599;</div>
             </div>
           </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f9d8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         </a>
       </div>
     </div>
@@ -713,161 +714,197 @@ const SUPP_HOURS=[
     ]
   },
   {
-    key:'LEGACY',label:'Legacy Capital Services',logo:LEGACY_LOGO,color:'#6d28d9',
+    key:'LEGACY',label:'Legacy / Elite Legal Practice (ELP)',logo:LEGACY_LOGO,color:'#6d28d9',
     tz:'America/Chicago',
     days:[1,2,3,4,5],oh:8,om:0,ch:17,cm:0,
     contacts:[
-      {type:'phone',label:'(888) 536-2961',url:'tel:8885362961',style:'color:#0b7d6e;background:rgba(15,157,138,.08);border-color:rgba(15,157,138,.3);'}
+      {type:'phone',label:'(888) 536-2961',url:'tel:8885362961',style:'color:#0f172a;background:#ffffff;border-color:#e2e8f0;'}
     ]
   },
 ];
 const MAX_ROWS=10;
-const legacyState={feeRate:0.40,months:36};
-function legacyTotalCost(d,f){return Math.round((d||0)*(f||0));}
-function legacyMinMonths(){return 1;}
-function legacyMaxMonths(d,f){
-  const total=legacyTotalCost(d,f);
-  const maxByPayment=Math.floor(total/250);
-  return Math.max(legacyMinMonths(),Math.min(60,maxByPayment>0?maxByPayment:60));
+const legacyState={feeRate:0.40,months:36,splitPay:false};
+function legacyDraftCount(splitPay){
+  return splitPay ? 2 : 1;
 }
-function legacyClampMonths(d,f,mo){
-  const minMo=legacyMinMonths();
-  const maxMo=legacyMaxMonths(d,f);
-  const n=parseInt(mo,10);
-  const safe=Number.isFinite(n)?n:minMo;
-  return Math.max(minMo,Math.min(maxMo,safe));
+
+function legacyMonthlyAdminFees(splitPay){
+  return 80 + (4 * legacyDraftCount(splitPay));
 }
-function legacyMP(d,f,mo){
-  const months=legacyClampMonths(d,f,mo);
-  return Math.round(legacyTotalCost(d,f)/months);
+
+function legacyTotalServiceFee(d, f){
+  return Math.round((d || 0) * (f || 0));
+}
+
+function legacyTotalCost(d, f, mo, splitPay = false){
+  const months = legacyClampMonths(d, f, mo, splitPay);
+  return Math.round(
+    legacyTotalServiceFee(d, f) + legacyMonthlyAdminFees(splitPay) * months
+  );
+}
+
+function legacyMinMonths(){
+  return 1;
+}
+
+function legacyMaxMonths(d, f, splitPay = false){
+  const serviceFeeTotal = legacyTotalServiceFee(d, f);
+  const adminFees = legacyMonthlyAdminFees(splitPay);
+  const minimumClientPayment = 250;
+
+  const maxByPayment = Math.floor(
+    serviceFeeTotal / Math.max(1, minimumClientPayment - adminFees)
+  );
+
+  return Math.max(legacyMinMonths(), Math.min(60, maxByPayment > 0 ? maxByPayment : 60));
+}
+
+function legacyClampMonths(d, f, mo, splitPay = false){
+  const minMo = legacyMinMonths();
+  const maxMo = legacyMaxMonths(d, f, splitPay);
+  const n = parseInt(mo, 10);
+  const safe = Number.isFinite(n) ? n : minMo;
+
+  return Math.max(minMo, Math.min(maxMo, safe));
+}
+
+function legacyMP(d, f, mo, splitPay = false){
+  const months = legacyClampMonths(d, f, mo, splitPay);
+  return Math.round(
+    legacyTotalServiceFee(d, f) / months + legacyMonthlyAdminFees(splitPay)
+  );
 }
 function legacyCommAtFee(baseTotal,f){return Math.round(baseTotal*(f/0.40));}
-function legacyDefaultMonths(total,feeRate,csMp,ldMp){
-  const tc=legacyTotalCost(total,feeRate);
-  const maxMo=legacyMaxMonths(total,feeRate);
-  const minMo=legacyMinMonths();
-  const targets=[csMp,ldMp].filter(v=>v&&v>0);
-  if(!targets.length)return Math.max(minMo,Math.min(maxMo,36));
-  const target=Math.min(...targets);
-  const ideal=Math.round(tc/target);
-  return legacyClampMonths(total,feeRate,ideal);
+function legacyDefaultMonths(total, feeRate, csMp, ldMp, splitPay = false){
+  const serviceFeeTotal = legacyTotalServiceFee(total, feeRate);
+  const maxMo = legacyMaxMonths(total, feeRate, splitPay);
+  const minMo = legacyMinMonths();
+  const targets = [csMp, ldMp].filter(v => v && v > 0);
+  if(!targets.length) return Math.max(minMo, Math.min(maxMo, 36));
+
+  const monthlyFees = legacyMonthlyAdminFees(splitPay);
+  const target = Math.min(...targets);
+  const denominator = Math.max(1, target - monthlyFees);
+  const ideal = Math.round(serviceFeeTotal / denominator);
+
+  return legacyClampMonths(total, feeRate, ideal, splitPay);
 }
 const LEGACY_REJECT_RULES=[
-  {n:["American Recovery Systems"],s:"rej",r:"Legacy Capital Services list: Collateral Recovery."},
-  {n:["Aqua Finance"],s:"rej",r:"Legacy Capital Services list: Lending / Financing company."},
-  {n:["Arrowhead Advance"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Big Picture Loans"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Birch Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Bison Cash"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Blue Mountain Loan"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Bonneville Collection"],s:"rej",r:"Legacy Capital Services list: Standard collection agency / Debt recovery firm."},
-  {n:["Boost Credit"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Bright Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["BX Omni"],s:"rej",r:"Legacy Capital Services list: Unknown / ambiguous."},
-  {n:["Clear Air Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Climb Loans"],s:"rej",r:"Legacy Capital Services list: Student Loans."},
-  {n:["Crane Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Credit 9"],s:"rej",r:"Legacy Capital Services list: Likely consumer credit / lending."},
-  {n:["Credit Cube"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["E Loan Warehouse"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Eagle Wing Funds"],s:"rej",r:"Legacy Capital Services list: Possibly investment / lending fund."},
-  {n:["Elective Group USA (this is a federal student loan provider)"],s:"rej",r:"Legacy Capital Services list: Student / educational loan / financing."},
-  {n:["Eloan Warehouse"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Equity Sales Finance"],s:"rej",r:"Legacy Capital Services list: Asset finance / sales financing."},
-  {n:["Express Cash Flow"],s:"rej",r:"Legacy Capital Services list: Must be 3rd party or not part of colleterial, business or commercial debt."},
-  {n:["Figure Tech/Figure Lending"],s:"rej",r:"Legacy Capital Services list: Not accepted by Legacy Capital Services.."},
-  {n:["Fineday Funds"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["GoodLeap LLC (Does business as Goodleap Solar)"],s:"rej",r:"Legacy Capital Services list: Fintech / clean energy finance / Solar."},
-  {n:["Green Arrow Loans"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Greenline"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Greensky"],s:"rej",r:"Legacy Capital Services list: Per Legal."},
-  {n:["Hollis Cobb"],s:"rej",r:"Legacy Capital Services list: possibly collection / finance."},
-  {n:["Home Equity Line of Credit"],s:"rej",r:"Legacy Capital Services list: Not accepted by Legacy Capital Services.."},
-  {n:["Kadikorn Bank"],s:"rej",r:"Legacy Capital Services list: Bank / financial institution."},
-  {n:["Lendumo"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Level Up Funding"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["LIGHTSTREAM"],s:"rej",r:"Legacy Capital Services list: Home Improvement, Auto, Debt Consolidation, Recreation, Adoption, education, etc.)."},
-  {n:["Little Lake Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Loan At Last"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Lookout Credit Union"],s:"rej",r:"Legacy Capital Services list: Credit union / cooperative financial institution."},
-  {n:["Makwa Finance"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Makwa Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Mariner Finance"],s:"rej",r:"Legacy Capital Services list: Installment Loans."},
-  {n:["Maxlend"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Merit Financial Trust (Tribal Loans)"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Military Star"],s:"rej",r:"Legacy Capital Services list: Government-backed loans."},
-  {n:["Minto Money"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["MobiLoans LLC (Tribal Loan Company)"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["My QuickWallet"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["NCR Finance"],s:"rej",r:"Legacy Capital Services list: Finance company / lender."},
-  {n:["Night Wings Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Opici Funds LLC"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Post Lake Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Premier Loan Solutions"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Reach Financial"],s:"rej",r:"Legacy Capital Services list: Personal / small-dollar / consumer finance."},
-  {n:["Rise Up Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["River Valley Loans"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Sallie Mae Loans"],s:"rej",r:"Legacy Capital Services list: Education / student lending."},
-  {n:["Same Day Credit"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["SBA Loans"],s:"rej",r:"Legacy Capital Services list: Government-backed small business loans."},
-  {n:["Simple Fast Loans"],s:"rej",r:"Legacy Capital Services list: Payday / quick consumer lending."},
-  {n:["Snap On Credit"],s:"rej",r:"Legacy Capital Services list: Secured Loans only."},
-  {n:["Spotloan"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Sunbelt Federal Credit Union (Sunbelt FCU)"],s:"rej",r:"Legacy Capital Services list: Credit union / cooperative bank."},
-  {n:["Three Sticks Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Today Cash"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Tule Lake Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Uprova"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Versara Lending"],s:"rej",r:"Legacy Capital Services list: Consolidation/Negotiation."},
-  {n:["White Pine Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Willow Lake Lending"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["WithU Loans"],s:"rej",r:"Legacy Capital Services list: Tribal."},
-  {n:["Write St. Education Leins"],s:"rej",r:"Legacy Capital Services list: Educational lender / student finance / lien recording in education."},
-  {n:["Yendo"],s:"rej",r:"Legacy Capital Services list: Not accepted by Legacy Capital Services.."},
-  {n:["ZipLoan (AKA Zuntafi)"],s:"rej",r:"Legacy Capital Services list: Student / consumer loan origination & servicing."},
-  {n:["Zuntafi (AKA ZipLoan)"],s:"rej",r:"Legacy Capital Services list: Student / consumer loan origination & servicing."}
+  {n:["American Recovery Systems"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Collateral Recovery."},
+  {n:["Aqua Finance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Lending / Financing company."},
+  {n:["Arrowhead Advance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Big Picture Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Birch Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Bison Cash"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Blue Mountain Loan"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Bonneville Collection"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Standard collection agency / Debt recovery firm."},
+  {n:["Boost Credit"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Bright Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["BX Omni"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Unknown / ambiguous."},
+  {n:["Clear Air Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Climb Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Student Loans."},
+  {n:["Crane Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Credit 9"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Likely consumer credit / lending."},
+  {n:["Credit Cube"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["E Loan Warehouse"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Eagle Wing Funds"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Possibly investment / lending fund."},
+  {n:["Elective Group USA (this is a federal student loan provider)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Student / educational loan / financing."},
+  {n:["Eloan Warehouse"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Equity Sales Finance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Asset finance / sales financing."},
+  {n:["Express Cash Flow"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Must be 3rd party or not part of colleterial, business or commercial debt."},
+  {n:["Figure Tech/Figure Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Not accepted by Legacy / Elite Legal Practice (ELP).."},
+  {n:["Fineday Funds"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["GoodLeap LLC (Does business as Goodleap Solar)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Fintech / clean energy finance / Solar."},
+  {n:["Green Arrow Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Greenline"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Greensky"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Per Legal."},
+  {n:["Hollis Cobb"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: possibly collection / finance."},
+  {n:["Home Equity Line of Credit"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Not accepted by Legacy / Elite Legal Practice (ELP).."},
+  {n:["Kadikorn Bank"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Bank / financial institution."},
+  {n:["Lendumo"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Level Up Funding"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["LIGHTSTREAM"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Home Improvement, Auto, Debt Consolidation, Recreation, Adoption, education, etc.)."},
+  {n:["Little Lake Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Loan At Last"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Lookout Credit Union"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Credit union / cooperative financial institution."},
+  {n:["Makwa Finance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Makwa Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Mariner Finance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Installment Loans."},
+  {n:["Maxlend"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Merit Financial Trust (Tribal Loans)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Military Star"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Government-backed loans."},
+  {n:["Minto Money"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["MobiLoans LLC (Tribal Loan Company)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["My QuickWallet"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["NCR Finance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Finance company / lender."},
+  {n:["Night Wings Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Opici Funds LLC"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Post Lake Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Premier Loan Solutions"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Reach Financial"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Personal / small-dollar / consumer finance."},
+  {n:["Rise Up Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["River Valley Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Sallie Mae Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Education / student lending."},
+  {n:["Same Day Credit"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["SBA Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Government-backed small business loans."},
+  {n:["Simple Fast Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Payday / quick consumer lending."},
+  {n:["Snap On Credit"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Secured Loans only."},
+  {n:["Spotloan"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Sunbelt Federal Credit Union (Sunbelt FCU)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Credit union / cooperative bank."},
+  {n:["Three Sticks Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Today Cash"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Tule Lake Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Uprova"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Versara Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Consolidation/Negotiation."},
+  {n:["White Pine Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Willow Lake Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["WithU Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Write St. Education Leins"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Educational lender / student finance / lien recording in education."},
+  {n:["Yendo"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Not accepted by Legacy / Elite Legal Practice (ELP).."},
+  {n:["ZipLoan (AKA Zuntafi)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Student / consumer loan origination & servicing."},
+  {n:["Zuntafi (AKA ZipLoan)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Student / consumer loan origination & servicing."}
 ];
 const LEGACY_ACCEPT_RULES=[
-  {n:["3rd Party Collections"],s:"ok",r:"Legacy Capital Services accepted list: See unacceptable debt list below."},
-  {n:["ADT Alarm System"],s:"ok",r:"Legacy Capital Services accepted list: Removal of the system may be required based on its age. Create a NOTE that client is aware the system may be removed."},
-  {n:["Auto Loans (RVs/Moto/Leases//Repos/Balances)"],s:"ok",r:"Legacy Capital Services accepted list: MUST BE IN 3RD PARTY COLLECTIONS / Cannot accept deficiency loans."},
-  {n:["Back Rent"],s:"ok",r:"Legacy Capital Services accepted list: Client is no longer living in unit."},
-  {n:["Business Debts/Loans"],s:"ok",r:"Legacy Capital Services accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
-  {n:["Cash Advance"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
-  {n:["Check Cashing"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
-  {n:["Consolidation Loans"],s:"ok",r:"Legacy Capital Services accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
-  {n:["Credit Builder Loans"],s:"ok",r:"Legacy Capital Services accepted list: Add Repo Note in Sales Force."},
-  {n:["Credit Unions / Federal"],s:"ok",r:"Legacy Capital Services accepted list: Add Repo Note in Sales Force."},
-  {n:["Department Stores"],s:"ok",r:"Legacy Capital Services accepted list: Add Repo Note in Sales Force."},
-  {n:["Furniture and/or Jewelry"],s:"ok",r:"Legacy Capital Services accepted list: Add Repo Note in Sales Force."},
-  {n:["Gas Cards"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
-  {n:["Gyms / Fitness Centers"],s:"ok",r:"Legacy Capital Services accepted list: Add note, client unerstands will lose membership."},
-  {n:["Health clubs"],s:"ok",r:"Legacy Capital Services accepted list: Add note, client unerstands will lose membership."},
-  {n:["Installment Loans / Note Loans"],s:"ok",r:"Legacy Capital Services accepted list: Not Issues from Debt Settlement Company. Add Cross Collateral / Repo Note in Sales Force."},
-  {n:["Judgements"],s:"ok",r:"Legacy Capital Services accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
-  {n:["Lake Lending"],s:"ok",r:"Legacy Capital Services accepted list: Not tied to Collateral."},
-  {n:["Lawsuits"],s:"ok",r:"Legacy Capital Services accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
-  {n:["Lending Club"],s:"ok",r:"Legacy Capital Services accepted list: Not Secured to collateral and/or Not Secured to Home."},
-  {n:["Lines of Credit"],s:"ok",r:"Legacy Capital Services accepted list: Must be used like a credit card and include the first page of the statement with client and billing information."},
-  {n:["Medical Debt"],s:"ok",r:"Legacy Capital Services accepted list: Needs to provide the first page of the statement showing both client and billing details.."},
-  {n:["Merchant Cash Advance Loans"],s:"ok",r:"Legacy Capital Services accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
-  {n:["Military Credit Unions"],s:"ok",r:"Legacy Capital Services accepted list: Excludes: Military, Star, Pioneer Loans, BX Omni, and VA Loans.."},
-  {n:["Military Loans"],s:"ok",r:"Legacy Capital Services accepted list: Not endorsed by the government, noted on bottom of website."},
-  {n:["Navy Federal Credit Union"],s:"ok",r:"Legacy Capital Services accepted list: Verify they are not currently in the military, and they don't have, or have to get secret or top secret clearance. Cannot be endorsed by the government.."},
-  {n:["OMNI Financial"],s:"ok",r:"Legacy Capital Services accepted list: Military Personal Loans / Not Backed by the Government."},
-  {n:["Online Buy Now - Pay Later"],s:"ok",r:"Legacy Capital Services accepted list: Clear screenshot of balance acceptable. Check for Wage Assignment (Affirm, Afterpay, Klarna, Online Payback Programs.)."},
-  {n:["Payday Loans"],s:"ok",r:"Legacy Capital Services accepted list: Check for Wage Assignment."},
-  {n:["Personal Loans"],s:"ok",r:"Legacy Capital Services accepted list: Not Secured to collateral and/or Not Secured to Home."},
-  {n:["Signature Loans"],s:"ok",r:"Legacy Capital Services accepted list: Not Secured to collateral and/or Not Secured to Home."},
-  {n:["Summons"],s:"ok",r:"Legacy Capital Services accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
-  {n:["Timeshares"],s:"ok",r:"Legacy Capital Services accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
-  {n:["Together Loans (aka Transform Credit)"],s:"ok",r:"Legacy Capital Services accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
-  {n:["Transform Credit"],s:"ok",r:"Legacy Capital Services accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
-  {n:["Unsecured Credit Cards"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
-  {n:["Unsecured Debts"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
-  {n:["USAA Federal Savings Bank"],s:"ok",r:"Legacy Capital Services accepted list: Accepted by Legacy Capital Services.."},
-  {n:["Utility Bills"],s:"ok",r:"Legacy Capital Services accepted list: Items such as power, internet, electric, cellular, and cable require a NOTE confirming the client is aware service will be shut off.."},
-  {n:["Velocity"],s:"ok",r:"Legacy Capital Services accepted list: Acceptable 3rd party."}
+  {n:["3rd Party Collections"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: See unacceptable debt list below."},
+  {n:["ADT Alarm System"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Removal of the system may be required based on its age. Create a NOTE that client is aware the system may be removed."},
+  {n:["Auto Loans (RVs/Moto/Leases//Repos/Balances)"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS / Cannot accept deficiency loans."},
+  {n:["Back Rent"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Client is no longer living in unit."},
+  {n:["Business Debts/Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
+  {n:["Cash Advance"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
+  {n:["Check Cashing"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
+  {n:["Consolidation Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
+  {n:["Credit Builder Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
+  {n:["Credit Unions / Federal"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
+  {n:["Department Stores"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
+  {n:["Furniture and/or Jewelry"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
+  {n:["Gas Cards"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
+  {n:["Gyms / Fitness Centers"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add note, client unerstands will lose membership."},
+  {n:["Health clubs"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add note, client unerstands will lose membership."},
+  {n:["Installment Loans / Note Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not Issues from Debt Settlement Company. Add Cross Collateral / Repo Note in Sales Force."},
+  {n:["Judgements"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Lake Lending"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not tied to Collateral."},
+  {n:["Lawsuits"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Lending Club"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
+  {n:["Lines of Credit"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Must be used like a credit card and include the first page of the statement with client and billing information."},
+  {n:["Medical Debt"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Needs to provide the first page of the statement showing both client and billing details.."},
+  {n:["Merchant Cash Advance Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
+  {n:["Military Credit Unions"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Excludes: Military, Star, Pioneer Loans, BX Omni, and VA Loans.."},
+  {n:["Military Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not endorsed by the government, noted on bottom of website."},
+  {n:["Navy Federal Credit Union"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Verify they are not currently in the military, and they don't have, or have to get secret or top secret clearance. Cannot be endorsed by the government.."},
+  {n:["OMNI Financial"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Military Personal Loans / Not Backed by the Government."},
+  {n:["Online Buy Now - Pay Later"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Clear screenshot of balance acceptable. Check for Wage Assignment (Affirm, Afterpay, Klarna, Online Payback Programs.)."},
+  {n:["Payday Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Check for Wage Assignment."},
+  {n:["Personal Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
+  {n:["Signature Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
+  {n:["Summons"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Timeshares"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
+  {n:["Together Loans (aka Transform Credit)"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
+  {n:["Transform Credit"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
+  {n:["Unsecured Credit Cards"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
+  {n:["Unsecured Debts"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
+  {n:["USAA Federal Savings Bank"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
+  {n:["Utility Bills"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Items such as power, internet, electric, cellular, and cable require a NOTE confirming the client is aware service will be shut off.."},
+  {n:["Velocity"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Acceptable 3rd party."}
 ];
 const ALL_CRED_RULES=[...CRED_RULES,...LEGACY_REJECT_RULES,...LEGACY_ACCEPT_RULES];
 const LEVEL_DEBT_UNACCEPTED_LOOKUP=[
@@ -985,7 +1022,7 @@ const getLDMaxTerm=d=>d<10000?24:d<12500?30:d<15000?36:d<25000?42:d<35000?48:d<5
 const getLDMinDraft=d=>(LD_DRAFT_MINS.find(t=>d>=t.min&&(t.max===Infinity||d<=t.max))||{minPay:150}).minPay;
 function toggleAcc(bodyId,btnId){const b=$(bodyId),btn=$(btnId);if(!b||!btn)return;const open=b.classList.contains('open');b.classList.toggle('open',!open);btn.classList.toggle('open',!open);}
 let nextId=2;
-const app={sel:'',rows:[newRow(1)]};
+const app={sel:'',rows:[newRow(1)],selectedProgramRoute:''};
 function newRow(id){return{id,cred:'',amount:'',dt:'Unsecured',secured:false,collections:false,litigation:false,paid:true,bizUnprof:false};}
 function calcDN(d,apr=.24){const mp=d*.025,mr=apr/12;if(d<=0||mp<=d*mr)return{mp:0,months:0,apr,total:0};const months=Math.max(1,Math.round(Math.log(mp/(mp-d*mr))/Math.log(1+mr)));return{mp,months,apr,total:mp*months};}
 function collectFlags(rows,total,sc){
@@ -1027,40 +1064,89 @@ function chooseRoute(total,sc,flags){
   const legacyOK=legacy.status!=='BLACKOUT'&&total>=6000;
   if(total>0&&total<4000)return{route:'NO OPTION',reason:'Debt below $4,000 - no current backend matches this scenario.'};
   if(total>=4000&&total<=5999){if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt between $4,000 and $5,999 routes to Consumer Shield.'};return{route:'NO OPTION',reason:'Debt in Consumer Shield range but CS is not available for this state or scenario.'};}
-  if(total>=6000&&total<=6999){if(legacyOK)return{route:'LEGACY',reason:'Debt between $6,000 and $6,999 routes to Legacy Capital Services when state and creditor rules allow.'};if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt is in the Legacy preferred band, but Legacy is unavailable, so routing falls back to Consumer Shield.'};return{route:'NO OPTION',reason:'Debt is in the Legacy preferred band, but no backend is available for this state or scenario.'};}
-  if(total>6000&&pref==='debt_validation'){if(legacyOK)return{route:'LEGACY',reason:'Prospect wants debt validation - Legacy Capital Services is available in this state.'};if(csOK)return{route:'CONSUMER SHIELD',reason:'Prospect wants debt validation - Legacy unavailable, routing to Consumer Shield.'};return{route:'NO OPTION',reason:'Prospect wants debt validation but neither Legacy nor Consumer Shield is available.'};}
+  if(total>=6000&&total<=6999){if(legacyOK)return{route:'LEGACY',reason:'Debt between $6,000 and $6,999 routes to Legacy / Elite Legal Practice (ELP) when state and creditor rules allow.'};if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt is in the Legacy preferred band, but Legacy is unavailable, so routing falls back to Consumer Shield.'};return{route:'NO OPTION',reason:'Debt is in the Legacy preferred band, but no backend is available for this state or scenario.'};}
+  if(total>6000&&pref==='debt_validation'){if(legacyOK)return{route:'LEGACY',reason:'Prospect wants debt validation - Legacy / Elite Legal Practice (ELP) is available in this state.'};if(csOK)return{route:'CONSUMER SHIELD',reason:'Prospect wants debt validation - Legacy unavailable, routing to Consumer Shield.'};return{route:'NO OPTION',reason:'Prospect wants debt validation but neither Legacy nor Consumer Shield is available.'};}
   if(ldOK)return{route:'LEVEL',reason:ld.status==='RED'?'Best option is Level Debt under the attorney model in this state.':'Best option is Level Debt in a serviceable standard state.'};
-  if(legacyOK)return{route:'LEGACY',reason:'Level Debt not available under current routing rules - Legacy Capital Services is the next best option.'};
+  if(legacyOK)return{route:'LEGACY',reason:'Level Debt not available under current routing rules - Legacy / Elite Legal Practice (ELP) is the next best option.'};
   if(csOK)return{route:'CONSUMER SHIELD',reason:'Level Debt not available for this scenario - Consumer Shield is the fallback option.'};
   return{route:'NO OPTION',reason:'No available backend is serviceable in this state.'};
 }
 function computeScenario(){
-  const rows=app.rows.filter(r=>num(r.amount)>0);
-  const total=rows.reduce((s,r)=>s+num(r.amount),0);
-  const flags=collectFlags(rows,total,app.sel);
-  const route=chooseRoute(total,app.sel,flags);
-  const lds=getLDState(app.sel),css=getCSState(app.sel),lgs=getLegacyState(app.sel);
-  const csProg=getCsProg(total);
-  const csAvail=css.status!=='BLACKOUT'&&total>=4000&&!flags.cs.some(f=>f.includes('not accepted')||f.includes('requires at least'));
-  const ldAvail=lds.status!=='BLACKOUT'&&total>=7000;
-  const legacyAvail=lgs.status!=='BLACKOUT'&&total>=6000;
-  const feeRate=route.route==='LEVEL'?(lds.status==='RED'?.27:.25):0;
-  const dn=calcDN(total);
-  let shortest=null,recommended=null;
-if(route.route==='LEVEL'){const tc=total*.5+total*feeRate;const minDraft=getLDMinDraft(total);const mt=getLDMaxTerm(total);const maxTermForMin=minDraft>0?Math.floor(tc/minDraft):mt;const effTerm=Math.min(mt,maxTermForMin>0?maxTermForMin:mt);shortest={term:12,tc,mp:tc/12};recommended={term:effTerm,tc,mp:Math.round(tc/effTerm)};}  else if(route.route==='CONSUMER SHIELD'&&csProg){const tc=csProg.term*csProg.pay;shortest={term:csProg.term,tc,mp:csProg.pay};recommended=shortest;}
-  else if(route.route==='LEGACY'&&legacyAvail){
-    const tc=legacyTotalCost(total,legacyState.feeRate);
-    const minMo=legacyMinMonths();
-    const mo=legacyClampMonths(total,legacyState.feeRate,legacyState.months||legacyDefaultMonths(total,legacyState.feeRate,csProg?csProg.pay:0,0));
-    shortest={term:minMo,tc,mp:legacyMP(total,legacyState.feeRate,minMo)};
-    recommended={term:mo,tc,mp:legacyMP(total,legacyState.feeRate,mo)};
+  const rows = app.rows.filter(r => num(r.amount) > 0);
+  const total = rows.reduce((sum, row) => sum + num(row.amount), 0);
+  const flags = collectFlags(rows, total, app.sel);
+  const route = chooseRoute(total, app.sel, flags);
+  const lds = getLDState(app.sel), css = getCSState(app.sel), lgs = getLegacyState(app.sel);
+  const csProg = getCsProg(total);
+
+  const csAvail = css.status !== 'BLACKOUT' && total >= 4000 && !flags.cs.some(f => f.includes('not accepted') || f.includes('requires at least'));
+  const ldAvail = lds.status !== 'BLACKOUT' && total >= 7000;
+  const legacyAvail = lgs.status !== 'BLACKOUT' && total >= 6000;
+
+  const feeRate = route.route === 'LEVEL' ? (lds.status === 'RED' ? .27 : .25) : 0;
+  const dn = calcDN(total);
+  let shortest = null, recommended = null;
+
+  if(route.route === 'LEVEL'){
+    const tc = total * .5 + total * feeRate;
+    const minDraft = getLDMinDraft(total);
+    const mt = getLDMaxTerm(total);
+    const maxTermForMin = minDraft > 0 ? Math.floor(tc / minDraft) : mt;
+    const effTerm = Math.min(mt, maxTermForMin > 0 ? maxTermForMin : mt);
+    shortest = {term:12, tc, mp:tc / 12};
+    recommended = {term:effTerm, tc, mp:Math.round(tc / effTerm)};
   }
-  const activeFlags=[];
-  if(route.route==='LEVEL')activeFlags.push(...flags.ld);
-  if(rows.some(r=>normName(r.cred).includes('DISCOVER')))activeFlags.push(`Discover selected — apply Level Debt's 60% Discover exposure rule when evaluating routing.`);
-  if(route.route==='CONSUMER SHIELD'){activeFlags.push(...flags.cs);activeFlags.push(`Consumer Shield support window: ${fmtHoursInDisplayTZ(SUPP_HOURS.find(x=>x.key==='CS'))}.`);activeFlags.push('Consumer Shield uses Equifax for credit pull.');}
-  if(route.route==='NO OPTION')activeFlags.push(route.reason);
-  return{rows,total,route,dn,shortest,recommended,feeRate,lds,css,lgs,csProg,csAvail,ldAvail,legacyAvail,flags:activeFlags};
+  else if(route.route === 'CONSUMER SHIELD' && csProg){
+    const tc = csProg.term * csProg.pay;
+    shortest = {term:csProg.term, tc, mp:csProg.pay};
+    recommended = shortest;
+  }
+  else if(route.route === 'LEGACY' && legacyAvail){
+    const minMo = legacyMinMonths();
+    const defaultMo = legacyDefaultMonths(
+      total,
+      legacyState.feeRate,
+      csProg ? csProg.pay : 0,
+      ldAvail ? Math.round((total * .5 + total * (lds.status === 'RED' ? .27 : .25)) / getLDMaxTerm(total)) : 0,
+      legacyState.splitPay
+    );
+
+    const mo = legacyClampMonths(
+      total,
+      legacyState.feeRate,
+      legacyState.months || defaultMo,
+      legacyState.splitPay
+    );
+
+    const tc = legacyTotalCost(total, legacyState.feeRate, mo, legacyState.splitPay);
+
+    shortest = {
+      term: minMo,
+      tc: legacyTotalCost(total, legacyState.feeRate, minMo, legacyState.splitPay),
+      mp: legacyMP(total, legacyState.feeRate, minMo, legacyState.splitPay)
+    };
+
+    recommended = {
+      term: mo,
+      tc,
+      mp: legacyMP(total, legacyState.feeRate, mo, legacyState.splitPay)
+    };
+  }
+
+  const activeFlags = [];
+  if(route.route === 'LEVEL') activeFlags.push(...flags.ld);
+  if(rows.some(r => normName(r.cred).includes('DISCOVER'))) activeFlags.push(`Discover selected — apply Level Debt's 60% Discover exposure rule when evaluating routing.`);
+  if(route.route === 'CONSUMER SHIELD'){
+    activeFlags.push(...flags.cs);
+    activeFlags.push(`Consumer Shield support window: ${fmtHoursInDisplayTZ(SUPP_HOURS.find(x => x.key === 'CS'))}.`);
+    activeFlags.push('Consumer Shield uses Equifax for credit pull.');
+  }
+  if(route.route === 'LEGACY'){
+    activeFlags.push(`Legacy payment includes ${fmt(legacyMonthlyAdminFees(legacyState.splitPay))}/mo in admin/draft fees (${legacyState.splitPay ? '$80 maintenance + two $4 draft fees' : '$80 maintenance + one $4 draft fee'}).`);
+  }
+  if(route.route === 'NO OPTION') activeFlags.push(route.reason);
+
+  return {rows,total,route,dn,shortest,recommended,feeRate,lds,css,lgs,csProg,csAvail,ldAvail,legacyAvail,flags:activeFlags};
 }
 function rowAlerts(row,route){
   const alerts=[];
@@ -1259,13 +1345,13 @@ function renderCommCompare(c){
       <tr>
         <td style="${tdStyle}font-weight:700;">Daily Deal Bonus</td>
         <td style="${tdStyle}">3 deals in one day</td>
-        <td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td>
+        <td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">ELP</span></td>
         <td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$50 /deal</td>
       </tr>
       <tr>
         <td style="${tdLast}font-weight:700;">Daily Deal Bonus</td>
         <td style="${tdLast}">5+ deals in one day</td>
-        <td style="${tdLast}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td>
+        <td style="${tdLast}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">ELP</span></td>
         <td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$75 /deal</td>
       </tr>
     </tbody>
@@ -1276,11 +1362,11 @@ function renderCommCompare(c){
   <table style="width:100%;border-collapse:collapse;">
     ${tHead('Monthly Threshold')}
     <tbody>
-      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">8 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$300</td></tr>
-      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">12 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$600</td></tr>
-      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">17 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$1,000</td></tr>
-      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">23 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$1,500</td></tr>
-      <tr><td style="${tdLast}font-weight:700;">Monthly Volume</td><td style="${tdLast}">30+ deals/mo</td><td style="${tdLast}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">Legacy</span></td><td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$2,250</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">8 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">ELP</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$300</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">12 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">ELP</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$600</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">17 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">ELP</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$1,000</td></tr>
+      <tr><td style="${tdStyle}font-weight:700;">Monthly Volume</td><td style="${tdStyle}">23 deals/mo</td><td style="${tdStyle}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">ELP</span></td><td style="${tdStyle}font-weight:900;color:var(--g);font-size:15px;">+$1,500</td></tr>
+      <tr><td style="${tdLast}font-weight:700;">Monthly Volume</td><td style="${tdLast}">30+ deals/mo</td><td style="${tdLast}"><span class="spiff-tag cs">Consumer Shield</span> <span class="spiff-tag lg">ELP</span></td><td style="${tdLast}font-weight:900;color:var(--g);font-size:15px;">+$2,250</td></tr>
     </tbody>
   </table>`;
 
@@ -1328,7 +1414,7 @@ function logoBox(url,name){const init=name.split(' ').map(w=>w[0]).join('').slic
 function renderPanel(c){
   // Teal route badge with logo
   const rLogo=c.route.route==='LEVEL'?LD_LOGO:c.route.route==='CONSUMER SHIELD'?CS_LOGO:c.route.route==='LEGACY'?LEGACY_LOGO:'';
-  const rl=c.route.route==='LEVEL'?'Route: Level Debt':c.route.route==='CONSUMER SHIELD'?'Route: Consumer Shield':c.route.route==='LEGACY'?'Route: Legacy Capital Services':'No Route Available';
+  const rl=c.route.route==='LEVEL'?'Route: Level Debt':c.route.route==='CONSUMER SHIELD'?'Route: Consumer Shield':c.route.route==='LEGACY'?'Route: Elite Legal Practice (ELP)':'No Route Available';
   const bc=c.route.route==='LEVEL'?'rb-ld':c.route.route==='CONSUMER SHIELD'?'rb-cs':c.route.route==='LEGACY'?'rb-lg':'rb-no';
   const badgeBg=c.route.route==='LEVEL'?'linear-gradient(135deg,#0f9d8a,#0b7d6e)':c.route.route==='CONSUMER SHIELD'?'linear-gradient(135deg,#0f2a5e,#1a3a8f,#1e52c4)':c.route.route==='LEGACY'?'linear-gradient(135deg,#7f1d1d,#6d28d9,#2563eb)':'';
   const badgeHtml=c.route.route&&c.route.route!=='NO OPTION'
@@ -1341,7 +1427,7 @@ function renderPanel(c){
   const providers=[
     {name:'Level Debt',logo:LD_LOGO,avail:c.ldAvail,best:c.route.route==='LEVEL',status:c.lds.status},
     {name:'Consumer Shield',logo:CS_LOGO,avail:c.csAvail,best:c.route.route==='CONSUMER SHIELD',status:c.css.status},
-    {name:'Legacy Capital',logo:LEGACY_LOGO,avail:c.legacyAvail,best:c.route.route==='LEGACY',status:c.lgs.status},
+    {name:'Elite Legal Practice',logo:LEGACY_LOGO,avail:c.legacyAvail,best:c.route.route==='LEGACY',status:c.lgs.status},
   ];
   $('providerAvail').innerHTML=`<div class="prov-grid">${providers.map(p=>{
     const cls=p.best?'prov-best':p.avail?'prov-avail':'prov-none';
@@ -1417,16 +1503,16 @@ const mt=getLDMaxTerm(c.total),minDraft=getLDMinDraft(c.total),_ldTc=c.total*.5+
   {
     const isRec=c.route.route==='LEGACY';
     const total=c.total,feeRate=legacyState.feeRate;
-    const tc=legacyTotalCost(total,feeRate);
-    const maxMo=legacyMaxMonths(total,feeRate),minMo=legacyMinMonths();
+    const maxMo=legacyMaxMonths(total,feeRate,legacyState.splitPay),minMo=legacyMinMonths();
     const csMp=c.csProg?c.csProg.pay:0;
     const ldMp=c.ldAvail?Math.round((total*.5+total*c.feeRate)/getLDMaxTerm(total)):0;
     if(total>0 && (!legacyState._init||legacyState._initTotal!==total)){
-      legacyState.months=legacyDefaultMonths(total,feeRate,csMp,ldMp);
+      legacyState.months=legacyDefaultMonths(total,feeRate,csMp,ldMp,legacyState.splitPay);
       legacyState._init=true;legacyState._initTotal=total;
     }
-    const mo=legacyClampMonths(total,feeRate,legacyState.months||minMo);legacyState.months=mo;
-    const mp=legacyMP(total,feeRate,mo);const feeLabel=Math.round(feeRate*100);
+    const mo=legacyClampMonths(total,feeRate,legacyState.months||minMo,legacyState.splitPay);legacyState.months=mo;
+    const tc=legacyTotalCost(total,feeRate,mo,legacyState.splitPay);
+    const mp=legacyMP(total,feeRate,mo,legacyState.splitPay);const feeLabel=Math.round(feeRate*100);
     const comm=getCommForCard(c,'LEGACY');
     const cardStyle = c.legacyAvail ? '' : ' style="filter:grayscale(1);opacity:.5;"';
     cards.push(`<div class="plan-card-v pc-lg${isRec?' rec':''}" id="legacyPlanCard"${cardStyle}>
@@ -1434,7 +1520,7 @@ const mt=getLDMaxTerm(c.total),minDraft=getLDMinDraft(c.total),_ldTc=c.total*.5+
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="logo-sm"><img src="${LEGACY_LOGO}" alt="Legacy" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-size:8px;font-weight:800;color:#6d28d9;\'>LCS</span>';"/></div>
-            <div><span style="font-size:14px;font-weight:900;">Legacy Capital Services</span></div>
+            <div><span style="font-size:14px;font-weight:900;">Legacy / Elite Legal Practice (ELP)</span></div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class="plan-chip-rec">Recommended</span>':(c.legacyAvail?'<span class="plan-chip-check">✓</span>':'')}</div>
         </div>
@@ -1454,18 +1540,36 @@ const mt=getLDMaxTerm(c.total),minDraft=getLDMinDraft(c.total),_ldTc=c.total*.5+
           <input type="range" class="rng-p" min="35" max="49" value="${feeLabel}" step="1" oninput="updateLegacyCalc(this.value,null)" ${c.legacyAvail?'':'disabled'}>
           <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>35% (most affordable)</span><span>49% (max)</span></div>
         </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 12px 0;padding:10px 12px;border:1.5px solid ${legacyState.splitPay?'rgba(109,40,217,.45)':'var(--br)'};border-radius:12px;background:${legacyState.splitPay?'linear-gradient(135deg,rgba(109,40,217,.13),rgba(15,157,138,.06))':'#fff'};box-shadow:${legacyState.splitPay?'0 6px 18px rgba(109,40,217,.12)':'none'};">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:999px;background:${legacyState.splitPay?'#6d28d9':'#e2e8f0'};color:${legacyState.splitPay?'#fff':'#64748b'};font-size:12px;font-weight:900;flex-shrink:0;">⇄</span>
+            <div>
+              <div style="font-size:12px;font-weight:900;color:${legacyState.splitPay?'#6d28d9':'#334155'};line-height:1.2;">Split Pay</div>
+              <div style="font-size:10px;color:#64748b;font-weight:700;margin-top:2px;">Two monthly drafts instead of one</div>
+            </div>
+            <div class="ttp" style="margin-left:2px;">
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:999px;background:#e2e8f0;color:#475569;font-size:11px;font-weight:900;cursor:help;">?</span>
+              <div class="ttp-body">Monthly cost includes:<br>$80 maintenance fee<br>$4 draft fee per transaction<br><br>Standard: 1 draft = $84/month<br>Split Pay: 2 drafts = $88/month</div>
+            </div>
+          </div>
+          <label style="position:relative;display:inline-flex;align-items:center;width:48px;height:26px;flex-shrink:0;cursor:${c.legacyAvail?'pointer':'not-allowed'};opacity:${c.legacyAvail?'1':'.45'};">
+            <input type="checkbox" ${legacyState.splitPay?'checked':''} onchange="updateLegacyCalc(null,null,this.checked)" ${c.legacyAvail?'':'disabled'} style="opacity:0;width:0;height:0;position:absolute;" />
+            <span style="position:absolute;inset:0;border-radius:999px;background:${legacyState.splitPay?'linear-gradient(135deg,#6d28d9,#0f9d8a)':'#cbd5e1'};transition:.18s;box-shadow:inset 0 1px 3px rgba(15,23,42,.18);"></span>
+            <span style="position:absolute;top:3px;left:${legacyState.splitPay?'25px':'3px'};width:20px;height:20px;border-radius:999px;background:#fff;box-shadow:0 2px 6px rgba(15,23,42,.25);transition:.18s;"></span>
+          </label>
+        </div>
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:11px;font-weight:700;color:#334155;">Program Length</span><span style="font-size:11px;font-weight:800;color:#6d28d9;">${mo} mo &rarr; ${fmt(mp)}/mo</span></div>
           <input type="range" class="rng-p" min="${minMo}" max="${maxMo}" value="${mo}" step="1" oninput="updateLegacyCalc(null,this.value)" ${c.legacyAvail?'':'disabled'}>
-          <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>${minMo} mo (${fmt(Math.round(tc/Math.max(minMo,1)))}/mo)</span><span>${maxMo} mo ($250/mo min)</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:1px;"><span>${minMo} mo (${fmt(legacyMP(total,feeRate,minMo,legacyState.splitPay))}/mo)</span><span>${maxMo} mo ($250/mo min)</span></div>
         </div>
-        ${!c.legacyAvail?'<div style="background:#f8fafc;border:1px solid var(--br);border-radius:8px;padding:6px 10px;font-size:11px;color:#64748b;font-weight:700;margin-top:8px;">Legacy is unavailable for this state or debt range.</div>':(mp<250?'<div style="background:#fef2f2;border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 10px;font-size:11px;color:#b91c1c;font-weight:700;margin-top:8px;">&#9888; Below $250 minimum — increase fee or shorten program.</div>':'')}
+        ${!c.legacyAvail?'<div style="background:#f8fafc;border:1px solid var(--br);border-radius:8px;padding:6px 10px;font-size:11px;color:#64748b;font-weight:700;margin-top:8px;">Elite Legal Practice (ELP) is unavailable for this state or debt range.</div>':(mp<250?'<div style="background:#fef2f2;border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 10px;font-size:11px;color:#b91c1c;font-weight:700;margin-top:8px;">&#9888; Below $250 minimum — increase fee or shorten program.</div>':'')}
       </div>
     </div>`);
   }
 
   $('planCards').innerHTML=cards.length?cards.join(''):`<div style="grid-column:1/-1;border:1px solid rgba(239,68,68,.3);background:#fef2f2;color:#b91c1c;border-radius:12px;padding:14px;font-weight:700;">No program options available for this state and debt scenario.</div>`;
-  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:12px;overflow:hidden;"><div style="background:var(--dk);padding:11px 16px;font-size:13px;font-weight:800;color:#fff;">How the Programs Differ</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Legacy Capital Services</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$6,000+</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Service Fee</td><td style="padding:10px 14px;">Fixed by program tier</td><td style="padding:10px 14px;">25–27% of enrolled</td><td style="padding:10px 14px;">Adjustable 35–49%</td></tr></tbody></table></div></div>`;
+  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:12px;overflow:hidden;"><div style="background:var(--dk);padding:11px 16px;font-size:13px;font-weight:800;color:#fff;">How the Programs Differ</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Legacy / Elite Legal Practice (ELP)</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$6,000+</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Service Fee</td><td style="padding:10px 14px;">Fixed by program tier</td><td style="padding:10px 14px;">25–27% of enrolled</td><td style="padding:10px 14px;">Adjustable 35–49%</td></tr></tbody></table></div></div>`;
 }
 
 function renderLDCard(c){
@@ -1486,9 +1590,10 @@ function renderLegacyCard(c){
   card.style.display='block';
   const total=c.total;
   const feeRate=legacyState.feeRate;
-  const tc=legacyTotalCost(total,feeRate);
-  const mo=legacyState.months;
-  const mp=Math.round(tc/mo);
+  const mo=legacyClampMonths(total,feeRate,legacyState.months||legacyDefaultMonths(total,feeRate,c.csProg?c.csProg.pay:0,c.ldAvail?Math.round((total*.5+total*c.feeRate)/getLDMaxTerm(total)):0,legacyState.splitPay),legacyState.splitPay);
+  legacyState.months=mo;
+  const tc=legacyTotalCost(total,feeRate,mo,legacyState.splitPay);
+  const mp=legacyMP(total,feeRate,mo,legacyState.splitPay);
   const feeLabel=Math.round(feeRate*100);
   const band=getLegacyComm(total);
   const activeBand=band;
@@ -1514,7 +1619,7 @@ function renderLegacyCard(c){
       <div style="font-size:12px;color:#334155;line-height:1.8;margin-top:14px;">
         <div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Program Explanation</div>
         <ul style="padding-left:18px;display:grid;gap:6px;">
-          <li>Legacy is a legal debt dispute and resolution program that works through a consumer-rights law-firm model rather than a traditional loan structure.</li>
+          <li>Elite Legal Practice (ELP) is a legal debt dispute and resolution program that works through a consumer-rights law-firm model rather than a traditional loan structure.</li>
           <li>The program challenges creditor, collector, and credit-reporting records for accuracy and compliance using federal and state consumer-protection laws.</li>
           <li>Clients receive legal representation and can direct creditor contact back to the law firm after enrollment.</li>
           <li>The fees pay for legal services and representation, not for direct creditor payoff, and the program is not a loan.</li>
@@ -1530,8 +1635,8 @@ function renderLegacyCard(c){
   // Band grid
   $('legacyBandGrid').innerHTML=LEGACY_COMM.map(b=>{
     const isAct=activeBand&&b.code===activeBand.code;
-    const bTc=legacyTotalCost(total>0?total:b.min,feeRate);
-    const bMp=total>0?Math.round(bTc/mo):0;
+    const bTc=legacyTotalCost(total>0?total:b.min,feeRate,mo,legacyState.splitPay);
+    const bMp=total>0?legacyMP(total,feeRate,mo,legacyState.splitPay):0;
     return `<div class="lc-tile${isAct?' lc-act':''}">
       <div style="font-size:12px;font-weight:800;color:${isAct?'#6d28d9':'#64748b'};">Band ${b.code}</div>
       <div style="font-size:9px;color:#94a3b8;margin-top:1px;">$${b.min.toLocaleString()}${b.max===Infinity?'+':'–$'+b.max.toLocaleString()}</div>
@@ -1542,27 +1647,81 @@ function renderLegacyCard(c){
     </div>`;
   }).join('');
 }
+
+const PUBLIC_PROGRAM_NAMES={LEVEL:'Debt Settlement','CONSUMER SHIELD':'Debt Validation',LEGACY:'Debt Waiver'};
+const INTERNAL_PROGRAM_NAMES={LEVEL:'Level Debt', 'CONSUMER SHIELD':'Consumer Shield', LEGACY:'Legacy / Elite Legal Practice (ELP)'};
+function publicProgramName(route){return PUBLIC_PROGRAM_NAMES[route]||'Recommended Program';}
+function internalProgramName(route){return INTERNAL_PROGRAM_NAMES[route]||'Recommended Program';}
+function programRouteAvailable(c,route){
+  if(route==='LEVEL')return !!c.ldAvail;
+  if(route==='CONSUMER SHIELD')return !!(c.csAvail&&c.csProg);
+  if(route==='LEGACY')return !!c.legacyAvail;
+  return false;
+}
+function selectableProgramRoutes(c){return ['LEVEL','CONSUMER SHIELD','LEGACY'].filter(r=>programRouteAvailable(c,r));}
+function selectedProgramRoute(c){
+  const routes=selectableProgramRoutes(c);
+  if(app.selectedProgramRoute&&routes.includes(app.selectedProgramRoute))return app.selectedProgramRoute;
+  if(c.route&&c.route.route&&routes.includes(c.route.route))return c.route.route;
+  return routes[0]||'';
+}
+function programEstimate(c,route){
+  const total=c.total||0;
+  if(route==='LEVEL'&&c.ldAvail){
+    const rate=c.lds&&c.lds.status==='RED'?.27:.25;
+    const tc=total*.5+total*rate;
+    const minDraft=getLDMinDraft(total);
+    const mt=getLDMaxTerm(total);
+    const maxTermForMin=minDraft>0?Math.floor(tc/minDraft):mt;
+    const effTerm=Math.min(mt,maxTermForMin>0?maxTermForMin:mt);
+    return {route,term:effTerm,tc,mp:Math.round(tc/Math.max(1,effTerm)),shortest:{term:12,tc,mp:tc/12},serviceFeePct:Math.round(rate*100)};
+  }
+  if(route==='CONSUMER SHIELD'&&c.csAvail&&c.csProg){
+    const tc=c.csProg.term*c.csProg.pay;
+    return {route,term:c.csProg.term,tc,mp:c.csProg.pay,shortest:{term:c.csProg.term,tc,mp:c.csProg.pay},csProgramLabel:`Program ${c.csProg.k}`};
+  }
+  if(route==='LEGACY'&&c.legacyAvail){
+    const mo=legacyClampMonths(total,legacyState.feeRate,legacyState.months||legacyDefaultMonths(total,legacyState.feeRate,c.csProg?c.csProg.pay:0,c.ldAvail?Math.round((total*.5+total*(c.lds&&c.lds.status==='RED'?.27:.25))/getLDMaxTerm(total)):0,legacyState.splitPay),legacyState.splitPay);
+    const tc=legacyTotalCost(total,legacyState.feeRate,mo,legacyState.splitPay);
+    return {route,term:mo,tc,mp:legacyMP(total,legacyState.feeRate,mo,legacyState.splitPay),shortest:{term:legacyMinMonths(),tc:legacyTotalCost(total,legacyState.feeRate,legacyMinMonths(),legacyState.splitPay),mp:legacyMP(total,legacyState.feeRate,legacyMinMonths(),legacyState.splitPay)},serviceFeePct:Math.round((legacyState.feeRate||0)*100),splitPay:!!legacyState.splitPay,monthlyAdminFees:legacyMonthlyAdminFees(legacyState.splitPay)};
+  }
+  return null;
+}
+function renderProgramChoice(c){
+  const box=$('programChoiceBox');if(!box)return;
+  const routes=selectableProgramRoutes(c);
+  if(!routes.length){box.style.display='none';box.innerHTML='';return;}
+  const sel=selectedProgramRoute(c);
+  box.style.display='block';
+  box.innerHTML=`<div style="display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:12px;align-items:center;">
+    <div><label style="display:block;font-size:11px;font-weight:900;color:#334155;text-transform:uppercase;letter-spacing:.45px;margin-bottom:6px;">Agent-selected prospect program</label>
+      <select id="selectedProgramRoute" class="fi" style="font-size:13px;">${routes.map(r=>`<option value="${r}" ${r===sel?'selected':''}>${publicProgramName(r)}</option>`).join('')}</select></div>
+    <div style="font-size:12px;color:#64748b;font-weight:600;line-height:1.55;">This controls the Recommended Program column and Prospect Delivery. Public pages/emails show the program type only — not the servicing company name.</div>
+  </div>`;
+  const dd=$('selectedProgramRoute');
+  if(dd)dd.onchange=()=>{app.selectedProgramRoute=dd.value;render();};
+}
+
 function renderCmpTable(c){
   const hdrLogo=$('recommendedProgramLogo'),hdrText=$('recommendedProgramHeader');
-  const recName=c.route.route==='LEVEL'?'Level Debt':c.route.route==='CONSUMER SHIELD'?'Consumer Shield':c.route.route==='LEGACY'?'Legacy Capital Services':'Recommended Program';
-  const recLogo=c.route.route==='LEVEL'?LD_LOGO:c.route.route==='CONSUMER SHIELD'?CS_LOGO:c.route.route==='LEGACY'?LEGACY_LOGO:'';
+  const selRoute=selectedProgramRoute(c);
+  const est=programEstimate(c,selRoute);
+  const recName=publicProgramName(selRoute);
   if(hdrText)hdrText.textContent=recName;
-  if(hdrLogo){if(recLogo){hdrLogo.src=recLogo;hdrLogo.alt=recName;hdrLogo.style.display='inline-block';hdrLogo.onerror=()=>{hdrLogo.style.display='none';};}else{hdrLogo.style.display='none';}}
+  if(hdrLogo){hdrLogo.style.display='none';hdrLogo.removeAttribute('src');hdrLogo.alt='';}
   let recMonthly='&mdash;',recMonths='&mdash;',recTotal='&mdash;',recSavings='&mdash;';
-  if((c.route.route==='LEVEL'||c.route.route==='CONSUMER SHIELD')&&c.recommended){recMonthly=fmt(c.recommended.mp);recMonths=`${c.recommended.term} months`;recTotal=fmt(c.recommended.tc);recSavings=`<strong style="font-size:15px;color:#0b7d6e;">${fmt(Math.max(0,c.dn.total-c.recommended.tc))}</strong>`;}
-  else if(c.route.route==='LEGACY'&&c.legacyAvail){
-    const tc=legacyTotalCost(c.total,legacyState.feeRate);
-    const mo=legacyState.months;
-    recMonthly=fmt(Math.round(tc/mo));recMonths=`${mo} months`;recTotal=fmt(tc);
-    recSavings=`<strong style="font-size:15px;color:#0b7d6e;">${fmt(Math.max(0,c.dn.total-tc))}</strong>`;
+  let fM='&mdash;',fMo='&mdash;',fT='&mdash;',fS='&mdash;';
+  if(est){
+    recMonthly=fmt(est.mp);recMonths=`${est.term} months`;recTotal=fmt(est.tc);
+    recSavings=`<strong style="font-size:15px;color:#0b7d6e;">${fmt(Math.max(0,c.dn.total-est.tc))}</strong>`;
+    if(est.shortest){fM=fmt(est.shortest.mp);fMo=`${est.shortest.term} months`;fT=fmt(est.shortest.tc);fS=`<strong>${fmt(Math.max(0,c.dn.total-est.shortest.tc))}</strong>`;}
   }
-  const fM=c.shortest?fmt(c.shortest.mp):'&mdash;';const fMo=c.shortest?`${c.shortest.term} months`:'&mdash;';const fT=c.shortest?fmt(c.shortest.tc):'&mdash;';const fS=c.shortest?`<strong>${fmt(Math.max(0,c.dn.total-c.shortest.tc))}</strong>`:'&mdash;';
   const mpTooltip=`<span class="tip-wrap" style="margin-left:5px;"><span style="font-size:10px;color:#93c5fd;cursor:help;border-bottom:1px dashed #93c5fd;">est.</span><span class="tip-box">This is an estimate based on the typical minimum monthly payment creditors charge — approximately 2–2.5% of the total outstanding balance. Actual minimum payments will vary by creditor, interest rate, and account status.</span></span>`;
   const rows=[
     ['Monthly Payments',`${fmt(c.dn.mp)}${mpTooltip}`,fM,recMonthly,'mp-row'],
     ['Total Enrolled Debt',fmt(c.total),fmt(c.total),fmt(c.total),''],
     ['Months to Payoff',`${c.dn.months} months`,fMo,recMonths,''],
-    ['Est. Interest Rate',`${(c.dn.apr*100).toFixed(0)}% APR`,c.shortest?'0%':'&mdash;',c.route.route==='LEGACY'?'N/A':(recTotal!=='&mdash;'?'0%':'&mdash;'),''],
+    ['Est. Interest Rate',`${(c.dn.apr*100).toFixed(0)}% APR`,est?'0%':'&mdash;',selRoute==='LEGACY'?'N/A':(recTotal!=='&mdash;'?'0%':'&mdash;'),''],
     ['Est. Total Payback',`<span style="color:var(--rd);font-weight:900;">${fmt(c.dn.total)}</span>`,fT,recTotal,''],
     ['Est. Savings vs Min Pay','&mdash;',fS,recSavings,'sv'],
   ];
@@ -1629,8 +1788,8 @@ function onAmtChange(e){const i=Number(e.target.dataset.i);if(!app.rows[i])retur
 function addRow(){if(app.rows.length>=MAX_ROWS)return;app.rows.push(newRow(nextId++));renderRows();render();}
 function removeRow(i){if(app.rows.length<=1)return;app.rows.splice(i,1);renderRows();render();}
 let lastScenario=null;
-function render(){const c=computeScenario();lastScenario=c;$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCommCompare(c);renderCSCard(c);renderLDCard(c);renderLegacyCard(c);renderPlanCards(c);renderCmpTable(c);renderClocks();const can=!!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION');['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}
-async function buildPdf(){const c=computeScenario();if(!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION'))return;const fn=$('fName').value.trim()||'Client',ln=$('lName').value.trim()||'';const fullName=`${fn} ${ln}`.trim();const{jsPDF}=window.jspdf;const doc=new jsPDF();let y=20;doc.setFontSize(20);doc.setTextColor(15,157,138);doc.text('Funding Tier - Debt Resolution Summary',14,y);y+=10;doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text(`Prepared for: ${fullName}`,14,y);y+=7;const progType=c.route.route==='LEVEL'?'Debt Settlement':c.route.route==='CONSUMER SHIELD'?'Debt Validation':c.route.route==='LEGACY'?'Attorney-Led Resolution':'Unknown';doc.text(`State: ${app.sel}  |  Program: ${progType}`,14,y);y+=10;if(c.csProg&&c.route.route==='CONSUMER SHIELD'){doc.setFontSize(12);doc.setTextColor(26,110,216);doc.text(`Consumer Shield Program ${c.csProg.k}: ${c.csProg.range}`,14,y);y+=7;doc.setFontSize(10);doc.setTextColor(71,85,105);doc.text(`Monthly: ${fmt(c.csProg.pay)}  |  Term: ${c.csProg.term} months  |  Total: ${fmt(c.csProg.term*c.csProg.pay)}`,14,y);y+=10;} if(c.route.route==='LEGACY'&&c.recommended){doc.setFontSize(12);doc.setTextColor(109,40,217);doc.text(`Legacy Capital Services`,14,y);y+=7;doc.setFontSize(10);doc.setTextColor(71,85,105);doc.text(`Monthly: ${fmt(c.recommended.mp)}  |  Term: ${c.recommended.term} months  |  Total: ${fmt(c.recommended.tc)}`,14,y);y+=10;}const tRows=[['Monthly Payments',fmt(c.dn.mp),c.shortest?fmt(c.shortest.mp):'--',c.recommended?fmt(c.recommended.mp):'--'],['Total Debt',fmt(c.total),fmt(c.total),fmt(c.total)],['Months to Payoff',`${c.dn.months} mo`,c.shortest?`${c.shortest.term} mo`:'--',c.recommended?`${c.recommended.term} mo`:'--'],['Est. Total Payback',fmt(c.dn.total),c.shortest?fmt(c.shortest.tc):'--',c.recommended?fmt(c.recommended.tc):'--'],['Est. Savings','--',c.shortest?fmt(Math.max(0,c.dn.total-c.shortest.tc)):'--',c.recommended?fmt(Math.max(0,c.dn.total-c.recommended.tc)):'--']];const hdrs=['Detail','Current Situation','Fastest Payoff','Recommended'];const cx=[14,64,114,162];const rh=10;doc.setFillColor(241,245,249);doc.rect(14,y,182,rh,'F');doc.setFontSize(7);doc.setTextColor(51,65,85);hdrs.forEach((h,i)=>doc.text(doc.splitTextToSize(h,44),cx[i]+2,y+4));y+=14;tRows.forEach((row,ri)=>{const isSav=ri===4;if(isSav){doc.setFillColor(15,157,138);doc.rect(14,y,182,rh,'F');}else if(ri%2===1){doc.setFillColor(248,250,252);doc.rect(14,y,182,rh,'F');}row.forEach((cell,ci)=>{if(isSav){doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');}else if(ri===3&&ci===1){doc.setTextColor(239,68,68);doc.setFont(undefined,'bold');}else{doc.setTextColor(15,23,42);doc.setFont(undefined,'normal');}doc.setFontSize(8);doc.text(String(cell),cx[ci]+2,y+6);});y+=rh;});const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Funding-Tier-Debt-Resolution.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+function render(){const c=computeScenario();lastScenario=c;$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCommCompare(c);renderCSCard(c);renderLDCard(c);renderLegacyCard(c);renderPlanCards(c);renderProgramChoice(c);renderCmpTable(c);renderClocks();const can=!!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION');['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}
+async function buildPdf(){const c=computeScenario();if(!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION'))return;const fn=$('fName').value.trim()||'Client',ln=$('lName').value.trim()||'';const fullName=`${fn} ${ln}`.trim();const{jsPDF}=window.jspdf;const doc=new jsPDF();let y=20;doc.setFontSize(20);doc.setTextColor(15,157,138);doc.text('Funding Tier - Debt Resolution Summary',14,y);y+=10;doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text(`Prepared for: ${fullName}`,14,y);y+=7;const selRoute=selectedProgramRoute(c);const est=programEstimate(c,selRoute);const progType=publicProgramName(selRoute);doc.text(`State: ${app.sel}  |  Program: ${progType}`,14,y);y+=10;if(est){doc.setFontSize(12);doc.setTextColor(15,157,138);doc.text(`${progType} Program`,14,y);y+=7;doc.setFontSize(10);doc.setTextColor(71,85,105);doc.text(`Monthly: ${fmt(est.mp)}  |  Term: ${est.term} months  |  Total: ${fmt(est.tc)}`,14,y);y+=10;}const tRows=[['Monthly Payments',fmt(c.dn.mp),est&&est.shortest?fmt(est.shortest.mp):'--',est?fmt(est.mp):'--'],['Total Debt',fmt(c.total),fmt(c.total),fmt(c.total)],['Months to Payoff',`${c.dn.months} mo`,est&&est.shortest?`${est.shortest.term} mo`:'--',est?`${est.term} mo`:'--'],['Est. Total Payback',fmt(c.dn.total),est&&est.shortest?fmt(est.shortest.tc):'--',est?fmt(est.tc):'--'],['Est. Savings','--',est&&est.shortest?fmt(Math.max(0,c.dn.total-est.shortest.tc)):'--',est?fmt(Math.max(0,c.dn.total-est.tc)):'--']];const hdrs=['Detail','Current Situation','Fastest Payoff','Recommended'];const cx=[14,64,114,162];const rh=10;doc.setFillColor(241,245,249);doc.rect(14,y,182,rh,'F');doc.setFontSize(7);doc.setTextColor(51,65,85);hdrs.forEach((h,i)=>doc.text(doc.splitTextToSize(h,44),cx[i]+2,y+4));y+=14;tRows.forEach((row,ri)=>{const isSav=ri===4;if(isSav){doc.setFillColor(15,157,138);doc.rect(14,y,182,rh,'F');}else if(ri%2===1){doc.setFillColor(248,250,252);doc.rect(14,y,182,rh,'F');}row.forEach((cell,ci)=>{if(isSav){doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');}else if(ri===3&&ci===1){doc.setTextColor(239,68,68);doc.setFont(undefined,'bold');}else{doc.setTextColor(15,23,42);doc.setFont(undefined,'normal');}doc.setFontSize(8);doc.text(String(cell),cx[ci]+2,y+6);});y+=rh;});const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Funding-Tier-Debt-Resolution.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
 function showSendModal(){
   const c=computeScenario();
   const email=$('pEmail').value.trim();
@@ -1648,7 +1807,7 @@ async function sendEmailConfirmed(){
   const email=$('pEmail').value.trim();
   const btn=$('sendBtn');const orig=btn.textContent;btn.disabled=true;btn.textContent='Sending…';
   try{
-    const payload={firstName:$('fName').value.trim()||'Prospect',lastName:$('lName').value.trim()||'',email,state:app.sel,totalDebt:Math.round(c.total),doNothing:{monthlyPayment:Math.round(c.dn.mp),monthsToPayoff:Math.round(c.dn.months),totalPayback:Math.round(c.dn.total),apr:c.dn.apr},shortest:c.shortest?{term:c.shortest.term,monthlyPayment:Math.round(c.shortest.mp),totalCost:Math.round(c.shortest.tc)}:{},recommended:{term:c.recommended.term,monthlyPayment:Math.round(c.recommended.mp),totalCost:Math.round(c.recommended.tc)},route:c.route.route,routeReason:c.route.reason,csProgramLabel:c.csProg?`Program ${c.csProg.k}`:'',rows:app.rows.filter(r=>num(r.amount)>0).map(r=>({creditorName:r.cred,amount:Math.round(num(r.amount)),debtType:r.dt,isSecured:!!r.secured,inCollections:!!r.collections,inLitigation:!!r.litigation,paymentMade:!!r.paid,businessUnprofitable:!!r.bizUnprof}))};
+    const payload={firstName:$('fName').value.trim()||'Prospect',lastName:$('lName').value.trim()||'',email,state:app.sel,totalDebt:Math.round(c.total),doNothing:{monthlyPayment:Math.round(c.dn.mp),monthsToPayoff:Math.round(c.dn.months),totalPayback:Math.round(c.dn.total),apr:c.dn.apr},shortest:c.shortest?{term:c.shortest.term,monthlyPayment:Math.round(c.shortest.mp),totalCost:Math.round(c.shortest.tc)}:{},recommended:{term:c.recommended.term,monthlyPayment:Math.round(c.recommended.mp),totalCost:Math.round(c.recommended.tc)},route:publicProgramName(selectedProgramRoute(c)),selectedProgramRoute:publicProgramName(selectedProgramRoute(c)),programType:publicProgramName(selectedProgramRoute(c)),routeReason:c.route.reason,csProgramLabel:c.csProg?`Program ${c.csProg.k}`:'',rows:app.rows.filter(r=>num(r.amount)>0).map(r=>({creditorName:r.cred,amount:Math.round(num(r.amount)),debtType:r.dt,isSecured:!!r.secured,inCollections:!!r.collections,inLitigation:!!r.litigation,paymentMade:!!r.paid,businessUnprofitable:!!r.bizUnprof}))};
     const res=await fetch('/api/generate-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const data=await res.json();
     if(!res.ok||!data.ok)throw new Error(data.error||'Server returned an error. Check that your backend is running.');
@@ -1688,13 +1847,14 @@ async function generateUrlOnly(){
   finally{if(btn){btn.disabled=false;btn.textContent=orig;}}
 }
 
-function updateLegacyCalc(newFee,newMo){
+function updateLegacyCalc(newFee,newMo,newSplitPay){
   if(!lastScenario||!lastScenario.legacyAvail)return;
   const total=lastScenario.total;
+  if(newSplitPay!==undefined&&newSplitPay!==null)legacyState.splitPay=!!newSplitPay;
   if(newFee!==undefined&&newFee!==null&&newFee!=='')legacyState.feeRate=parseFloat(newFee)/100;
   legacyState.feeRate=Math.max(0.35,Math.min(0.49,legacyState.feeRate||0.40));
-  if(newMo!==undefined&&newMo!==null&&newMo!=='')legacyState.months=legacyClampMonths(total,legacyState.feeRate,newMo);
-  else legacyState.months=legacyClampMonths(total,legacyState.feeRate,legacyState.months||legacyDefaultMonths(total,legacyState.feeRate, lastScenario.csProg?lastScenario.csProg.pay:0, lastScenario.ldAvail?Math.round((total*.5+total*lastScenario.feeRate)/getLDMaxTerm(total)):0));
+  if(newMo!==undefined&&newMo!==null&&newMo!=='')legacyState.months=legacyClampMonths(total,legacyState.feeRate,newMo,legacyState.splitPay);
+  else legacyState.months=legacyClampMonths(total,legacyState.feeRate,legacyState.months||legacyDefaultMonths(total,legacyState.feeRate, lastScenario.csProg?lastScenario.csProg.pay:0, lastScenario.ldAvail?Math.round((total*.5+total*lastScenario.feeRate)/getLDMaxTerm(total)):0,legacyState.splitPay),legacyState.splitPay);
   legacyState._init=true;
   legacyState._initTotal=total;
   renderPlanCards(lastScenario);
@@ -1704,7 +1864,7 @@ function updateLegacyCalc(newFee,newMo){
 }
 
 let _lastPlanUrl=null,_lastPlanKey=null;
-function _prospectKey(){return [$('fName').value.trim(),$('lName').value.trim(),$('pEmail').value.trim(),app.sel||''].join('|').toLowerCase();}
+function _prospectKey(){return [$('fName').value.trim(),$('lName').value.trim(),$('pEmail').value.trim(),app.sel||'',app.selectedProgramRoute||''].join('|').toLowerCase();}
 function _modalShow(viewId){['modalConfirmView','modalSendingView','modalSuccessView','modalErrorView'].forEach(id=>{const el=$(id);if(el)el.style.display=id===viewId?'block':'none';});const m=$('sendModal');if(m)m.style.display='flex';}
 function _progressTo(pct,label){const p=$('modalProgress'),l=$('modalProgressLabel');if(p)p.style.width=pct+'%';if(l)l.textContent=label||'';}
 function _showSuccessModal(pageUrl,email){const se=$('modalSuccessEmail');if(se)se.textContent=email&&email!=='(no email)'?'Sent to '+email:'Plan URL generated';const ur=$('modalUrlRow'),ui=$('modalUrlInput'),ul=$('modalUrlLink');if(pageUrl&&ur&&ui&&ul){ui.value=pageUrl;ul.href=pageUrl;ur.style.display='block';}_modalShow('modalSuccessView');}
@@ -1724,13 +1884,21 @@ function buildFullPayload(sendEmail){
   const c=computeScenario();
   const email=$('pEmail').value.trim();
   const total=Math.round(c.total||0);
-  const legacyTotal=c.route.route==='LEGACY' || c.legacyAvail ? legacyTotalCost(total,legacyState.feeRate) : 0;
-  const legacyMonths=c.legacyAvail ? legacyClampMonths(total,legacyState.feeRate,legacyState.months||36) : null;
-  const recommended=c.route.route==='LEGACY'
-    ? {term:legacyMonths,monthlyPayment:legacyMP(total,legacyState.feeRate,legacyMonths),totalCost:legacyTotal,serviceFeePct:Math.round((legacyState.feeRate||0)*100)}
-    : c.recommended
-      ? {term:c.recommended.term,monthlyPayment:Math.round(c.recommended.mp),totalCost:Math.round(c.recommended.tc),serviceFeePct:c.route.route==='LEVEL'?Math.round((c.feeRate||0)*100):undefined}
-      : null;
+  const selRoute=selectedProgramRoute(c);
+  const est=programEstimate(c,selRoute);
+  const legacyMonths=c.legacyAvail ? legacyClampMonths(total,legacyState.feeRate,legacyState.months||36,legacyState.splitPay) : null;
+  const legacyTotal=c.legacyAvail ? legacyTotalCost(total,legacyState.feeRate,legacyMonths||36,legacyState.splitPay) : 0;
+  const recommended=est?{
+    term:est.term,
+    monthlyPayment:Math.round(est.mp),
+    totalCost:Math.round(est.tc),
+    programType:publicProgramName(selRoute),
+    publicProgramName:publicProgramName(selRoute),
+    route:publicProgramName(selRoute),
+    serviceFeePct:est.serviceFeePct,
+    splitPay:!!est.splitPay,
+    monthlyAdminFees:est.monthlyAdminFees
+  }:null;
   return {
     firstName:$('fName').value.trim()||'Prospect',
     lastName:$('lName').value.trim()||'',
@@ -1749,17 +1917,22 @@ function buildFullPayload(sendEmail){
     deliverPdfToEmail:!!sendEmail,
     deliveryMode:sendEmail?'email_and_pdf':'url_only',
     doNothing:{monthlyPayment:Math.round(c.dn.mp),monthsToPayoff:Math.round(c.dn.months),totalPayback:Math.round(c.dn.total),apr:c.dn.apr},
-    shortest:c.shortest?{term:c.shortest.term,monthlyPayment:Math.round(c.shortest.mp),totalCost:Math.round(c.shortest.tc)}:null,
+    shortest:est&&est.shortest?{term:est.shortest.term,monthlyPayment:Math.round(est.shortest.mp),totalCost:Math.round(est.shortest.tc)}:null,
     recommended,
-    route:c.route.route,
+    route:publicProgramName(selRoute),
+    selectedProgramRoute:publicProgramName(selRoute),
+    publicProgramName:publicProgramName(selRoute),
+    programType:publicProgramName(selRoute),
     routeReason:c.route.reason,
     csProgramLabel:c.csProg?`Program ${c.csProg.k}`:'',
-    legacy:{available:!!c.legacyAvail,serviceFeePct:Math.round((legacyState.feeRate||0)*100),months:legacyMonths,monthlyPayment:legacyMonths?legacyMP(total,legacyState.feeRate,legacyMonths):null,totalCost:legacyTotal||null},
+    legacy:{available:!!c.legacyAvail,serviceFeePct:Math.round((legacyState.feeRate||0)*100),months:legacyMonths,splitPay:!!legacyState.splitPay,monthlyAdminFees:legacyMonthlyAdminFees(legacyState.splitPay),monthlyPayment:legacyMonths?legacyMP(total,legacyState.feeRate,legacyMonths,legacyState.splitPay):null,totalCost:legacyTotal||null},
     rows:app.rows.filter(r=>num(r.amount)>0).map(r=>({creditorName:r.cred,amount:Math.round(num(r.amount)),debtType:r.dt,isSecured:!!r.secured,inCollections:!!r.collections,inLitigation:!!r.litigation,paymentMade:!!r.paid,businessUnprofitable:!!r.bizUnprof})),
     emailOptions:{
       template:'prospect_program_delivery',
       attachPdf:true,
-      includePlanUrl:true
+      includePlanUrl:true,
+      publicProgramName:publicProgramName(selRoute),
+      hideServicingCompany:true
     }
   };
 }
