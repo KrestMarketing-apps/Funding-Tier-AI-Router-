@@ -108,13 +108,14 @@ ${dataBlob.url}
       contentType: 'application/pdf'
     });
 
-    return res.status(200).json({
-      ok: true,
-      slug,
-      pageUrl,
-      pdfUrl: pdfBlob.url,
-      dataUrl: dataBlob.url
-    });
+return res.status(200).json({
+  ok: true,
+  slug,
+  pageUrl,
+  pdfUrl: pdfBlob.url,
+  dataUrl: dataBlob.url,
+  route   // 👈 ADD THIS
+});
   } catch (error) {
     return res.status(500).json({
       ok: false,
