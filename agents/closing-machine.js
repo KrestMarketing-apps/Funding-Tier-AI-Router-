@@ -3,81 +3,200 @@ document.addEventListener("DOMContentLoaded", function () {
   const data = window.SCRIPTING_AND_LEAD_HANDLING;
   if (!data) return;
 
-  // Create floating button
-  const button = document.createElement("div");
-  button.innerText = "🧠 Closing Machine";
-  button.style.position = "fixed";
-  button.style.bottom = "20px";
-  button.style.right = "20px";
-  button.style.background = "#009f8d";
-  button.style.color = "#fff";
-  button.style.padding = "12px 16px";
-  button.style.borderRadius = "8px";
-  button.style.cursor = "pointer";
-  button.style.zIndex = "9999";
-  button.style.fontWeight = "bold";
-  button.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
-  document.body.appendChild(button);
+  const route = window.CURRENT_ROUTE || "LEVEL";
+  const mappedProgramKey = data.helper.mapRouteToProgram(route);
+  const programData = data.programScripts[mappedProgramKey];
 
-  // Create panel
-  const panel = document.createElement("div");
-  panel.style.position = "fixed";
-  panel.style.bottom = "80px";
-  panel.style.right = "20px";
-  panel.style.width = "400px";
-  panel.style.maxHeight = "70vh";
-  panel.style.overflowY = "auto";
-  panel.style.background = "#fff";
-  panel.style.border = "1px solid #ccc";
-  panel.style.borderRadius = "10px";
-  panel.style.padding = "16px";
-  panel.style.display = "none";
-  panel.style.zIndex = "9999";
-  panel.style.boxShadow = "0 6px 20px rgba(0,0,0,0.2)";
-  document.body.appendChild(panel);
+  /* ========================
+     CREATE MAIN CONTAINER
+  ======================== */
 
-  function renderScripts() {
-    panel.innerHTML = "";
+  const container = document.createElement("div");
+  container.style.position = "fixed";
+  container.style.bottom = "100px";
+  container.style.right = "20px";
+  container.style.width = "420px";
+  container.style.background = "#111";
+  container.style.color = "#fff";
+  container.style.borderRadius = "12px";
+  container.style.boxShadow = "0 10px 30px rgba(0,0,0,0.4)";
+  container.style.zIndex = "9999";
+  container.style.fontFamily = "Arial, sans-serif";
+  container.style.display = "none";
+  container.style.resize = "both";
+  container.style.overflow = "hidden";
 
-    const sections = [
-      { title: "Warm Transfer", obj: data.warmTransfer },
-      { title: "Lead Transitions", obj: data.leadTransitions },
-      { title: "Program Scripts", obj: data.programScripts },
-      { title: "Objections", obj: data.objections }
-    ];
+  document.body.appendChild(container);
 
-    sections.forEach(section => {
-      const header = document.createElement("h3");
-      header.innerText = section.title;
-      header.style.marginTop = "15px";
-      panel.appendChild(header);
+  /* ========================
+     HEADER (DRAGGABLE)
+  ======================== */
 
-      Object.values(section.obj).forEach(item => {
-        const box = document.createElement("div");
-        box.style.background = "#f5f5f5";
-        box.style.padding = "10px";
-        box.style.marginBottom = "10px";
-        box.style.borderRadius = "6px";
+  const header = document.createElement("div");
+  header.innerText = "🧠 AI Agent Assist";
+  header.style.padding = "14px";
+  header.style.background = "#009f8d";
+  header.style.cursor = "move";
+  header.style.fontWeight = "bold";
+  header.style.userSelect = "none";
+  container.appendChild(header);
 
-        const title = document.createElement("strong");
-        title.innerText = item.title || item.name;
-        box.appendChild(title);
+  /* ========================
+     TAB NAV
+  ======================== */
 
-        const script = document.createElement("p");
-        script.innerText = item.script;
-        script.style.whiteSpace = "pre-wrap";
-        script.style.marginTop = "6px";
-        box.appendChild(script);
+  const tabs = document.createElement("div");
+  tabs.style.display = "flex";
+  tabs.style.background = "#1a1a1a";
+  container.appendChild(tabs);
 
-        panel.appendChild(box);
-      });
+  const tabNames = ["Program", "Objections", "Warm Transfer"];
+  const content = document.createElement("div");
+  content.style.padding = "16px";
+  content.style.maxHeight = "400px";
+  content.style.overflowY = "auto";
+  container.appendChild(content);
+
+  function createCopyButton(text) {
+    const btn = document.createElement("button");
+    btn.innerText = "Copy";
+    btn.style.background = "#009f8d";
+    btn.style.color = "#fff";
+    btn.style.border = "none";
+    btn.style.padding = "6px 10px";
+    btn.style.marginTop = "8px";
+    btn.style.cursor = "pointer";
+    btn.onclick = () => navigator.clipboard.writeText(text);
+    return btn;
+  }
+
+  function renderProgram() {
+    content.innerHTML = "";
+    const title = document.createElement("h3");
+    title.innerText = programData.name;
+    content.appendChild(title);
+
+    const script = document.createElement("p");
+    script.innerText = programData.script;
+    script.style.whiteSpace = "pre-wrap";
+    content.appendChild(script);
+
+    content.appendChild(createCopyButton(programData.script));
+  }
+
+  function renderObjections() {
+    content.innerHTML = "";
+    Object.values(data.objections).forEach(obj => {
+      const box = document.createElement("div");
+      box.style.marginBottom = "15px";
+      box.style.padding = "10px";
+      box.style.background = "#222";
+      box.style.borderRadius = "8px";
+
+      const title = document.createElement("strong");
+      title.innerText = obj.title;
+      box.appendChild(title);
+
+      const script = document.createElement("p");
+      script.innerText = obj.script;
+      script.style.whiteSpace = "pre-wrap";
+      script.style.marginTop = "6px";
+      box.appendChild(script);
+
+      box.appendChild(createCopyButton(obj.script));
+
+      content.appendChild(box);
     });
   }
 
-  renderScripts();
+  function renderWarmTransfer() {
+    content.innerHTML = "";
+    Object.values(data.warmTransfer).forEach(item => {
+      const box = document.createElement("div");
+      box.style.marginBottom = "15px";
+      box.style.padding = "10px";
+      box.style.background = "#222";
+      box.style.borderRadius = "8px";
 
-  button.addEventListener("click", function () {
-    panel.style.display = panel.style.display === "none" ? "block" : "none";
+      const title = document.createElement("strong");
+      title.innerText = item.title;
+      box.appendChild(title);
+
+      const script = document.createElement("p");
+      script.innerText = item.script;
+      script.style.whiteSpace = "pre-wrap";
+      script.style.marginTop = "6px";
+      box.appendChild(script);
+
+      box.appendChild(createCopyButton(item.script));
+      content.appendChild(box);
+    });
+  }
+
+  const renderMap = {
+    "Program": renderProgram,
+    "Objections": renderObjections,
+    "Warm Transfer": renderWarmTransfer
+  };
+
+  tabNames.forEach(name => {
+    const tab = document.createElement("div");
+    tab.innerText = name;
+    tab.style.flex = "1";
+    tab.style.padding = "10px";
+    tab.style.cursor = "pointer";
+    tab.style.textAlign = "center";
+    tab.onclick = () => renderMap[name]();
+    tabs.appendChild(tab);
+  });
+
+  renderProgram();
+
+  /* ========================
+     TOGGLE BUTTON
+  ======================== */
+
+  const toggle = document.createElement("div");
+  toggle.innerText = "🧠";
+  toggle.style.position = "fixed";
+  toggle.style.bottom = "20px";
+  toggle.style.right = "20px";
+  toggle.style.background = "#009f8d";
+  toggle.style.padding = "14px";
+  toggle.style.borderRadius = "50%";
+  toggle.style.cursor = "pointer";
+  toggle.style.zIndex = "9999";
+  toggle.onclick = () => {
+    container.style.display =
+      container.style.display === "none" ? "block" : "none";
+  };
+
+  document.body.appendChild(toggle);
+
+  /* ========================
+     DRAG LOGIC
+  ======================== */
+
+  let isDragging = false;
+  let offsetX, offsetY;
+
+  header.addEventListener("mousedown", function (e) {
+    isDragging = true;
+    offsetX = e.clientX - container.offsetLeft;
+    offsetY = e.clientY - container.offsetTop;
+  });
+
+  document.addEventListener("mousemove", function (e) {
+    if (isDragging) {
+      container.style.left = (e.clientX - offsetX) + "px";
+      container.style.top = (e.clientY - offsetY) + "px";
+      container.style.right = "auto";
+      container.style.bottom = "auto";
+    }
+  });
+
+  document.addEventListener("mouseup", function () {
+    isDragging = false;
   });
 
 });
