@@ -115,42 +115,46 @@ Let’s secure this now.`
 
   objections: {
 
-    spouse: {
-      title: "Spouse Objection",
-      script: `I understand — we can go over it together, but first let’s secure the structure so you don’t lose the option.
+  spouse: {
+    title: "Spouse Objection",
+    triggers: ["spouse", "wife", "husband", "partner"],
+    script: `I understand — we can go over it together, but first let’s secure the structure so you don’t lose the option.
 
 There is no money out of pocket today, and you can cancel if it doesn’t make sense.
 
 Let’s lock it in now.`
-    },
+  },
 
-    think: {
-      title: "Think About It",
-      script: `What specifically do you need to think through?
+  think: {
+    title: "Think About It",
+    triggers: ["think", "later", "not sure", "need time"],
+    script: `What specifically do you need to think through?
 
 Let’s clear that up right now so you’re making a decision based on facts.`
-    },
+  },
 
-    callBack: {
-      title: "Call Back",
-      script: `We already have everything in front of us right now.
+  callBack: {
+    title: "Call Back",
+    triggers: ["call back", "later today", "tomorrow", "another time"],
+    script: `We already have everything in front of us right now.
 
 This takes a couple minutes and there’s no money out of pocket today.
 
 Let’s finish it while we’re here.`
-    },
+  },
 
-    trust: {
-      title: "Trust",
-      script: `That’s a fair question.
+  trust: {
+    title: "Trust",
+    triggers: ["scam", "real", "legit", "trust", "how do I know"],
+    script: `That’s a fair question.
 
 Everything we’re discussing is based on your actual numbers.
 
 I’ll walk you through it so you understand exactly what this is before anything is finalized.`
-    }
+  }
 
-  },
-
+},
+  
   helper: {
 
     mapRouteToProgram: function(route){
