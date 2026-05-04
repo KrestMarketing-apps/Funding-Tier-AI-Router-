@@ -524,8 +524,82 @@ const LD_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c3
 const CS_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png';
 const LEGACY_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69e1c95dc56ad279084b3141.png';
 
-  
+  // ================================
+// GLOBAL ROUTE STATE CONTROLLER
+// ================================
 
+window.APP_STATE = {
+  route: null
+};
+
+function setRoute(route){
+  if(window.APP_STATE.route === route) return;
+
+  window.APP_STATE.route = route;
+
+  // Update Close Machine panel
+  setRoute(route);
+  // Optional: console debug so you can see it firing
+  console.log("Route set to:", route);
+}
+
+function getRoute(){
+  return window.APP_STATE.route;
+}
+function detectRouteFromCards(){
+
+  const recCard = document.querySelector('.plan-card-v.rec');
+  if(!recCard) return;
+
+  const name = recCard.innerText.toLowerCase();
+
+  if(name.includes('level')){
+    setRoute('LEVEL');
+  }
+  else if(name.includes('consumer')){
+    setRoute('CONSUMER_SHIELD');
+  }
+  else if(name.includes('legacy') || name.includes('elite')){
+    setRoute('LEGACY');
+  }
+}
+
+  // ============================
+// STABLE ROUTE ENGINE (FINAL)
+// ============================
+
+window.APP_STATE = { route: null };
+
+function setRoute(route){
+  console.log("setRoute called with:", route);
+
+  if(window.APP_STATE.route === route) return;
+
+  window.APP_STATE.route = route;
+  updateCloseMachine(route);
+}
+
+function getRoute(){
+  return window.APP_STATE.route;
+}
+  function detectRouteFromRecommendedCard(){
+
+  const rec = document.querySelector('.plan-card-v.rec');
+  if(!rec) return;
+
+  const txt = rec.innerText.toLowerCase();
+
+  if(txt.includes('level')){
+    setRoute('LEVEL');
+  }
+  else if(txt.includes('consumer')){
+    setRoute('CONSUMER_SHIELD');
+  }
+  else if(txt.includes('legacy') || txt.includes('elite')){
+    setRoute('LEGACY');
+  }
+}
+  
 const CS_PROGS=[
   {k:'A',range:'$4,000-$4,999',   min:4000, max:4999,    pay:220,term:18,comm:{p2:150,p4:0,total:150}},
   {k:'B',range:'$5,000-$8,799',   min:5000, max:8799,    pay:220,term:24,comm:{p2:150,p4:0,total:150}},
@@ -2027,6 +2101,20 @@ function detectRouteFromUI(){
   }
 
   updateCloseMachine(CURRENT_ROUTE);
+}
+
+  // Observe planCards container for routing updates
+const planContainer = document.getElementById('planCards');
+
+if(planContainer){
+  const observer = new MutationObserver(() => {
+    detectRouteFromRecommendedCard();
+  });
+
+  observer.observe(planContainer, {
+    childList: true,
+    subtree: true
+  });
 }
   
 </script>
