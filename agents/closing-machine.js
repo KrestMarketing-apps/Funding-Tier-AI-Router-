@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const mappedProgramKey = data.helper.mapRouteToProgram(route);
   const programData = data.programScripts[mappedProgramKey];
 
-  let callStage = "qualification";
   let recognition = null;
+  let activeTimer = null;
 
   /* =========================
      MAIN CONTAINER
@@ -16,9 +16,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const container = document.createElement("div");
   container.style.position = "fixed";
-  container.style.bottom = "100px";
+  container.style.bottom = "140px"; // ABOVE other floating buttons
   container.style.right = "20px";
-  container.style.width = "420px";
+  container.style.width = "450px";
   container.style.background = "#111";
   container.style.color = "#fff";
   container.style.borderRadius = "12px";
@@ -26,17 +26,16 @@ document.addEventListener("DOMContentLoaded", function () {
   container.style.zIndex = "9999";
   container.style.fontFamily = "Arial, sans-serif";
   container.style.display = "none";
-  container.style.resize = "both";
   container.style.overflow = "hidden";
 
   document.body.appendChild(container);
 
   /* =========================
-     HEADER (DRAGGABLE)
+     HEADER
   ========================= */
 
   const header = document.createElement("div");
-  header.innerText = "🧠 AI Agent Assist";
+  header.innerText = "🔥 Close Machine";
   header.style.padding = "14px";
   header.style.background = "#009f8d";
   header.style.cursor = "move";
@@ -45,43 +44,21 @@ document.addEventListener("DOMContentLoaded", function () {
   container.appendChild(header);
 
   /* =========================
-     STAGE TRACKING
-  ========================= */
-
-  const stageBar = document.createElement("div");
-  stageBar.style.display = "flex";
-  stageBar.style.background = "#1a1a1a";
-  container.appendChild(stageBar);
-
-  const stages = ["qualification", "program", "objection", "close"];
-
-  stages.forEach(stage => {
-    const btn = document.createElement("div");
-    btn.innerText = stage.toUpperCase();
-    btn.style.flex = "1";
-    btn.style.padding = "8px";
-    btn.style.cursor = "pointer";
-    btn.style.textAlign = "center";
-    btn.onclick = () => callStage = stage;
-    stageBar.appendChild(btn);
-  });
-
-  /* =========================
-     TAB NAVIGATION
+     TAB NAV
   ========================= */
 
   const tabs = document.createElement("div");
   tabs.style.display = "flex";
-  tabs.style.background = "#222";
+  tabs.style.background = "#1a1a1a";
   container.appendChild(tabs);
 
   const content = document.createElement("div");
   content.style.padding = "16px";
-  content.style.maxHeight = "400px";
+  content.style.maxHeight = "420px";
   content.style.overflowY = "auto";
   container.appendChild(content);
 
-  const tabNames = ["Program", "Objections", "Warm Transfer"];
+  const tabNames = ["Program", "Objections", "Warm Transfer", "About"];
 
   function createCopyButton(text) {
     const btn = document.createElement("button");
@@ -96,8 +73,13 @@ document.addEventListener("DOMContentLoaded", function () {
     return btn;
   }
 
+  /* =========================
+     PROGRAM TAB
+  ========================= */
+
   function renderProgram() {
     content.innerHTML = "";
+
     const title = document.createElement("h3");
     title.innerText = programData.name;
     content.appendChild(title);
@@ -110,8 +92,13 @@ document.addEventListener("DOMContentLoaded", function () {
     content.appendChild(createCopyButton(programData.script));
   }
 
+  /* =========================
+     OBJECTION TAB
+  ========================= */
+
   function renderObjections() {
     content.innerHTML = "";
+
     Object.values(data.objections).forEach(obj => {
       const box = document.createElement("div");
       box.style.marginBottom = "15px";
@@ -134,34 +121,118 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  /* =========================
+     WARM TRANSFER TAB
+  ========================= */
+
+  function startTimer(seconds) {
+    clearInterval(activeTimer);
+
+    let remaining = seconds;
+
+    const timerDisplay = document.createElement("div");
+    timerDisplay.style.margin = "10px 0";
+    timerDisplay.style.fontWeight = "bold";
+    timerDisplay.style.color = "#ff4444";
+
+    content.prepend(timerDisplay);
+
+    activeTimer = setInterval(() => {
+      timerDisplay.innerText = `⏱ ${remaining}s remaining`;
+      remaining--;
+      if (remaining < 0) {
+        clearInterval(activeTimer);
+        timerDisplay.innerText = "⚠ Time Expired";
+      }
+    }, 1000);
+  }
+
   function renderWarmTransfer() {
     content.innerHTML = "";
-    Object.values(data.warmTransfer).forEach(item => {
-      const box = document.createElement("div");
-      box.style.marginBottom = "15px";
-      box.style.padding = "10px";
-      box.style.background = "#1f1f1f";
-      box.style.borderRadius = "8px";
 
-      const title = document.createElement("strong");
-      title.innerText = item.title;
-      box.appendChild(title);
+    const tier45 = document.createElement("button");
+    tier45.innerText = "Start 45s Rapid Qual";
+    tier45.onclick = () => startTimer(45);
 
-      const script = document.createElement("p");
-      script.innerText = item.script;
-      script.style.whiteSpace = "pre-wrap";
-      script.style.marginTop = "6px";
-      box.appendChild(script);
+    const tier100 = document.createElement("button");
+    tier100.innerText = "Start 100s Full Qual";
+    tier100.onclick = () => startTimer(100);
 
-      box.appendChild(createCopyButton(item.script));
-      content.appendChild(box);
-    });
+    content.appendChild(tier45);
+    content.appendChild(tier100);
+
+    const detailedScript = `
+Rapid Fire Qualification Script:
+
+1. "What is your total unsecured debt amount?"
+   (Credit cards, personal loans, lines of credit — no car, no mortgage)
+
+2. "Are you currently working or receiving steady income?"
+
+3. "If we restructure this properly, could you commit to at least $250 per month?"
+
+4. "Are you looking to handle this immediately, or are you just exploring?"
+
+Stay direct. No fluff. Control the frame.
+`;
+
+    const scriptBlock = document.createElement("p");
+    scriptBlock.innerText = detailedScript;
+    scriptBlock.style.whiteSpace = "pre-wrap";
+    scriptBlock.style.marginTop = "15px";
+    content.appendChild(scriptBlock);
+
+    content.appendChild(createCopyButton(detailedScript));
   }
+
+  /* =========================
+     ABOUT TAB
+  ========================= */
+
+  function renderAbout() {
+    content.innerHTML = "";
+
+    const aboutText = `
+What Is Close Machine?
+
+This is a live tactical assistant built to help you control calls, eliminate hesitation, and move prospects to decisions.
+
+Why We Use It:
+
+• Keeps you structured under pressure
+• Prevents rambling
+• Ensures compliance
+• Forces proper qualification
+• Protects conversion windows
+• Helps you overcome objections instantly
+
+How To Use It:
+
+1. Follow stages.
+2. Use rapid qualifiers under time pressure.
+3. Lock structure before emotion.
+4. Control pace.
+5. Close confidently.
+
+This tool is not for reading scripts.
+It is for executing controlled persuasion.
+`;
+
+    const p = document.createElement("p");
+    p.innerText = aboutText;
+    p.style.whiteSpace = "pre-wrap";
+    content.appendChild(p);
+  }
+
+  /* =========================
+     TAB SWITCHING
+  ========================= */
 
   const renderMap = {
     "Program": renderProgram,
     "Objections": renderObjections,
-    "Warm Transfer": renderWarmTransfer
+    "Warm Transfer": renderWarmTransfer,
+    "About": renderAbout
   };
 
   tabNames.forEach(name => {
@@ -178,101 +249,17 @@ document.addEventListener("DOMContentLoaded", function () {
   renderProgram();
 
   /* =========================
-     REAL-TIME OBJECTION DETECTION
-  ========================= */
-
-  function detectObjection(text) {
-    if (!text) return null;
-    const lower = text.toLowerCase();
-
-    for (const key in data.objections) {
-      const obj = data.objections[key];
-      if (!obj.triggers) continue;
-      if (obj.triggers.some(t => lower.includes(t.toLowerCase()))) {
-        return key;
-      }
-    }
-    return null;
-  }
-
-  function highlightObjection(key) {
-    if (!key) return;
-    renderObjections();
-
-    const boxes = content.querySelectorAll("div");
-    boxes.forEach(box => {
-      if (box.innerText.includes(data.objections[key].title)) {
-        box.style.border = "2px solid #00ffcc";
-        box.style.background = "#003333";
-        box.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    });
-  }
-
-  /* =========================
-     VOICE MODE
-  ========================= */
-
-  function startVoiceMode() {
-    if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) return;
-
-    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.continuous = true;
-
-    recognition.onresult = function (event) {
-      const transcript = event.results[event.results.length - 1][0].transcript;
-      const detected = detectObjection(transcript);
-      if (detected) highlightObjection(detected);
-    };
-
-    recognition.start();
-  }
-
-  const voiceBtn = document.createElement("button");
-  voiceBtn.innerText = "🎙 Voice Mode";
-  voiceBtn.style.background = "#444";
-  voiceBtn.style.color = "#fff";
-  voiceBtn.style.border = "none";
-  voiceBtn.style.padding = "8px";
-  voiceBtn.style.margin = "8px";
-  voiceBtn.onclick = startVoiceMode;
-  container.appendChild(voiceBtn);
-
-  /* =========================
-     GPT DYNAMIC REBUTTAL HOOK
-  ========================= */
-
-  async function generateDynamicRebuttal(context) {
-    const response = await fetch("/api/gpt-rebuttal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(context)
-    });
-
-    const result = await response.json();
-
-    const aiBox = document.createElement("div");
-    aiBox.style.marginTop = "15px";
-    aiBox.style.padding = "10px";
-    aiBox.style.background = "#002b2b";
-    aiBox.style.borderRadius = "8px";
-    aiBox.innerText = result.rebuttal;
-
-    content.appendChild(aiBox);
-  }
-
-  /* =========================
      TOGGLE BUTTON
   ========================= */
 
   const toggle = document.createElement("div");
-  toggle.innerText = "🧠";
+  toggle.innerText = "Close Machine";
   toggle.style.position = "fixed";
-  toggle.style.bottom = "20px";
+  toggle.style.bottom = "90px"; // ABOVE your other buttons
   toggle.style.right = "20px";
   toggle.style.background = "#009f8d";
-  toggle.style.padding = "14px";
-  toggle.style.borderRadius = "50%";
+  toggle.style.padding = "12px 18px";
+  toggle.style.borderRadius = "30px";
   toggle.style.cursor = "pointer";
   toggle.style.zIndex = "9999";
   toggle.onclick = () => {
