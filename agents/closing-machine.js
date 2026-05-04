@@ -3,29 +3,43 @@ document.addEventListener("DOMContentLoaded", function () {
   const data = window.SCRIPTING_AND_LEAD_HANDLING;
   if (!data) return;
 
-  const route = window.CURRENT_ROUTE || "LEVEL";
-  const mappedProgramKey = data.helper.mapRouteToProgram(route);
-  const programData = data.programScripts[mappedProgramKey];
+  /* =========================
+     ROUTE DETECTION
+  ========================= */
 
-  let recognition = null;
+  const route = window.CURRENT_ROUTE || window.planRoute || null;
+
+  let programData = null;
+
+  if (route && data.helper) {
+    const mapped = data.helper.mapRouteToProgram(route);
+    programData = data.programScripts[mapped];
+  }
+
   let activeTimer = null;
 
   /* =========================
-     MAIN CONTAINER
+     MAIN DOCKED CONTAINER
   ========================= */
 
   const container = document.createElement("div");
   container.style.position = "fixed";
-  container.style.bottom = "140px"; // ABOVE other floating buttons
-  container.style.right = "20px";
-  container.style.width = "450px";
+  container.style.right = "0";
+  container.style.top = "62%"; // Lower third anchor
+  container.style.transform = "translateX(100%) translateY(-50%)";
+  container.style.width = "440px";
+  container.style.height = "72vh";
+  container.style.maxHeight = "750px";
   container.style.background = "#111";
   container.style.color = "#fff";
-  container.style.borderRadius = "12px";
-  container.style.boxShadow = "0 10px 30px rgba(0,0,0,0.4)";
-  container.style.zIndex = "9999";
+  container.style.borderTopLeftRadius = "16px";
+  container.style.borderBottomLeftRadius = "16px";
+  container.style.boxShadow = "-10px 0 30px rgba(0,0,0,0.4)";
+  container.style.transition = "transform 0.3s ease";
+  container.style.zIndex = "9995";
+  container.style.display = "flex";
+  container.style.flexDirection = "column";
   container.style.fontFamily = "Arial, sans-serif";
-  container.style.display = "none";
   container.style.overflow = "hidden";
 
   document.body.appendChild(container);
@@ -35,16 +49,14 @@ document.addEventListener("DOMContentLoaded", function () {
   ========================= */
 
   const header = document.createElement("div");
-  header.innerText = "🔥 Close Machine";
+  header.innerText = `🔥 Close Machine${route ? " • " + route : ""}`;
   header.style.padding = "14px";
   header.style.background = "#009f8d";
-  header.style.cursor = "move";
   header.style.fontWeight = "bold";
-  header.style.userSelect = "none";
   container.appendChild(header);
 
   /* =========================
-     TAB NAV
+     TAB BAR
   ========================= */
 
   const tabs = document.createElement("div");
@@ -54,8 +66,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const content = document.createElement("div");
   content.style.padding = "16px";
-  content.style.maxHeight = "420px";
   content.style.overflowY = "auto";
+  content.style.flex = "1";
   container.appendChild(content);
 
   const tabNames = ["Program", "Objections", "Warm Transfer", "About"];
@@ -80,6 +92,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderProgram() {
     content.innerHTML = "";
 
+    if (!programData) {
+      content.innerHTML = "<p>No active route detected.</p>";
+      return;
+    }
+
     const title = document.createElement("h3");
     title.innerText = programData.name;
     content.appendChild(title);
@@ -93,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* =========================
-     OBJECTION TAB
+     OBJECTIONS TAB
   ========================= */
 
   function renderObjections() {
@@ -140,6 +157,11 @@ document.addEventListener("DOMContentLoaded", function () {
     activeTimer = setInterval(() => {
       timerDisplay.innerText = `⏱ ${remaining}s remaining`;
       remaining--;
+
+      if (remaining <= 10) {
+        timerDisplay.style.color = "#ff0000";
+      }
+
       if (remaining < 0) {
         clearInterval(activeTimer);
         timerDisplay.innerText = "⚠ Time Expired";
@@ -161,28 +183,29 @@ document.addEventListener("DOMContentLoaded", function () {
     content.appendChild(tier45);
     content.appendChild(tier100);
 
-    const detailedScript = `
+    const scriptText = `
 Rapid Fire Qualification Script:
 
-1. "What is your total unsecured debt amount?"
-   (Credit cards, personal loans, lines of credit — no car, no mortgage)
+1. "What is your total unsecured debt amount?
+   That includes credit cards, personal loans, and lines of credit.
+   No car loans, no mortgage."
 
 2. "Are you currently working or receiving steady income?"
 
 3. "If we restructure this properly, could you commit to at least $250 per month?"
 
-4. "Are you looking to handle this immediately, or are you just exploring?"
+4. "Are you looking to handle this immediately, or are you just exploring options?"
 
-Stay direct. No fluff. Control the frame.
+Control the pace. Keep it direct. Stay structured.
 `;
 
     const scriptBlock = document.createElement("p");
-    scriptBlock.innerText = detailedScript;
+    scriptBlock.innerText = scriptText;
     scriptBlock.style.whiteSpace = "pre-wrap";
     scriptBlock.style.marginTop = "15px";
-    content.appendChild(scriptBlock);
 
-    content.appendChild(createCopyButton(detailedScript));
+    content.appendChild(scriptBlock);
+    content.appendChild(createCopyButton(scriptText));
   }
 
   /* =========================
@@ -193,29 +216,23 @@ Stay direct. No fluff. Control the frame.
     content.innerHTML = "";
 
     const aboutText = `
-What Is Close Machine?
+Close Machine is a tactical call-control assistant.
 
-This is a live tactical assistant built to help you control calls, eliminate hesitation, and move prospects to decisions.
+Purpose:
+• Maintain structure
+• Control pacing
+• Ensure qualification discipline
+• Reduce emotional leakage
+• Increase close rates
 
-Why We Use It:
+This tool is not meant for reading scripts.
+It is meant to guide execution under pressure.
 
-• Keeps you structured under pressure
-• Prevents rambling
-• Ensures compliance
-• Forces proper qualification
-• Protects conversion windows
-• Helps you overcome objections instantly
-
-How To Use It:
-
-1. Follow stages.
-2. Use rapid qualifiers under time pressure.
-3. Lock structure before emotion.
-4. Control pace.
-5. Close confidently.
-
-This tool is not for reading scripts.
-It is for executing controlled persuasion.
+Use it to:
+1. Qualify fast.
+2. Transition clean.
+3. Lock structure.
+4. Close decisively.
 `;
 
     const p = document.createElement("p");
@@ -249,50 +266,33 @@ It is for executing controlled persuasion.
   renderProgram();
 
   /* =========================
-     TOGGLE BUTTON
+     DOCK TOGGLE BUTTON
   ========================= */
 
-  const toggle = document.createElement("div");
-  toggle.innerText = "Close Machine";
-  toggle.style.position = "fixed";
-  toggle.style.bottom = "90px"; // ABOVE your other buttons
-  toggle.style.right = "20px";
-  toggle.style.background = "#009f8d";
-  toggle.style.padding = "12px 18px";
-  toggle.style.borderRadius = "30px";
-  toggle.style.cursor = "pointer";
-  toggle.style.zIndex = "9999";
-  toggle.onclick = () => {
-    container.style.display =
-      container.style.display === "none" ? "block" : "none";
+  const dockToggle = document.createElement("div");
+  dockToggle.innerText = "Close Machine";
+  dockToggle.style.position = "fixed";
+  dockToggle.style.right = "0";
+  dockToggle.style.top = "62%";
+  dockToggle.style.transform = "translateY(-50%)";
+  dockToggle.style.background = "#009f8d";
+  dockToggle.style.color = "#fff";
+  dockToggle.style.padding = "14px 22px";
+  dockToggle.style.cursor = "pointer";
+  dockToggle.style.fontWeight = "bold";
+  dockToggle.style.borderTopLeftRadius = "10px";
+  dockToggle.style.borderBottomLeftRadius = "10px";
+  dockToggle.style.zIndex = "9996";
+
+  document.body.appendChild(dockToggle);
+
+  let open = false;
+
+  dockToggle.onclick = () => {
+    open = !open;
+    container.style.transform = open
+      ? "translateX(0%) translateY(-50%)"
+      : "translateX(100%) translateY(-50%)";
   };
-
-  document.body.appendChild(toggle);
-
-  /* =========================
-     DRAG LOGIC
-  ========================= */
-
-  let isDragging = false;
-  let offsetX, offsetY;
-
-  header.addEventListener("mousedown", function (e) {
-    isDragging = true;
-    offsetX = e.clientX - container.offsetLeft;
-    offsetY = e.clientY - container.offsetTop;
-  });
-
-  document.addEventListener("mousemove", function (e) {
-    if (isDragging) {
-      container.style.left = (e.clientX - offsetX) + "px";
-      container.style.top = (e.clientY - offsetY) + "px";
-      container.style.right = "auto";
-      container.style.bottom = "auto";
-    }
-  });
-
-  document.addEventListener("mouseup", function () {
-    isDragging = false;
-  });
 
 });
