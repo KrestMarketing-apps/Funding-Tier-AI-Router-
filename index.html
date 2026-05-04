@@ -524,66 +524,27 @@ const LD_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c3
 const CS_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png';
 const LEGACY_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69e1c95dc56ad279084b3141.png';
 
-  // ================================
-// GLOBAL ROUTE STATE CONTROLLER
-// ================================
+  // ============================
+// CLEAN GLOBAL ROUTE ENGINE
+// ============================
 
-window.APP_STATE = {
-  route: null
-};
+window.APP_STATE = { route: null };
 
 function setRoute(route){
   if(window.APP_STATE.route === route) return;
 
   window.APP_STATE.route = route;
 
-  // Update Close Machine panel
-  setRoute(route);
-  // Optional: console debug so you can see it firing
+  updateCloseMachine(route);
+
   console.log("Route set to:", route);
 }
 
 function getRoute(){
   return window.APP_STATE.route;
 }
-function detectRouteFromCards(){
 
-  const recCard = document.querySelector('.plan-card-v.rec');
-  if(!recCard) return;
-
-  const name = recCard.innerText.toLowerCase();
-
-  if(name.includes('level')){
-    setRoute('LEVEL');
-  }
-  else if(name.includes('consumer')){
-    setRoute('CONSUMER_SHIELD');
-  }
-  else if(name.includes('legacy') || name.includes('elite')){
-    setRoute('LEGACY');
-  }
-}
-
-  // ============================
-// STABLE ROUTE ENGINE (FINAL)
-// ============================
-
-window.APP_STATE = { route: null };
-
-function setRoute(route){
-  console.log("setRoute called with:", route);
-
-  if(window.APP_STATE.route === route) return;
-
-  window.APP_STATE.route = route;
-  updateCloseMachine(route);
-}
-
-function getRoute(){
-  return window.APP_STATE.route;
-}
-  function detectRouteFromRecommendedCard(){
-
+function detectRouteFromRecommendedCard(){
   const rec = document.querySelector('.plan-card-v.rec');
   if(!rec) return;
 
@@ -2077,45 +2038,9 @@ function init(){
   setInterval(renderClocks,1000);
 }
 init();
-let CURRENT_ROUTE = null;
 
-function detectRouteFromUI(){
 
-  const header = document.getElementById('recommendedProgramHeader');
-
-  if(!header) return;
-
-  const text = header.innerText.toUpperCase();
-
-  if(text.includes('LEVEL')){
-    CURRENT_ROUTE = 'LEVEL';
-  }
-  else if(text.includes('CONSUMER')){
-    CURRENT_ROUTE = 'CONSUMER_SHIELD';
-  }
-  else if(text.includes('LEGACY')){
-    CURRENT_ROUTE = 'LEGACY';
-  }
-  else{
-    CURRENT_ROUTE = null;
-  }
-
-  updateCloseMachine(CURRENT_ROUTE);
-}
-
-  // Observe planCards container for routing updates
-const planContainer = document.getElementById('planCards');
-
-if(planContainer){
-  const observer = new MutationObserver(() => {
-    detectRouteFromRecommendedCard();
-  });
-
-  observer.observe(planContainer, {
-    childList: true,
-    subtree: true
-  });
-}
+ 
   
 </script>
 <!-- Send Confirmation Modal -->
