@@ -239,6 +239,7 @@ export function routeDecision(data: RouterCaseData): RouterDecision {
   let recommended = "";
   let badgeClass = "route-warn";
   let decisionType = "Manual Review";
+  let backendKey = "NONE";
 
   if (!data.state) reasons.push("State not selected");
   if (!data.incomeStatus) reasons.push("Income status not selected");
@@ -263,36 +264,41 @@ export function routeDecision(data: RouterCaseData): RouterDecision {
     warnings.push(`Discover concentration exceeds ${DISCOVER_LIMIT_PCT}% of unsecured debt`);
   }
 
-  if (reasons.length > 0) {
-    recommended = "Not Eligible / Do Not Route Yet";
-    badgeClass = "route-bad";
-    decisionType = "Stop";
-  } else if (serviceableLevel && discoverPct <= DISCOVER_LIMIT_PCT) {
-    recommended = "Route to Level Debt / Pinnacle";
-    badgeClass = "route-good";
-    decisionType = "Primary Route";
-  } else if (serviceableConsumerShield) {
-    recommended = "Route to Consumer Shield Exception Flow";
-    badgeClass = "route-warn";
-    decisionType = "Fallback Route";
-  } else {
-    recommended = "Manual Escalation Required";
-    badgeClass = "route-bad";
-    decisionType = "Escalation";
-  }
+if (reasons.length > 0) {
+  recommended = "Not Eligible / Do Not Route Yet";
+  backendKey = "NONE";
+  badgeClass = "route-bad";
+  decisionType = "Stop";
+} else if (serviceableLevel && discoverPct <= DISCOVER_LIMIT_PCT) {
+  recommended = "Route to Level Debt / Pinnacle";
+  backendKey = "LEVEL";
+  badgeClass = "route-good";
+  decisionType = "Primary Route";
+} } else if (serviceableConsumerShield) {
+  recommended = "Route to Consumer Shield Exception Flow";
+  backendKey = "CONSUMER SHIELD";
+  badgeClass = "route-warn";
+  decisionType = "Fallback Route";
+} else {
+  recommended = "Manual Escalation Required";
+  backendKey = "LEGACY"; // or "ESCALATION" if you prefer
+  badgeClass = "route-bad";
+  decisionType = "Escalation";
+}
 
   return {
-    totalDebt: data.creditors.reduce((sum, c) => sum + c.amount, 0),
-    unsecured,
-    discoverPct,
-    recommended,
-    badgeClass,
-    decisionType,
-    reasons,
-    warnings,
-    serviceableLevel,
-    serviceableConsumerShield,
-  };
+  totalDebt,
+  unsecured,
+  discoverPct,
+  recommended,
+  backendKey, 
+  badgeClass,
+  decisionType,
+  reasons,
+  warnings,
+  serviceableLevel,
+  serviceableConsumerShield,
+};
 }
 
 export function buildPdfTextLines(data: RouterCaseData, result: RouterDecision) {
