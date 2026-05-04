@@ -7,9 +7,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const mappedProgramKey = data.helper.mapRouteToProgram(route);
   const programData = data.programScripts[mappedProgramKey];
 
-  /* ========================
-     CREATE MAIN CONTAINER
-  ======================== */
+  let callStage = "qualification";
+  let recognition = null;
+
+  /* =========================
+     MAIN CONTAINER
+  ========================= */
 
   const container = document.createElement("div");
   container.style.position = "fixed";
@@ -28,9 +31,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.body.appendChild(container);
 
-  /* ========================
+  /* =========================
      HEADER (DRAGGABLE)
-  ======================== */
+  ========================= */
 
   const header = document.createElement("div");
   header.innerText = "🧠 AI Agent Assist";
@@ -41,21 +44,44 @@ document.addEventListener("DOMContentLoaded", function () {
   header.style.userSelect = "none";
   container.appendChild(header);
 
-  /* ========================
-     TAB NAV
-  ======================== */
+  /* =========================
+     STAGE TRACKING
+  ========================= */
+
+  const stageBar = document.createElement("div");
+  stageBar.style.display = "flex";
+  stageBar.style.background = "#1a1a1a";
+  container.appendChild(stageBar);
+
+  const stages = ["qualification", "program", "objection", "close"];
+
+  stages.forEach(stage => {
+    const btn = document.createElement("div");
+    btn.innerText = stage.toUpperCase();
+    btn.style.flex = "1";
+    btn.style.padding = "8px";
+    btn.style.cursor = "pointer";
+    btn.style.textAlign = "center";
+    btn.onclick = () => callStage = stage;
+    stageBar.appendChild(btn);
+  });
+
+  /* =========================
+     TAB NAVIGATION
+  ========================= */
 
   const tabs = document.createElement("div");
   tabs.style.display = "flex";
-  tabs.style.background = "#1a1a1a";
+  tabs.style.background = "#222";
   container.appendChild(tabs);
 
-  const tabNames = ["Program", "Objections", "Warm Transfer"];
   const content = document.createElement("div");
   content.style.padding = "16px";
   content.style.maxHeight = "400px";
   content.style.overflowY = "auto";
   container.appendChild(content);
+
+  const tabNames = ["Program", "Objections", "Warm Transfer"];
 
   function createCopyButton(text) {
     const btn = document.createElement("button");
@@ -90,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const box = document.createElement("div");
       box.style.marginBottom = "15px";
       box.style.padding = "10px";
-      box.style.background = "#222";
+      box.style.background = "#1f1f1f";
       box.style.borderRadius = "8px";
 
       const title = document.createElement("strong");
@@ -104,7 +130,6 @@ document.addEventListener("DOMContentLoaded", function () {
       box.appendChild(script);
 
       box.appendChild(createCopyButton(obj.script));
-
       content.appendChild(box);
     });
   }
@@ -115,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const box = document.createElement("div");
       box.style.marginBottom = "15px";
       box.style.padding = "10px";
-      box.style.background = "#222";
+      box.style.background = "#1f1f1f";
       box.style.borderRadius = "8px";
 
       const title = document.createElement("strong");
@@ -152,9 +177,93 @@ document.addEventListener("DOMContentLoaded", function () {
 
   renderProgram();
 
-  /* ========================
+  /* =========================
+     REAL-TIME OBJECTION DETECTION
+  ========================= */
+
+  function detectObjection(text) {
+    if (!text) return null;
+    const lower = text.toLowerCase();
+
+    for (const key in data.objections) {
+      const obj = data.objections[key];
+      if (!obj.triggers) continue;
+      if (obj.triggers.some(t => lower.includes(t.toLowerCase()))) {
+        return key;
+      }
+    }
+    return null;
+  }
+
+  function highlightObjection(key) {
+    if (!key) return;
+    renderObjections();
+
+    const boxes = content.querySelectorAll("div");
+    boxes.forEach(box => {
+      if (box.innerText.includes(data.objections[key].title)) {
+        box.style.border = "2px solid #00ffcc";
+        box.style.background = "#003333";
+        box.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
+  }
+
+  /* =========================
+     VOICE MODE
+  ========================= */
+
+  function startVoiceMode() {
+    if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) return;
+
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = true;
+
+    recognition.onresult = function (event) {
+      const transcript = event.results[event.results.length - 1][0].transcript;
+      const detected = detectObjection(transcript);
+      if (detected) highlightObjection(detected);
+    };
+
+    recognition.start();
+  }
+
+  const voiceBtn = document.createElement("button");
+  voiceBtn.innerText = "🎙 Voice Mode";
+  voiceBtn.style.background = "#444";
+  voiceBtn.style.color = "#fff";
+  voiceBtn.style.border = "none";
+  voiceBtn.style.padding = "8px";
+  voiceBtn.style.margin = "8px";
+  voiceBtn.onclick = startVoiceMode;
+  container.appendChild(voiceBtn);
+
+  /* =========================
+     GPT DYNAMIC REBUTTAL HOOK
+  ========================= */
+
+  async function generateDynamicRebuttal(context) {
+    const response = await fetch("/api/gpt-rebuttal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(context)
+    });
+
+    const result = await response.json();
+
+    const aiBox = document.createElement("div");
+    aiBox.style.marginTop = "15px";
+    aiBox.style.padding = "10px";
+    aiBox.style.background = "#002b2b";
+    aiBox.style.borderRadius = "8px";
+    aiBox.innerText = result.rebuttal;
+
+    content.appendChild(aiBox);
+  }
+
+  /* =========================
      TOGGLE BUTTON
-  ======================== */
+  ========================= */
 
   const toggle = document.createElement("div");
   toggle.innerText = "🧠";
@@ -173,9 +282,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.body.appendChild(toggle);
 
-  /* ========================
+  /* =========================
      DRAG LOGIC
-  ======================== */
+  ========================= */
 
   let isDragging = false;
   let offsetX, offsetY;
