@@ -524,6 +524,8 @@ const LD_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c3
 const CS_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png';
 const LEGACY_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69e1c95dc56ad279084b3141.png';
 
+  
+
 const CS_PROGS=[
   {k:'A',range:'$4,000-$4,999',   min:4000, max:4999,    pay:220,term:18,comm:{p2:150,p4:0,total:150}},
   {k:'B',range:'$5,000-$8,799',   min:5000, max:8799,    pay:220,term:24,comm:{p2:150,p4:0,total:150}},
@@ -1421,6 +1423,7 @@ function renderPanel(c){
     ?`<div class="route-badge" style="background:${badgeBg};">${rLogo?`<img src="${rLogo}" alt=""/>`:''}${rl}</div>`
     :`<span class="rb rb-no">${rl}</span>`;
   $('routeBadges').innerHTML=badgeHtml;
+  setTimeout(detectRouteFromUI, 0);
   $('routeReason').textContent=c.route.reason||'Enter debts to calculate routing.';
 
   // Compact horizontal provider grid
@@ -2000,6 +2003,32 @@ function init(){
   setInterval(renderClocks,1000);
 }
 init();
+let CURRENT_ROUTE = null;
+
+function detectRouteFromUI(){
+
+  const header = document.getElementById('recommendedProgramHeader');
+
+  if(!header) return;
+
+  const text = header.innerText.toUpperCase();
+
+  if(text.includes('LEVEL')){
+    CURRENT_ROUTE = 'LEVEL';
+  }
+  else if(text.includes('CONSUMER')){
+    CURRENT_ROUTE = 'CONSUMER_SHIELD';
+  }
+  else if(text.includes('LEGACY')){
+    CURRENT_ROUTE = 'LEGACY';
+  }
+  else{
+    CURRENT_ROUTE = null;
+  }
+
+  updateCloseMachine(CURRENT_ROUTE);
+}
+  
 </script>
 <!-- Send Confirmation Modal -->
 <div id="sendModal" class="modal-overlay">
