@@ -1,0 +1,624 @@
+/**
+ * ============================================================
+ *  LEGACY CAPITAL SERVICES / ELITE LEGAL PRACTICE (ELP)
+ *  legacyCreditorMatcher.js
+ * ============================================================
+ *  Determines whether a creditor name or debt type is:
+ *    - accepted          → eligible for ELP enrollment
+ *    - conditional       → accepted with stipulations / notes
+ *    - unacceptable      → cannot be enrolled with ELP
+ *
+ *  Usage:
+ *    import { legacyCreditorMatcher } from "./legacyCreditorMatcher.js";
+ *    const result = legacyCreditorMatcher.findMatch("Mariner Finance");
+ *    // → { matched: true, status: "unacceptable", rule: "..." }
+ * ============================================================
+ */
+
+export const legacyCreditorMatcher = {
+
+  // ─────────────────────────────────────────────────────────
+  //  NORMALIZATION
+  // ─────────────────────────────────────────────────────────
+
+  normalize(value) {
+    return String(value || "")
+      .toUpperCase()
+      .replace(/&/g, " AND ")
+      .replace(/[^A-Z0-9 ]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  },
+
+  // ─────────────────────────────────────────────────────────
+  //  PROGRAM IDENTITY
+  // ─────────────────────────────────────────────────────────
+
+  program: {
+    name: "Legacy Capital Services / Elite Legal Practice (ELP)",
+    serviceType: "Attorney-Led Debt Resolution",
+    minimumDebt: 6000,
+    minimumPayment: 250,
+    minimumAccountBalance: 100,
+    restrictedStates: ["ID", "ND", "GA"],
+    supportPhone: "(725) 218-2796",
+    supportEmail: "b2b@legacycapitalservices.com",
+    supportHours: {
+      mondayFriday: "8:00 AM – 4:30 PM PST",
+      saturday: "7:00 AM – 5:00 PM PST (On Call Only)"
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────
+  //  UNACCEPTABLE DEBT TYPES
+  //  These categories can never be enrolled with ELP.
+  // ─────────────────────────────────────────────────────────
+
+  unacceptableDebtTypes: [
+    {
+      key: "AIR_CONDITIONING",
+      aliases: ["AIR CONDITIONING", "AIR CONDITIONING UNIT", "HVAC LOAN", "AC UNIT"],
+      rule: "Air conditioning unit financing is not accepted by ELP."
+    },
+    {
+      key: "ALIMONY_CHILD_SUPPORT",
+      aliases: ["ALIMONY", "CHILD SUPPORT", "SPOUSAL SUPPORT", "DOMESTIC SUPPORT"],
+      rule: "Alimony and child support obligations are not accepted by ELP."
+    },
+    {
+      key: "BANKRUPTCY",
+      aliases: ["BANKRUPTCY", "CHAPTER 7", "CHAPTER 13"],
+      rule: "Bankruptcy-related debts are not accepted by ELP."
+    },
+    {
+      key: "BUSINESS_CREDIT_CARD_EIN",
+      aliases: ["BUSINESS CREDIT CARD EIN", "BUSINESS CARD EIN", "CORPORATE CARD EIN"],
+      rule: "Business credit cards under EIN are not accepted by ELP."
+    },
+    {
+      key: "BUSINESS_CREDIT_CARD_SS",
+      aliases: ["BUSINESS CREDIT CARD SS", "BUSINESS CARD SS", "CORPORATE CARD SS"],
+      rule: "Business credit cards under SS# are not accepted by ELP."
+    },
+    {
+      key: "BUSINESS_INVENTORY",
+      aliases: ["BUSINESS INVENTORY", "BUSINESS INVENTORY BALANCE", "OUTSTANDING INVENTORY"],
+      rule: "Business inventory outstanding balances are not accepted by ELP."
+    },
+    {
+      key: "BUSINESS_LOAN_EIN",
+      aliases: ["BUSINESS LOAN EIN", "COMMERCIAL LOAN EIN"],
+      rule: "Business loans under EIN are not accepted by ELP."
+    },
+    {
+      key: "BUSINESS_LOAN_SS",
+      aliases: ["BUSINESS LOAN SS", "COMMERCIAL LOAN SS", "BUSINESS DEBT SS"],
+      rule: "Business loans under SS# are not accepted by ELP."
+    },
+    {
+      key: "GOVERNMENT_DEBT",
+      aliases: [
+        "CITY DEBT", "COUNTY DEBT", "STATE DEBT", "FEDERAL DEBT",
+        "CITATION", "TICKET", "PARKING TICKET", "GOVERNMENT FINE",
+        "MUNICIPAL DEBT", "COURT FINE"
+      ],
+      rule: "City, county, state, and federal debts, citations, and tickets are not accepted by ELP."
+    },
+    {
+      key: "CREDIT_BUILDER_MEMBERSHIP",
+      aliases: [
+        "CREDIT BUILDER MEMBERSHIP",
+        "CREDIT BUILDER MONTHLY MEMBERSHIP",
+        "TRANSFORM LOAN MEMBERSHIP"
+      ],
+      rule: "Credit builder monthly memberships are not accepted by ELP."
+    },
+    {
+      key: "DEBT_NEGOTIATION",
+      aliases: [
+        "DEBT NEGOTIATION LOAN",
+        "DEBT CONSOLIDATION FROM DEBT SETTLEMENT COMPANY",
+        "DEBT SETTLEMENT LOAN"
+      ],
+      rule: "Debt negotiation or debt consolidation loans from debt settlement companies are not accepted by ELP."
+    },
+    {
+      key: "HOME_IMPROVEMENT_SECURED",
+      aliases: [
+        "HOME IMPROVEMENT LOAN",
+        "ROOF LOAN", "KITCHEN LOAN", "WINDOW LOAN",
+        "MECHANICS LIEN", "MECHANICS LIEN PROPERTY",
+        "HOME EQUITY LINE OF CREDIT", "HELOC"
+      ],
+      rule: "Home improvement loans secured to property (roofs, kitchens, windows, mechanics liens, HELOC) are not accepted by ELP."
+    },
+    {
+      key: "MORTGAGE",
+      aliases: ["MORTGAGE", "HOME LOAN", "HOME MORTGAGE"],
+      rule: "Mortgages and home loans are not accepted by ELP."
+    },
+    {
+      key: "PIONEER_LOANS",
+      aliases: ["PIONEER LOANS", "PIONEER LOAN"],
+      rule: "Pioneer Loans are not accepted by ELP."
+    },
+    {
+      key: "SOLAR_PANELS",
+      aliases: ["SOLAR PANEL", "SOLAR PANELS", "SOLAR LOAN", "SOLAR FINANCING"],
+      rule: "Solar panel financing is not accepted by ELP."
+    },
+    {
+      key: "STUDENT_LOANS",
+      aliases: [
+        "STUDENT LOAN", "STUDENT LOANS",
+        "FEDERAL STUDENT LOAN", "NAVIENT",
+        "SALLIE MAE", "MOHELA", "NELNET"
+      ],
+      rule: "Student loans (federal and private) are not accepted by ELP."
+    },
+    {
+      key: "TAX_DEBT",
+      aliases: [
+        "TAX DEBT", "IRS", "IRS TAX DEBT",
+        "INTERNAL REVENUE SERVICE",
+        "STATE TAX", "FTB", "TAX LIEN"
+      ],
+      rule: "Tax debts are not accepted by ELP. Provide the client a referral phone number for tax relief."
+    },
+    {
+      key: "TRIBAL_LOANS",
+      aliases: ["TRIBAL LOAN", "TRIBAL LENDING", "TRIBAL LENDER"],
+      rule: "Tribal loans are not accepted by ELP."
+    },
+    {
+      key: "VA_LOAN",
+      aliases: ["VA LOAN", "VA LOANS", "VETERANS AFFAIRS LOAN", "VETERANS ADMINISTRATION LOAN"],
+      rule: "VA loans are not accepted by ELP."
+    },
+    {
+      key: "WAGE_GARNISHMENT",
+      aliases: [
+        "WAGE GARNISHMENT",
+        "COURT ORDERED GARNISHMENT",
+        "COURT ORDERED WAGE GARNISHMENT"
+      ],
+      rule: "Court-ordered wage garnishments are not accepted by ELP. (Wage assignments are different and may be acceptable.)"
+    }
+  ],
+
+  // ─────────────────────────────────────────────────────────
+  //  UNACCEPTABLE NAMED CREDITORS / LENDERS
+  //  These specific companies are rejected by ELP.
+  // ─────────────────────────────────────────────────────────
+
+  unacceptableNamedCreditors: [
+
+    // ── Tribal Lenders ────────────────────────────────────
+    { key: "ARROWHEAD_ADVANCE",   aliases: ["ARROWHEAD ADVANCE"],            rule: "Tribal lender — not accepted by ELP." },
+    { key: "BIG_PICTURE_LOANS",   aliases: ["BIG PICTURE LOANS"],            rule: "Tribal lender — not accepted by ELP." },
+    { key: "BIRCH_LENDING",       aliases: ["BIRCH LENDING"],                rule: "Tribal lender — not accepted by ELP." },
+    { key: "BISON_CASH",          aliases: ["BISON CASH"],                   rule: "Tribal lender — not accepted by ELP." },
+    { key: "BLUE_MOUNTAIN_LOAN",  aliases: ["BLUE MOUNTAIN LOAN"],           rule: "Tribal lender — not accepted by ELP." },
+    { key: "BOOST_CREDIT",        aliases: ["BOOST CREDIT"],                 rule: "Tribal lender — not accepted by ELP." },
+    { key: "BRIGHT_LENDING",      aliases: ["BRIGHT LENDING"],               rule: "Tribal lender — not accepted by ELP." },
+    { key: "CLEAR_AIR_LENDING",   aliases: ["CLEAR AIR LENDING"],            rule: "Tribal lender — not accepted by ELP." },
+    { key: "CRANE_LENDING",       aliases: ["CRANE LENDING"],                rule: "Tribal lender — not accepted by ELP." },
+    { key: "CREDIT_CUBE",         aliases: ["CREDIT CUBE"],                  rule: "Tribal lender — not accepted by ELP." },
+    { key: "E_LOAN_WAREHOUSE",    aliases: ["E LOAN WAREHOUSE", "ELOAN WAREHOUSE"], rule: "Tribal lender — not accepted by ELP." },
+    { key: "FINEDAY_FUNDS",       aliases: ["FINEDAY FUNDS"],                rule: "Tribal lender — not accepted by ELP." },
+    { key: "GREEN_ARROW_LOANS",   aliases: ["GREEN ARROW LOANS"],            rule: "Tribal lender — not accepted by ELP." },
+    { key: "GREENLINE",           aliases: ["GREENLINE"],                    rule: "Tribal lender — not accepted by ELP." },
+    { key: "LENDUMO",             aliases: ["LENDUMO"],                      rule: "Tribal lender — not accepted by ELP." },
+    { key: "LEVEL_UP_FUNDING",    aliases: ["LEVEL UP FUNDING"],             rule: "Tribal lender — not accepted by ELP." },
+    { key: "LITTLE_LAKE_LENDING", aliases: ["LITTLE LAKE LENDING"],          rule: "Tribal lender — not accepted by ELP." },
+    { key: "LOAN_AT_LAST",        aliases: ["LOAN AT LAST"],                 rule: "Tribal lender — not accepted by ELP." },
+    { key: "MAKWA_FINANCE",       aliases: ["MAKWA FINANCE", "MAKWA LENDING"], rule: "Tribal lender — not accepted by ELP." },
+    { key: "MAXLEND",             aliases: ["MAXLEND"],                      rule: "Tribal lender — not accepted by ELP." },
+    { key: "MERIT_FINANCIAL",     aliases: ["MERIT FINANCIAL TRUST"],        rule: "Tribal lender — not accepted by ELP." },
+    { key: "MINTO_MONEY",         aliases: ["MINTO MONEY"],                  rule: "Tribal lender — not accepted by ELP." },
+    { key: "MOBILOANS",           aliases: ["MOBILOANS LLC", "MOBILOANS"],   rule: "Tribal lender — not accepted by ELP." },
+    { key: "MY_QUICKWALLET",      aliases: ["MY QUICKWALLET", "MYQUICKWALLET"], rule: "Tribal lender — not accepted by ELP." },
+    { key: "NIGHT_WINGS_LENDING", aliases: ["NIGHT WINGS LENDING"],          rule: "Tribal lender — not accepted by ELP." },
+    { key: "OPICI_FUNDS",         aliases: ["OPICI FUNDS LLC"],              rule: "Tribal lender — not accepted by ELP." },
+    { key: "POST_LAKE_LENDING",   aliases: ["POST LAKE LENDING"],            rule: "Tribal lender — not accepted by ELP." },
+    { key: "PREMIER_LOAN_SOLUTIONS", aliases: ["PREMIER LOAN SOLUTIONS"],   rule: "Tribal lender — not accepted by ELP." },
+    { key: "RISE_UP_LENDING",     aliases: ["RISE UP LENDING"],              rule: "Tribal lender — not accepted by ELP." },
+    { key: "RIVER_VALLEY_LOANS",  aliases: ["RIVER VALLEY LOANS"],           rule: "Tribal lender — not accepted by ELP." },
+    { key: "SAME_DAY_CREDIT",     aliases: ["SAME DAY CREDIT"],              rule: "Tribal lender — not accepted by ELP." },
+    { key: "SPOTLOAN",            aliases: ["SPOTLOAN", "SPOT LOAN"],        rule: "Tribal lender — not accepted by ELP." },
+    { key: "THREE_STICKS_LENDING",aliases: ["THREE STICKS LENDING"],         rule: "Tribal lender — not accepted by ELP." },
+    { key: "TODAY_CASH",          aliases: ["TODAY CASH"],                   rule: "Tribal lender — not accepted by ELP." },
+    { key: "TULE_LAKE_LENDING",   aliases: ["TULE LAKE LENDING"],            rule: "Tribal lender — not accepted by ELP." },
+    { key: "UPROVA",              aliases: ["UPROVA"],                       rule: "Tribal lender — not accepted by ELP." },
+    { key: "WHITE_PINE_LENDING",  aliases: ["WHITE PINE LENDING"],           rule: "Tribal lender — not accepted by ELP." },
+    { key: "WILLOW_LAKE_LENDING", aliases: ["WILLOW LAKE LENDING"],          rule: "Tribal lender — not accepted by ELP." },
+    { key: "WITHU_LOANS",         aliases: ["WITHU LOANS"],                  rule: "Tribal lender — not accepted by ELP." },
+    { key: "ZIPLOAN",             aliases: ["ZIPLOAN", "ZIP LOAN", "ZUNTAFI"], rule: "Tribal lender — not accepted by ELP. (Also known as Zuntafi.)" },
+    { key: "ZUNTAFI",             aliases: ["ZUNTAFI", "ZIPLOAN"],           rule: "Tribal lender — not accepted by ELP. (Also known as ZipLoan.)" },
+
+    // ── Collection Agencies (specific) ───────────────────
+    {
+      key: "AMERICAN_RECOVERY_SYSTEMS",
+      aliases: ["AMERICAN RECOVERY SYSTEMS", "ARS"],
+      rule: "American Recovery Systems (collateral recovery) is not accepted by ELP."
+    },
+    {
+      key: "BONNEVILLE_COLLECTION",
+      aliases: ["BONNEVILLE COLLECTION", "BONNEVILLE COLLECTIONS"],
+      rule: "Bonneville Collection is not accepted by ELP."
+    },
+    {
+      key: "HOLLIS_COBB",
+      aliases: ["HOLLIS COBB", "HOLLIS COBB ASSOCIATES"],
+      rule: "Hollis Cobb is not accepted by ELP."
+    },
+
+    // ── Financial Lenders (specific) ─────────────────────
+    {
+      key: "AQUA_FINANCE",
+      aliases: ["AQUA FINANCE", "AQUAFINANCE"],
+      rule: "Aqua Finance (HVAC / home improvement financing) is not accepted by ELP."
+    },
+    {
+      key: "BX_OMNI",
+      aliases: ["BX OMNI", "BXOMNI"],
+      rule: "BX Omni is not accepted by ELP."
+    },
+    {
+      key: "CREDIT_9",
+      aliases: ["CREDIT 9", "CREDIT9"],
+      rule: "Credit 9 is not accepted by ELP."
+    },
+    {
+      key: "EAGLE_WING_FUNDS",
+      aliases: ["EAGLE WING FUNDS"],
+      rule: "Eagle Wing Funds is not accepted by ELP."
+    },
+    {
+      key: "ELECTIVE_GROUP_USA",
+      aliases: ["ELECTIVE GROUP USA"],
+      rule: "Elective Group USA (federal student loan provider) is not accepted by ELP."
+    },
+    {
+      key: "EQUITY_SALES_FINANCE",
+      aliases: ["EQUITY SALES FINANCE"],
+      rule: "Equity Sales Finance is not accepted by ELP."
+    },
+    {
+      key: "EXPRESS_CASH_FLOW",
+      aliases: ["EXPRESS CASH FLOW"],
+      rule: "Express Cash Flow is not accepted by ELP unless in 3rd party collections and not part of collateral, business, or commercial debt."
+    },
+    {
+      key: "FIGURE_TECH",
+      aliases: ["FIGURE TECH", "FIGURE LENDING", "FIGURE TECHNOLOGIES"],
+      rule: "Figure Tech / Figure Lending is not accepted by ELP."
+    },
+    {
+      key: "GOODLEAP",
+      aliases: ["GOODLEAP", "GOOD LEAP", "GOODLEAP LLC", "GOODLEAP SOLAR", "LOANPAL", "LOAN PAL"],
+      rule: "GoodLeap / LoanPal (solar / home improvement) is not accepted by ELP."
+    },
+    {
+      key: "GREENSKY",
+      aliases: ["GREENSKY", "GREEN SKY"],
+      rule: "GreenSky is not accepted by ELP — per legal."
+    },
+    {
+      key: "KADIKORN_BANK",
+      aliases: ["KADIKORN BANK"],
+      rule: "Kadikorn Bank is not accepted by ELP."
+    },
+    {
+      key: "LIGHTSTREAM",
+      aliases: ["LIGHTSTREAM", "LIGHT STREAM", "TRUIST LIGHTSTREAM"],
+      rule: "LightStream (home improvement, auto, debt consolidation, recreation, education loans) is not accepted by ELP."
+    },
+    {
+      key: "LOOKOUT_CREDIT_UNION",
+      aliases: ["LOOKOUT CREDIT UNION"],
+      rule: "Lookout Credit Union is not accepted by ELP."
+    },
+    {
+      key: "MARINER_FINANCE",
+      aliases: ["MARINER FINANCE", "MARINER", "PERSONAL FINANCE COMPANY"],
+      rule: "Mariner Finance / Personal Finance Company — installment loans are not accepted by ELP."
+    },
+    {
+      key: "MILITARY_STAR",
+      aliases: ["MILITARY STAR", "EXCHANGE CREDIT PROGRAM", "AFES", "AAFES"],
+      rule: "Military Star / AFES accounts are not accepted by ELP."
+    },
+    {
+      key: "NCR_FINANCE",
+      aliases: ["NCR FINANCE"],
+      rule: "NCR Finance is not accepted by ELP."
+    },
+    {
+      key: "REACH_FINANCIAL",
+      aliases: ["REACH FINANCIAL"],
+      rule: "Reach Financial is not accepted by ELP."
+    },
+    {
+      key: "SALLIE_MAE",
+      aliases: ["SALLIE MAE", "SALLIE MAE LOANS", "SALLIEMAE"],
+      rule: "Sallie Mae loans (student lending) are not accepted by ELP."
+    },
+    {
+      key: "SBA_LOANS",
+      aliases: ["SBA LOAN", "SBA LOANS", "SMALL BUSINESS ADMINISTRATION"],
+      rule: "SBA loans are not accepted by ELP."
+    },
+    {
+      key: "SIMPLE_FAST_LOANS",
+      aliases: ["SIMPLE FAST LOANS", "SIMPLEFAST"],
+      rule: "Simple Fast Loans is not accepted by ELP."
+    },
+    {
+      key: "SNAP_ON_CREDIT",
+      aliases: ["SNAP ON CREDIT", "SNAP-ON CREDIT", "SNAPON CREDIT"],
+      rule: "Snap-On Credit (secured tool financing) is not accepted by ELP."
+    },
+    {
+      key: "SUNBELT_FCU",
+      aliases: ["SUNBELT FEDERAL CREDIT UNION", "SUNBELT FCU"],
+      rule: "Sunbelt Federal Credit Union is not accepted by ELP."
+    },
+    {
+      key: "VERSARA_LENDING",
+      aliases: ["VERSARA LENDING", "VERSARA"],
+      rule: "Versara Lending (consolidation / negotiation) is not accepted by ELP."
+    },
+    {
+      key: "WRITE_ST_EDUCATION",
+      aliases: ["WRITE ST EDUCATION", "WRITE ST EDUCATION LEINS", "WRITE STREET EDUCATION"],
+      rule: "Write St. Education Liens (educational lender / student finance) is not accepted by ELP."
+    },
+    {
+      key: "YENDO",
+      aliases: ["YENDO"],
+      rule: "Yendo (vehicle-equity credit card) is not accepted by ELP."
+    }
+  ],
+
+  // ─────────────────────────────────────────────────────────
+  //  ACCEPTED DEBT TYPES (with stipulations)
+  // ─────────────────────────────────────────────────────────
+
+  acceptedDebtTypes: [
+    { type: "3rd Party Collections",               stipulation: "See unacceptable list — must not be tribal, business, or otherwise excluded." },
+    { type: "Alarm System",                        stipulation: "Removal may be required based on age. Add note: client is aware the system may be removed." },
+    { type: "Auto Loans / Repos",                  stipulation: "MUST BE IN 3RD PARTY COLLECTIONS. Cannot accept deficiency loans." },
+    { type: "Back Rent",                           stipulation: "Client must no longer be living in the unit." },
+    { type: "Cash Advance",                        stipulation: null },
+    { type: "Check Cashing",                       stipulation: null },
+    { type: "Consolidation Loans",                 stipulation: "Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships." },
+    { type: "Credit Builder Loans",                stipulation: "Add Cross Collateral / Repo Note in Salesforce." },
+    { type: "Credit Unions / Federal",             stipulation: "Add Cross Collateral / Repo Note in Salesforce." },
+    { type: "Department Stores",                   stipulation: "Add Repo Note / Case in Salesforce." },
+    { type: "Furniture / Jewelry (Unsecured)",     stipulation: "Unsecured only. Add Repo Note in Salesforce." },
+    { type: "Gas Cards",                           stipulation: null },
+    { type: "Gyms / Fitness Centers",              stipulation: "Add note: client understands they will lose membership." },
+    { type: "Health Clubs",                        stipulation: "Add note: client understands they will lose membership." },
+    { type: "Installment Loans / Note Loans",      stipulation: "Not issued by a debt settlement company. Add Cross Collateral / Repo Note in Salesforce." },
+    { type: "Judgements",                          stipulation: "Debt must already be enrolled. $650 legal fee — can be spread over 2 months. Must be paid prior to representation.", legalFee: 650 },
+    { type: "Lake Lending",                        stipulation: "Not tied to collateral." },
+    { type: "Lawsuits",                            stipulation: "Debt must already be enrolled. $650 legal fee — can be spread over 2 months. Must be paid prior to representation.", legalFee: 650 },
+    { type: "Lending Club",                        stipulation: "Not secured to collateral and/or not secured to home." },
+    { type: "Lines of Credit",                     stipulation: "Must be used like a credit card. First page of statement required (client and billing info)." },
+    { type: "Medical Debt",                        stipulation: "Must NOT be currently receiving treatment. First page of statement required." },
+    { type: "Merchant Cash Advance Loans",         stipulation: "MUST BE IN 3RD PARTY COLLECTIONS." },
+    { type: "Military Credit Unions",              stipulation: "Excludes: Military Star, Pioneer Loans, BX Omni, VA Loans." },
+    { type: "Military Loans",                      stipulation: "Verify NOT currently active military. No secret/top secret clearance. Cannot be government-endorsed." },
+    { type: "Navy Federal Credit Union",           stipulation: "Verify NOT currently active military. No secret/top secret clearance. Cannot be government-endorsed." },
+    { type: "OMNI Financial",                      stipulation: "Military personal loans only. NOT backed by the government." },
+    { type: "Online Buy Now - Pay Later",          stipulation: "Clear screenshot of balance required. Check for Wage Assignment. (Affirm, Afterpay, Klarna, etc.)" },
+    { type: "Payday Loans",                        stipulation: "Check for Wage Assignment." },
+    { type: "Personal Loans",                      stipulation: "Not secured to collateral and/or not secured to home." },
+    { type: "Signature Loans",                     stipulation: "Not secured to collateral and/or not secured to home." },
+    { type: "Summons",                             stipulation: "$650 legal fee applies. Can be spread over 2 months.", legalFee: 650 },
+    { type: "Timeshares",                          stipulation: "MUST BE IN 3RD PARTY COLLECTIONS." },
+    { type: "Transform Credit / Together Loans",   stipulation: "Not issued by a debt settlement company. No loans under $3,000. No monthly memberships." },
+    { type: "Unsecured Credit Cards",              stipulation: "See unacceptable creditor list." },
+    { type: "Unsecured Debts",                     stipulation: "Add Cross Collateral / Repo Note in Salesforce. Note: client aware service may be shut off." },
+    { type: "USAA Federal Savings Bank",           stipulation: null },
+    { type: "Utility Bills",                       stipulation: "Previous provider/address ONLY. Client must NOT currently be using the service. Note required: client aware service will be shut off." },
+    { type: "Velocity",                            stipulation: "Acceptable as 3rd party collections only." },
+  ],
+
+  // ─────────────────────────────────────────────────────────
+  //  CONDITIONAL NAMED CREDITORS
+  //  Accepted by ELP with specific conditions or notes.
+  // ─────────────────────────────────────────────────────────
+
+  conditionalNamedCreditors: [
+    {
+      key: "NAVY_FEDERAL",
+      aliases: ["NAVY FEDERAL CREDIT UNION", "NAVY FEDERAL", "NFCU"],
+      rule: "Navy Federal — verify client is NOT currently active military, does NOT have secret/top secret clearance, and the loan is NOT government-endorsed."
+    },
+    {
+      key: "OMNI_FINANCIAL",
+      aliases: ["OMNI FINANCIAL", "OMNI MILITARY LOANS"],
+      rule: "OMNI Financial — military personal loans only. Must NOT be backed by or endorsed by the government."
+    },
+    {
+      key: "USAA",
+      aliases: ["USAA", "USAA FEDERAL SAVINGS BANK", "USAA BANK"],
+      rule: "USAA Federal Savings Bank — accepted by ELP. No additional restrictions noted."
+    },
+    {
+      key: "VELOCITY",
+      aliases: ["VELOCITY", "VELOCITY INVESTMENTS"],
+      rule: "Velocity — accepted as 3rd party collections only."
+    },
+    {
+      key: "LAKE_LENDING",
+      aliases: ["LAKE LENDING"],
+      rule: "Lake Lending — accepted only when not tied to collateral."
+    },
+    {
+      key: "LENDING_CLUB",
+      aliases: ["LENDING CLUB", "LENDINGCLUB"],
+      rule: "Lending Club — accepted only when not secured to collateral and not secured to home."
+    },
+    {
+      key: "TRANSFORM_CREDIT",
+      aliases: ["TRANSFORM CREDIT", "TOGETHER LOANS", "TOGETHER LOANS AKA TRANSFORM CREDIT"],
+      rule: "Transform Credit / Together Loans — not issued by a debt settlement company. No loans under $3,000. No monthly memberships."
+    },
+    {
+      key: "ADT_ALARM",
+      aliases: ["ADT", "ADT ALARM SYSTEM", "ADT SECURITY"],
+      rule: "ADT Alarm System — removal of the system may be required based on its age. Add note: client is aware the system may be removed."
+    },
+    {
+      key: "JUDGEMENTS_LAWSUITS_SUMMONS",
+      aliases: ["JUDGMENT", "JUDGEMENT", "LAWSUIT", "SUMMONS"],
+      rule: "$650 legal representation fee applies. Debt must already be enrolled. Fee must be paid prior to representation and can be spread over 2 months."
+    }
+  ],
+
+  // ─────────────────────────────────────────────────────────
+  //  MATCHING HELPERS
+  // ─────────────────────────────────────────────────────────
+
+  matchesAlias(input, alias) {
+    const a = this.normalize(input);
+    const b = this.normalize(alias);
+    if (!a || !b) return false;
+    if (a === b) return true;
+    if (a.includes(b) || b.includes(a)) return true;
+    const aTokens = a.split(" ");
+    const bTokens = b.split(" ");
+    const [shorter, longer] =
+      aTokens.length <= bTokens.length ? [aTokens, bTokens] : [bTokens, aTokens];
+    return (
+      shorter.length >= 2 &&
+      shorter.every((token) => token.length > 2 && longer.includes(token))
+    );
+  },
+
+  searchList(input, list) {
+    if (!input) return null;
+    for (const entry of list) {
+      for (const alias of entry.aliases) {
+        if (this.matchesAlias(input, alias)) {
+          return {
+            matched: true,
+            key: entry.key,
+            input,
+            matchedAlias: alias,
+            rule: entry.rule || entry.stipulation || null
+          };
+        }
+      }
+    }
+    return null;
+  },
+
+  // ─────────────────────────────────────────────────────────
+  //  PUBLIC MATCHERS
+  // ─────────────────────────────────────────────────────────
+
+  findUnacceptable(input) {
+    const byDebtType = this.searchList(input, this.unacceptableDebtTypes);
+    if (byDebtType) return { ...byDebtType, type: "unacceptable", status: "unacceptable" };
+    const byName = this.searchList(input, this.unacceptableNamedCreditors);
+    if (byName) return { ...byName, type: "unacceptable", status: "unacceptable" };
+    return null;
+  },
+
+  findConditional(input) {
+    const byName = this.searchList(input, this.conditionalNamedCreditors);
+    if (byName) return { ...byName, type: "conditional", status: "conditional" };
+    return null;
+  },
+
+  findAccepted(input) {
+    const byType = this.searchList(input, this.acceptedDebtTypes);
+    if (byType) return { ...byType, type: "accepted", status: "accepted" };
+    return null;
+  },
+
+  /**
+   * Primary entry point.
+   * @param {string} input              - Creditor name or debt type
+   * @param {object} [options]
+   * @param {string} [options.debtType] - Debt type selected for this row
+   * @returns {{ matched, status, type, input, matchedAlias, rule }}
+   */
+  findMatch(input, options = {}) {
+    const debtType = this.normalize(options.debtType || "");
+    const creditorName = this.normalize(input || "");
+
+    // 1. Check debt type against unacceptable list
+    if (debtType) {
+      const dtUnacceptable = this.searchList(debtType, this.unacceptableDebtTypes);
+      if (dtUnacceptable) {
+        return { matched: true, status: "unacceptable", type: "unacceptable",
+          input, matchedAlias: debtType, rule: dtUnacceptable.rule };
+      }
+    }
+
+    // 2. Check creditor name against unacceptable named creditors
+    if (creditorName) {
+      const unacceptable = this.findUnacceptable(creditorName);
+      if (unacceptable) return unacceptable;
+    }
+
+    // 3. Check creditor name against conditional list
+    if (creditorName) {
+      const conditional = this.findConditional(creditorName);
+      if (conditional) return conditional;
+    }
+
+    // 4. Check debt type against accepted list (returns stipulation if any)
+    if (debtType) {
+      const accepted = this.findAccepted(debtType);
+      if (accepted) {
+        return { matched: true, status: "accepted", type: "accepted",
+          input, matchedAlias: debtType, rule: accepted.rule };
+      }
+    }
+
+    return {
+      matched: false,
+      status: "accepted",
+      type: "accepted",
+      input,
+      matchedAlias: null,
+      rule: null
+    };
+  },
+
+  // Convenience wrappers
+  isUnacceptable(input, options = {}) {
+    return this.findMatch(input, options).status === "unacceptable";
+  },
+  isConditional(input, options = {}) {
+    return this.findMatch(input, options).status === "conditional";
+  },
+  isAccepted(input, options = {}) {
+    return this.findMatch(input, options).status === "accepted";
+  },
+  getRule(input, options = {}) {
+    return this.findMatch(input, options).rule;
+  },
+
+  /**
+   * Check if a state is eligible for ELP.
+   * @param {string} stateCode - Two-letter state code
+   * @returns {{ eligible: boolean, reason: string|null }}
+   */
+  checkState(stateCode) {
+    const code = String(stateCode || "").toUpperCase().trim();
+    if (this.program.restrictedStates.includes(code)) {
+      return {
+        eligible: false,
+        reason: `ELP cannot accept clients or debts from ${code}. Restricted states: ${this.program.restrictedStates.join(", ")}.`
+      };
+    }
+    return { eligible: true, reason: null };
+  }
+};
