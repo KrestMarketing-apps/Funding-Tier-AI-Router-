@@ -524,66 +524,29 @@ const LD_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c3
 const CS_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png';
 const LEGACY_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69e1c95dc56ad279084b3141.png';
 
-  // ================================
-// GLOBAL ROUTE STATE CONTROLLER
 // ================================
+// GLOBAL ROUTE STATE CONTROLLER — SAFE FINAL VERSION
+// ================================
+window.APP_STATE = window.APP_STATE || { route: null };
 
-window.APP_STATE = {
-  route: null
-};
+function safeUpdateCloseMachine(route){
+  if(typeof window.updateCloseMachine === 'function'){
+    window.updateCloseMachine(route);
+  }
+}
 
 function setRoute(route){
   if(window.APP_STATE.route === route) return;
-
   window.APP_STATE.route = route;
-
-  // Update Close Machine panel
-  setRoute(route);
-  // Optional: console debug so you can see it firing
-  console.log("Route set to:", route);
+  safeUpdateCloseMachine(route);
+  console.log('Route set to:', route);
 }
 
 function getRoute(){
   return window.APP_STATE.route;
 }
-function detectRouteFromCards(){
 
-  const recCard = document.querySelector('.plan-card-v.rec');
-  if(!recCard) return;
-
-  const name = recCard.innerText.toLowerCase();
-
-  if(name.includes('level')){
-    setRoute('LEVEL');
-  }
-  else if(name.includes('consumer')){
-    setRoute('CONSUMER_SHIELD');
-  }
-  else if(name.includes('legacy') || name.includes('elite')){
-    setRoute('LEGACY');
-  }
-}
-
-  // ============================
-// STABLE ROUTE ENGINE (FINAL)
-// ============================
-
-window.APP_STATE = { route: null };
-
-function setRoute(route){
-  console.log("setRoute called with:", route);
-
-  if(window.APP_STATE.route === route) return;
-
-  window.APP_STATE.route = route;
-  updateCloseMachine(route);
-}
-
-function getRoute(){
-  return window.APP_STATE.route;
-}
-  function detectRouteFromRecommendedCard(){
-
+function detectRouteFromRecommendedCard(){
   const rec = document.querySelector('.plan-card-v.rec');
   if(!rec) return;
 
@@ -599,7 +562,11 @@ function getRoute(){
     setRoute('LEGACY');
   }
 }
-  
+
+function detectRouteFromCards(){
+  detectRouteFromRecommendedCard();
+}
+
 const CS_PROGS=[
   {k:'A',range:'$4,000-$4,999',   min:4000, max:4999,    pay:220,term:18,comm:{p2:150,p4:0,total:150}},
   {k:'B',range:'$5,000-$8,799',   min:5000, max:8799,    pay:220,term:24,comm:{p2:150,p4:0,total:150}},
@@ -635,7 +602,7 @@ const STATE_NAMES={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'Calif
 const LD_BLACKOUT=new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
 const LD_RED=new Set(['CT','GA','LA','MN','NV','NH','NJ','ND','OH','PA','TN','WA','WY']);
 const CS_BLACKOUT=new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
-const LEGACY_BLACKOUT=new Set(['AK','RI','VT','WV','OR']);
+const LEGACY_BLACKOUT=new Set(['AK','RI','VT','WV','OR','ID','GA','ND']);
 const STATE_OPTS=Object.entries(STATE_NAMES).map(([a,n])=>({a,n,l:`${a} - ${n}`})).sort((x,y)=>x.l.localeCompare(y.l));
 const CS_REJ=new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
 const CS_COND=new Set(['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt']);
@@ -705,38 +672,87 @@ const LANG_OPTIONS=[
 ];
 let appLang='en';
 function getGoogTransLang(){
-  const m=document.cookie.match(/(?:^|; )googtrans=\/en\/([^;]+)/);
+  const m=document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
   return m&&m[1]?decodeURIComponent(m[1]):'en';
 }
 function populateLanguageSelector(){
-  const sel=$('langSel'); if(!sel) return;
+  const sel=$('langSel');
+  if(!sel) return;
   sel.innerHTML=LANG_OPTIONS.map(([code,flag,label])=>`<option value="${code}">${flag} ${label}</option>`).join('');
   appLang=getGoogTransLang();
   if(!LANG_OPTIONS.some(([c])=>c===appLang)) appLang='en';
   sel.value=appLang;
 }
+function setGoogTransCookie(lang){
+  const val=`/en/${lang || 'en'}`;
+  document.cookie=`googtrans=${val};path=/;SameSite=Lax`;
+  const host=location.hostname;
+  if(host && host.includes('.')){
+    document.cookie=`googtrans=${val};path=/;domain=.${host};SameSite=Lax`;
+  }
+}
+function clearGoogTransCookie(){
+  const expired='googtrans=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+  document.cookie=expired;
+  const host=location.hostname;
+  if(host && host.includes('.')) document.cookie=`${expired};domain=.${host}`;
+}
 function applyGoogleTranslate(lang){
   const combo=document.querySelector('.goog-te-combo');
   if(!combo) return false;
   combo.value=lang;
-  combo.dispatchEvent(new Event('change'));
+  combo.dispatchEvent(new Event('change',{bubbles:true}));
+  combo.dispatchEvent(new Event('input',{bubbles:true}));
   return true;
+}
+function loadGoogleTranslateScript(){
+  if(window.google && google.translate && google.translate.TranslateElement) return true;
+  if(document.querySelector('script[data-ft-google-translate="1"]')) return false;
+  const s=document.createElement('script');
+  s.dataset.ftGoogleTranslate='1';
+  s.src='https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+  s.async=true;
+  s.onerror=function(){
+    const sel=$('langSel');
+    if(sel){
+      sel.title='Google Translate could not load. Check browser ad blockers, CSP, or network access to translate.google.com.';
+    }
+  };
+  document.body.appendChild(s);
+  return false;
 }
 function setLang(l){
   appLang=l||'en';
-  document.cookie=`googtrans=/en/${appLang};path=/`;
-  const sel=$('langSel'); if(sel && sel.value!==appLang) sel.value=appLang;
-  if(appLang==='en'){ window.location.reload(); return; }
-  if(!applyGoogleTranslate(appLang)){
-    setTimeout(()=>{ if(!applyGoogleTranslate(appLang)) window.location.reload(); },500);
+  const sel=$('langSel');
+  if(sel && sel.value!==appLang) sel.value=appLang;
+
+  if(appLang==='en'){
+    clearGoogTransCookie();
+    window.location.reload();
+    return;
   }
+
+  setGoogTransCookie(appLang);
+  loadGoogleTranslateScript();
+
+  let attempts=0;
+  const tryApply=()=>{
+    attempts++;
+    if(applyGoogleTranslate(appLang)) return;
+    if(attempts<12) setTimeout(tryApply,350);
+  };
+  tryApply();
 }
 window.googleTranslateElementInit=function(){
+  if(!(window.google && google.translate && google.translate.TranslateElement)) return;
   new google.translate.TranslateElement({
     pageLanguage:'en',
     autoDisplay:false,
     includedLanguages: LANG_OPTIONS.map(([code])=>code).join(',')
   }, 'google_translate_element');
+  appLang=getGoogTransLang();
+  const sel=$('langSel');
+  if(sel && LANG_OPTIONS.some(([c])=>c===appLang)) sel.value=appLang;
   if(appLang && appLang!=='en'){
     setTimeout(()=>applyGoogleTranslate(appLang),700);
   }
@@ -982,6 +998,82 @@ const LEGACY_ACCEPT_RULES=[
   {n:["Utility Bills"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Items such as power, internet, electric, cellular, and cable require a NOTE confirming the client is aware service will be shut off.."},
   {n:["Velocity"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Acceptable 3rd party."}
 ];
+// ─── Consumer Shield: Explicit Accepted Named Creditor Rules ───
+// These prevent broad reject aliases from accidentally blocking normal accepted cards.
+const CS_NAMED_ACCEPT_RULES = [
+  {n:["American Express","AMEX","Amex","American Express Card","American Express Credit Card"], s:"ok", r:"American Express / Amex credit cards are accepted by Consumer Shield unless the specific product is a business loan or otherwise excluded."},
+];
+
+// ─── Consumer Shield: Named Creditor Reject / Conditional Rules ───
+const CS_NAMED_REJECT_RULES = [
+  // Military / Government
+  {n:["Military Star","Exchange Credit Program","AFES","AAFES"],                        s:"rej", r:"Military Star / AFES accounts are not accepted by Consumer Shield."},
+  {n:["VA Loan","VA Loans","Veterans Affairs Loan","Veterans Administration"],           s:"rej", r:"VA loans are not accepted by Consumer Shield."},
+  {n:["SBA Loan","SBA Loans","Small Business Administration"],                           s:"rej", r:"SBA loans are not accepted by Consumer Shield."},
+  // Solar / Home Improvement
+  {n:["GoodLeap","Good Leap","GoodLeap LLC","GoodLeap Solar","LoanPal","Loan Pal"],      s:"rej", r:"GoodLeap / LoanPal (solar / home improvement) is not accepted by Consumer Shield."},
+  {n:["Solar Mosaic","Mosaic Solar","Mosaic"],                                            s:"rej", r:"Solar Mosaic is not accepted by Consumer Shield."},
+  {n:["Aqua Finance","AquaFinance"],                                                      s:"rej", r:"Aqua Finance (HVAC / home improvement) is not accepted by Consumer Shield."},
+  {n:["EnerBank","EnerBank USA"],                                                         s:"rej", r:"EnerBank (home improvement) is not accepted by Consumer Shield."},
+  {n:["Service Finance Company","Service Finance","SVCFIN","SRVFINCO"],                   s:"rej", r:"Service Finance Company is not accepted by Consumer Shield."},
+  {n:["PowerPay","Power Pay"],                                                            s:"rej", r:"PowerPay is not accepted by Consumer Shield."},
+  {n:["GreenSky","Green Sky"],                                                            s:"rej", r:"GreenSky is not accepted by Consumer Shield."},
+  // Auto / Vehicle-secured
+  {n:["Yendo"],                                                                            s:"rej", r:"Yendo (vehicle-equity card) is not accepted by Consumer Shield — secured to vehicle title."},
+  {n:["Toledo Finance","Toledo Financial"],                                               s:"rej", r:"Toledo Finance is not accepted by Consumer Shield."},
+  // Rent-to-Own / POS
+  {n:["Rent-A-Center","Rent A Center","RentACenter","RAC"],                              s:"rej", r:"Rent-A-Center is not accepted by Consumer Shield."},
+  {n:["Acceptance Now","AcceptanceNow"],                                                  s:"rej", r:"Acceptance Now is not accepted by Consumer Shield."},
+  {n:["Acima","Acima Credit","Acima Digital"],                                           s:"rej", r:"Acima is not accepted by Consumer Shield."},
+  {n:["Koalafi"],                                                                          s:"rej", r:"Koalafi is not accepted by Consumer Shield."},
+  {n:["Farmers Furniture","FRMRS FURN","Farmers Home Furniture"],                        s:"rej", r:"Farmers Furniture is not accepted by Consumer Shield."},
+  // Retail Furniture
+  {n:["Bobs Discount Furniture","Bob Discount Furniture","Bobs Furniture","Bobs Finance","Bob Finance","Bob S Discount"], s:"rej", r:"Bob's Discount Furniture is not accepted by Consumer Shield."},
+  {n:["Nebraska Furniture","Nebraska Furniture Mart","NFM"],                             s:"rej", r:"Nebraska Furniture Mart is not accepted by Consumer Shield."},
+  // Tool / Equipment
+  {n:["Snap On Credit","Snap-On Credit","Snapon Credit","Snap On Financial"],             s:"rej", r:"Snap-On Credit is not accepted by Consumer Shield."},
+  {n:["West Creek Financial","WestCreek Financial","West Creek Finance"],                 s:"rej", r:"West Creek Financial is not accepted by Consumer Shield."},
+  // Named Credit Unions
+  {n:["State Employees Credit Union","State Employees C U","STATEEMP","SECU"],           s:"rej", r:"State Employees Credit Union (all state variants) is not accepted by Consumer Shield."},
+  {n:["Empower FCU","Empower Federal Credit Union"],                                      s:"rej", r:"Empower FCU is not accepted by Consumer Shield."},
+  {n:["ESL Credit Union","ESL FCU","ESL Federal Credit Union"],                          s:"rej", r:"ESL Credit Union is not accepted by Consumer Shield."},
+  {n:["Redstone Credit Union","Redstone Federal Credit Union"],                           s:"rej", r:"Redstone Credit Union is not accepted by Consumer Shield."},
+  {n:["Fortera Credit Union","Fortera FCU"],                                              s:"rej", r:"Fortera Credit Union is not accepted by Consumer Shield."},
+  {n:["Local Government Federal Credit Union","Local Government FCU","LGFCU"],           s:"rej", r:"Local Government FCU is not accepted by Consumer Shield."},
+  {n:["Garden Federal Credit Union","Garden FCU"],                                       s:"rej", r:"Garden FCU is not accepted by Consumer Shield."},
+  {n:["Golden One Credit Union","Golden 1 Credit Union","Golden1"],                      s:"rej", r:"Golden One Credit Union is not accepted by Consumer Shield."},
+  {n:["Hawaii Credit Union","Hawaii CU","HCU"],                                          s:"rej", r:"Hawaii Credit Union is not accepted by Consumer Shield."},
+  {n:["WSECU","Washington State Employees Credit Union"],                                s:"rej", r:"WSECU is not accepted by Consumer Shield."},
+  // Credit Builder
+  {n:["KIKOFF","Kikoff"],                                                                 s:"rej", r:"KIKOFF (credit builder) is not accepted by Consumer Shield."},
+  {n:["OpenSky","Open Sky","OpenSky Secured Visa"],                                      s:"rej", r:"OpenSky (secured card) is not accepted by Consumer Shield."},
+  // MLM / Direct Sales
+  {n:["HC ROYA","HYCITE","Royal Prestige","HC Royal"],                                  s:"rej", r:"HC Roya / Royal Prestige is not accepted by Consumer Shield."},
+  // Regional / PR
+  {n:["Island Finance","Island Finance PR"],                                             s:"rej", r:"Island Finance (PR) is not accepted by Consumer Shield."},
+  {n:["Popular Bank","Banco Popular"],                                                    s:"rej", r:"Popular Bank / Banco Popular is not accepted by Consumer Shield."},
+  // Goldman Sachs CC only
+  {n:["Goldman Sachs Credit Card","Marcus Credit Card","Marcus by Goldman Sachs"],       s:"rej", r:"Goldman Sachs credit cards are not accepted by Consumer Shield. Apple Card and GS personal loans ARE accepted."},
+  // BHG
+  {n:["BHG Financial","BHG Money","Bankers Healthcare Group","BHG"],                     s:"rej", r:"All BHG entities are not accepted by Consumer Shield."},
+  // Other
+  {n:["Pinnacle Financial Group","Pinnacle Financial"],                                  s:"rej", r:"Pinnacle Financial Group is not accepted by Consumer Shield."},
+  {n:["Concord Servicing","Concord Servicing Corp"],                                     s:"rej", r:"Concord Servicing is not accepted by Consumer Shield."},
+  {n:["Credologi","Credologi LLC"],                                                       s:"rej", r:"Credologi is not accepted by Consumer Shield."},
+  {n:["Kabbage","Kabbage Loans","AmEx Business Blueprint"],                              s:"rej", r:"Kabbage (small business lending) is not accepted by Consumer Shield."},
+  {n:["Robinhood","Robinhood Financial"],                                                s:"rej", r:"Robinhood (investment / brokerage) is not accepted by Consumer Shield."},
+  {n:["Alleviate Tax","Alleviate Tax LLC","Alleviate Financial"],                        s:"rej", r:"Alleviate Tax is a tax relief firm — not an enrollable creditor."},
+];
+
+const CS_NAMED_COND_RULES = [
+  {n:["Lendmark","Lendmark Financial","Lendmark Financial Services"],   s:"cond", r:"Lendmark — unsecured accounts only. Secured NOT accepted. Verify before enrolling."},
+  {n:["Mariner Finance","Mariner","Mariner Financial"],                  s:"cond", r:"Mariner Finance — unsecured accounts only. Secured NOT accepted. Verify before enrolling."},
+  {n:["OneMain","OneMain Financial","One Main Financial","One Main"],    s:"cond", r:"OneMain — unsecured accounts only. Secured NOT accepted. Verify before enrolling."},
+  {n:["Regional Finance","Regional Finance Corp","Regional Management"], s:"cond", r:"Regional Finance — unsecured accounts only. Secured NOT accepted. Verify before enrolling."},
+  {n:["Republic Finance","Republic Finance LLC"],                        s:"cond", r:"Republic Finance — unsecured accounts only. Secured NOT accepted. Verify before enrolling."},
+  {n:["USAA","USAA Federal Savings Bank","USAA Bank"],                   s:"cond", r:"USAA is conditional for Consumer Shield — documentation required."},
+];
+
 const ALL_CRED_RULES=[...CRED_RULES,...LEGACY_REJECT_RULES,...LEGACY_ACCEPT_RULES];
 const LEVEL_DEBT_UNACCEPTED_LOOKUP=[
   "ALLEVIATE TAX LLC",
@@ -1067,7 +1159,83 @@ const num=v=>{const n=parseFloat(String(v).replace(/[^0-9.]/g,''));return Number
 const esc=v=>String(v||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const pct=v=>`${(v||0).toFixed(1)}%`;
 function normName(v){return String(v||'').toUpperCase().replace(/&/g,' AND ').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();}
-function getCredRule(name){if(!name)return null;const a=normName(name);return ALL_CRED_RULES_EXTENDED.find(r=>r.n.some(n=>{const b=normName(n);if(a===b||a.includes(b)||b.includes(a))return true;const ta=a.split(' '),tb=b.split(' ');const[sh,lo]=ta.length<=tb.length?[ta,tb]:[tb,ta];return sh.length>=2&&sh.every(t=>t.length>2&&lo.includes(t));}))||null;}
+// ─── Per-program creditor lookup functions ────────────────────────
+function _ruleSearch(name, ruleList) {
+  if(!name) return null;
+  const a = normName(name);
+  return ruleList.find(r => (r.n||[]).some(n => {
+    const b = normName(n);
+    if(a === b || a.includes(b) || b.includes(a)) return true;
+    const ta = a.split(' '), tb = b.split(' ');
+    const [sh, lo] = ta.length <= tb.length ? [ta, tb] : [tb, ta];
+    return sh.length >= 2 && sh.every(t => t.length > 2 && lo.includes(t));
+  })) || null;
+}
+
+// Level Debt only (CRED_RULES + LEVEL_DEBT_UNACCEPTED_RULES)
+function getLevelCredRule(name) {
+  return _ruleSearch(name, [...CRED_RULES, ...LEVEL_DEBT_UNACCEPTED_RULES]);
+}
+
+// Consumer Shield only — explicit accepts override reject/conditional aliases
+function getCSNamedRule(name) {
+  const accepted = _ruleSearch(name, CS_NAMED_ACCEPT_RULES || []);
+  if(accepted) return accepted;
+  return _ruleSearch(name, [...CS_NAMED_REJECT_RULES, ...CS_NAMED_COND_RULES]);
+}
+
+// Legacy / ELP only (LEGACY_REJECT_RULES + LEGACY_ACCEPT_RULES)
+function getLegacyCredRule(name) {
+  return _ruleSearch(name, [...LEGACY_REJECT_RULES, ...LEGACY_ACCEPT_RULES]);
+}
+
+// Legacy (all rules merged — for backward compat where needed)
+function getCredRule(name) {
+  return _ruleSearch(name, ALL_CRED_RULES_EXTENDED);
+}
+
+/**
+ * Returns the status of a creditor across all three programs.
+ * @returns {{ level, cs, legacy }} — each: { status:'ok'|'cond'|'rej', rule:string|null }
+ */
+function getCreditorProgramStatus(credName, debtType) {
+  const dt = String(debtType || 'Unsecured');
+
+  const levelRule = getLevelCredRule(credName);
+  const levelStatus = levelRule
+    ? { status: levelRule.s, rule: levelRule.r }
+    : { status: 'ok', rule: null };
+
+  let csStatus;
+  if(CS_REJ.has(dt)) {
+    csStatus = { status: 'rej', rule: `${dt} not accepted by Consumer Shield.` };
+  } else if(CS_COND.has(dt)) {
+    csStatus = { status: 'cond', rule: `${dt} is conditional for Consumer Shield.` };
+  } else {
+    const csRule = getCSNamedRule(credName);
+    csStatus = csRule ? { status: csRule.s, rule: csRule.r } : { status: 'ok', rule: null };
+  }
+
+  const legacyDebtRej = [
+    'Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt',
+    'Alimony / Child Support','Wage Garnishments','Solar Panels',
+    'Student Loans','Tax Debts','VA Loans','Pioneer Loans',
+    'Business Credit Cards under EIN#','Business Credit Cards under SS#',
+    'Business Loans under EIN#','Business Loans under SS#',
+    'Home Improvement Loans','Mechanic\'s Liens'
+  ];
+  let legacyStatus;
+  if(legacyDebtRej.some(t => dt.toLowerCase().includes(t.toLowerCase()))) {
+    legacyStatus = { status: 'rej', rule: `${dt} is not accepted by ELP.` };
+  } else {
+    const legacyRule = getLegacyCredRule(credName);
+    legacyStatus = legacyRule
+      ? { status: legacyRule.s, rule: legacyRule.r }
+      : { status: 'ok', rule: null };
+  }
+
+  return { level: levelStatus, cs: csStatus, legacy: legacyStatus };
+}
 const isTradCard=n=>TRAD_CARDS.some(t=>normName(n).includes(normName(t)));
 const getLDState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:LD_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Black Out'}:LD_RED.has(c)?{status:'RED',label:'Attorney Model'}:{status:'GREEN',label:'Standard Model'};
 const getCSState=c=>!c?{status:'UNKNOWN',label:'Unknown'}:CS_BLACKOUT.has(c)?{status:'BLACKOUT',label:'Black Out'}:{status:'GREEN',label:'Serviceable'};
@@ -1101,51 +1269,117 @@ let nextId=2;
 const app={sel:'',rows:[newRow(1)],selectedProgramRoute:''};
 function newRow(id){return{id,cred:'',amount:'',dt:'Unsecured',secured:false,collections:false,litigation:false,paid:true,bizUnprof:false};}
 function calcDN(d,apr=.24){const mp=d*.025,mr=apr/12;if(d<=0||mp<=d*mr)return{mp:0,months:0,apr,total:0};const months=Math.max(1,Math.round(Math.log(mp/(mp-d*mr))/Math.log(1+mr)));return{mp,months,apr,total:mp*months};}
-function collectFlags(rows,total,sc){
-  const csF=[],ldF=[];
-  if(total>0&&total<4000)csF.push('Consumer Shield requires at least $4,000 total enrolled debt.');
-  if(sc&&getCSState(sc).status==='BLACKOUT')csF.push('Consumer Shield does not service this state.');
-  if(total>0&&total<7000)ldF.push('Level Debt requires at least $7,000 total enrolled debt.');
-  const discDebt=rows.reduce((s,r)=>normName(r.cred).includes('DISCOVER')?s+num(r.amount):s,0);
-  if(discDebt>0)ldF.push(`Discover debt portion is ${pct(discDebt/Math.max(total,1)*100)} of enrolled. Level Debt caps Discover exposure at 60% of total enrolled debt.`);
-  if(total>0&&discDebt/total>.6)ldF.push(`Discover debt is ${pct(discDebt/total*100)} of enrolled - Level max is 60%.`);
-  const medDebt=rows.reduce((s,r)=>['Medical Bill','Back Rent','Apartment Back Rent (Collections)','Repossession Deficiency','Auto Repo Deficiency'].includes(r.dt)?s+num(r.amount):s,0);
-  if(total>0&&medDebt/total>.5)ldF.push(`Medical/back rent/repo is ${pct(medDebt/total*100)} of enrolled - Level max is 50%.`);
-  const psDebt=rows.reduce((s,r)=>r.dt==='Private Student Loan'?s+num(r.amount):s,0);
-  if(total>0&&psDebt/total>.25)ldF.push(`Private student loans are ${pct(psDebt/total*100)} of enrolled - Level max is 25%.`);
-  rows.forEach(r=>{
-    const a=num(r.amount);if(!a)return;
-    if(a<100)csF.push(`${r.cred||r.dt}: below Consumer Shield $100 minimum.`);
-    if(CS_REJ.has(r.dt))csF.push(`${r.dt} not accepted by Consumer Shield.`);
-    if(LD_REJ.has(r.dt))ldF.push(`${r.dt} not accepted by Level Debt.`);
-    if(a<200&&!r.collections)ldF.push(`${r.cred||r.dt}: must be $200+ unless in collections.`);
-    if(!r.paid)ldF.push(`${r.cred||r.dt}: must have at least one payment made.`);
-    const rule=getCredRule(r.cred);
-    if(rule&&rule.s==='rej')ldF.push(`${r.cred}: ${rule.r}`);
-    if(rule&&rule.s==='cond'&&r.secured)ldF.push(`${r.cred} (secured): ${rule.r}`);
-    if(r.litigation)ldF.push(`${r.cred||r.dt}: in litigation - needs legal review.`);
-    if(r.dt==='Business Debt'&&!r.bizUnprof)ldF.push(`${r.cred||r.dt}: business must be closed or unprofitable.`);
-    if(r.dt==='Private Student Loan'&&sc==='CA')ldF.push('Private student loans not accepted for CA residents.');
-    if(r.dt==='Private Student Loan'&&normName(r.cred).includes('DISCOVER'))ldF.push('Discover private student loans not accepted.');
+function collectFlags(rows, total, sc) {
+  const csF = [], ldF = [], legacyF = [];
+
+  // ── State-level checks ──────────────────────────────────
+  if(total > 0 && total < 4000)  csF.push('Consumer Shield requires at least $4,000 total enrolled debt.');
+  if(sc && getCSState(sc).status === 'BLACKOUT') csF.push('Consumer Shield does not service this state.');
+  if(total > 0 && total < 7000)  ldF.push('Level Debt requires at least $7,000 total enrolled debt.');
+  if(sc && getLDState(sc).status === 'BLACKOUT') ldF.push('Level Debt does not service this state.');
+  if(total > 0 && total < 6000)  legacyF.push('ELP requires at least $6,000 total enrolled debt.');
+  if(sc && getLegacyState(sc).status === 'BLACKOUT') legacyF.push('ELP does not service this state.');
+
+  // ── Level concentration rules ───────────────────────────
+  const discDebt = rows.reduce((s,r) => normName(r.cred).includes('DISCOVER') ? s + num(r.amount) : s, 0);
+  if(discDebt > 0) ldF.push(`Discover debt is ${pct(discDebt/Math.max(total,1)*100)} of enrolled — Level Debt caps Discover exposure at 60%.`);
+  if(total > 0 && discDebt/total > .6) ldF.push(`Discover exposure ${pct(discDebt/total*100)} exceeds Level's 60% cap — routing blocked.`);
+  const medDebt = rows.reduce((s,r) => ['Medical Bill','Back Rent','Apartment Back Rent (Collections)','Repossession Deficiency','Auto Repo Deficiency'].includes(r.dt) ? s + num(r.amount) : s, 0);
+  if(total > 0 && medDebt/total > .5) ldF.push(`Medical/back rent/repo is ${pct(medDebt/total*100)} of enrolled — Level max is 50%.`);
+  const psDebt = rows.reduce((s,r) => r.dt === 'Private Student Loan' ? s + num(r.amount) : s, 0);
+  if(total > 0 && psDebt/total > .25) ldF.push(`Private student loans are ${pct(psDebt/total*100)} of enrolled — Level max is 25%.`);
+
+  // ── Per-row per-program checks ──────────────────────────
+  rows.forEach(r => {
+    const a = num(r.amount);
+    if(!a) return;
+
+    const ps = getCreditorProgramStatus(r.cred, r.dt);
+    const label = r.cred || r.dt;
+
+    // Consumer Shield
+    if(a < 100) csF.push(`${label}: below Consumer Shield $100 minimum.`);
+    if(ps.cs.status === 'rej') csF.push(`${label}: ${ps.cs.rule}`);
+
+    // Level Debt
+    if(a < 200 && !r.collections) ldF.push(`${label}: must be $200+ unless in 3rd party collections.`);
+    if(!r.paid) ldF.push(`${label}: Level requires at least one payment made.`);
+    if(ps.level.status === 'rej') ldF.push(`${label}: ${ps.level.rule}`);
+    if(ps.level.status === 'cond' && r.secured) ldF.push(`${label} (secured): ${ps.level.rule}`);
+    if(LD_REJ.has(r.dt)) ldF.push(`${r.dt} not accepted by Level Debt.`);
+    if(r.litigation) ldF.push(`${label}: in litigation — needs legal review.`);
+    if(r.dt === 'Business Debt' && !r.bizUnprof) ldF.push(`${label}: business must be closed or unprofitable for Level.`);
+    if(r.dt === 'Private Student Loan' && sc === 'CA') ldF.push('Private student loans not accepted for CA residents.');
+    if(r.dt === 'Private Student Loan' && normName(r.cred).includes('DISCOVER')) ldF.push('Discover private student loans not accepted by Level.');
+
+    // Legacy / ELP
+    if(ps.legacy.status === 'rej') legacyF.push(`${label}: ${ps.legacy.rule}`);
   });
-  return{cs:Array.from(new Set(csF)),ld:Array.from(new Set(ldF))};
+
+  return {
+    cs:     Array.from(new Set(csF)),
+    ld:     Array.from(new Set(ldF)),
+    legacy: Array.from(new Set(legacyF))
+  };
 }
-function chooseRoute(total,sc,flags){
-  if(!sc)return{route:'',reason:'Select a state to calculate routing.'};
-  const pref=$('featurePriority')?.value||'best_fit';
-  const cs=getCSState(sc),ld=getLDState(sc),legacy=getLegacyState(sc);
-  const csOK=cs.status!=='BLACKOUT'&&total>=4000&&!flags.cs.some(f=>f.includes('not accepted')||f.includes('requires at least'));
-  const ldStop=flags.ld.some(f=>f.includes('not accepted')||f.includes('requires at least')||f.includes('60%')||f.includes('50%')||f.includes('25%')||f.includes('CA residents')||f.includes('Discover private'));
-  const ldOK=ld.status!=='BLACKOUT'&&total>=7000&&!ldStop;
-  const legacyOK=legacy.status!=='BLACKOUT'&&total>=6000;
-  if(total>0&&total<4000)return{route:'NO OPTION',reason:'Debt below $4,000 - no current backend matches this scenario.'};
-  if(total>=4000&&total<=5999){if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt between $4,000 and $5,999 routes to Consumer Shield.'};return{route:'NO OPTION',reason:'Debt in Consumer Shield range but CS is not available for this state or scenario.'};}
-  if(total>=6000&&total<=6999){if(legacyOK)return{route:'LEGACY',reason:'Debt between $6,000 and $6,999 routes to Legacy / Elite Legal Practice (ELP) when state and creditor rules allow.'};if(csOK)return{route:'CONSUMER SHIELD',reason:'Debt is in the Legacy preferred band, but Legacy is unavailable, so routing falls back to Consumer Shield.'};return{route:'NO OPTION',reason:'Debt is in the Legacy preferred band, but no backend is available for this state or scenario.'};}
-  if(total>6000&&pref==='debt_validation'){if(legacyOK)return{route:'LEGACY',reason:'Prospect wants debt validation - Legacy / Elite Legal Practice (ELP) is available in this state.'};if(csOK)return{route:'CONSUMER SHIELD',reason:'Prospect wants debt validation - Legacy unavailable, routing to Consumer Shield.'};return{route:'NO OPTION',reason:'Prospect wants debt validation but neither Legacy nor Consumer Shield is available.'};}
-  if(ldOK)return{route:'LEVEL',reason:ld.status==='RED'?'Best option is Level Debt under the attorney model in this state.':'Best option is Level Debt in a serviceable standard state.'};
-  if(legacyOK)return{route:'LEGACY',reason:'Level Debt not available under current routing rules - Legacy / Elite Legal Practice (ELP) is the next best option.'};
-  if(csOK)return{route:'CONSUMER SHIELD',reason:'Level Debt not available for this scenario - Consumer Shield is the fallback option.'};
-  return{route:'NO OPTION',reason:'No available backend is serviceable in this state.'};
+function chooseRoute(total, sc, flags) {
+  if(!sc) return { route:'', reason:'Select a state to calculate routing.' };
+  const pref = $('featurePriority')?.value || 'best_fit';
+  const cs = getCSState(sc), ld = getLDState(sc), legacy = getLegacyState(sc);
+
+  // ── Availability checks ─────────────────────────────────
+  const csOK = cs.status !== 'BLACKOUT' && total >= 4000 &&
+    !flags.cs.some(f => f.includes('not accepted') || f.includes('requires at least') || f.includes('does not service'));
+
+  const ldBlocking = flags.ld.some(f =>
+    f.includes('not accepted') || f.includes('requires at least') ||
+    f.includes('exceeds Level') || f.includes('50%') || f.includes('25%') ||
+    f.includes('CA residents') || f.includes('Discover private') ||
+    f.includes('does not service'));
+  const ldOK = ld.status !== 'BLACKOUT' && total >= 7000 && !ldBlocking;
+
+  const legacyBlocking = (flags.legacy || []).some(f =>
+    f.includes('not accepted') || f.includes('requires at least') ||
+    f.includes('does not service'));
+  const legacyOK = legacy.status !== 'BLACKOUT' && total >= 6000 && !legacyBlocking;
+
+  // ── Hard minimum ────────────────────────────────────────
+  if(total > 0 && total < 4000)
+    return { route:'NO OPTION', reason:'Total enrolled debt is below $4,000 — no backend available for this amount.' };
+
+  // ── $4,000–$5,999 band: CS primary ─────────────────────
+  if(total >= 4000 && total <= 5999) {
+    if(csOK) return { route:'CONSUMER SHIELD', reason:'Debt between $4,000 and $5,999 routes to Consumer Shield.' };
+    return { route:'NO OPTION', reason:'Debt is in the Consumer Shield band but CS is unavailable for this state or creditor mix.' };
+  }
+
+  // ── $6,000–$6,999 band: Legacy primary, CS fallback ────
+  if(total >= 6000 && total <= 6999) {
+    if(legacyOK) return { route:'LEGACY', reason:'Debt between $6,000 and $6,999 routes to Legacy / ELP when state and creditor rules allow.' };
+    if(csOK) return { route:'CONSUMER SHIELD', reason:'Debt is in Legacy\'s preferred band but ELP is unavailable — falling back to Consumer Shield.' };
+    return { route:'NO OPTION', reason:'No backend available for this debt amount and state combination.' };
+  }
+
+  // ── Priority: Debt Validation preference ────────────────
+  if(total > 6000 && pref === 'debt_validation') {
+    if(legacyOK) return { route:'LEGACY', reason:'Prospect prefers debt validation — Legacy / ELP is available in this state.' };
+    if(csOK)     return { route:'CONSUMER SHIELD', reason:'Prospect prefers debt validation — Legacy unavailable, routing to Consumer Shield.' };
+    return { route:'NO OPTION', reason:'Prospect wants debt validation but neither Legacy nor Consumer Shield is available.' };
+  }
+
+  // ── Priority: Attorney-led / Legal Support ───────────────
+  if(pref === 'legal_support') {
+    if(legacyOK) return { route:'LEGACY', reason:'Prospect wants attorney-led support — Legacy / ELP is the right fit and is available.' };
+    if(ldOK)     return { route:'LEVEL', reason:'Prospect wants legal support but ELP is unavailable — Level Debt attorney model is available in this state.' };
+    if(csOK)     return { route:'CONSUMER SHIELD', reason:'Attorney-led programs unavailable — falling back to Consumer Shield.' };
+    return { route:'NO OPTION', reason:'No backend available for this state and preference combination.' };
+  }
+
+  // ── Standard routing: Level → Legacy → CS ───────────────
+  if(ldOK)     return { route:'LEVEL', reason: ld.status === 'RED' ? 'Best option is Level Debt under the attorney model in this state.' : 'Best option is Level Debt — serviceable standard state.' };
+  if(legacyOK) return { route:'LEGACY', reason:'Level Debt not available under current routing rules — Legacy / ELP is the next best option.' };
+  if(csOK)     return { route:'CONSUMER SHIELD', reason:'Level Debt and Legacy / ELP are both unavailable — Consumer Shield is the fallback option.' };
+  return { route:'NO OPTION', reason:'No backend is serviceable for this state and scenario.' };
 }
 function computeScenario(){
   const rows = app.rows.filter(r => num(r.amount) > 0);
@@ -1155,9 +1389,9 @@ function computeScenario(){
   const lds = getLDState(app.sel), css = getCSState(app.sel), lgs = getLegacyState(app.sel);
   const csProg = getCsProg(total);
 
-  const csAvail = css.status !== 'BLACKOUT' && total >= 4000 && !flags.cs.some(f => f.includes('not accepted') || f.includes('requires at least'));
-  const ldAvail = lds.status !== 'BLACKOUT' && total >= 7000;
-  const legacyAvail = lgs.status !== 'BLACKOUT' && total >= 6000;
+  const csAvail = css.status !== 'BLACKOUT' && total >= 4000 && !flags.cs.some(f => f.includes('not accepted') || f.includes('requires at least') || f.includes('does not service'));
+  const ldAvail = lds.status !== 'BLACKOUT' && total >= 7000 && !flags.ld.some(f => f.includes('not accepted') || f.includes('requires at least') || f.includes('exceeds Level') || f.includes('50%') || f.includes('25%') || f.includes('CA residents') || f.includes('Discover private') || f.includes('does not service'));
+  const legacyAvail = lgs.status !== 'BLACKOUT' && total >= 6000 && !(flags.legacy||[]).some(f => f.includes('not accepted') || f.includes('requires at least') || f.includes('does not service'));
 
   const feeRate = route.route === 'LEVEL' ? (lds.status === 'RED' ? .27 : .25) : 0;
   const dn = calcDN(total);
@@ -1218,25 +1452,69 @@ function computeScenario(){
     activeFlags.push('Consumer Shield uses Equifax for credit pull.');
   }
   if(route.route === 'LEGACY'){
+    activeFlags.push(...(flags.legacy || []));
     activeFlags.push(`Legacy payment includes ${fmt(legacyMonthlyAdminFees(legacyState.splitPay))}/mo in admin/draft fees (${legacyState.splitPay ? '$80 maintenance + two $4 draft fees' : '$80 maintenance + one $4 draft fee'}).`);
   }
   if(route.route === 'NO OPTION') activeFlags.push(route.reason);
 
   return {rows,total,route,dn,shortest,recommended,feeRate,lds,css,lgs,csProg,csAvail,ldAvail,legacyAvail,flags:activeFlags};
 }
-function rowAlerts(row,route){
-  const alerts=[];
-  const rule=getCredRule(row.cred);
-  if(rule){
-    if(rule.s==='rej')alerts.push({label:'Level rejected creditor',tone:'r',detail:rule.r});
-    else if(rule.s==='cond')alerts.push({label:row.secured?'Level conditional - secured not eligible':'Level conditional creditor',tone:row.secured?'r':'a',detail:rule.r});
+function rowAlerts(row, route) {
+  const alerts = [];
+  const ps = getCreditorProgramStatus(row.cred, row.dt);
+
+  // ── Level badges ────────────────────────────────────────
+  if(ps.level.status === 'rej') {
+    alerts.push({ label:'Level ✕', tone:'r', detail: ps.level.rule, program:'LEVEL' });
+  } else if(ps.level.status === 'cond') {
+    alerts.push({ label: row.secured ? 'Level ✕ Secured' : 'Level ⚠', tone: row.secured ? 'r' : 'a', detail: ps.level.rule, program:'LEVEL' });
   }
-  if(route==='LEVEL'&&LD_REJ.has(row.dt))alerts.push({label:'Debt type not accepted',tone:'r',detail:row.dt+' not accepted by Level.'});
-  if(route==='LEVEL'&&normName(row.cred).includes('DISCOVER'))alerts.push({label:'Discover rule applies',tone:'a',detail:'Level Debt allows Discover only when total Discover exposure stays at or below 60% of enrolled debt.'});
-  if(route==='CONSUMER SHIELD'){
-    if(CS_REJ.has(row.dt))alerts.push({label:'Not accepted by CS',tone:'r',detail:row.dt+' not accepted by Consumer Shield.'});
-    if(CS_COND.has(row.dt))alerts.push({label:'Conditional - docs needed',tone:'a',detail:row.dt+' requires additional documentation.'});
+  if(route === 'LEVEL' && LD_REJ.has(row.dt))
+    alerts.push({ label:'Level ✕ Debt Type', tone:'r', detail:`${row.dt} not accepted by Level Debt.`, program:'LEVEL' });
+  if(normName(row.cred).includes('DISCOVER'))
+    alerts.push({ label:'Level Discover 60% Rule', tone:'a', detail:'Level caps Discover exposure at 60% of total enrolled.', program:'LEVEL' });
+
+  // ── Consumer Shield badges ──────────────────────────────
+  if(ps.cs.status === 'rej') {
+    alerts.push({ label:'CS ✕', tone:'r', detail: ps.cs.rule, program:'CS' });
+  } else if(ps.cs.status === 'cond') {
+    alerts.push({ label:'CS ⚠', tone:'a', detail: ps.cs.rule, program:'CS' });
   }
+
+  // ── Legacy / ELP badges ─────────────────────────────────
+  if(ps.legacy.status === 'rej') {
+    alerts.push({ label:'ELP ✕', tone:'p', detail: ps.legacy.rule, program:'LEGACY' });
+  } else if(ps.legacy.status === 'ok' && ps.legacy.rule) {
+    alerts.push({ label:'ELP — notes', tone:'a', detail: ps.legacy.rule, program:'LEGACY' });
+  }
+
+  // ── Cross-program routing opportunity ───────────────────
+  const progMap = [
+    { key:'LEVEL',  label:'Level',    s: ps.level.status  },
+    { key:'CS',     label:'CS',       s: ps.cs.status     },
+    { key:'LEGACY', label:'ELP',      s: ps.legacy.status },
+  ];
+  const rejected = progMap.filter(p => p.s === 'rej').map(p => p.label);
+  const available = progMap.filter(p => p.s !== 'rej').map(p => p.label);
+
+  if(rejected.length > 0 && available.length > 0) {
+    alerts.push({
+      label: `Available via: ${available.join(' & ')}`,
+      tone: 'b',
+      detail: `${row.cred || row.dt} is rejected by ${rejected.join(' & ')} but can be enrolled via ${available.join(' & ')}.`,
+      program: 'OPPORTUNITY'
+    });
+  }
+
+  if(rejected.length === 3) {
+    alerts.push({
+      label: 'No program accepts this creditor',
+      tone: 'r',
+      detail: `${row.cred || row.dt} is rejected by all three programs. Consider removing this account from enrollment.`,
+      program: 'ALL_REJECTED'
+    });
+  }
+
   return alerts;
 }
 function clockParts(tz){const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());const m={};p.forEach(x=>{if(x.type!=='literal')m[x.type]=x.value;});const wd={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};return{h:Number(m.hour),min:Number(m.minute),wd:wd[m.weekday]};}
@@ -1804,7 +2082,29 @@ function renderCmpTable(c){
   ];
   $('cmpTable').innerHTML=rows.map(r=>`<tr class="${r[4]}">${r.slice(0,4).map(v=>`<td>${v}</td>`).join('')}</tr>`).join('');
 }
-function refreshRowVisuals(){const c=computeScenario();app.rows.forEach((row,i)=>{const card=document.querySelector(`[data-row="${i}"]`);if(!card)return;const alerts=rowAlerts(row,c.route.route);card.className='row-card'+(row.secured?' fr':alerts.some(a=>a.tone==='r')?' fr':alerts.some(a=>a.tone==='a')?' fa':'');const wrap=card.querySelector('.aw');if(wrap)wrap.innerHTML=alerts.map(a=>`<span class="pill b-${a.tone==='r'?'no':'cond'}" style="font-size:10px;cursor:help;" title="${esc(a.detail||a.label)}">${a.label}</span>`).join('');});}
+function refreshRowVisuals() {
+  const c = computeScenario();
+  app.rows.forEach((row, i) => {
+    const card = document.querySelector(`[data-row="${i}"]`);
+    if(!card) return;
+    const alerts = rowAlerts(row, c.route.route);
+    const hasHardRej = alerts.some(a => a.tone === 'r' && a.program !== 'OPPORTUNITY');
+    const hasWarn    = alerts.some(a => a.tone === 'a');
+    card.className = 'row-card' + (row.secured ? ' fr' : hasHardRej ? ' fr' : hasWarn ? ' fa' : '');
+    const wrap = card.querySelector('.aw');
+    if(wrap) {
+      wrap.innerHTML = alerts.map(a => {
+        const styleMap = {
+          r: 'background:#fef2f2;color:#b91c1c;border:1px solid rgba(239,68,68,.3);',
+          a: 'background:#fffbeb;color:#92400e;border:1px solid rgba(245,158,11,.3);',
+          b: 'background:#eff6ff;color:#1d4ed8;border:1px solid rgba(26,110,216,.3);',
+          p: 'background:rgba(109,40,217,.1);color:#6d28d9;border:1px solid rgba(109,40,217,.3);',
+        };
+        return `<span class="pill" style="${styleMap[a.tone]||styleMap.a}font-size:10px;cursor:help;" title="${esc(a.detail||a.label)}">${a.label}</span>`;
+      }).join('');
+    }
+  });
+}
 function renderRows(){
   const total=app.rows.reduce((s,r)=>s+num(r.amount),0);
   $('rows').innerHTML=app.rows.map((row,i)=>`<div class="row-card" data-row="${i}"><div class="row-inner"><div style="position:relative;"><input class="fi ci" data-i="${i}" placeholder="Type creditor name&#8230;" value="${esc(row.cred||'')}" autocomplete="off"/><div class="drop" data-cr="${i}"></div><div class="aw" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div></div><div><input class="fi" data-i="${i}" data-k="amount" placeholder="$0" value="${row.amount||''}"/>${total>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${((num(row.amount)/total)*100).toFixed(1)}%</div>`:''}</div><div><div class="dt-wrap" data-dw="${i}"><svg class="dt-icon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg><input class="dt-inp" data-di="${i}" placeholder="Search debt type&#8230;" autocomplete="off"/><button class="dt-x" data-dx="${i}">&#10005;</button><div class="dt-panel" data-dp="${i}"></div></div><div class="dt-sel" data-ds="${i}"><span></span><button data-dsc="${i}">&#10005;</button></div></div><div>${app.rows.length>1?`<button type="button" data-rem="${i}" style="width:30px;height:30px;border:1.5px solid rgba(239,68,68,.4);border-radius:8px;background:#fef2f2;color:var(--rd);font-weight:900;font-size:16px;cursor:pointer;margin-top:5px;font-family:inherit;">&#8722;</button>`:'<div></div>'}</div></div></div>`).join('');
@@ -1819,7 +2119,7 @@ function getRuleMatches(q){
   const lq=normName(q);
   if(!lq)return[];
   const found=[];
-  ALL_CRED_RULES_EXTENDED.forEach(rule=>{
+  [...ALL_CRED_RULES_EXTENDED,...CS_NAMED_REJECT_RULES,...CS_NAMED_COND_RULES].forEach(rule=>{
     (rule.n||[]).forEach(name=>{
       const nn=normName(name);
       if(nn.includes(lq)||lq.includes(nn)){
@@ -1847,7 +2147,21 @@ async function searchCred(i,query){
     if(data.ok&&Array.isArray(data.results))data.results.forEach(item=>{const nm=String(item.display_name||'').trim();if(nm&&!merged.some(x=>normName(x.display_name)===normName(nm)))merged.push({...item,source:'api'});});
   }catch(e){}
   if(!merged.length){box.innerHTML=`<button type="button" data-mv="${i}" data-mq="${esc(query)}">Use "${esc(query)}" as manual entry</button>`;box.className='drop open';bindCredClicks();return;}
-  box.innerHTML=merged.slice(0,12).map(item=>{const sec=item.secured===true||item.secured==='true';const rule=getCredRule(item.display_name||'');const isRej=rule&&rule.s==='rej',isCond=rule&&rule.s==='cond';const dt=isTradCard(item.display_name||'')?'Unsecured':sec?'Secured Loan':'Unsecured';return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="${esc(dt)}" data-ps="${sec}" style="background:${isRej?'#fef2f2':isCond?'#fffbeb':'#fff'};"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;"><span style="font-weight:800;color:${isRej?'var(--rd)':isCond?'#92400e':'var(--dk)'};">${esc(item.display_name||'')}</span><span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${item.source==='rule'?`<span style="font-size:10px;font-weight:800;background:#e2e8f0;color:#334155;border-radius:999px;padding:2px 7px;">Lookup</span>`:''}${isRej?`<span style="font-size:10px;font-weight:800;background:var(--rd);color:#fff;border-radius:999px;padding:2px 7px;">Level rejected</span>`:''}${isCond?`<span style="font-size:10px;font-weight:800;background:var(--am);color:#fff;border-radius:999px;padding:2px 7px;">Level conditional</span>`:''}</span></div><div style="font-size:11px;color:${sec?'var(--rd)':'#0b7d6e'};margin-top:2px;">${esc(dt)} &middot; ${sec?'Secured':'Unsecured'}</div>${rule?`<div style="font-size:11px;color:#64748b;margin-top:2px;font-style:italic;">${esc(rule.r)}</div>`:''}</button>`;}).join('');
+  box.innerHTML=merged.slice(0,12).map(item=>{
+    const sec=item.secured===true||item.secured==='true';
+    const dt=isTradCard(item.display_name||'')?'Unsecured':sec?'Secured Loan':'Unsecured';
+    const ps = getCreditorProgramStatus(item.display_name || '', item.product_type || dt || 'Unsecured');
+    const isLevelRej  = ps.level.status  === 'rej';
+    const isLevelCond = ps.level.status  === 'cond';
+    const isCSRej     = ps.cs.status     === 'rej';
+    const isCSCond    = ps.cs.status     === 'cond';
+    const isLegacyRej = ps.legacy.status === 'rej';
+    const allRej      = isLevelRej && isCSRej && isLegacyRej;
+    const isRej       = allRej;
+    const isCond      = !allRej && (isLevelCond || isCSCond);
+    const reasons = [ps.level.rule, ps.cs.rule, ps.legacy.rule].filter(Boolean).filter((v,idx,arr)=>arr.indexOf(v)===idx).join(' | ');
+    return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="${esc(dt)}" data-ps="${sec}" style="background:${isRej?'#fef2f2':isCond?'#fffbeb':'#fff'};"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;"><span style="font-weight:800;color:${isRej?'var(--rd)':isCond?'#92400e':'var(--dk)'};">${esc(item.display_name||'')}</span><span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${item.source==='rule'?`<span style="font-size:10px;font-weight:800;background:#e2e8f0;color:#334155;border-radius:999px;padding:2px 7px;">Lookup</span>`:''}${isLevelRej  ? `<span style="background:#dc2626;color:#fff;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">Level ✕</span>` : ''}${isLevelCond ? `<span style="background:#d97706;color:#fff;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">Level ⚠</span>` : ''}${isCSRej     ? `<span style="background:#1e40af;color:#fff;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">CS ✕</span>` : ''}${isCSCond    ? `<span style="background:#1e3a8a;color:#bfdbfe;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">CS ⚠</span>` : ''}${isLegacyRej ? `<span style="background:#6d28d9;color:#fff;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">ELP ✕</span>` : ''}${allRej      ? `<span style="background:#0f172a;color:#f87171;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">All programs ✕</span>` : ''}</span></div><div style="font-size:11px;color:${sec?'var(--rd)':'#0b7d6e'};margin-top:2px;">${esc(dt)} &middot; ${sec?'Secured':'Unsecured'}</div>${reasons?`<div style="font-size:11px;color:#64748b;margin-top:2px;font-style:italic;">${esc(reasons)}</div>`:''}</button>`;
+  }).join('');
   box.className='drop open';bindCredClicks();
 }
 function bindCredSearches(){document.querySelectorAll('.ci').forEach(n=>{n.addEventListener('input',e=>{const i=Number(e.target.dataset.i);app.rows[i].cred=e.target.value||'';if(isTradCard(e.target.value||'')){app.rows[i].dt='Unsecured';app.rows[i].secured=false;}searchCred(i,e.target.value||'');render();});n.addEventListener('focus',e=>searchCred(Number(e.target.dataset.i),e.target.value||''));});}
@@ -2061,6 +2375,8 @@ async function sendPlanDirect(){
 function toggleSupportFab(force){const p=$('supportFabPanel');if(!p)return;const open=typeof force==='boolean'?force:!p.classList.contains('open');p.classList.toggle('open',open);}
 function toggleDeliveryFab(force){const p=$('deliveryFabPanel');if(!p)return;const open=typeof force==='boolean'?force:!p.classList.contains('open');p.classList.toggle('open',open);}
 function init(){
+  populateLanguageSelector();
+  loadGoogleTranslateScript();
   const ss=$('stateSearch');if(ss){
     ss.addEventListener('input',e=>{if(_selectingState)return;syncStateFromInput(false);searchStates(e.target.value||'');render();});
     ss.addEventListener('focus',e=>searchStates(e.target.value||''));
@@ -2100,7 +2416,7 @@ function detectRouteFromUI(){
     CURRENT_ROUTE = null;
   }
 
-  updateCloseMachine(CURRENT_ROUTE);
+  safeUpdateCloseMachine(CURRENT_ROUTE);
 }
 
   // Observe planCards container for routing updates
