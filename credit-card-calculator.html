@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Funding Tier — Credit Card Payment Impact Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--g:#0f9d8a;--gd:#0b7d6e;--dk:#0f172a;--blue:#14365a;--muted:#64748b;--br:#dbe4ea;--bg:#f6faf9;--red:#ef4444;--amber:#f59e0b;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,#f8fffd 0%,#eef7f5 45%,#f8fafc 100%);color:var(--dk);min-height:100vh;}
+.header{background:linear-gradient(135deg,#0f172a 0%,#14365a 45%,#0f9d8a 100%);padding:22px 20px 28px;color:#fff;box-shadow:0 12px 40px rgba(15,23,42,.24);}
+.header-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+.logo-wrap{display:flex;align-items:center;gap:14px;}
+.logo-wrap img{height:38px;width:auto;}
+.kicker{font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.65);}
+h1{font-size:clamp(24px,3vw,42px);line-height:1.02;letter-spacing:-.04em;margin-top:5px;}
+.sub{font-size:14px;color:rgba(255,255,255,.78);line-height:1.55;max-width:760px;margin-top:10px;font-weight:600;}
+.shell{max-width:1240px;margin:-20px auto 60px;padding:0 20px;display:grid;gap:18px;}
+.grid{display:grid;grid-template-columns:minmax(280px,400px) 1fr;gap:18px;align-items:start;}
+@media(max-width:980px){.grid{grid-template-columns:1fr;}}
+.card{background:#fff;border:1px solid var(--br);border-radius:20px;box-shadow:0 10px 30px rgba(15,23,42,.07);overflow:hidden;}
+.card-pad{padding:20px;}
+.card-hd{padding:18px 20px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.card-title{font-size:15px;font-weight:900;color:var(--dk);}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:900;background:rgba(15,157,138,.1);color:#0b7d6e;border:1px solid rgba(15,157,138,.25);}
+label{display:block;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#334155;margin-bottom:7px;}
+.input-row{display:grid;gap:12px;margin-bottom:14px;}
+input,select{width:100%;border:1.5px solid var(--br);border-radius:13px;padding:12px 13px;font-size:15px;font-weight:800;color:var(--dk);outline:none;background:#fff;font-family:inherit;}
+input:focus,select:focus{border-color:var(--g);box-shadow:0 0 0 4px rgba(15,157,138,.12);}
+.small-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn{border:none;border-radius:13px;padding:13px 16px;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+.btn-g{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;box-shadow:0 10px 18px rgba(15,157,138,.22);}
+.btn-d{background:#0f172a;color:#fff;}
+.apr-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.apr-pill{border:1.5px solid var(--br);background:#fff;color:#334155;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:900;cursor:pointer;}
+.apr-pill:hover,.apr-pill.active{border-color:var(--g);background:rgba(15,157,138,.08);color:#0b7d6e;}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:980px){.metrics{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.metrics,.small-grid{grid-template-columns:1fr;}}
+.metric{background:linear-gradient(180deg,#fff,#fbfffe);border:1px solid var(--br);border-radius:18px;padding:16px;position:relative;overflow:hidden;}
+.metric:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--g),#14365a);}
+.metric-lbl{font-size:10px;color:#64748b;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.metric-val{font-size:clamp(20px,2.5vw,32px);font-weight:900;letter-spacing:-.04em;line-height:1;color:#0f172a;}
+.metric-sub{font-size:12px;color:#64748b;font-weight:600;margin-top:7px;line-height:1.45;}
+.impact-callout{background:linear-gradient(135deg,#0f172a,#14365a 55%,#0f9d8a);color:#fff;border-radius:20px;padding:20px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;}
+@media(max-width:760px){.impact-callout{grid-template-columns:1fr;}}
+.callout-big{font-size:clamp(24px,4vw,46px);font-weight:900;letter-spacing:-.05em;line-height:1;}
+.callout-text{font-size:13px;line-height:1.6;color:rgba(255,255,255,.78);font-weight:600;margin-top:8px;}
+.chart-wrap{padding:20px;}
+canvas{width:100%;height:380px;border-radius:16px;background:#fff;border:1px solid var(--br);}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:#0f172a;color:rgba(255,255,255,.82);text-align:left;padding:12px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;}
+td{padding:13px 12px;border-bottom:1px solid var(--br);font-weight:700;color:#334155;white-space:nowrap;}
+tr:nth-child(even) td{background:#f8fafc;}
+.good{color:#0b7d6e;font-weight:900;}
+.bad{color:#b91c1c;font-weight:900;}
+.note{font-size:12px;line-height:1.65;color:#92400e;background:#fffbeb;border:1px solid rgba(245,158,11,.3);border-radius:14px;padding:13px 15px;font-weight:650;}
+.footer-note{font-size:11px;color:#64748b;line-height:1.6;font-weight:600;text-align:center;margin-top:6px;}
+.tip{position:relative;display:inline-flex;margin-left:6px;}
+.tip>a{font-size:10px;color:#0b7d6e;font-weight:900;border-bottom:1px dashed #0b7d6e;text-decoration:none;cursor:help;}
+.tip .tip-box{visibility:hidden;opacity:0;position:absolute;bottom:calc(100% + 8px);left:0;background:#0f172a;color:#fff;border-radius:10px;padding:10px 12px;width:320px;white-space:normal;line-height:1.55;font-size:11px;font-weight:650;z-index:50;box-shadow:0 12px 26px rgba(15,23,42,.25);transition:opacity .15s;}
+.tip:hover .tip-box{visibility:visible;opacity:1;}
+.script-box{background:linear-gradient(135deg,#f8fffd 0%,#ecfdf5 52%,#eff6ff 100%);border:2px solid rgba(15,157,138,.28);border-radius:18px;padding:18px 20px;margin-top:14px;display:grid;gap:10px;box-shadow:0 10px 28px rgba(15,23,42,.08);}
+.script-title{display:inline-flex;align-items:center;width:max-content;padding:5px 11px;border-radius:999px;background:linear-gradient(135deg,#0f9d8a,#0b7d6e);color:#fff;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;}
+.script-copy{font-size:16px;color:#1e293b;line-height:1.7;font-weight:750;}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" alt="Funding Tier" onerror="this.style.display='none'"/>
+      <div>
+        <div class="kicker">Funding Tier Calculator</div>
+        <h1>Credit Card Payment Impact</h1>
+        <div class="sub">Show prospects how minimum payments, APR, and interest can stretch payoff timelines even when they stop using the card.</div>
+      </div>
+    </div>
+    <span class="badge">No purchases • No late fees • No APR changes</span>
+  </div>
+</header>
+
+<main class="shell">
+  <div class="grid">
+    <section class="card">
+      <div class="card-hd"><div class="card-title">Calculator Inputs</div><span class="badge">Router Default: 3%</span></div>
+      <div class="card-pad">
+        <div class="input-row">
+          <div><label>Total Credit Card Balance</label><input id="balance" type="number" min="0" step="100" value="30000"></div>
+          <div class="small-grid">
+            <div><label>APR</label><input id="apr" type="number" min="0" max="59.99" step="0.01" value="27.99"></div>
+            <div><label>Minimum Payment %</label><input id="minPct" type="number" min="1" max="10" step="0.1" value="3.0"></div>
+          </div>
+          <div class="small-grid">
+            <div><label>Fixed Monthly Payment</label><input id="fixedPay" type="number" min="0" step="25" value="900"></div>
+            <div><label>Flat Minimum Floor</label><input id="floor" type="number" min="0" step="5" value="35"></div>
+          </div>
+          <div><label>APR Impact Presets</label><div id="aprPills" class="apr-pills"></div></div>
+          <button class="btn btn-g" onclick="updateCalc()">Recalculate Impact</button>
+        </div>
+        <div class="note">Required assumption: this estimate assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes. Actual creditor formulas vary.</div>
+      </div>
+    </section>
+
+    <section style="display:grid;gap:18px;">
+      <div class="metrics">
+        <div class="metric"><div class="metric-lbl">Month 1 Starting Minimum</div><div id="mMin" class="metric-val">--</div><div class="metric-sub">starting estimate, not fixed forever</div></div>
+        <div class="metric"><div class="metric-lbl">Declining Minimum-Only Payoff</div><div id="mMinTime" class="metric-val">--</div><div class="metric-sub">payment recalculates downward</div></div>
+        <div class="metric"><div class="metric-lbl">Minimum-Only Interest</div><div id="mMinInterest" class="metric-val">--</div><div class="metric-sub">Estimated interest cost</div></div>
+        <div class="metric"><div class="metric-lbl">Fixed-Payment Payoff</div><div id="mFixedTime" class="metric-val">--</div><div class="metric-sub">If fixed payment stays the same</div></div>
+      </div>
+      <div class="impact-callout">
+        <div>
+          <div class="kicker">Real Cost of Interest</div>
+          <div id="impactBig" class="callout-big">--</div>
+          <div id="impactText" class="callout-text">--</div>
+        </div>
+        <button class="btn btn-d" onclick="copySummary()">Copy Summary</button>
+      </div>
+      <div class="script-box">
+        <div class="script-title">Prospect Phone Script</div>
+        <div id="agentScript" class="script-copy">--</div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="card-hd"><div class="card-title">APR Impact Chart</div><span class="badge">Balance Over Time</span></div>
+    <div style="padding:0 20px 12px;color:#475569;font-size:13px;line-height:1.6;"><strong>How to read this:</strong> the minimum-only line assumes the payment starts at the Month 1 minimum, then recalculates downward as the balance drops. This is why payoff can take many years even when the starting payment looks high.</div>
+    <div class="chart-wrap"><canvas id="impactChart" width="1000" height="420"></canvas></div>
+  </section>
+
+  <section class="card">
+    <div class="card-hd"><div class="card-title">APR Comparison Table</div><span class="badge">Minimum-only vs fixed-payment</span></div>
+    <div class="table-wrap"><table><thead><tr><th>APR</th><th>Month 1 Starting Minimum</th><th>Declining Minimum-Only Payoff</th><th>Interest — Declining Minimum</th><th>Total Paid — Declining Minimum</th><th>If Starting Payment Stayed Fixed</th><th>Interest — Fixed Starting Payment</th><th>Total Paid — Fixed Starting Payment</th><th>Agent Tooltip</th></tr></thead><tbody id="aprTable"></tbody></table></div>
+  </section>
+
+  <div class="footer-note">For internal Funding Tier routing, education, and comparison support only. This does not replace creditor-specific account terms.</div>
+</main>
+
+<script>
+/**
+ * Funding Tier — Credit Card Payment Calculator v2
+ * ------------------------------------------------
+ * Router-ready module for estimating:
+ * 1) Required monthly credit card minimum payment
+ * 2) Payoff timeline if only minimum payments are made
+ * 3) Payoff timeline if a fixed payment is made
+ * 4) Current "do nothing" cost comparison for the Funding Tier Deal Router
+ *
+ * REQUIRED ASSUMPTIONS — ALWAYS DISPLAY THESE:
+ * - No new purchases are made on the credit card.
+ * - The client is never late.
+ * - No additional fees are added.
+ * - No penalty APR is triggered.
+ * - APR remains unchanged.
+ * - Actual creditor formulas vary.
+ *
+ * Recommended Funding Tier default:
+ * - Use 3% of total unsecured credit card balance as the current minimum payment estimate.
+ * - If APR is unknown, use 27.99% as a conservative default.
+ */
+
+(function(global){
+  "use strict";
+
+  const FT_CC_CALC = {
+    version: "2.0.0",
+
+    defaults: {
+      minimumPaymentPercent: 0.03,       // Main router default: 3%
+      minimumPaymentLowPercent: 0.025,   // Lower estimate: 2.5%
+      minimumPaymentHighPercent: 0.035,  // Higher estimate: 3.5%
+      principalPlusInterestPercent: 0.01,
+      flatMinimumPayment: 35,
+      unknownAPR: 0.2799,
+      maxMonths: 720,                    // 60-year hard cap
+      balancePayoffClamp: 0.005
+    },
+
+    assumptions: [
+      "No new purchases are made on the credit card.",
+      "The client is never late.",
+      "No additional fees are added.",
+      "No penalty APR is triggered.",
+      "APR remains unchanged.",
+      "Actual creditor formulas vary."
+    ],
+
+    knowledge: {
+      typicalMinimumPayment:
+        "Most unsecured credit card minimum payments are commonly estimated at 1% to 3% of the balance, often calculated as 1% of principal plus monthly interest and fees, or as 2% to 3% of the statement balance, subject to a flat minimum.",
+      fundingTierDefault:
+        "For Funding Tier routing comparisons, use 3% of total unsecured credit card balance as the default estimated monthly minimum payment.",
+      requiredAssumptionDisclosure:
+        "This payoff estimate assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes."
+    }
+  };
+
+  function n(value, fallback = 0){
+    const parsed = Number(String(value ?? "").replace(/[^0-9.-]/g, ""));
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
+  function round2(value){
+    return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+  }
+
+  function money(value, decimals = 0){
+    return n(value).toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+  }
+
+  function pct(value, digits = 2){
+    return `${(n(value) * 100).toFixed(digits)}%`;
+  }
+
+  function normalizeAPR(apr){
+    const raw = n(apr, FT_CC_CALC.defaults.unknownAPR);
+
+    // Allows 27.99 or 0.2799
+    if(raw > 1) return raw / 100;
+    if(raw <= 0) return FT_CC_CALC.defaults.unknownAPR;
+
+    return raw;
+  }
+
+  function assumptionNote(){
+    return FT_CC_CALC.knowledge.requiredAssumptionDisclosure;
+  }
+
+  function yearsMonths(months){
+    months = Math.max(0, Math.round(n(months)));
+    const years = Math.floor(months / 12);
+    const remMonths = months % 12;
+
+    if(years === 0) return `${remMonths} month${remMonths === 1 ? "" : "s"}`;
+    if(remMonths === 0) return `${years} year${years === 1 ? "" : "s"}`;
+
+    return `${years} year${years === 1 ? "" : "s"}, ${remMonths} month${remMonths === 1 ? "" : "s"}`;
+  }
+
+  /**
+   * Estimate required monthly minimum payment.
+   *
+   * Default method:
+   * - 3% of balance, subject to flat minimum.
+   *
+   * Range:
+   * - 2.5% low
+   * - 3.0% default
+   * - 3.5% high
+   */
+  function estimateMinimumPayment(balance, options = {}){
+    const b = Math.max(0, n(balance));
+    const floor = options.flatMinimumPayment ?? FT_CC_CALC.defaults.flatMinimumPayment;
+
+    const lowPct = options.lowPercent ?? FT_CC_CALC.defaults.minimumPaymentLowPercent;
+    const defaultPct = options.minimumPaymentPercent ?? FT_CC_CALC.defaults.minimumPaymentPercent;
+    const highPct = options.highPercent ?? FT_CC_CALC.defaults.minimumPaymentHighPercent;
+
+    if(b <= 0){
+      return {
+        balance: 0,
+        low: 0,
+        default: 0,
+        high: 0,
+        selected: 0,
+        selectedPercent: defaultPct,
+        assumptionNote: assumptionNote()
+      };
+    }
+
+    const low = Math.min(b, Math.max(floor, b * lowPct));
+    const mid = Math.min(b, Math.max(floor, b * defaultPct));
+    const high = Math.min(b, Math.max(floor, b * highPct));
+
+    return {
+      balance: b,
+      balanceFormatted: money(b),
+      low: round2(low),
+      lowFormatted: money(low),
+      default: round2(mid),
+      defaultFormatted: money(mid),
+      high: round2(high),
+      highFormatted: money(high),
+      selected: round2(mid),
+      selectedFormatted: money(mid),
+      lowPercent: lowPct,
+      lowPercentFormatted: pct(lowPct, 1),
+      selectedPercent: defaultPct,
+      selectedPercentFormatted: pct(defaultPct, 1),
+      highPercent: highPct,
+      highPercentFormatted: pct(highPct, 1),
+      flatMinimumPayment: floor,
+      flatMinimumPaymentFormatted: money(floor),
+      formulaLabel: `${pct(defaultPct, 1)} of balance, subject to an estimated ${money(floor)} minimum floor`,
+      assumptionNote: assumptionNote()
+    };
+  }
+
+  /**
+   * Estimate creditor-style minimum payment:
+   * 1% of balance + monthly interest + fees, subject to flat minimum.
+   *
+   * Fees default to 0 because Funding Tier assumption says no added fees.
+   */
+  function estimatePrincipalPlusInterestMinimum(balance, apr, options = {}){
+    const b = Math.max(0, n(balance));
+    const annualAPR = normalizeAPR(apr);
+    const monthlyRate = annualAPR / 12;
+
+    const principalPct = options.principalPercent ?? FT_CC_CALC.defaults.principalPlusInterestPercent;
+    const floor = options.flatMinimumPayment ?? FT_CC_CALC.defaults.flatMinimumPayment;
+    const fees = Math.max(0, n(options.fees ?? 0));
+
+    if(b <= 0){
+      return {
+        balance: 0,
+        estimatedMinimum: 0,
+        estimatedMinimumFormatted: money(0),
+        assumptionNote: assumptionNote()
+      };
+    }
+
+    const interest = b * monthlyRate;
+    const principalPortion = b * principalPct;
+    const estimatedMinimum = Math.min(b + interest + fees, Math.max(floor, principalPortion + interest + fees));
+
+    return {
+      balance: b,
+      balanceFormatted: money(b),
+      apr: annualAPR,
+      aprFormatted: pct(annualAPR, 2),
+      monthlyRate,
+      monthlyRateFormatted: pct(monthlyRate, 3),
+      monthlyInterest: round2(interest),
+      monthlyInterestFormatted: money(interest),
+      principalPortion: round2(principalPortion),
+      principalPortionFormatted: money(principalPortion),
+      fees: round2(fees),
+      feesFormatted: money(fees),
+      estimatedMinimum: round2(estimatedMinimum),
+      estimatedMinimumFormatted: money(estimatedMinimum),
+      formulaLabel: `1% of balance + monthly interest + fees, subject to an estimated ${money(floor)} minimum floor`,
+      assumptionNote: assumptionNote()
+    };
+  }
+
+  /**
+   * Fixed-payment payoff calculation.
+   *
+   * This answers:
+   * "If the client pays $X every month and makes no new purchases,
+   * how long does it take to pay off the balance?"
+   */
+  function calculateFixedPaymentPayoff(balance, apr, monthlyPayment, options = {}){
+    const originalBalance = Math.max(0, n(balance));
+    const annualAPR = normalizeAPR(apr);
+    const monthlyRate = annualAPR / 12;
+    const payment = Math.max(0, n(monthlyPayment));
+    const maxMonths = options.maxMonths ?? FT_CC_CALC.defaults.maxMonths;
+    const includeSchedule = options.includeSchedule === true;
+
+    if(originalBalance <= 0){
+      return payoffError("No balance entered.", originalBalance, annualAPR, payment);
+    }
+
+    if(payment <= 0){
+      return payoffError("No monthly payment entered.", originalBalance, annualAPR, payment);
+    }
+
+    const firstMonthInterest = originalBalance * monthlyRate;
+
+    if(payment <= firstMonthInterest){
+      return payoffError(
+        "Monthly payment is not enough to cover estimated first-month interest. The balance may grow or never pay off.",
+        originalBalance,
+        annualAPR,
+        payment,
+        { firstMonthInterest }
+      );
+    }
+
+    let balanceLeft = originalBalance;
+    let totalInterest = 0;
+    let totalPaid = 0;
+    let months = 0;
+    const schedule = [];
+
+    while(balanceLeft > FT_CC_CALC.defaults.balancePayoffClamp && months < maxMonths){
+      months += 1;
+
+      const interest = balanceLeft * monthlyRate;
+      const actualPayment = Math.min(payment, balanceLeft + interest);
+      const principalPaid = actualPayment - interest;
+
+      balanceLeft = Math.max(0, balanceLeft - principalPaid);
+      totalInterest += interest;
+      totalPaid += actualPayment;
+
+      if(includeSchedule){
+        schedule.push({
+          month: months,
+          payment: round2(actualPayment),
+          interest: round2(interest),
+          principal: round2(principalPaid),
+          remainingBalance: round2(balanceLeft)
+        });
+      }
+    }
+
+    const capped = balanceLeft > 0.01;
+
+    return {
+      ok: !capped,
+      method: "fixed_payment",
+      reason: capped ? `Reached ${maxMonths} months and still had a remaining balance.` : "Payoff calculated successfully.",
+      balance: round2(originalBalance),
+      balanceFormatted: money(originalBalance),
+      apr: annualAPR,
+      aprFormatted: pct(annualAPR, 2),
+      monthlyPayment: round2(payment),
+      monthlyPaymentFormatted: money(payment),
+      months,
+      years: round2(months / 12),
+      yearsMonths: yearsMonths(months),
+      totalPaid: round2(totalPaid),
+      totalPaidFormatted: money(totalPaid),
+      totalInterest: round2(totalInterest),
+      totalInterestFormatted: money(totalInterest),
+      schedule,
+      assumptionNote: assumptionNote()
+    };
+  }
+
+  /**
+   * Declining minimum-payment payoff calculation.
+   *
+   * This answers:
+   * "If you only pay the estimated minimum payment each month,
+   * and that minimum declines as the balance decreases, how long does payoff take?"
+   */
+  function calculateMinimumOnlyPayoff(balance, apr, options = {}){
+    const originalBalance = Math.max(0, n(balance));
+    const annualAPR = normalizeAPR(apr);
+    const monthlyRate = annualAPR / 12;
+    const minPercent = options.minimumPaymentPercent ?? FT_CC_CALC.defaults.minimumPaymentPercent;
+    const principalPct = options.principalPercent ?? FT_CC_CALC.defaults.principalPlusInterestPercent;
+    const floor = options.flatMinimumPayment ?? FT_CC_CALC.defaults.flatMinimumPayment;
+    const maxMonths = options.maxMonths ?? FT_CC_CALC.defaults.maxMonths;
+    const includeSchedule = options.includeSchedule === true;
+
+    if(originalBalance <= 0){
+      return payoffError("No balance entered.", originalBalance, annualAPR, 0);
+    }
+
+    let balanceLeft = originalBalance;
+    let totalInterest = 0;
+    let totalPaid = 0;
+    let months = 0;
+    let firstPayment = null;
+    const schedule = [];
+
+    while(balanceLeft > FT_CC_CALC.defaults.balancePayoffClamp && months < maxMonths){
+      months += 1;
+
+      const interest = balanceLeft * monthlyRate;
+
+      // Uses the higher of:
+      // 1) percent of balance
+      // 2) 1% principal + interest
+      // 3) flat minimum
+      const percentPayment = balanceLeft * minPercent;
+      const principalInterestPayment = balanceLeft * principalPct + interest;
+      const calculatedPayment = Math.max(floor, percentPayment, principalInterestPayment);
+      const actualPayment = Math.min(calculatedPayment, balanceLeft + interest);
+      const principalPaid = actualPayment - interest;
+
+      if(principalPaid <= 0){
+        return payoffError(
+          "Estimated minimum payment does not cover monthly interest. The balance may grow or never pay off.",
+          originalBalance,
+          annualAPR,
+          actualPayment,
+          { firstMonthInterest: interest }
+        );
+      }
+
+      if(firstPayment === null) firstPayment = actualPayment;
+
+      balanceLeft = Math.max(0, balanceLeft - principalPaid);
+      totalInterest += interest;
+      totalPaid += actualPayment;
+
+      if(includeSchedule){
+        schedule.push({
+          month: months,
+          payment: round2(actualPayment),
+          interest: round2(interest),
+          principal: round2(principalPaid),
+          remainingBalance: round2(balanceLeft)
+        });
+      }
+    }
+
+    const capped = balanceLeft > 0.01;
+
+    return {
+      ok: !capped,
+      method: "minimum_only_declining",
+      reason: capped ? `Reached ${maxMonths} months and still had a remaining balance.` : "Minimum-only payoff calculated successfully.",
+      balance: round2(originalBalance),
+      balanceFormatted: money(originalBalance),
+      apr: annualAPR,
+      aprFormatted: pct(annualAPR, 2),
+      firstEstimatedMinimumPayment: round2(firstPayment ?? 0),
+      firstEstimatedMinimumPaymentFormatted: money(firstPayment ?? 0),
+      startingMinimumPayment: round2(firstPayment ?? 0),
+      startingMinimumPaymentFormatted: money(firstPayment ?? 0),
+      minimumPaymentPercent: minPercent,
+      minimumPaymentPercentFormatted: pct(minPercent, 1),
+      paymentBehaviorLabel: `${money(firstPayment ?? 0)}/mo starting estimated minimum payment, then recalculated monthly as the balance declines`,
+      months,
+      years: round2(months / 12),
+      yearsMonths: yearsMonths(months),
+      totalPaid: round2(totalPaid),
+      totalPaidFormatted: money(totalPaid),
+      totalInterest: round2(totalInterest),
+      totalInterestFormatted: money(totalInterest),
+      schedule,
+      assumptionNote: assumptionNote()
+    };
+  }
+
+  function payoffError(reason, balance, apr, monthlyPayment, extra = {}){
+    return {
+      ok: false,
+      reason,
+      balance: round2(balance),
+      balanceFormatted: money(balance),
+      apr,
+      aprFormatted: pct(apr, 2),
+      monthlyPayment: round2(monthlyPayment),
+      monthlyPaymentFormatted: money(monthlyPayment),
+      months: null,
+      years: null,
+      yearsMonths: "N/A",
+      totalPaid: null,
+      totalPaidFormatted: "N/A",
+      totalInterest: null,
+      totalInterestFormatted: "N/A",
+      assumptionNote: assumptionNote(),
+      ...extra
+    };
+  }
+
+  /**
+   * Main router-ready function.
+   *
+   * Use this for the "Current Situation / Do Nothing" area.
+   */
+  function buildCurrentSituation(balance, apr, options = {}){
+    const b = Math.max(0, n(balance));
+    const annualAPR = normalizeAPR(apr ?? FT_CC_CALC.defaults.unknownAPR);
+
+    const minByPercent = estimateMinimumPayment(b, options);
+    const minByPrincipalInterest = estimatePrincipalPlusInterestMinimum(b, annualAPR, options);
+
+    const selectedMethod = options.minimumMethod || "percent_default";
+
+    let selectedMinimum;
+    let selectedFormula;
+
+    if(selectedMethod === "principal_plus_interest"){
+      selectedMinimum = minByPrincipalInterest.estimatedMinimum;
+      selectedFormula = minByPrincipalInterest.formulaLabel;
+    } else {
+      selectedMinimum = minByPercent.selected;
+      selectedFormula = minByPercent.formulaLabel;
+    }
+
+    const fixedPayoff = calculateFixedPaymentPayoff(b, annualAPR, selectedMinimum, options);
+    const minimumOnlyPayoff = calculateMinimumOnlyPayoff(b, annualAPR, options);
+
+    return {
+      balance: b,
+      balanceFormatted: money(b),
+      apr: annualAPR,
+      aprFormatted: pct(annualAPR, 2),
+
+      selectedMinimumPayment: round2(selectedMinimum),
+      selectedMinimumPaymentFormatted: money(selectedMinimum),
+      selectedMinimumFormula: selectedFormula,
+      selectedMinimumMethod: selectedMethod,
+
+      minimumRange: {
+        low: minByPercent.low,
+        lowFormatted: minByPercent.lowFormatted,
+        default: minByPercent.default,
+        defaultFormatted: minByPercent.defaultFormatted,
+        high: minByPercent.high,
+        highFormatted: minByPercent.highFormatted
+      },
+
+      principalPlusInterestMinimum: minByPrincipalInterest,
+
+      fixedPaymentPayoff: fixedPayoff,
+      minimumOnlyPayoff: minimumOnlyPayoff,
+
+      routerText: {
+        currentMinimumPayment:
+          `${money(selectedMinimum)} estimated monthly minimum payment`,
+        fixedPaymentPayoff:
+          fixedPayoff.ok
+            ? `If the client pays approximately ${money(selectedMinimum)} every month with no new purchases, estimated payoff time is ${fixedPayoff.yearsMonths}.`
+            : fixedPayoff.reason,
+        minimumOnlyPayoff:
+          minimumOnlyPayoff.ok
+            ? `Minimum-only starts at ${minimumOnlyPayoff.startingMinimumPaymentFormatted || minimumOnlyPayoff.firstEstimatedMinimumPaymentFormatted}/mo using the selected ${minimumOnlyPayoff.minimumPaymentPercentFormatted || 'minimum-payment'} rule, then recalculates downward as the balance declines. Estimated payoff time is ${minimumOnlyPayoff.yearsMonths}.`
+            : minimumOnlyPayoff.reason,
+        totalInterestFixed:
+          fixedPayoff.ok ? `${fixedPayoff.totalInterestFormatted} estimated interest using fixed-payment assumption` : "N/A",
+        totalInterestMinimumOnly:
+          minimumOnlyPayoff.ok ? `${minimumOnlyPayoff.totalInterestFormatted} estimated interest using declining minimum-payment assumption` : "N/A",
+        assumption: assumptionNote(),
+        disclaimer:
+          "Estimate only. Actual creditor formulas, APRs, fees, and payoff timelines vary."
+      }
+    };
+  }
+
+  /**
+   * Optional helper for router row arrays.
+   * Totals only rows that look like unsecured credit card debt.
+   */
+  function totalCreditCardDebtFromRows(rows){
+    if(!Array.isArray(rows)) return 0;
+
+    return rows.reduce((sum, row) => {
+      const debtType = String(row.dt || row.debtType || row.type || "").toLowerCase();
+      const creditor = String(row.cred || row.creditor || "").toLowerCase();
+
+      const looksLikeCreditCard =
+        debtType.includes("credit card") ||
+        debtType.includes("store card") ||
+        debtType.includes("retail card") ||
+        debtType.includes("unsecured card") ||
+        creditor.includes("visa") ||
+        creditor.includes("mastercard") ||
+        creditor.includes("amex") ||
+        creditor.includes("american express") ||
+        creditor.includes("discover") ||
+        creditor.includes("capital one") ||
+        creditor.includes("chase") ||
+        creditor.includes("citi") ||
+        creditor.includes("citibank") ||
+        creditor.includes("synchrony") ||
+        creditor.includes("comenity") ||
+        creditor.includes("barclays") ||
+        creditor.includes("wells fargo");
+
+      return looksLikeCreditCard ? sum + n(row.amount) : sum;
+    }, 0);
+  }
+
+  /**
+   * Simple HTML render helper.
+   * You can use this to drop a compact explanation into the router.
+   */
+  function renderCurrentSituationHTML(currentSituation){
+    if(!currentSituation || !currentSituation.balance){
+      return `<div class="flag flag-a">Enter credit card debt to calculate current payment burden.</div>`;
+    }
+
+    const c = currentSituation;
+
+    return `
+      <div class="cc-current-situation">
+        <div style="display:grid;gap:8px;">
+          <div><strong>Starting Minimum Payment:</strong> ${c.minimumOnlyPayoff.startingMinimumPaymentFormatted || c.selectedMinimumPaymentFormatted}/mo</div>
+          <div><strong>Estimated APR Used:</strong> ${c.aprFormatted}</div>
+          <div><strong>Formula:</strong> ${c.selectedMinimumFormula}</div>
+          <div><strong>Minimum-Only Payment Behavior:</strong> starts at ${c.minimumOnlyPayoff.startingMinimumPaymentFormatted || c.selectedMinimumPaymentFormatted}/mo, then recalculates monthly as the balance declines</div>
+          <div><strong>Fixed-Payment Payoff:</strong> ${c.fixedPaymentPayoff.yearsMonths}</div>
+          <div><strong>Fixed-Payment Interest:</strong> ${c.fixedPaymentPayoff.totalInterestFormatted}</div>
+          <div><strong>Minimum-Only Payoff:</strong> ${c.minimumOnlyPayoff.yearsMonths}</div>
+          <div><strong>Minimum-Only Interest:</strong> ${c.minimumOnlyPayoff.totalInterestFormatted}</div>
+          <div style="font-size:12px;color:#92400e;background:#fffbeb;border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 10px;">
+            ${c.routerText.assumption}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  const api = {
+    config: FT_CC_CALC,
+    money,
+    pct,
+    normalizeAPR,
+    assumptionNote,
+    estimateMinimumPayment,
+    estimatePrincipalPlusInterestMinimum,
+    calculateFixedPaymentPayoff,
+    calculateMinimumOnlyPayoff,
+    buildCurrentSituation,
+    totalCreditCardDebtFromRows,
+    renderCurrentSituationHTML
+  };
+
+  global.FundingTierCreditCardCalculator = api;
+
+  if(typeof module !== "undefined" && module.exports){
+    module.exports = api;
+  }
+
+})(typeof window !== "undefined" ? window : globalThis);
+
+
+/**
+ * QUICK TESTS / EXAMPLES
+ * ----------------------
+ *
+ * const current = FundingTierCreditCardCalculator.buildCurrentSituation(30000, 27.99);
+ * console.log(current.selectedMinimumPaymentFormatted);       // $900
+ * console.log(current.fixedPaymentPayoff.yearsMonths);        // fixed $900/mo payoff time
+ * console.log(current.minimumOnlyPayoff.yearsMonths);         // declining minimum payoff time
+ * console.log(current.routerText.assumption);                 // required assumption note
+ */
+
+
+const APR_PRESETS=[18.99,24.99,27.99,29.99,34.99];
+const CHART_COLORS=['#0f9d8a','#14365a','#ef4444','#f59e0b','#6d28d9'];
+let lastSummary='';
+function $(id){return document.getElementById(id);}
+function val(id){return Number($(id).value||0);}
+function fmt(v){return FundingTierCreditCardCalculator.money(v);}
+function initPills(){
+  $('aprPills').innerHTML=APR_PRESETS.map(a=>`<button type="button" class="apr-pill" data-apr="${a}" onclick="setApr(${a})">${a}%</button>`).join('');
+}
+function setApr(a){$('apr').value=a.toFixed(2);updateCalc();}
+function updateCalc(){
+  const balance=val('balance');
+  const apr=val('apr');
+  const minPct=val('minPct')/100;
+  const floor=val('floor');
+  let fixedPay=val('fixedPay');
+  const min=FundingTierCreditCardCalculator.estimateMinimumPayment(balance,{minimumPaymentPercent:minPct,lowPercent:.025,highPercent:.035,flatMinimumPayment:floor});
+  if(!fixedPay){fixedPay=min.selected;$('fixedPay').value=Math.round(fixedPay);}
+  const current=FundingTierCreditCardCalculator.buildCurrentSituation(balance,apr,{minimumPaymentPercent:minPct,lowPercent:.025,highPercent:.035,flatMinimumPayment:floor});
+  const fixed=FundingTierCreditCardCalculator.calculateFixedPaymentPayoff(balance,apr,fixedPay,{minimumPaymentPercent:minPct,flatMinimumPayment:floor});
+  $('mMin').textContent=current.minimumOnlyPayoff.startingMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted;
+  $('mMinTime').textContent=current.minimumOnlyPayoff.yearsMonths;
+  $('mMinInterest').textContent=current.minimumOnlyPayoff.totalInterestFormatted;
+  $('mFixedTime').textContent=fixed.yearsMonths;
+  $('impactBig').textContent=current.minimumOnlyPayoff.totalInterestFormatted;
+  $('impactText').textContent=`Minimum-only starts at ${(current.minimumOnlyPayoff.startingMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted)}/mo using the selected ${(minPct*100).toFixed(1)}% rule, then recalculates downward as the balance declines. Declining minimum interest: ${current.minimumOnlyPayoff.totalInterestFormatted}. Fixed starting-payment interest: ${fixed.totalInterestFormatted}.`;
+  const script=balance>0
+    ? `Here is the simple way to look at it. If you stay on the regular minimum-payment path, your estimated starting minimum payment is around ${(current.minimumOnlyPayoff.startingMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted)}/mo based on ${fmt(balance)} at ${apr.toFixed(2)}% APR. The catch is that the minimum payment usually goes down as your balance goes down, so even though the first payment starts around ${(current.minimumOnlyPayoff.startingMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted)}/mo, the payoff timeline can stretch to about ${current.minimumOnlyPayoff.yearsMonths} and cost you about ${current.minimumOnlyPayoff.totalInterestFormatted} in interest. If you kept paying that same starting amount every month as a fixed payment instead of letting it drop, payoff is closer to ${fixed.yearsMonths} with about ${fixed.totalInterestFormatted} in interest. So the big difference is staying on a declining minimum payment versus keeping a fixed payment.`
+    : `Enter a credit card balance to generate a prospect-facing phone script.`;
+  $('agentScript').textContent=script;
+  lastSummary=`Balance: ${fmt(balance)} | APR: ${apr.toFixed(2)}% | Month 1 starting minimum-only payment: ${(current.minimumOnlyPayoff.startingMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted)}/mo | Declining minimum-only payoff: ${current.minimumOnlyPayoff.yearsMonths} | Interest - declining minimum: ${current.minimumOnlyPayoff.totalInterestFormatted} | Total paid - declining minimum: ${current.minimumOnlyPayoff.totalPaidFormatted} | If starting payment stayed fixed at ${fmt(fixedPay)}/mo: ${fixed.yearsMonths} | Interest - fixed payment: ${fixed.totalInterestFormatted} | Total paid - fixed payment: ${fixed.totalPaidFormatted} | Assumption: no new purchases, no late payments, no added fees, no penalty APR, and no APR changes.`;
+  updatePills(apr);renderTable(balance,minPct,floor,fixedPay);drawChart(balance,minPct,floor);
+}
+function updatePills(apr){document.querySelectorAll('.apr-pill').forEach(b=>b.classList.toggle('active',Number(b.dataset.apr)===Number(apr)));}
+function renderTable(balance,minPct,floor,fixedPay){
+  $('aprTable').innerHTML=APR_PRESETS.map(apr=>{
+    const c=FundingTierCreditCardCalculator.buildCurrentSituation(balance,apr,{minimumPaymentPercent:minPct,flatMinimumPayment:floor});
+    const f=FundingTierCreditCardCalculator.calculateFixedPaymentPayoff(balance,apr,fixedPay,{flatMinimumPayment:floor});
+    const script=`The starting minimum is ${c.minimumOnlyPayoff.startingMinimumPaymentFormatted || c.selectedMinimumPaymentFormatted}/mo. Minimum-only payoff means that payment declines as the balance drops, which is why payoff can take ${c.minimumOnlyPayoff.yearsMonths} and cost about ${c.minimumOnlyPayoff.totalInterestFormatted} in interest. If you kept paying the starting amount every month, payoff is about ${f.yearsMonths} with about ${f.totalInterestFormatted} in interest.`;
+    return `<tr><td class="good">${apr.toFixed(2)}%</td><td>${c.minimumOnlyPayoff.startingMinimumPaymentFormatted || c.selectedMinimumPaymentFormatted}</td><td>${c.minimumOnlyPayoff.yearsMonths}</td><td class="bad">${c.minimumOnlyPayoff.totalInterestFormatted}</td><td class="bad">${c.minimumOnlyPayoff.totalPaidFormatted}</td><td>${f.yearsMonths}</td><td class="bad">${f.totalInterestFormatted}</td><td class="bad">${f.totalPaidFormatted}</td><td><span class="tip"><a>what to say</a><span class="tip-box">${script}</span></span></td></tr>`;
+  }).join('');
+}
+function makeSeries(balance,apr,minPct,floor){
+  const res=FundingTierCreditCardCalculator.calculateMinimumOnlyPayoff(balance,apr,{minimumPaymentPercent:minPct,flatMinimumPayment:floor,includeSchedule:true,maxMonths:360});
+  const points=[{month:0,remainingBalance:balance}].concat((res.schedule||[]).map(p=>({month:p.month,remainingBalance:p.remainingBalance})));
+  return {apr,res,points};
+}
+function drawChart(balance,minPct,floor){
+  const canvas=$('impactChart'),ctx=canvas.getContext('2d');
+  const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);
+  const pad={l:62,r:28,t:30,b:54};
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h);
+  const series=APR_PRESETS.map(a=>makeSeries(balance,a,minPct,floor));
+  const maxMonth=Math.max(12,...series.map(s=>Math.min(360,(s.points.at(-1)||{month:0}).month)));
+  const maxBal=Math.max(balance,1);
+  ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.font='12px Inter, Arial';ctx.fillStyle='#64748b';
+  for(let i=0;i<=5;i++){
+    const y=pad.t+(h-pad.t-pad.b)*i/5;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
+    const label=fmt(maxBal*(1-i/5));ctx.fillText(label,8,y+4);
+  }
+  for(let i=0;i<=6;i++){
+    const x=pad.l+(w-pad.l-pad.r)*i/6;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,h-pad.b);ctx.stroke();
+    const m=Math.round(maxMonth*i/6);ctx.fillText(`${m} mo`,x-16,h-20);
+  }
+  series.forEach((s,idx)=>{
+    ctx.strokeStyle=CHART_COLORS[idx%CHART_COLORS.length];ctx.lineWidth=3;ctx.beginPath();
+    s.points.forEach((p,j)=>{
+      const x=pad.l+(w-pad.l-pad.r)*Math.min(p.month,maxMonth)/maxMonth;
+      const y=pad.t+(h-pad.t-pad.b)*(1-(p.remainingBalance/maxBal));
+      if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    });ctx.stroke();
+  });
+  const legendY=18;let lx=pad.l;ctx.font='12px Inter, Arial';
+  series.forEach((s,idx)=>{ctx.fillStyle=CHART_COLORS[idx%CHART_COLORS.length];ctx.fillRect(lx,legendY-9,18,4);ctx.fillStyle='#334155';ctx.fillText(`${s.apr.toFixed(2)}% APR`,lx+25,legendY-5);lx+=125;});
+  ctx.fillStyle='#0f172a';ctx.font='700 13px Inter, Arial';ctx.fillText('Projected balance decline using declining minimum-payment assumptions',pad.l,pad.t-10);
+}
+async function copySummary(){
+  try{await navigator.clipboard.writeText(lastSummary);alert('Summary copied.');}
+  catch(e){prompt('Copy summary:',lastSummary);}
+}
+['balance','apr','minPct','fixedPay','floor'].forEach(id=>$(id).addEventListener('input',updateCalc));
+initPills();updateCalc();
+</script>
+</body>
+</html>
