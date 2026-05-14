@@ -298,6 +298,17 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 body{top:0!important;}
 #google_translate_element,.skiptranslate{font-size:0!important;}
 
+.agent-script-bubble{margin:14px 20px 0;padding:18px 20px;border-radius:18px;border:2px solid rgba(15,157,138,.28);background:linear-gradient(135deg,#f8fffd 0%,#ecfdf5 52%,#eff6ff 100%);box-shadow:0 10px 28px rgba(15,23,42,.08);}
+.agent-script-kicker{display:inline-flex;align-items:center;gap:8px;padding:5px 11px;border-radius:999px;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;}
+.agent-script-title{font-size:16px;font-weight:950;color:#0f172a;margin-bottom:8px;}
+.agent-script-text{font-size:16px;line-height:1.7;color:#1e293b;font-weight:750;}
+.agent-script-assumption{margin-top:10px;padding-top:10px;border-top:1px solid rgba(15,157,138,.18);color:#92400e;font-size:13px;line-height:1.55;font-weight:750;}
+.agent-script-copy-btn{margin-top:12px;border:none;border-radius:10px;padding:9px 14px;background:#0f172a;color:#fff;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit;}
+.best-program-header{display:flex;flex-direction:column;gap:4px;}
+.best-program-overline{font-size:10px;font-weight:900;color:#0b7d6e;text-transform:uppercase;letter-spacing:.06em;}
+.best-program-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+#programChoiceBox{display:none!important;}
+
 /* Funding Tier credit card current-situation calculator patch */
 .cc-impact-card{margin-top:14px;border:1.5px solid rgba(15,157,138,.24);border-radius:14px;background:linear-gradient(135deg,rgba(15,157,138,.08),rgba(15,42,94,.04));padding:14px;}
 .cc-impact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:10px;}
@@ -406,6 +417,13 @@ body{top:0!important;}
       <div style="font-size:17px;font-weight:900;color:var(--dk);margin-bottom:4px;">Program vs Current Financial Situation</div>
       <p style="font-size:13px;color:#64748b;font-weight:500;">Continuing minimum payments is almost always the most expensive long-term path.</p>
       <div id="programChoiceBox" style="display:none;margin-top:14px;padding:12px;border:1.5px solid var(--br);border-radius:12px;background:var(--bg);"></div>
+      <div id="agentScriptBubble" class="agent-script-bubble" style="display:none;margin-left:0;margin-right:0;">
+        <div class="agent-script-kicker">Phone Script</div>
+        <div class="agent-script-title">Say this directly to the prospect</div>
+        <div id="agentScriptBubbleText" class="agent-script-text"></div>
+        <div id="agentScriptBubbleAssumption" class="agent-script-assumption"></div>
+        <button type="button" class="agent-script-copy-btn" onclick="copyAgentScriptBubble()">Copy Phone Script</button>
+      </div>
     </div>
     <div style="padding:20px;overflow-x:auto;">
       <table class="cmp">
@@ -416,8 +434,13 @@ body{top:0!important;}
           <th style="text-align:left;background:rgba(15,157,138,.06);color:#0b7d6e;min-width:200px;">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
               <img id="recommendedProgramLogo" src="" alt="" style="display:none;height:16px;width:auto;max-width:70px;object-fit:contain;border-radius:4px;background:#fff;border:1px solid #dbe4ea;padding:2px 5px;"/>
-              <span id="recommendedProgramHeader">Recommended Program</span>
-              <span style="background:var(--g);color:#fff;border-radius:999px;padding:2px 8px;font-size:10px;white-space:nowrap;">Best Option</span>
+              <span class="best-program-header">
+                <span class="best-program-overline">Program Being Calculated as Best Option</span>
+                <span class="best-program-name">
+                  <span id="recommendedProgramHeader">Recommended Program</span>
+                  <span style="background:var(--g);color:#fff;border-radius:999px;padding:2px 8px;font-size:10px;white-space:nowrap;">Best Option</span>
+                </span>
+              </span>
             </div>
           </th>
         </tr></thead>
@@ -1921,9 +1944,9 @@ function calcDN(d,apr){
     minimumOnlyTotalPaidFormatted: FundingTierCreditCardCalculator.money(minOnly.totalPaid||0),
     fixedInterestFormatted: FundingTierCreditCardCalculator.money(fixed.totalInterest||0),
     fixedTotalPaidFormatted: FundingTierCreditCardCalculator.money(fixed.totalPaid||0),
-    agentTalkTrack: `Based on ${FundingTierCreditCardCalculator.money(d)} at ${((current.apr||0)*100).toFixed(2)}% APR, the estimated starting minimum payment is ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo. If the client only follows the required minimum, that payment usually drops as the balance drops, which is why payoff can take ${minOnly.yearsMonths||'N/A'} and cost about ${FundingTierCreditCardCalculator.money(minOnly.totalInterest||0)} in interest. If they kept paying that starting amount as a fixed payment every month, payoff is closer to ${fixed.yearsMonths||'N/A'} with about ${FundingTierCreditCardCalculator.money(fixed.totalInterest||0)} in interest. The difference is declining minimum versus fixed payment.`,
-    minimumOnlyAgentScript: `The ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted} is the Month 1 starting minimum. If you only pay the required minimum, that amount usually drops as your balance drops, so the payoff timeline stretches out. On this estimate, that path takes about ${minOnly.yearsMonths||'N/A'} and costs about ${FundingTierCreditCardCalculator.money(minOnly.totalInterest||0)} in interest.`,
-    fixedPaymentAgentScript: `If you kept paying the starting minimum amount every month instead of letting it drop, payoff would be much faster — about ${fixed.yearsMonths||'N/A'} — with about ${FundingTierCreditCardCalculator.money(fixed.totalInterest||0)} in interest.`,
+    agentTalkTrack: d > 0 ? `Here is the simple way to look at it. If you stay on the regular minimum-payment path, your estimated starting minimum payment is around ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo based on ${FundingTierCreditCardCalculator.money(d)} at ${((current.apr||0)*100).toFixed(2)}% APR. The catch is that the minimum payment usually goes down as your balance goes down, so even though the first payment starts around ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo, the payoff timeline can stretch to about ${minOnly.yearsMonths||'N/A'} and cost you about ${FundingTierCreditCardCalculator.money(minOnly.totalInterest||0)} in interest. If you kept paying that same starting amount every month as a fixed payment instead of letting it drop, payoff is closer to ${fixed.yearsMonths||'N/A'} with about ${FundingTierCreditCardCalculator.money(fixed.totalInterest||0)} in interest. So the big difference is staying on a declining minimum payment versus keeping a fixed payment.` : '',
+    minimumOnlyAgentScript: d > 0 ? `Your Month 1 starting minimum is ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo. If you stay on minimum payments only, that payment usually drops as your balance drops, so the payoff timeline stretches out. On this estimate, that path takes about ${minOnly.yearsMonths||'N/A'} and costs about ${FundingTierCreditCardCalculator.money(minOnly.totalInterest||0)} in interest.` : '',
+    fixedPaymentAgentScript: d > 0 ? `If you kept paying the starting minimum amount every month instead of letting it drop, payoff would be much faster — about ${fixed.yearsMonths||'N/A'} — with about ${FundingTierCreditCardCalculator.money(fixed.totalInterest||0)} in interest.` : '',
     assumption: current.routerText.assumption
   };
 }
@@ -2748,6 +2771,32 @@ function renderProgramChoice(c){
   }
 }
 
+
+function renderAgentScriptBubble(dn){
+  const box=$('agentScriptBubble');
+  const txt=$('agentScriptBubbleText');
+  const ass=$('agentScriptBubbleAssumption');
+  if(!box||!txt||!ass||!dn)return;
+  const hasBalance=Number(dn.balance||dn.debt||dn.totalDebt||0)>0 || Number(dn.mp||dn.startingMinimumPayment||0)>0;
+  const script=hasBalance ? (dn.agentTalkTrack||dn.minimumOnlyAgentScript||'') : '';
+  if(!script){
+    box.style.display='none';
+    txt.textContent='';
+    ass.textContent='';
+    return;
+  }
+  txt.textContent=script;
+  ass.textContent=dn.assumption||'This payoff estimate assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes.';
+  box.style.display='block';
+}
+function copyAgentScriptBubble(){
+  const txt=$('agentScriptBubbleText')?.textContent||'';
+  const ass=$('agentScriptBubbleAssumption')?.textContent||'';
+  const out=[txt,ass].filter(Boolean).join('\n\n');
+  if(!out)return;
+  navigator.clipboard?.writeText(out);
+}
+
 function renderCmpTable(c){
   const hdrLogo=$('recommendedProgramLogo'),hdrText=$('recommendedProgramHeader');
   const selRoute=selectedProgramRoute(c);
@@ -2763,15 +2812,16 @@ function renderCmpTable(c){
     if(est.shortest){fM=fmt(est.shortest.mp);fMo=`${est.shortest.term} months`;fT=fmt(est.shortest.tc);fS=`<strong>${fmt(Math.max(0,(c.dn.total||0)-est.shortest.tc))}</strong>`;}
   }
   const dn=c.dn||{};
+  renderAgentScriptBubble(dn);
   const current=dn.currentSituation||null;
   const dnMonths=dn.yearsMonths||(`${dn.months||0} months`);
   const fixedMonths=dn.fixedYearsMonths||'N/A';
   const mpTooltip=`<span class="tip-wrap" style="margin-left:5px;"><span style="font-size:10px;color:#93c5fd;cursor:help;border-bottom:1px dashed #93c5fd;">est.</span><span class="tip-box">Funding Tier default estimate: 3% of unsecured credit card balance. Assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes. Actual creditor formulas vary.</span></span>`;
   const sayTip=(text)=>`<span class="tip-wrap" style="margin-left:6px;"><span style="font-size:10px;color:#0b7d6e;cursor:help;border-bottom:1px dashed #0b7d6e;font-weight:900;">what to say</span><span class="tip-box">${esc(text)}</span></span>`;
-  const minOnlyScript=dn.minimumOnlyAgentScript||`The starting minimum is ${fmt(dn.mp||0)}/mo. If the client only pays the required minimum, the payment usually drops as the balance drops. That is why payoff can take ${dnMonths} and cost about ${fmt(dn.interest||0)} in interest.`;
-  const fixedScript=dn.fixedPaymentAgentScript||`If the client keeps paying the starting ${fmt(dn.mp||0)}/mo every month instead of letting it drop, payoff is about ${fixedMonths} with about ${fmt(dn.fixedInterest||0)} in interest.`;
+  const minOnlyScript=dn.minimumOnlyAgentScript||`The starting minimum is ${fmt(dn.mp||0)}/mo. If you only pay the required minimum, the payment usually drops as the balance drops. That is why payoff can take ${dnMonths} and cost about ${fmt(dn.interest||0)} in interest.`;
+  const fixedScript=dn.fixedPaymentAgentScript||`If you keep paying the starting ${fmt(dn.mp||0)}/mo every month instead of letting it drop, payoff is about ${fixedMonths} with about ${fmt(dn.fixedInterest||0)} in interest.`;
   const rows=[
-    ['Month 1 Starting Minimum Payment',`${fmt(dn.mp||0)}${mpTooltip}${sayTip('This is the estimated first required minimum payment. It is not the same as saying the client pays this exact amount forever.')}<br><span style="font-size:11px;color:#64748b;font-weight:700;">This is the estimated first required minimum — not a fixed payment forever.</span>`,fM,recMonthly,'mp-row'],
+    ['Month 1 Starting Minimum Payment',`${fmt(dn.mp||0)}${mpTooltip}${sayTip('This is the estimated first required minimum payment. It is not the same as saying you pay this exact amount forever.')}<br><span style="font-size:11px;color:#64748b;font-weight:700;">This is the estimated first required minimum — not a fixed payment forever.</span>`,fM,recMonthly,'mp-row'],
     ['Payment Behavior',`${dn.paymentBehaviorLabel||'Starts at estimated minimum, then recalculates downward as the balance drops.'}${sayTip('Minimum-only means the required payment usually starts higher and then drops as the balance drops. That lower future payment is what stretches the payoff timeline.')}`,'Fixed payment stays the same monthly','Program payment shown is fixed/structured by selected backend.',''],
     ['Plain-English Explanation',`<span style="font-size:11px;color:#475569;line-height:1.55;display:block;">${esc(dn.plainEnglishExplanation||'The minimum-only payoff can take a long time because the required minimum payment usually decreases as the balance goes down.')}</span>${sayTip(dn.agentTalkTrack||minOnlyScript)}`,'Fixed payoff assumes the same payment is made every month.','Program payment is structured by the selected backend.',''],
     ['Total Enrolled Debt',fmt(c.total),fmt(c.total),fmt(c.total),''],
