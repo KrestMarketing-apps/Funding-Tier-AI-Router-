@@ -6,6 +6,10 @@
       "destination": "/api/plan?slug=:slug"
     },
     {
+      "source": "/credit-card-calculator",
+      "destination": "/credit-card-calculator.html"
+    },
+    {
       "source": "/agents/legacy-capital-program-calculator",
       "destination": "/agents/legacy-capital-program-calculator.html"
     },
