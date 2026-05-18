@@ -3097,11 +3097,34 @@ function getLocalCreditorMatches(q){
   });
   return merged;
 }
+async function renderCreditorProgramStatusPill(programLabel, status, rule){
+  const safeRule = rule ? esc(rule) : '';
+  if(status === 'rej'){
+    return `<span title="${safeRule || programLabel + ' rejected'}" style="background:#dc2626;color:#fff;font-size:9px;font-weight:900;border-radius:999px;padding:3px 7px;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;">${programLabel}: Rejected</span>`;
+  }
+  if(status === 'cond'){
+    return `<span title="${safeRule || programLabel + ' possible exception / contact support'}" style="background:#1d4ed8;color:#fff;font-size:9px;font-weight:900;border-radius:999px;padding:3px 7px;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;">${programLabel}: Contact Support</span>`;
+  }
+  return `<span title="${programLabel} accepted" style="background:#16a34a;color:#fff;font-size:9px;font-weight:900;border-radius:999px;padding:3px 7px;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;">${programLabel}: Accepted</span>`;
+}
+function renderCreditorProgramStatusPills(ps){
+  return `<span style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:6px;">${renderCreditorProgramStatusPill('Level',ps.level.status,ps.level.rule)}${renderCreditorProgramStatusPill('CS',ps.cs.status,ps.cs.rule)}${renderCreditorProgramStatusPill('ELP',ps.legacy.status,ps.legacy.rule)}</span>`;
+}
+function searchCreditorResultBackground(ps){
+  const statuses=[ps.level.status,ps.cs.status,ps.legacy.status];
+  if(statuses.every(s=>s==='rej')) return '#fef2f2';
+  if(statuses.includes('cond')) return '#eff6ff';
+  if(statuses.includes('rej')) return '#fff7ed';
+  return '#fff';
+}
 async function searchCred(i,query){
   const box=document.querySelector(`[data-cr="${i}"]`);if(!box)return;
   if(!query.trim()){
     const popular=getTradMatches('');
-    box.innerHTML=popular.map(item=>`<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="Unsecured" data-ps="false"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-weight:800;color:var(--dk);">${esc(item.display_name||'')}</span><span style="font-size:10px;font-weight:800;background:rgba(15,157,138,.1);color:#0b7d6e;border:1px solid rgba(15,157,138,.25);border-radius:999px;padding:2px 7px;">Typical Card</span></div><div style="font-size:11px;color:#0b7d6e;margin-top:2px;">Unsecured credit card</div></button>`).join('');
+    box.innerHTML=popular.map(item=>{
+      const ps=getCreditorProgramStatus(item.display_name||'', 'Unsecured');
+      return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="Unsecured" data-ps="false" style="background:${searchCreditorResultBackground(ps)};"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-weight:800;color:var(--dk);">${esc(item.display_name||'')}</span><span style="font-size:10px;font-weight:800;background:rgba(15,157,138,.1);color:#0b7d6e;border:1px solid rgba(15,157,138,.25);border-radius:999px;padding:2px 7px;">Typical Card</span></div><div style="font-size:11px;color:#0b7d6e;margin-top:2px;">Unsecured credit card</div>${renderCreditorProgramStatusPills(ps)}</button>`;
+    }).join('');
     box.className='drop open';
     bindCredClicks();
     return;
@@ -3117,16 +3140,10 @@ async function searchCred(i,query){
     const sec=item.secured===true||item.secured==='true';
     const dt=isTradCard(item.display_name||'')?'Unsecured':sec?'Secured Loan':'Unsecured';
     const ps = getCreditorProgramStatus(item.display_name || '', item.product_type || dt || 'Unsecured');
-    const isLevelRej  = ps.level.status  === 'rej';
-    const isLevelCond = ps.level.status  === 'cond';
-    const isCSRej     = ps.cs.status     === 'rej';
-    const isCSCond    = ps.cs.status     === 'cond';
-    const isLegacyRej = ps.legacy.status === 'rej';
-    const allRej      = isLevelRej && isCSRej && isLegacyRej;
-    const isRej       = allRej;
-    const isCond      = !allRej && (isLevelCond || isCSCond);
     const reasons = [ps.level.rule, ps.cs.rule, ps.legacy.rule].filter(Boolean).filter((v,idx,arr)=>arr.indexOf(v)===idx).join(' | ');
-    return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="${esc(dt)}" data-ps="${sec}" style="background:${isRej?'#fef2f2':isCond?'#fffbeb':'#fff'};"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;"><span style="font-weight:800;color:${isRej?'var(--rd)':isCond?'#92400e':'var(--dk)'};">${esc(item.display_name||'')}</span><span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${item.source==='rule'?`<span style="font-size:10px;font-weight:800;background:#e2e8f0;color:#334155;border-radius:999px;padding:2px 7px;">Lookup</span>`:''}${isLevelRej  ? `<span style="background:#dc2626;color:#fff;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">Level ✕</span>` : ''}${isLevelCond ? `<span style="background:#d97706;color:#fff;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">Level ⚠</span>` : ''}${isCSRej     ? `<span style="background:#1e40af;color:#fff;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">CS ✕</span>` : ''}${isCSCond    ? `<span style="background:#1e3a8a;color:#bfdbfe;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">CS ⚠</span>` : ''}${isLegacyRej ? `<span style="background:#6d28d9;color:#fff;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">ELP ✕</span>` : ''}${allRej      ? `<span style="background:#0f172a;color:#f87171;font-size:9px;font-weight:800;border-radius:999px;padding:2px 7px;white-space:nowrap;">All programs ✕</span>` : ''}</span></div><div style="font-size:11px;color:${sec?'var(--rd)':'#0b7d6e'};margin-top:2px;">${esc(dt)} &middot; ${sec?'Secured':'Unsecured'}</div>${reasons?`<div style="font-size:11px;color:#64748b;margin-top:2px;font-style:italic;">${esc(reasons)}</div>`:''}</button>`;
+    const hasRule=item.source==='rule';
+    const bg=searchCreditorResultBackground(ps);
+    return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="${esc(dt)}" data-ps="${sec}" style="background:${bg};"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;"><span style="font-weight:800;color:var(--dk);">${esc(item.display_name||'')}</span><span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${hasRule?`<span style="font-size:10px;font-weight:800;background:#e2e8f0;color:#334155;border-radius:999px;padding:2px 7px;">Creditor Rule</span>`:''}</span></div><div style="font-size:11px;color:${sec?'var(--rd)':'#0b7d6e'};margin-top:2px;">${esc(dt)} &middot; ${sec?'Secured':'Unsecured'}</div>${renderCreditorProgramStatusPills(ps)}${reasons?`<div style="font-size:11px;color:#64748b;margin-top:4px;font-style:italic;line-height:1.45;">${esc(reasons)}</div>`:''}</button>`;
   }).join('');
   box.className='drop open';bindCredClicks();
 }
