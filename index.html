@@ -318,6 +318,36 @@ body{top:0!important;}
 .cc-impact-note{font-size:11px;line-height:1.55;color:#92400e;background:#fffbeb;border:1px solid rgba(245,158,11,.32);border-radius:10px;padding:9px 11px;margin-top:10px;}
 .cc-apr-input{max-width:120px;text-align:center;font-weight:900;color:#0f172a;}
 
+/* Level Debt tooltip visibility patch */
+.plan-card-v,
+.plan-body,
+#planCards,
+.pc-ld,
+.pc-ld .plan-body{
+  overflow:visible!important;
+}
+.pc-ld .ttp{
+  position:relative;
+  z-index:999999!important;
+}
+.pc-ld .ttp .ttp-body{
+  z-index:2147483647!important;
+  min-width:360px;
+  max-width:420px;
+  white-space:normal!important;
+  text-align:left;
+  line-height:1.55;
+}
+.pc-ld .ttp:hover .ttp-body{
+  visibility:visible!important;
+  opacity:1!important;
+}
+.ld-term-slider-wrap{margin-top:12px;border:1.5px solid rgba(15,157,138,.22);border-radius:12px;background:#f8fffd;padding:12px;}
+.ld-term-slider-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.ld-term-slider-label{font-size:11px;font-weight:900;color:#0b7d6e;text-transform:uppercase;letter-spacing:.45px;}
+.ld-term-slider-value{font-size:12px;font-weight:900;color:#0f172a;}
+.ld-term-slider-note{font-size:10px;color:#64748b;font-weight:700;line-height:1.45;margin-top:8px;}
+
 </style>
 </head>
 <body>
@@ -1443,6 +1473,40 @@ const SUPP_HOURS=[
 ];
 const MAX_ROWS=10;
 const legacyState={feeRate:0.40,months:36,splitPay:false};
+const levelDebtState={term:null,total:null};
+function getLDProgramCost(total, feeRate){
+  return (total || 0) * 0.5 + (total || 0) * (feeRate || 0);
+}
+function getLDMinTerm(total){
+  return total >= LEVEL_DEBT_KNOWLEDGEBASE.minimums.totalDebt ? 12 : 0;
+}
+function getLDEffectiveMaxTerm(total, feeRate){
+  const maxByDebt = getLDMaxTerm(total);
+  const minDraft = getLDMinDraft(total);
+  const tc = getLDProgramCost(total, feeRate);
+  const maxByMinPayment = minDraft > 0 ? Math.floor(tc / minDraft) : maxByDebt;
+  const effectiveMax = Math.min(maxByDebt, maxByMinPayment > 0 ? maxByMinPayment : maxByDebt);
+  return Math.max(getLDMinTerm(total), effectiveMax || 0);
+}
+function getLDSelectedTerm(total, feeRate){
+  const minTerm = getLDMinTerm(total);
+  const maxTerm = getLDEffectiveMaxTerm(total, feeRate);
+  if(!minTerm || !maxTerm) return 0;
+  if(levelDebtState.total !== total || !levelDebtState.term){
+    levelDebtState.total = total;
+    levelDebtState.term = maxTerm;
+  }
+  levelDebtState.term = Math.max(minTerm, Math.min(maxTerm, parseInt(levelDebtState.term,10) || maxTerm));
+  return levelDebtState.term;
+}
+function updateLDTerm(value){
+  if(!lastScenario) return;
+  const minTerm = getLDMinTerm(lastScenario.total);
+  const maxTerm = getLDEffectiveMaxTerm(lastScenario.total, lastScenario.feeRate);
+  levelDebtState.total = lastScenario.total;
+  levelDebtState.term = Math.max(minTerm, Math.min(maxTerm, parseInt(value,10) || maxTerm));
+  render();
+}
 function legacyDraftCount(splitPay){
   return splitPay ? 2 : 1;
 }
@@ -1888,9 +1952,90 @@ function syncStateFromInput(force){
   if(force)app.sel='';
   return false;
 }
-const getLDMaxTerm=d=>d<10000?24:d<12500?30:d<15000?36:d<25000?42:d<35000?48:d<50000?54:60;
-  const LD_DRAFT_MINS=[{min:7000,max:9999,minPay:150},{min:10000,max:12999,minPay:200},{min:13000,max:Infinity,minPay:250}];
-const getLDMinDraft=d=>(LD_DRAFT_MINS.find(t=>d>=t.min&&(t.max===Infinity||d<=t.max))||{minPay:150}).minPay;
+const LEVEL_DEBT_KNOWLEDGEBASE = {
+  minimums: {
+    totalDebt: 7000,
+    perAccount: 200,
+    minimumMonthlyDeposit: 250,
+    draftPayments: [
+      {
+        label: 'Debt enrolled $7,000+',
+        debtMin: 7000,
+        debtMax: Infinity,
+        minMonthlyPayment: 250
+      }
+    ]
+  },
+
+  forthCrmPlanRules: {
+    summary:
+      'FORTH CRM plan selection for Level Debt depends on total enrolled debt. Debt loads under $35,000 should use the Debt Settlement Enrollment Plan. Debt loads of $35,000 or more should use the corresponding Override Plan for terms beyond 48 months to help lower the monthly program deposit and improve monthly affordability for the client.',
+
+    debtSettlementEnrollmentPlan: {
+      label: 'Debt Settlement Enrollment Plan',
+      debtMin: 7000,
+      debtMax: 34999,
+      instruction:
+        'For debt loads under $35,000, use the Debt Settlement Enrollment Plan inside FORTH CRM.'
+    },
+
+    overridePlan: {
+      label: 'Override Plan',
+      debtMin: 35000,
+      debtMax: Infinity,
+      instruction:
+        'For debt loads $35,000 or higher, and the client wants lower monthly payments than the 48 month term offers, use the corresponding Override Plan inside FORTH CRM for terms beyond 48 months. This is designed to help lower the monthly program deposit and improve monthly affordability for the client.'
+    },
+
+    minimumMonthlyDeposit: 250,
+
+    agentNote:
+      'LEVEL DEBT FORTH CRM SETUP: If enrolled debt is under $35,000, use the Debt Settlement Enrollment Plan in FORTH CRM. If enrolled debt is $35,000 or higher, use the corresponding Override Plan in FORTH CRM for terms beyond 48 months. The override plan is intended to lower the monthly program deposit and make the program more affordable for the client on a month-to-month basis. Current minimum monthly program deposit is $250.'
+  },
+
+  termRules: [
+    { label: 'Debt enrolled $7,000 – $9,999', debtMin: 7000, debtMax: 9999, maxTerm: 24 },
+    { label: 'Debt enrolled $10,000 – $12,499', debtMin: 10000, debtMax: 12499, maxTerm: 30 },
+    { label: 'Debt enrolled $12,500 – $14,999', debtMin: 12500, debtMax: 14999, maxTerm: 36 },
+    { label: 'Debt enrolled $15,000 – $24,999', debtMin: 15000, debtMax: 24999, maxTerm: 42 },
+    { label: 'Debt enrolled $25,000 – $34,999', debtMin: 25000, debtMax: 34999, maxTerm: 48 },
+    { label: 'Debt enrolled $35,000 – $49,999', debtMin: 35000, debtMax: 49999, maxTerm: 54 },
+    { label: 'Debt enrolled $50,000+', debtMin: 50000, debtMax: Infinity, maxTerm: 60 }
+  ]
+};
+
+function getLDMaxTerm(totalDebt) {
+  const rule = LEVEL_DEBT_KNOWLEDGEBASE.termRules.find(r =>
+    totalDebt >= r.debtMin && totalDebt <= r.debtMax
+  );
+
+  return rule ? rule.maxTerm : 0;
+}
+
+function getLDMinDraft(totalDebt) {
+  if(totalDebt < LEVEL_DEBT_KNOWLEDGEBASE.minimums.totalDebt) return 0;
+  return LEVEL_DEBT_KNOWLEDGEBASE.minimums.minimumMonthlyDeposit;
+}
+
+function getLDForthPlanRule(totalDebt) {
+  const rules = LEVEL_DEBT_KNOWLEDGEBASE.forthCrmPlanRules;
+
+  if(totalDebt >= rules.overridePlan.debtMin) {
+    return {
+      planType: rules.overridePlan.label,
+      instruction: rules.overridePlan.instruction,
+      agentNote: rules.agentNote,
+      minimumMonthlyDeposit: rules.minimumMonthlyDeposit
+    };
+  }
+
+  return {
+    planType: rules.debtSettlementEnrollmentPlan.label,
+    instruction: rules.debtSettlementEnrollmentPlan.instruction,
+    agentNote: rules.agentNote,
+    minimumMonthlyDeposit: rules.minimumMonthlyDeposit
+  };
+}
 function toggleAcc(bodyId,btnId){const b=$(bodyId),btn=$(btnId);if(!b||!btn)return;const open=b.classList.contains('open');b.classList.toggle('open',!open);btn.classList.toggle('open',!open);}
 let nextId=2;
 const app={sel:'',rows:[newRow(1)],selectedProgramRoute:'',ccApr:27.99};
@@ -2084,8 +2229,17 @@ function computeScenario(){
     const mt = getLDMaxTerm(total);
     const maxTermForMin = minDraft > 0 ? Math.floor(tc / minDraft) : mt;
     const effTerm = Math.min(mt, maxTermForMin > 0 ? maxTermForMin : mt);
+    const forthPlanRule = getLDForthPlanRule(total);
     shortest = {term:12, tc, mp:tc / 12};
-    recommended = {term:effTerm, tc, mp:Math.round(tc / effTerm)};
+    recommended = {
+      term: effTerm,
+      tc,
+      mp: Math.round(tc / Math.max(1, effTerm)),
+      minimumMonthlyDeposit: minDraft,
+      forthCrmPlanType: forthPlanRule.planType,
+      forthCrmInstruction: forthPlanRule.instruction,
+      forthCrmAgentNote: forthPlanRule.agentNote
+    };
   }
   else if(route.route === 'CONSUMER SHIELD' && csProg){
     const tc = csProg.term * csProg.pay;
@@ -2512,7 +2666,17 @@ function renderPlanCards(c){
   }
 
   if(c.ldAvail){
-const mt=getLDMaxTerm(c.total),minDraft=getLDMinDraft(c.total),_ldTc=c.total*.5+c.total*c.feeRate,_ldMaxT=Math.min(mt,minDraft>0?Math.floor(_ldTc/minDraft):mt),mp=Math.round(_ldTc/Math.max(1,_ldMaxT)),isRec=c.route.route==='LEVEL';    const comm=getCommForCard(c,'LEVEL');
+    const mt = getLDMaxTerm(c.total);
+    const minTerm = getLDMinTerm(c.total);
+    const minDraft = getLDMinDraft(c.total);
+    const forthPlanRule = getLDForthPlanRule(c.total);
+    const _ldTc = getLDProgramCost(c.total, c.feeRate);
+    const _ldMaxT = getLDEffectiveMaxTerm(c.total, c.feeRate);
+    const selectedTerm = getLDSelectedTerm(c.total, c.feeRate);
+    const mp = Math.round(_ldTc / Math.max(1, selectedTerm));
+    const isRec = c.route.route === 'LEVEL';
+    const comm=getCommForCard(c,'LEVEL');
+    const forthTooltip = `<strong>FORTH CRM Plan: ${esc(forthPlanRule.planType)}</strong><br>${esc(forthPlanRule.instruction)}`;
     cards.push(`<div class="plan-card-v pc-ld${isRec?' rec':''}">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
@@ -2522,19 +2686,39 @@ const mt=getLDMaxTerm(c.total),minDraft=getLDMinDraft(c.total),_ldTc=c.total*.5+
           </div>
           <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class="plan-chip-rec">Recommended</span>':'<span class="plan-chip-check">✓</span>'}</div>
         </div>
-        <div style="border:1.5px solid rgba(15,157,138,.25);border-radius:12px;overflow:hidden;">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;">
-            <div style="padding:10px 12px;border-right:1px solid rgba(15,157,138,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div><div style="font-size:18px;font-weight:900;color:#0b7d6e;line-height:1;">${fmt(mp)}</div>
-<div style="font-size:9px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0f172a,#0b3b50,#0f9d8a);border-radius:6px;padding:3px 8px;margin-top:5px;display:inline-block;letter-spacing:.3px;">min ${fmt(minDraft)}/mo</div></div>
-            <div style="padding:10px 12px;border-right:1px solid rgba(15,157,138,.15);background:#fff;text-align:center;"><div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Length (Months)</div><div style="font-size:18px;font-weight:900;color:#0b7d6e;line-height:1;">${_ldMaxT}<span style="font-size:10px;font-weight:700;vertical-align:middle;"> mo</span></div></div>
-            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);line-height:1;">${fmt(mp*_ldMaxT)}</div></div>
+        <div style="border:1.5px solid rgba(15,157,138,.25);border-radius:12px;overflow:visible;position:relative;z-index:50;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;overflow:visible;">
+            <div style="padding:10px 12px;border-right:1px solid rgba(15,157,138,.15);background:#fff;text-align:center;position:relative;overflow:visible;">
+              <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Payment</div>
+              <div class="ttp" style="font-size:18px;font-weight:900;color:#0b7d6e;line-height:1;cursor:help;">
+                <span>${fmt(mp)}</span>
+                <span class="ttp-body">${forthTooltip}</span>
+              </div>
+            </div>
+            <div style="padding:10px 12px;border-right:1px solid rgba(15,157,138,.15);background:#fff;text-align:center;position:relative;overflow:visible;">
+              <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Length (Months)</div>
+              <div class="ttp" style="font-size:18px;font-weight:900;color:#0b7d6e;line-height:1;cursor:help;">
+                <span>${selectedTerm}<span style="font-size:10px;font-weight:700;vertical-align:middle;"> mo</span></span>
+                <span class="ttp-body">${forthTooltip}</span>
+              </div>
+            </div>
+            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);line-height:1;">${fmt(_ldTc)}</div></div>
           </div>
         </div>
       </div>
       <hr class="comm-divider"/>
       <div class="plan-comm-block${isRec?' rec-comm':''}">${commContentHtml(comm,isRec)}</div>
+      <div class="ld-term-slider-wrap" style="margin:14px 18px 18px 18px;">
+        <div class="ld-term-slider-head">
+          <div class="ld-term-slider-label">Adjust Program Length</div>
+          <div class="ld-term-slider-value">${selectedTerm} months → ${fmt(mp)}/mo</div>
+        </div>
+        <input type="range" class="rng-g" min="${minTerm}" max="${_ldMaxT}" value="${selectedTerm}" step="1" oninput="updateLDTerm(this.value)">
+        <div class="ld-term-slider-note">Allowed Level Debt term range for ${fmt(c.total)} enrolled debt: ${minTerm}–${_ldMaxT} months. This slider defaults to the maximum available term based on the debt amount and the ${fmt(minDraft)}/mo minimum monthly program deposit.</div>
+      </div>
     </div>`);
   }
+
 
   {
     const isRec=c.route.route==='LEGACY';
@@ -2612,14 +2796,14 @@ function renderLDCard(c){
   const card=$('ldProgramCard');
   if(!c.ldAvail){card.style.display='none';return;}
   card.style.display='block';
-  const term=getLDMaxTerm(c.total);
-const minDraftLD=getLDMinDraft(c.total);
-const _ldTcDet=c.total*.5+c.total*c.feeRate;
-const _ldTermDet=Math.min(term,minDraftLD>0?Math.floor(_ldTcDet/minDraftLD):term);
-const mp=Math.round(_ldTcDet/Math.max(1,_ldTermDet));
-  $('ldActiveDetail').innerHTML=`<div style="background:rgba(15,157,138,.06);border:2px solid var(--g);border-radius:12px;padding:16px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:#0b7d6e;">Level Debt Program Explanation</span><span style="font-size:12px;color:#64748b;margin-left:10px;">Client-facing quick pitch</span></div><span class="pill p-g">Settlement</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px;text-align:center;">${[['Monthly Payment',fmt(mp),'est. monthly'],['Program Length',`${term} mo`,'estimated'],['Estimated Total',fmt(mp*term),'program total']].map(([l,v,s])=>`<div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">${l}</div><div style="font-size:22px;font-weight:900;color:#0b7d6e;margin-top:4px;">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${s}</div></div>`).join('')}</div><div style="font-size:12px;color:#334155;line-height:1.8;"><div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Program Explanation</div><ul style="padding-left:18px;display:grid;gap:6px;"><li>One structured monthly deposit replaces the chaos of multiple unsecured debt payments.</li><li>The program works to negotiate enrolled creditors and may reduce what the client ultimately pays, depending on creditor participation.</li><li>Clients gain a defined timeline instead of revolving minimum payments that can drag on for years.</li><li>There are no guarantees on settlement timing or savings, but the goal is to improve cash flow and create a realistic path out of debt.</li><li>Credit impact can occur while accounts are being resolved, so expectations should stay clear and transparent.</li></ul></div></div>`;
+  const term = getLDMaxTerm(c.total);
+  const minDraftLD = getLDMinDraft(c.total);
+  const forthPlanRule = getLDForthPlanRule(c.total);
+  const _ldTcDet = getLDProgramCost(c.total, c.feeRate);
+  const _ldTermDet = getLDSelectedTerm(c.total, c.feeRate);
+  const mp = Math.round(_ldTcDet / Math.max(1, _ldTermDet));
+  $('ldActiveDetail').innerHTML=`<div style="background:rgba(15,157,138,.06);border:2px solid var(--g);border-radius:12px;padding:16px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:#0b7d6e;">Level Debt Program Explanation</span><span style="font-size:12px;color:#64748b;margin-left:10px;">Client-facing quick pitch</span></div><span class="pill p-g">Settlement</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px;text-align:center;">${[['Monthly Payment',fmt(mp),'est. monthly'],['Program Length',`${_ldTermDet} mo`,'estimated'],['Estimated Total',fmt(_ldTcDet),'program total'],['Minimum Deposit',fmt(minDraftLD),'current minimum']].map(([l,v,s])=>`<div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">${l}</div><div style="font-size:22px;font-weight:900;color:#0b7d6e;margin-top:4px;">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${s}</div></div>`).join('')}</div><div style="background:#f0fdf4;border:1.5px solid rgba(15,157,138,.28);border-radius:10px;padding:11px 13px;margin-bottom:14px;"><div style="font-size:10px;font-weight:900;color:#0b7d6e;text-transform:uppercase;letter-spacing:.45px;margin-bottom:5px;">FORTH CRM Setup Instruction</div><div style="font-size:13px;font-weight:900;color:#0f172a;margin-bottom:4px;">${forthPlanRule.planType}</div><div style="font-size:12px;color:#334155;font-weight:650;line-height:1.55;">${forthPlanRule.instruction}</div></div><div style="font-size:12px;color:#334155;line-height:1.8;"><div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Program Explanation</div><ul style="padding-left:18px;display:grid;gap:6px;"><li>One structured monthly deposit replaces the chaos of multiple unsecured debt payments.</li><li>The program works to negotiate enrolled creditors and may reduce what the client ultimately pays, depending on creditor participation.</li><li>Clients gain a defined timeline instead of revolving minimum payments that can drag on for years.</li><li>There are no guarantees on settlement timing or savings, but the goal is to improve cash flow and create a realistic path out of debt.</li><li>Credit impact can occur while accounts are being resolved, so expectations should stay clear and transparent.</li></ul></div></div>`;
 }
-
 function renderLegacyCard(c){
   const card=$('legacyProgramCard');
   if(!c.legacyAvail){card.style.display='none';return;}
@@ -2705,12 +2889,22 @@ function programEstimate(c,route){
   const total=c.total||0;
   if(route==='LEVEL'&&c.ldAvail){
     const rate=c.lds&&c.lds.status==='RED'?.27:.25;
-    const tc=total*.5+total*rate;
+    const tc=getLDProgramCost(total, rate);
     const minDraft=getLDMinDraft(total);
-    const mt=getLDMaxTerm(total);
-    const maxTermForMin=minDraft>0?Math.floor(tc/minDraft):mt;
-    const effTerm=Math.min(mt,maxTermForMin>0?maxTermForMin:mt);
-    return {route,term:effTerm,tc,mp:Math.round(tc/Math.max(1,effTerm)),shortest:{term:12,tc,mp:tc/12},serviceFeePct:Math.round(rate*100)};
+    const effTerm=getLDSelectedTerm(total, rate);
+    const forthPlanRule=getLDForthPlanRule(total);
+    return {
+      route,
+      term:effTerm,
+      tc,
+      mp:Math.round(tc/Math.max(1,effTerm)),
+      shortest:{term:12,tc,mp:tc/12},
+      serviceFeePct:Math.round(rate*100),
+      minimumMonthlyDeposit:minDraft,
+      forthCrmPlanType:forthPlanRule.planType,
+      forthCrmInstruction:forthPlanRule.instruction,
+      forthCrmAgentNote:forthPlanRule.agentNote
+    };
   }
   if(route==='CONSUMER SHIELD'&&c.csAvail&&c.csProg){
     const tc=c.csProg.term*c.csProg.pay;
@@ -3074,7 +3268,11 @@ function buildFullPayload(sendEmail){
     route:publicProgramName(selRoute),
     serviceFeePct:est.serviceFeePct,
     splitPay:!!est.splitPay,
-    monthlyAdminFees:est.monthlyAdminFees
+    monthlyAdminFees:est.monthlyAdminFees,
+    minimumMonthlyDeposit:est.minimumMonthlyDeposit||null,
+    forthCrmPlanType:est.forthCrmPlanType||null,
+    forthCrmInstruction:est.forthCrmInstruction||null,
+    forthCrmAgentNote:est.forthCrmAgentNote||null
   }:null;
   return {
     firstName:$('fName').value.trim()||'Prospect',
