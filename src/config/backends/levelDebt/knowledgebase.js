@@ -7,26 +7,41 @@ export const knowledgebase = {
   minimums: {
     totalDebt: 7000,
     perAccount: 200,
+    minimumMonthlyDeposit: 250,
     draftPayments: [
       {
-        label: "Debt enrolled $7,000 – $9,999",
+        label: "Debt enrolled $7,000+",
         debtMin: 7000,
-        debtMax: 9999,
-        minMonthlyPayment: 150
-      },
-      {
-        label: "Debt enrolled $10,000 – $12,999",
-        debtMin: 10000,
-        debtMax: 12999,
-        minMonthlyPayment: 200
-      },
-      {
-        label: "Debt enrolled $13,000+",
-        debtMin: 13000,
         debtMax: null,
         minMonthlyPayment: 250
       }
     ]
+  },
+
+  forthCrmPlanRules: {
+    summary:
+      "FORTH CRM plan selection for Level Debt depends on total enrolled debt. Debt loads under $35,000 should use the Debt Settlement Enrollment Plan. Debt loads of $35,000 or more should use the corresponding Override Plan for terms beyond 48 months to help lower the monthly program deposit and improve monthly affordability for the client.",
+
+    debtSettlementEnrollmentPlan: {
+      label: "Debt Settlement Enrollment Plan",
+      debtMin: 7000,
+      debtMax: 34999,
+      instruction:
+        "For debt loads under $35,000, use the Debt Settlement Enrollment Plan inside FORTH CRM."
+    },
+
+    overridePlan: {
+      label: "Override Plan",
+      debtMin: 35000,
+      debtMax: null,
+      instruction:
+        "For debt loads $35,000 or higher, and the client wants lower monthly payments than the 48 month term offers, use the corresponding Override Plan inside FORTH CRM for terms beyond 48 months. This is designed to help lower the monthly program deposit and improve monthly affordability for the client."
+    },
+
+    minimumMonthlyDeposit: 250,
+
+    agentNote:
+      "LEVEL DEBT FORTH CRM SETUP: If enrolled debt is under $35,000, use the Debt Settlement Enrollment Plan in FORTH CRM. If enrolled debt is $35,000 or higher, use the corresponding Override Plan in FORTH CRM for terms beyond 48 months. The override plan is intended to lower the monthly program deposit and make the program more affordable for the client on a month-to-month basis. Current minimum monthly program deposit is $250."
   },
 
   stateRules: {
@@ -87,7 +102,10 @@ export const knowledgebase = {
     "OneMain secured accounts are not accepted, unsecured is okay.",
     "Regional Finance secured accounts are not accepted, unsecured is okay.",
     "Republic Finance secured accounts are not accepted, unsecured is okay.",
-    "Goldman Sachs credit cards are not accepted, but Apple Cards and Goldman Sachs loans are accepted."
+    "Goldman Sachs credit cards are not accepted, but Apple Cards and Goldman Sachs loans are accepted.",
+    "FORTH CRM: For Level Debt enrolled debt under $35,000, use the Debt Settlement Enrollment Plan.",
+    "FORTH CRM: For Level Debt enrolled debt of $35,000 or higher, use the corresponding Override Plan for terms beyond 48 months to help lower the monthly program deposit and improve monthly affordability for the client.",
+    "Level Debt currently requires a minimum monthly program deposit of $250."
   ],
 
   unacceptableCreditors: [
