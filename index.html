@@ -3097,7 +3097,7 @@ function getLocalCreditorMatches(q){
   });
   return merged;
 }
-async function renderCreditorProgramStatusPill(programLabel, status, rule){
+function renderCreditorProgramStatusPill(programLabel, status, rule){
   const safeRule = rule ? esc(rule) : '';
   if(status === 'rej'){
     return `<span title="${safeRule || programLabel + ' rejected'}" style="background:#dc2626;color:#fff;font-size:9px;font-weight:900;border-radius:999px;padding:3px 7px;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;">${programLabel}: Rejected</span>`;
