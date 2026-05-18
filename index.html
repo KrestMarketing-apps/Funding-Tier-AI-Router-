@@ -2330,6 +2330,15 @@ function rowAlerts(row, route) {
     alerts.push({ label:'ELP — notes', tone:'a', detail: ps.legacy.rule, program:'LEGACY' });
   }
 
+  if(isAutoRelatedAccount(row.cred, row.dt, '')) {
+    alerts.push({
+      label: 'Auto / repo rule',
+      tone: 'a',
+      detail: AUTO_ACCOUNT_NOTICE,
+      program: 'AUTO_RULE'
+    });
+  }
+
   // ── Cross-program routing opportunity ───────────────────
   const progMap = [
     { key:'LEVEL',  label:'Level',    s: ps.level.status  },
@@ -3089,9 +3098,86 @@ function getRuleMatches(q){
   });
   return found.slice(0,12);
 }
+const AUTO_ACCOUNT_NOTICE = "Automobile must already be posessed and account in 3rd party collections";
+const AUTO_CREDITOR_OPTIONS = [
+  "Auto Loan",
+  "Automobile Loan",
+  "Vehicle Loan",
+  "Car Loan",
+  "Repossession Deficiency",
+  "Auto Repo Deficiency",
+  "Auto Deficiency Balance",
+  "Capital One Auto Finance",
+  "Ally Financial Auto",
+  "Toyota Financial Services",
+  "Honda Financial Services",
+  "Ford Credit",
+  "GM Financial",
+  "Santander Consumer USA",
+  "Exeter Finance",
+  "Westlake Financial",
+  "CarMax Auto Finance",
+  "Bridgecrest",
+  "Credit Acceptance",
+  "DriveTime",
+  "Chrysler Capital",
+  "Nissan Motor Acceptance",
+  "Hyundai Motor Finance",
+  "Kia Motors Finance"
+];
+const AUTO_KEYWORDS = [
+  "AUTO",
+  "AUTOMOBILE",
+  "VEHICLE",
+  "CAR LOAN",
+  "CAR FINANCE",
+  "MOTOR",
+  "REPO",
+  "REPOSSESSION",
+  "DEFICIENCY",
+  "AUTO LOAN",
+  "AUTO FINANCE",
+  "AUTO FINANCIAL",
+  "AUTO CREDIT",
+  "TITLE LOAN",
+  "CAPITAL ONE AUTO",
+  "ALLY FINANCIAL AUTO",
+  "TOYOTA FINANCIAL",
+  "HONDA FINANCIAL",
+  "FORD CREDIT",
+  "GM FINANCIAL",
+  "SANTANDER CONSUMER",
+  "EXETER FINANCE",
+  "WESTLAKE FINANCIAL",
+  "CARMAX AUTO",
+  "BRIDGECREST",
+  "CREDIT ACCEPTANCE",
+  "DRIVETIME",
+  "CHRYSLER CAPITAL",
+  "NISSAN MOTOR",
+  "HYUNDAI MOTOR",
+  "KIA MOTORS"
+];
+function getAutoCreditorMatches(q){
+  const lq=String(q||'').trim().toLowerCase();
+  if(!lq)return [];
+  return AUTO_CREDITOR_OPTIONS
+    .filter(n=>n.toLowerCase().includes(lq) || lq.includes(n.toLowerCase()))
+    .slice(0,10)
+    .map(n=>({display_name:n,secured:true,product_type:'Auto Loan (Secured)',source:'auto_rule'}));
+}
+function isAutoRelatedAccount(name, debtType, productType){
+  const txt=normName(`${name||''} ${debtType||''} ${productType||''}`);
+  return AUTO_KEYWORDS.some(k=>txt.includes(normName(k)));
+}
+function renderAutoAccountWarning(isAuto){
+  if(!isAuto)return '';
+  return `<div title="${AUTO_ACCOUNT_NOTICE}" style="display:inline-flex;align-items:center;gap:5px;margin-top:6px;background:#f97316;color:#fff;border:1px solid #ea580c;border-radius:999px;padding:4px 9px;font-size:10px;font-weight:900;letter-spacing:.2px;box-shadow:0 3px 10px rgba(249,115,22,.2);">🚗 AUTO / REPO RULE</div>
+  <div style="margin-top:5px;background:#fff7ed;border:1px solid rgba(249,115,22,.35);border-radius:8px;padding:6px 8px;font-size:11px;color:#9a3412;font-weight:800;line-height:1.45;">${AUTO_ACCOUNT_NOTICE}</div>`;
+}
 function getLocalCreditorMatches(q){
   const merged=[];
-  [...getRuleMatches(q),...getTradMatches(q)].forEach(item=>{
+  [...getAutoCreditorMatches(q),...getRuleMatches(q),...getTradMatches(q)].forEach(item=>{
     const key=normName(item.display_name||'');
     if(key&&!merged.some(x=>normName(x.display_name)===key))merged.push(item);
   });
@@ -3110,7 +3196,8 @@ function renderCreditorProgramStatusPill(programLabel, status, rule){
 function renderCreditorProgramStatusPills(ps){
   return `<span style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:6px;">${renderCreditorProgramStatusPill('Level',ps.level.status,ps.level.rule)}${renderCreditorProgramStatusPill('CS',ps.cs.status,ps.cs.rule)}${renderCreditorProgramStatusPill('ELP',ps.legacy.status,ps.legacy.rule)}</span>`;
 }
-function searchCreditorResultBackground(ps){
+function searchCreditorResultBackground(ps, isAuto=false){
+  if(isAuto) return '#fff7ed';
   const statuses=[ps.level.status,ps.cs.status,ps.legacy.status];
   if(statuses.every(s=>s==='rej')) return '#fef2f2';
   if(statuses.includes('cond')) return '#eff6ff';
@@ -3123,7 +3210,8 @@ async function searchCred(i,query){
     const popular=getTradMatches('');
     box.innerHTML=popular.map(item=>{
       const ps=getCreditorProgramStatus(item.display_name||'', 'Unsecured');
-      return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="Unsecured" data-ps="false" style="background:${searchCreditorResultBackground(ps)};"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-weight:800;color:var(--dk);">${esc(item.display_name||'')}</span><span style="font-size:10px;font-weight:800;background:rgba(15,157,138,.1);color:#0b7d6e;border:1px solid rgba(15,157,138,.25);border-radius:999px;padding:2px 7px;">Typical Card</span></div><div style="font-size:11px;color:#0b7d6e;margin-top:2px;">Unsecured credit card</div>${renderCreditorProgramStatusPills(ps)}</button>`;
+      const isAuto=isAutoRelatedAccount(item.display_name||'', 'Unsecured', item.product_type||'');
+      return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="Unsecured" data-ps="false" style="background:${searchCreditorResultBackground(ps,isAuto)};${isAuto?'border:1.5px solid rgba(249,115,22,.55);':''}"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-weight:800;color:var(--dk);">${esc(item.display_name||'')}</span><span style="font-size:10px;font-weight:800;background:rgba(15,157,138,.1);color:#0b7d6e;border:1px solid rgba(15,157,138,.25);border-radius:999px;padding:2px 7px;">Typical Card</span></div><div style="font-size:11px;color:#0b7d6e;margin-top:2px;">Unsecured credit card</div>${renderAutoAccountWarning(isAuto)}${renderCreditorProgramStatusPills(ps)}</button>`;
     }).join('');
     box.className='drop open';
     bindCredClicks();
@@ -3137,13 +3225,16 @@ async function searchCred(i,query){
   }catch(e){}
   if(!merged.length){box.innerHTML=`<button type="button" data-mv="${i}" data-mq="${esc(query)}">Use "${esc(query)}" as manual entry</button>`;box.className='drop open';bindCredClicks();return;}
   box.innerHTML=merged.slice(0,12).map(item=>{
-    const sec=item.secured===true||item.secured==='true';
-    const dt=isTradCard(item.display_name||'')?'Unsecured':sec?'Secured Loan':'Unsecured';
+    const rawSec=item.secured===true||item.secured==='true';
+    const isAuto=isAutoRelatedAccount(item.display_name||'', item.product_type||'', item.debtType||'');
+    const sec=rawSec || isAuto;
+    const dt=isTradCard(item.display_name||'')&&!isAuto?'Unsecured':isAuto?'Auto Loan (Secured)':sec?'Secured Loan':'Unsecured';
     const ps = getCreditorProgramStatus(item.display_name || '', item.product_type || dt || 'Unsecured');
     const reasons = [ps.level.rule, ps.cs.rule, ps.legacy.rule].filter(Boolean).filter((v,idx,arr)=>arr.indexOf(v)===idx).join(' | ');
     const hasRule=item.source==='rule';
-    const bg=searchCreditorResultBackground(ps);
-    return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="${esc(dt)}" data-ps="${sec}" style="background:${bg};"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;"><span style="font-weight:800;color:var(--dk);">${esc(item.display_name||'')}</span><span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${hasRule?`<span style="font-size:10px;font-weight:800;background:#e2e8f0;color:#334155;border-radius:999px;padding:2px 7px;">Creditor Rule</span>`:''}</span></div><div style="font-size:11px;color:${sec?'var(--rd)':'#0b7d6e'};margin-top:2px;">${esc(dt)} &middot; ${sec?'Secured':'Unsecured'}</div>${renderCreditorProgramStatusPills(ps)}${reasons?`<div style="font-size:11px;color:#64748b;margin-top:4px;font-style:italic;line-height:1.45;">${esc(reasons)}</div>`:''}</button>`;
+    const hasAutoRule=item.source==='auto_rule' || isAuto;
+    const bg=searchCreditorResultBackground(ps,isAuto);
+    return `<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="${esc(dt)}" data-ps="${sec}" style="background:${bg};${isAuto?'border:1.5px solid rgba(249,115,22,.55);':''}"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;"><span style="font-weight:800;color:var(--dk);">${esc(item.display_name||'')}</span><span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${hasRule?`<span style="font-size:10px;font-weight:800;background:#e2e8f0;color:#334155;border-radius:999px;padding:2px 7px;">Creditor Rule</span>`:''}${hasAutoRule?`<span title="${AUTO_ACCOUNT_NOTICE}" style="font-size:10px;font-weight:900;background:#f97316;color:#fff;border-radius:999px;padding:2px 7px;">Auto Rule</span>`:''}</span></div><div style="font-size:11px;color:${sec?'var(--rd)':'#0b7d6e'};margin-top:2px;">${esc(dt)} &middot; ${sec?'Secured / Auto-related':'Unsecured'}</div>${renderAutoAccountWarning(isAuto)}${renderCreditorProgramStatusPills(ps)}${reasons?`<div style="font-size:11px;color:#64748b;margin-top:4px;font-style:italic;line-height:1.45;">${esc(reasons)}</div>`:''}</button>`;
   }).join('');
   box.className='drop open';bindCredClicks();
 }
