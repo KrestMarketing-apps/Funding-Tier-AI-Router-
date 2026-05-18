@@ -34,8 +34,12 @@ body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg
 .row-card.fr{border-color:var(--rd);background:#fef2f2;}
 .row-card.fa{border-color:var(--am);background:#fffbeb;}
 .row-inner{display:grid;grid-template-columns:1.6fr .65fr 1fr 34px;gap:10px;align-items:start;}
+/* Keep creditor/debt-type dropdowns above surrounding cards and prevent clipping */
+.card,.row-card,.row-inner,#rows,.dt-wrap{overflow:visible!important;}
+.creditor-entry-wrap{overflow:visible!important;position:relative;}
+.debt-input-shell{overflow:visible!important;}
 @media(max-width:760px){.row-hdr{display:none;}.row-inner{grid-template-columns:1fr;}}
-.drop{position:absolute;left:0;right:0;z-index:200;background:#fff;border:1.5px solid var(--br);border-radius:12px;box-shadow:0 8px 32px rgba(15,23,42,.12);overflow:hidden;display:none;max-height:260px;overflow-y:auto;}
+.drop{position:absolute;left:0;right:0;z-index:99999;background:#fff;border:1.5px solid var(--br);border-radius:12px;box-shadow:0 18px 48px rgba(15,23,42,.22);overflow-y:auto;overflow-x:hidden;display:none;max-height:360px;}
 .drop.open{display:block;}
 .drop button{display:block;width:100%;text-align:left;padding:10px 13px;font-size:13px;border:none;background:#fff;cursor:pointer;border-bottom:1px solid var(--br);font-family:inherit;transition:background .08s;}
 .drop button:last-child{border-bottom:none;}
@@ -396,7 +400,7 @@ body{top:0!important;}
         <div id="totalDebt" style="background:rgba(15,157,138,.08);border:1.5px solid var(--g);border-radius:10px;padding:10px 14px;font-size:20px;font-weight:900;color:#0b7d6e;">$0</div>
       </div>
     </div>
-    <div style="border:1.5px solid var(--br);border-radius:14px;overflow:hidden;">
+    <div class="debt-input-shell" style="border:1.5px solid var(--br);border-radius:14px;overflow:visible;">
       <div class="row-hdr"><div>Creditor Name</div><div>Amount</div><div>Debt Type</div><div></div></div>
       <div id="rows" style="display:grid;gap:8px;padding:10px;"></div>
       <div style="padding:0 10px 10px;"><button id="addBtn" class="btn-add" type="button"><span style="font-size:22px;line-height:1;">+</span><span>Add Creditor</span></button></div>
@@ -1312,7 +1316,10 @@ const CRED_RULES=[
   {n:['Regional Finance','Regional Finance Corp'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
   {n:['Republic Finance'],s:'cond',r:'Unsecured accounts OK - secured NOT accepted. Verify.'},
 ];
-const TRAD_CARDS=['American Express','Amex','Bank of America','Capital One','Chase','Citi','Citibank','Discover','Wells Fargo','Synchrony','Barclays','Barclaycard','Comenity Bank','Bread Financial','HSBC','Merrick Bank','Mission Lane','First Premier Bank','Credit One','Milestone','Upgrade','Avant','Best Egg','LendingClub','SoFi','Upstart','Prosper','Marcus','PayPal Credit','Apple Card','Navy Federal','USAA','PNC','TD Bank','U.S. Bank','US Bank','Regions Bank','Fifth Third Bank','Truist','SunTrust','BB&T','M&T Bank','KeyBank','Citizens Bank','Santander','Nordstrom Card',"Macy's Card","JCPenney Card","Kohl's Card",'Best Buy Card','Home Depot Card',"Lowe's Card",'Walmart Card','Target RedCard','Amazon Store Card','CareCredit',"Sam's Club Card",'Costco Card','Dell Financial'];
+const TYPICAL_CC_COMPANIES=[
+  'Visa Credit Card','Mastercard Credit Card','American Express','Discover','Capital One','Chase Credit Card','Citi Credit Card','Bank of America Credit Card','Wells Fargo Credit Card','Synchrony Bank','Comenity Bank','Barclays Credit Card','Credit One Bank','First Premier Bank','Merrick Bank','Mission Lane','Milestone Mastercard','Apple Card','PayPal Credit','Navy Federal Credit Card','USAA Credit Card','PNC Credit Card','TD Bank Credit Card','U.S. Bank Credit Card','Truist Credit Card','Regions Bank Credit Card','Fifth Third Credit Card','Citizens Bank Credit Card','Santander Credit Card','Best Buy Card','Home Depot Card',"Lowe's Card",'Walmart Card','Target RedCard','Amazon Store Card','CareCredit',"Macy's Card","Kohl's Card","JCPenney Card",'Nordstrom Card','Costco Card',"Sam's Club Card"
+];
+const TRAD_CARDS=[...new Set([...TYPICAL_CC_COMPANIES,'American Express','Amex','Bank of America','Capital One','Chase','Citi','Citibank','Discover','Wells Fargo','Synchrony','Barclays','Barclaycard','Comenity Bank','Bread Financial','HSBC','Merrick Bank','Mission Lane','First Premier Bank','Credit One','Milestone','Upgrade','Avant','Best Egg','LendingClub','SoFi','Upstart','Prosper','Marcus','PayPal Credit','Apple Card','Navy Federal','USAA','PNC','TD Bank','U.S. Bank','US Bank','Regions Bank','Fifth Third Bank','Truist','SunTrust','BB&T','M&T Bank','KeyBank','Citizens Bank','Santander','Nordstrom Card',"Macy's Card","JCPenney Card","Kohl's Card",'Best Buy Card','Home Depot Card',"Lowe's Card",'Walmart Card','Target RedCard','Amazon Store Card','CareCredit',"Sam's Club Card",'Costco Card','Dell Financial'])];
 const DT_CATS={'Credit cards & loans':['Unsecured','Unsecured Personal Loan','Unsecured Line of Credit','Medical Bill','Payday Loan','Tribal Loan','Cell Phone Bill'],'Auto & vehicle':['Repossession Deficiency','Auto Repo Deficiency','Deficiency','Auto Loan (Secured)'],'Student loans':['Private Student Loan','Federal Student Loan','Navient Student Loan'],'Housing & utilities':['Back Rent','Apartment Back Rent (Collections)','Utility Bill','Mortgage'],'Business':['Business Debt','SBA Loan'],'Tax & government':['IRS Tax Debt','Alimony / Child Support'],'Other':['Judgment','Peer-to-Peer Loan','USAA','Secured Loan','Cross Collateralized Account','Installment Sales Contract','Furniture Store Financing','Direct Furniture Store Loan','Credit Union Loan','Timeshare','Military Account','AFES Account','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Loan from Individual','Other']};
 const DT_REJ=new Set(['Federal Student Loan','Navient Student Loan','SBA Loan','Timeshare','IRS Tax Debt','Alimony / Child Support','Casino Debt','Cash Call','Overdraft Account','Employer Debt','Mortgage','Auto Loan (Secured)','Cross Collateralized Account','Furniture Store Financing','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account','Secured Loan','Installment Sales Contract']);
 const DT_COND=new Set(['Private Student Loan','Medical Bill','Back Rent','Apartment Back Rent (Collections)','Repossession Deficiency','Auto Repo Deficiency','Business Debt','Judgment','USAA','Deficiency','Tribal Loan']);
@@ -3056,14 +3063,18 @@ function refreshRowVisuals() {
 }
 function renderRows(){
   const total=app.rows.reduce((s,r)=>s+num(r.amount),0);
-  $('rows').innerHTML=app.rows.map((row,i)=>`<div class="row-card" data-row="${i}"><div class="row-inner"><div style="position:relative;"><input class="fi ci" data-i="${i}" placeholder="Type creditor name&#8230;" value="${esc(row.cred||'')}" autocomplete="off"/><div class="drop" data-cr="${i}"></div><div class="aw" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div></div><div><input class="fi" data-i="${i}" data-k="amount" placeholder="$0" value="${row.amount||''}"/>${total>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${((num(row.amount)/total)*100).toFixed(1)}%</div>`:''}</div><div><div class="dt-wrap" data-dw="${i}"><svg class="dt-icon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg><input class="dt-inp" data-di="${i}" placeholder="Search debt type&#8230;" autocomplete="off"/><button class="dt-x" data-dx="${i}">&#10005;</button><div class="dt-panel" data-dp="${i}"></div></div><div class="dt-sel" data-ds="${i}"><span></span><button data-dsc="${i}">&#10005;</button></div></div><div>${app.rows.length>1?`<button type="button" data-rem="${i}" style="width:30px;height:30px;border:1.5px solid rgba(239,68,68,.4);border-radius:8px;background:#fef2f2;color:var(--rd);font-weight:900;font-size:16px;cursor:pointer;margin-top:5px;font-family:inherit;">&#8722;</button>`:'<div></div>'}</div></div></div>`).join('');
+  $('rows').innerHTML=app.rows.map((row,i)=>`<div class="row-card" data-row="${i}"><div class="row-inner"><div class="creditor-entry-wrap"><input class="fi ci" data-i="${i}" placeholder="Type creditor name&#8230;" value="${esc(row.cred||'')}" autocomplete="off"/><div class="drop" data-cr="${i}"></div><div class="aw" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div></div><div><input class="fi" data-i="${i}" data-k="amount" placeholder="$0" value="${row.amount||''}"/>${total>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${((num(row.amount)/total)*100).toFixed(1)}%</div>`:''}</div><div><div class="dt-wrap" data-dw="${i}"><svg class="dt-icon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg><input class="dt-inp" data-di="${i}" placeholder="Search debt type&#8230;" autocomplete="off"/><button class="dt-x" data-dx="${i}">&#10005;</button><div class="dt-panel" data-dp="${i}"></div></div><div class="dt-sel" data-ds="${i}"><span></span><button data-dsc="${i}">&#10005;</button></div></div><div>${app.rows.length>1?`<button type="button" data-rem="${i}" style="width:30px;height:30px;border:1.5px solid rgba(239,68,68,.4);border-radius:8px;background:#fef2f2;color:var(--rd);font-weight:900;font-size:16px;cursor:pointer;margin-top:5px;font-family:inherit;">&#8722;</button>`:'<div></div>'}</div></div></div>`).join('');
   app.rows.forEach((row,i)=>{if(row.dt){const sel=document.querySelector(`[data-ds="${i}"]`);if(sel){const s=DT_REJ.has(row.dt)?'no':DT_COND.has(row.dt)?'cond':'ok';sel.querySelector('span').textContent=row.dt;sel.className=`dt-sel s-${s}`;}}});
   $('addBtn').style.display=app.rows.length<MAX_ROWS?'flex':'none';
   document.querySelectorAll('[data-k="amount"]').forEach(n=>{n.addEventListener('input',onAmtChange);});
   document.querySelectorAll('[data-rem]').forEach(b=>b.addEventListener('click',()=>removeRow(Number(b.dataset.rem))));
   bindCredSearches();bindDTRows();refreshRowVisuals();
 }
-function getTradMatches(q){const lq=q.trim().toLowerCase();if(!lq)return[];return TRAD_CARDS.filter(n=>n.toLowerCase().includes(lq)).slice(0,8).map(n=>({display_name:n,secured:false,product_type:'credit card',source:'local_card'}));}
+function getTradMatches(q){
+  const lq=String(q||'').trim().toLowerCase();
+  const source=lq ? TRAD_CARDS.filter(n=>n.toLowerCase().includes(lq)) : TYPICAL_CC_COMPANIES;
+  return source.slice(0,14).map(n=>({display_name:n,secured:false,product_type:'credit card',source:'local_card'}));
+}
 function getRuleMatches(q){
   const lq=normName(q);
   if(!lq)return[];
@@ -3088,7 +3099,13 @@ function getLocalCreditorMatches(q){
 }
 async function searchCred(i,query){
   const box=document.querySelector(`[data-cr="${i}"]`);if(!box)return;
-  if(!query.trim()){box.innerHTML='';box.className='drop';return;}
+  if(!query.trim()){
+    const popular=getTradMatches('');
+    box.innerHTML=popular.map(item=>`<button type="button" data-pi="${i}" data-pn="${esc(item.display_name||'')}" data-pt="Unsecured" data-ps="false"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-weight:800;color:var(--dk);">${esc(item.display_name||'')}</span><span style="font-size:10px;font-weight:800;background:rgba(15,157,138,.1);color:#0b7d6e;border:1px solid rgba(15,157,138,.25);border-radius:999px;padding:2px 7px;">Typical Card</span></div><div style="font-size:11px;color:#0b7d6e;margin-top:2px;">Unsecured credit card</div></button>`).join('');
+    box.className='drop open';
+    bindCredClicks();
+    return;
+  }
   let merged=[...getLocalCreditorMatches(query)];
   try{
     const res=await fetch(`/api/ghl-creditors?search=${encodeURIComponent(query)}`);
