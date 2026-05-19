@@ -1263,7 +1263,7 @@ const STATE_NAMES={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'Calif
 const LD_BLACKOUT=new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI']);
 const LD_RED=new Set(['CT','GA','LA','MN','NV','NH','NJ','ND','OH','PA','TN','WA','WY']);
 const CS_BLACKOUT=new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
-const LEGACY_BLACKOUT=new Set(['AK','RI','VT','WV','OR','ID','GA','ND']);
+const LEGACY_BLACKOUT=new Set(['ID','ND','GA']);
 const STATE_OPTS=Object.entries(STATE_NAMES).map(([a,n])=>({a,n,l:`${a} - ${n}`})).sort((x,y)=>x.l.localeCompare(y.l));
 const CS_REJ=new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
 const CS_COND=new Set(['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt']);
