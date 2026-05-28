@@ -40,6 +40,18 @@
     {
       "source": "/profit-engine/:path*",
       "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*"
+    },
+    {
+      "source": "/vendors/lead-vendor-guidelines/warm-call-transfers",
+      "destination": "https://funding-tier-vendors.vercel.app/vendors/lead-vendor-guidelines/warm-call-transfers/"
+    },
+    {
+      "source": "/vendors/lead-vendor-guidelines/warm-call-transfers/",
+      "destination": "https://funding-tier-vendors.vercel.app/vendors/lead-vendor-guidelines/warm-call-transfers/"
+    },
+    {
+      "source": "/vendors/lead-vendor-guidelines/warm-call-transfers/:path*",
+      "destination": "https://funding-tier-vendors.vercel.app/vendors/lead-vendor-guidelines/warm-call-transfers/:path*"
     }
   ]
 }
