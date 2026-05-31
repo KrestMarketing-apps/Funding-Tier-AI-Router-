@@ -42,6 +42,14 @@
       "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*"
     },
     {
+      "source": "/iblusend",
+      "destination": "https://iblusend-hub.vercel.app/"
+    },
+    {
+      "source": "/iblusend/:path*",
+      "destination": "https://iblusend-hub.vercel.app/:path*"
+    },
+    {
       "source": "/vendors/lead-vendor-guidelines/warm-call-transfers",
       "destination": "https://funding-tier-vendors.vercel.app/vendors/lead-vendor-guidelines/warm-call-transfers/"
     },
