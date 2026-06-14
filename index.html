@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
 :root{--g:#0f9d8a;--gd:#0b7d6e;--dk:#0f172a;--bl:#1a6ed8;--am:#f59e0b;--rd:#ef4444;--br:#e2e8f0;--bg:#f8fafc;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -321,6 +322,34 @@ body{top:0!important;}
 .cc-impact-val{font-size:17px;font-weight:900;color:#0f172a;line-height:1.1;}
 .cc-impact-note{font-size:11px;line-height:1.55;color:#92400e;background:#fffbeb;border:1px solid rgba(245,158,11,.32);border-radius:10px;padding:9px 11px;margin-top:10px;}
 .cc-apr-input{max-width:120px;text-align:center;font-weight:900;color:#0f172a;}
+.cmp-input{width:118px;max-width:100%;padding:7px 9px;border:1.5px solid var(--br);border-radius:9px;font-size:13px;font-weight:900;color:#0f172a;background:#fff;font-family:inherit;}
+.cmp-input:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 3px rgba(15,157,138,.1);}
+.cmp-section-title{font-size:12px;font-weight:900;color:#0b7d6e;text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px;}
+/* Router comparison refinements */
+.cmp-input.apr-input{width:92px;}
+.cmp-acc{border:1.5px solid rgba(239,68,68,.38);border-radius:14px;overflow:hidden;background:#fff;margin-top:10px;}
+.cmp-acc summary{list-style:none;cursor:pointer;background:linear-gradient(135deg,#7f1d1d,#b91c1c);color:#fff;padding:13px 16px;font-size:12px;font-weight:950;text-transform:uppercase;letter-spacing:.35px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.cmp-acc summary::-webkit-details-marker{display:none;}
+.cmp-acc summary:after{content:'⌄';font-size:16px;font-weight:900;color:rgba(255,255,255,.9);transition:transform .18s;}
+.cmp-acc[open] summary:after{transform:rotate(180deg);}
+.cmp-acc-body{padding:12px;background:#fff;}
+.cmp-head-tip{position:relative;display:inline-flex;align-items:center;gap:6px;cursor:help;}
+.cmp-head-tip .cmp-head-tip-box{visibility:hidden;opacity:0;position:absolute;top:calc(100% + 10px);left:0;width:min(640px,calc(100vw - 80px));z-index:999999;background:#0f172a;color:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 18px 42px rgba(15,23,42,.32);font-size:12px;font-weight:650;line-height:1.62;text-transform:none;letter-spacing:0;}
+.cmp-head-tip .cmp-head-tip-box:before{content:'';position:absolute;bottom:100%;left:20px;border:8px solid transparent;border-bottom-color:#0f172a;}
+.cmp-head-tip:hover .cmp-head-tip-box{visibility:visible;opacity:1;}
+.debt-forecast-box{border:1.5px solid rgba(15,157,138,.22);border-radius:14px;background:linear-gradient(135deg,#f8fffd,#fff);padding:13px;margin-top:10px;}
+.debt-forecast-bars{display:grid;gap:8px;margin-top:10px;}
+.debt-forecast-row{display:grid;grid-template-columns:70px 1fr 110px;gap:10px;align-items:center;font-size:11px;font-weight:800;color:#334155;}
+.debt-forecast-track{height:12px;border-radius:999px;background:#e2e8f0;overflow:hidden;}
+.debt-forecast-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#0f9d8a,#f59e0b,#ef4444);min-width:2px;}
+.cmp-head-tip .tip-box{min-width:520px;max-width:680px;text-align:left;line-height:1.6;text-transform:none;letter-spacing:0;font-size:12px;}
+.cmp-num-wrap{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.cmp-step-btn{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--br);background:#fff;color:#0f172a;font-size:15px;font-weight:950;cursor:pointer;font-family:inherit;line-height:1;display:inline-flex;align-items:center;justify-content:center;}
+.cmp-step-btn:hover{border-color:var(--g);color:#0b7d6e;background:#f8fffd;}
+.cmp-forecast-good{color:#0b7d6e;font-weight:900;}
+.cmp-forecast-bad{color:#b91c1c;font-weight:900;}
+
+
 
 /* Level Debt tooltip visibility patch */
 .plan-card-v,
@@ -352,6 +381,61 @@ body{top:0!important;}
 .ld-term-slider-value{font-size:12px;font-weight:900;color:#0f172a;}
 .ld-term-slider-note{font-size:10px;color:#64748b;font-weight:700;line-height:1.45;margin-top:8px;}
 
+/* Level Debt pricing breakdown hover tooltip */
+.ld-model-pill{display:inline-flex;align-items:center;gap:6px;border:1.5px solid;border-radius:999px;padding:6px 11px;font-size:10px;font-weight:900;letter-spacing:.03em;white-space:nowrap;text-transform:uppercase;}
+.ld-model-pill.red{background:#fef2f2;color:#b91c1c;border-color:rgba(239,68,68,.4);}
+.ld-model-pill.green{background:#ecfdf5;color:#0b7d6e;border-color:rgba(15,157,138,.35);}
+.ld-total-tip{position:relative;display:inline-flex;align-items:center;justify-content:center;cursor:help;z-index:99999;}
+.ld-total-tip .ld-price-pop{visibility:hidden;opacity:0;position:absolute;right:0;bottom:calc(100% + 14px);width:min(560px,calc(100vw - 44px));background:#f8fffd;border:2px solid rgba(15,157,138,.22);border-radius:18px;padding:20px 24px;box-shadow:0 24px 64px rgba(15,23,42,.28);z-index:2147483647;text-align:left;transition:opacity .15s ease, transform .15s ease;transform:translateY(6px);pointer-events:none;}
+.ld-total-tip .ld-price-pop:after{content:"";position:absolute;right:28px;top:100%;border:10px solid transparent;border-top-color:#c7e7df;}
+.ld-total-tip:hover .ld-price-pop{visibility:visible;opacity:1;transform:translateY(0);}
+.ld-price-pop-hd{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+.ld-price-pop-title{font-size:14px;font-weight:950;color:#0b7d6e;text-transform:uppercase;letter-spacing:.08em;}
+.ld-price-pop-row{display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:14px;color:#334155;font-weight:850;line-height:1.45;margin-bottom:14px;}
+.ld-price-pop-row strong{font-size:16px;font-weight:950;color:#334155;white-space:nowrap;}
+.ld-price-pop-total{border-top:1px solid rgba(15,157,138,.2);padding-top:14px;margin-top:2px;color:#0b7d6e;}
+.ld-price-pop-total strong{color:#0b7d6e;font-size:18px;}
+.ld-price-pop-note{margin-top:14px;font-size:11px;color:#92400e;background:#fffbeb;border:1px solid rgba(245,158,11,.32);border-radius:10px;padding:9px 11px;line-height:1.55;font-weight:750;}
+@media(max-width:760px){.ld-total-tip .ld-price-pop{right:-12px;width:calc(100vw - 36px);padding:16px;}.ld-price-pop-row{font-size:12px}.ld-price-pop-row strong{font-size:13px}.ld-price-pop-title{font-size:12px}}
+
+
+/* Geographic state coverage mega menu */
+.state-coverage-btn{display:inline-flex;align-items:center;gap:7px;min-height:32px;padding:6px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);color:#fff;font-size:11px;font-weight:900;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.state-coverage-btn:hover,.state-coverage-btn.open{background:rgba(255,255,255,.20);}
+.state-coverage-mega{display:none;position:fixed;top:62px;right:20px;width:min(1140px,75vw);max-width:calc(100vw - 40px);max-height:calc(100vh - 92px);z-index:5000;background:#fff;border:1px solid rgba(15,23,42,.14);border-radius:18px;box-shadow:0 28px 80px rgba(15,23,42,.34);overflow:hidden;}
+.state-coverage-mega.open{display:block;}
+.state-cov-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:14px 16px;background:linear-gradient(135deg,#0f172a 0%,#0b3b50 55%,#0f9d8a 100%);color:#fff;}
+.state-cov-title{font-size:14px;font-weight:950;line-height:1.1;}
+.state-cov-sub{font-size:10px;color:rgba(255,255,255,.72);font-weight:700;margin-top:4px;line-height:1.45;}
+.state-cov-close{width:28px;height:28px;border:none;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;font-size:18px;line-height:1;cursor:pointer;flex-shrink:0;}
+.state-cov-tabs{display:flex;gap:8px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--br);background:#f8fafc;}
+.state-cov-tab{border:1.5px solid var(--br);background:#fff;color:#334155;border-radius:999px;padding:7px 10px;font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.35px;cursor:pointer;font-family:inherit;}
+.state-cov-tab.active{background:linear-gradient(135deg,var(--g),var(--gd));border-color:var(--g);color:#fff;box-shadow:0 8px 18px rgba(15,157,138,.20);}
+.state-cov-body{padding:14px;overflow:auto;max-height:calc(100vh - 220px);}
+.state-cov-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,.7fr);gap:14px;align-items:stretch;}
+#stateCoverageMap{min-height:560px;border:1px solid var(--br);border-radius:14px;background:#fff;overflow:hidden;}
+.state-cov-detail{border:1.5px solid var(--br);border-radius:14px;background:#fff;padding:13px;display:grid;gap:10px;align-content:start;}
+.state-cov-detail-title{font-size:16px;font-weight:950;color:#0f172a;}
+.state-cov-pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 9px;font-size:10px;font-weight:950;border:1px solid var(--br);}
+.state-cov-pill.green{background:#ecfdf5;color:#0b7d6e;border-color:rgba(15,157,138,.32);}
+.state-cov-pill.red{background:#fef2f2;color:#b91c1c;border-color:rgba(239,68,68,.32);}
+.state-cov-pill.gray{background:#f1f5f9;color:#475569;border-color:#cbd5e1;}
+.state-cov-pill.blue{background:#eff6ff;color:#1a6ed8;border-color:rgba(26,110,216,.32);}
+.state-cov-note{font-size:11px;color:#64748b;line-height:1.55;font-weight:650;background:#f8fafc;border:1px solid var(--br);border-radius:10px;padding:9px 10px;}
+.state-cov-use{width:100%;border:none;border-radius:10px;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;font-size:12px;font-weight:950;padding:10px 12px;cursor:pointer;font-family:inherit;}
+.state-cov-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:10px;font-weight:850;color:#475569;}
+.state-cov-legend span{display:inline-flex;align-items:center;gap:5px;}
+.state-cov-dot{width:10px;height:10px;border-radius:999px;display:inline-block;}
+@media(max-width:1000px){.state-coverage-mega{width:calc(100vw - 24px);right:12px;top:70px;}.state-cov-grid{grid-template-columns:1fr;}#stateCoverageMap{min-height:360px;}}
+
+/* Prospect sizzle scripts */
+.ft-sizzle-box{margin-top:14px;background:linear-gradient(135deg,#0f172a 0%,#0b3b50 55%,#0f9d8a 100%);border-radius:14px;padding:14px 16px;color:#fff;box-shadow:0 10px 24px rgba(15,23,42,.16);}
+.ft-sizzle-kicker{font-size:10px;font-weight:950;color:#86efac;text-transform:uppercase;letter-spacing:.65px;margin-bottom:7px;}
+.ft-sizzle-title{font-size:13px;font-weight:950;color:#fff;margin-bottom:8px;}
+.ft-sizzle-script{font-size:13px;line-height:1.72;font-weight:750;color:rgba(255,255,255,.92);}
+.ft-sizzle-list{margin-top:10px;padding-left:18px;display:grid;gap:6px;font-size:12px;line-height:1.62;font-weight:650;color:rgba(255,255,255,.86);}
+.ft-sizzle-note{margin-top:10px;font-size:10.5px;line-height:1.55;color:#fde68a;font-weight:750;background:rgba(245,158,11,.13);border:1px solid rgba(245,158,11,.28);border-radius:10px;padding:8px 10px;}
+
 </style>
 </head>
 <body>
@@ -367,6 +451,7 @@ body{top:0!important;}
       </div>
     </div>
     <div id="headerMetaControls" style="margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;">
+      <button id="stateCoverageBtn" class="state-coverage-btn" type="button" onclick="toggleStateCoverageMenu()">🗺️ State Coverage</button>
       <select id="tzSel" class="meta-sel" onchange="setDispTZ(this.value)">
         <option value="America/Los_Angeles">PST / PDT (Pacific)</option>
         <option value="America/Denver">MST / MDT (Mountain)</option>
@@ -376,6 +461,31 @@ body{top:0!important;}
       </select>
       <span id="sysClockBadge" style="font-size:11px;font-weight:800;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:4px 10px;letter-spacing:.3px;font-variant-numeric:tabular-nums;white-space:nowrap;"></span>
       <select id="langSel" class="meta-sel" onchange="setLang(this.value)"></select>
+    </div>
+  </div>
+
+  <div id="stateCoverageMega" class="state-coverage-mega" aria-hidden="true">
+    <div class="state-cov-head">
+      <div>
+        <div class="state-cov-title">State Coverage Map</div>
+        <div class="state-cov-sub">Geographic U.S. map showing backend state rules for Level Debt, Elite Legal Practice, and Consumer Shield.</div>
+      </div>
+      <button type="button" class="state-cov-close" onclick="toggleStateCoverageMenu(false)">×</button>
+    </div>
+    <div class="state-cov-tabs">
+      <button type="button" class="state-cov-tab active" data-cov-view="level" onclick="renderStateCoverageMap('level')">Level Debt Rules</button>
+      <button type="button" class="state-cov-tab" data-cov-view="legacy" onclick="renderStateCoverageMap('legacy')">Elite Legal Practice Rules</button>
+      <button type="button" class="state-cov-tab" data-cov-view="cs" onclick="renderStateCoverageMap('cs')">Consumer Shield Rules</button>
+      <button type="button" class="state-cov-tab" data-cov-view="all" onclick="renderStateCoverageMap('all')">All Backend Coverage</button>
+    </div>
+    <div class="state-cov-body">
+      <div class="state-cov-grid">
+        <div>
+          <div id="stateCoverageMap"></div>
+          <div id="stateCoverageLegend" class="state-cov-legend"></div>
+        </div>
+        <div id="stateCoverageDetail" class="state-cov-detail"></div>
+      </div>
     </div>
   </div>
   <div id="google_translate_element" style="position:absolute;left:-9999px;top:-9999px;opacity:0;pointer-events:none;"></div>
@@ -413,17 +523,6 @@ body{top:0!important;}
       <div class="card-hd">Backend Routing</div>
       <div id="routeBadges" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;"></div>
       <div id="routeReason" style="font-size:13px;color:#475569;font-weight:500;line-height:1.65;background:var(--bg);border:1px solid var(--br);border-radius:10px;padding:10px 13px;margin-bottom:14px;"></div>
-      <div style="margin-bottom:14px;">
-        <label style="display:block;font-size:12px;font-weight:800;color:#334155;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;">What matters most to the prospect?</label>
-        <select id="featurePriority" class="fi">
-          <option value="best_fit">Best Overall Fit</option>
-          <option value="debt_validation">Debt Validation</option>
-          <option value="legal_support">Attorney-Led / Legal Support</option>
-          <option value="fixed_payment">Fixed Monthly Payment</option>
-          <option value="lowest_payment">Lowest Monthly Payment</option>
-          <option value="fastest_resolution">Fastest Resolution</option>
-        </select>
-      </div>
       <div id="providerAvail" style="border:1px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:10px;"></div>
       <div id="flagsBox" style="display:grid;gap:6px;"></div>
     </div>
@@ -460,26 +559,7 @@ body{top:0!important;}
       </div>
     </div>
     <div style="padding:20px;overflow-x:auto;">
-      <table class="cmp">
-        <thead><tr>
-          <th style="text-align:left;min-width:180px;">Detail</th>
-          <th style="text-align:left;background:#1e293b;min-width:180px;">Current Situation&nbsp;/&nbsp;"Do Nothing"</th>
-          <th style="text-align:left;min-width:160px;">Fastest Payoff</th>
-          <th style="text-align:left;background:rgba(15,157,138,.06);color:#0b7d6e;min-width:200px;">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-              <img id="recommendedProgramLogo" src="" alt="" style="display:none;height:16px;width:auto;max-width:70px;object-fit:contain;border-radius:4px;background:#fff;border:1px solid #dbe4ea;padding:2px 5px;"/>
-              <span class="best-program-header">
-                <span class="best-program-overline">Program Being Calculated as Best Option</span>
-                <span class="best-program-name">
-                  <span id="recommendedProgramHeader">Recommended Program</span>
-                  <span style="background:var(--g);color:#fff;border-radius:999px;padding:2px 8px;font-size:10px;white-space:nowrap;">Best Option</span>
-                </span>
-              </span>
-            </div>
-          </th>
-        </tr></thead>
-        <tbody id="cmpTable"></tbody>
-      </table>
+      <div id="cmpTableWrap"></div>
     </div>
   </div>
 
@@ -504,7 +584,7 @@ body{top:0!important;}
   <div class="card workspace-full" id="ldProgramCard" style="display:none;padding:0;overflow:hidden;">
     <button class="acc-btn" id="ldProgBtn" onclick="toggleAcc('ldProgBody','ldProgBtn')" style="padding:18px 20px;font-size:15px;font-weight:900;border-radius:16px;background:#fff;">
       <span style="display:flex;align-items:center;gap:10px;">
-        <div class="logo-sm" style="width:50px;height:26px;"><img src="${LD_LOGO}" alt="Level Debt"/></div>
+        <div class="logo-sm" style="width:50px;height:26px;"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2cab2203b0fc83186d.webp" alt="Level Debt"/></div>
         <span>Level Debt Programs</span>
       </span>
       <span class="acc-chevron">&#8964;</span>
@@ -514,12 +594,12 @@ body{top:0!important;}
     </div>
   </div>
 
-  <!-- FULL WIDTH: Legacy / Elite Legal Practice (ELP) Programs - collapsible accordion -->
+  <!-- FULL WIDTH: Elite Legal Practice (ELP) Programs - collapsible accordion -->
   <div class="card workspace-full" id="legacyProgramCard" style="display:none;padding:0;overflow:hidden;">
     <button class="acc-btn" id="legacyProgBtn" onclick="toggleAcc('legacyProgBody','legacyProgBtn')" style="padding:18px 20px;font-size:15px;font-weight:900;border-radius:16px;background:#fff;">
       <span style="display:flex;align-items:center;gap:10px;">
         <div class="logo-sm" style="width:50px;height:26px;"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69e1c95dc56ad279084b3141.png" alt="Legacy" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:8px;font-weight:800;color:#6d28d9;\\'>LCS</span>';"/></div>
-        <span>Legacy / Elite Legal Practice (ELP) Programs</span>
+        <span>Elite Legal Practice (ELP) Programs</span>
       </span>
       <span class="acc-chevron">&#8964;</span>
     </button>
@@ -552,7 +632,7 @@ body{top:0!important;}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0f9d8a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <div>
-              <div style="font-size:12px;font-weight:900;color:#0f172a;letter-spacing:.01em;line-height:1.2;">Legacy / Elite Legal Practice (ELP)</div>
+              <div style="font-size:12px;font-weight:900;color:#fff;letter-spacing:.01em;line-height:1.2;">Elite Legal Practice (ELP)</div>
               <div style="font-size:10px;color:#0b7d6e;font-weight:900;margin-top:2px;letter-spacing:.04em;text-transform:uppercase;">Affiliate Support &#8599;</div>
             </div>
           </div>
@@ -1191,9 +1271,7 @@ const LEGACY_LOGO='https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/
 window.APP_STATE = window.APP_STATE || { route: null };
 
 function safeUpdateCloseMachine(route){
-  if(typeof window.updateCloseMachine === 'function'){
-    window.updateCloseMachine(route);
-  }
+  return;
 }
 
 function setRoute(route){
@@ -1470,7 +1548,7 @@ const SUPP_HOURS=[
     ]
   },
   {
-    key:'LEGACY',label:'Legacy / Elite Legal Practice (ELP)',logo:LEGACY_LOGO,color:'#6d28d9',
+    key:'LEGACY',label:'Elite Legal Practice (ELP)',logo:LEGACY_LOGO,color:'#6d28d9',
     tz:'America/Chicago',
     days:[1,2,3,4,5],oh:8,om:0,ch:17,cm:0,
     contacts:[
@@ -1479,7 +1557,7 @@ const SUPP_HOURS=[
   },
 ];
 const MAX_ROWS=10;
-const legacyState={feeRate:0.40,months:36,splitPay:false};
+const legacyState={feeRate:0.49,months:null,splitPay:false};
 const levelDebtState={term:null,total:null};
 function getLDProgramCost(total, feeRate){
   return (total || 0) * 0.5 + (total || 0) * (feeRate || 0);
@@ -1580,121 +1658,121 @@ function legacyDefaultMonths(total, feeRate, csMp, ldMp, splitPay = false){
   return legacyClampMonths(total, feeRate, ideal, splitPay);
 }
 const LEGACY_REJECT_RULES=[
-  {n:["American Recovery Systems"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Collateral Recovery."},
-  {n:["Aqua Finance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Lending / Financing company."},
-  {n:["Arrowhead Advance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Big Picture Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Birch Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Bison Cash"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Blue Mountain Loan"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Bonneville Collection"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Standard collection agency / Debt recovery firm."},
-  {n:["Boost Credit"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Bright Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["BX Omni"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Unknown / ambiguous."},
-  {n:["Clear Air Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Climb Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Student Loans."},
-  {n:["Crane Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Credit 9"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Likely consumer credit / lending."},
-  {n:["Credit Cube"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["E Loan Warehouse"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Eagle Wing Funds"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Possibly investment / lending fund."},
-  {n:["Elective Group USA (this is a federal student loan provider)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Student / educational loan / financing."},
-  {n:["Eloan Warehouse"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Equity Sales Finance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Asset finance / sales financing."},
-  {n:["Express Cash Flow"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Must be 3rd party or not part of colleterial, business or commercial debt."},
-  {n:["Figure Tech/Figure Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Not accepted by Legacy / Elite Legal Practice (ELP).."},
-  {n:["Fineday Funds"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["GoodLeap LLC (Does business as Goodleap Solar)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Fintech / clean energy finance / Solar."},
-  {n:["Green Arrow Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Greenline"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Greensky"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Per Legal."},
-  {n:["Hollis Cobb"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: possibly collection / finance."},
-  {n:["Home Equity Line of Credit"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Not accepted by Legacy / Elite Legal Practice (ELP).."},
-  {n:["Kadikorn Bank"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Bank / financial institution."},
-  {n:["Lendumo"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Level Up Funding"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["LIGHTSTREAM"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Home Improvement, Auto, Debt Consolidation, Recreation, Adoption, education, etc.)."},
-  {n:["Little Lake Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Loan At Last"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Lookout Credit Union"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Credit union / cooperative financial institution."},
-  {n:["Makwa Finance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Makwa Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Mariner Finance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Installment Loans."},
-  {n:["Maxlend"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Merit Financial Trust (Tribal Loans)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Military Star"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Government-backed loans."},
-  {n:["Minto Money"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["MobiLoans LLC (Tribal Loan Company)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["My QuickWallet"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["NCR Finance"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Finance company / lender."},
-  {n:["Night Wings Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Opici Funds LLC"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Post Lake Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Premier Loan Solutions"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Reach Financial"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Personal / small-dollar / consumer finance."},
-  {n:["Rise Up Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["River Valley Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Sallie Mae Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Education / student lending."},
-  {n:["Same Day Credit"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["SBA Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Government-backed small business loans."},
-  {n:["Simple Fast Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Payday / quick consumer lending."},
-  {n:["Snap On Credit"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Secured Loans only."},
-  {n:["Spotloan"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Sunbelt Federal Credit Union (Sunbelt FCU)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Credit union / cooperative bank."},
-  {n:["Three Sticks Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Today Cash"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Tule Lake Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Uprova"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Versara Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Consolidation/Negotiation."},
-  {n:["White Pine Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Willow Lake Lending"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["WithU Loans"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Write St. Education Leins"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Educational lender / student finance / lien recording in education."},
-  {n:["Yendo"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Not accepted by Legacy / Elite Legal Practice (ELP).."},
-  {n:["ZipLoan (AKA Zuntafi)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Student / consumer loan origination & servicing."},
-  {n:["Zuntafi (AKA ZipLoan)"],s:"rej",r:"Legacy / Elite Legal Practice (ELP) list: Student / consumer loan origination & servicing."}
+  {n:["American Recovery Systems"],s:"rej",r:"Elite Legal Practice (ELP) list: Collateral Recovery."},
+  {n:["Aqua Finance"],s:"rej",r:"Elite Legal Practice (ELP) list: Lending / Financing company."},
+  {n:["Arrowhead Advance"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Big Picture Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Birch Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Bison Cash"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Blue Mountain Loan"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Bonneville Collection"],s:"rej",r:"Elite Legal Practice (ELP) list: Standard collection agency / Debt recovery firm."},
+  {n:["Boost Credit"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Bright Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["BX Omni"],s:"rej",r:"Elite Legal Practice (ELP) list: Unknown / ambiguous."},
+  {n:["Clear Air Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Climb Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Student Loans."},
+  {n:["Crane Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Credit 9"],s:"rej",r:"Elite Legal Practice (ELP) list: Likely consumer credit / lending."},
+  {n:["Credit Cube"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["E Loan Warehouse"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Eagle Wing Funds"],s:"rej",r:"Elite Legal Practice (ELP) list: Possibly investment / lending fund."},
+  {n:["Elective Group USA (this is a federal student loan provider)"],s:"rej",r:"Elite Legal Practice (ELP) list: Student / educational loan / financing."},
+  {n:["Eloan Warehouse"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Equity Sales Finance"],s:"rej",r:"Elite Legal Practice (ELP) list: Asset finance / sales financing."},
+  {n:["Express Cash Flow"],s:"rej",r:"Elite Legal Practice (ELP) list: Must be 3rd party or not part of colleterial, business or commercial debt."},
+  {n:["Figure Tech/Figure Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Not accepted by Elite Legal Practice (ELP).."},
+  {n:["Fineday Funds"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["GoodLeap LLC (Does business as Goodleap Solar)"],s:"rej",r:"Elite Legal Practice (ELP) list: Fintech / clean energy finance / Solar."},
+  {n:["Green Arrow Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Greenline"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Greensky"],s:"rej",r:"Elite Legal Practice (ELP) list: Per Legal."},
+  {n:["Hollis Cobb"],s:"rej",r:"Elite Legal Practice (ELP) list: possibly collection / finance."},
+  {n:["Home Equity Line of Credit"],s:"rej",r:"Elite Legal Practice (ELP) list: Not accepted by Elite Legal Practice (ELP).."},
+  {n:["Kadikorn Bank"],s:"rej",r:"Elite Legal Practice (ELP) list: Bank / financial institution."},
+  {n:["Lendumo"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Level Up Funding"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["LIGHTSTREAM"],s:"rej",r:"Elite Legal Practice (ELP) list: Home Improvement, Auto, Debt Consolidation, Recreation, Adoption, education, etc.)."},
+  {n:["Little Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Loan At Last"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Lookout Credit Union"],s:"rej",r:"Elite Legal Practice (ELP) list: Credit union / cooperative financial institution."},
+  {n:["Makwa Finance"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Makwa Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Mariner Finance"],s:"rej",r:"Elite Legal Practice (ELP) list: Installment Loans."},
+  {n:["Maxlend"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Merit Financial Trust (Tribal Loans)"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Military Star"],s:"rej",r:"Elite Legal Practice (ELP) list: Government-backed loans."},
+  {n:["Minto Money"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["MobiLoans LLC (Tribal Loan Company)"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["My QuickWallet"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["NCR Finance"],s:"rej",r:"Elite Legal Practice (ELP) list: Finance company / lender."},
+  {n:["Night Wings Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Opici Funds LLC"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Post Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Premier Loan Solutions"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Reach Financial"],s:"rej",r:"Elite Legal Practice (ELP) list: Personal / small-dollar / consumer finance."},
+  {n:["Rise Up Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["River Valley Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Sallie Mae Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Education / student lending."},
+  {n:["Same Day Credit"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["SBA Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Government-backed small business loans."},
+  {n:["Simple Fast Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Payday / quick consumer lending."},
+  {n:["Snap On Credit"],s:"rej",r:"Elite Legal Practice (ELP) list: Secured Loans only."},
+  {n:["Spotloan"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Sunbelt Federal Credit Union (Sunbelt FCU)"],s:"rej",r:"Elite Legal Practice (ELP) list: Credit union / cooperative bank."},
+  {n:["Three Sticks Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Today Cash"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Tule Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Uprova"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Versara Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Consolidation/Negotiation."},
+  {n:["White Pine Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Willow Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["WithU Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
+  {n:["Write St. Education Leins"],s:"rej",r:"Elite Legal Practice (ELP) list: Educational lender / student finance / lien recording in education."},
+  {n:["Yendo"],s:"rej",r:"Elite Legal Practice (ELP) list: Not accepted by Elite Legal Practice (ELP).."},
+  {n:["ZipLoan (AKA Zuntafi)"],s:"rej",r:"Elite Legal Practice (ELP) list: Student / consumer loan origination & servicing."},
+  {n:["Zuntafi (AKA ZipLoan)"],s:"rej",r:"Elite Legal Practice (ELP) list: Student / consumer loan origination & servicing."}
 ];
 const LEGACY_ACCEPT_RULES=[
-  {n:["3rd Party Collections"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: See unacceptable debt list below."},
-  {n:["ADT Alarm System"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Removal of the system may be required based on its age. Create a NOTE that client is aware the system may be removed."},
-  {n:["Auto Loans (RVs/Moto/Leases//Repos/Balances)"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS / Cannot accept deficiency loans."},
-  {n:["Back Rent"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Client is no longer living in unit."},
-  {n:["Business Debts/Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
-  {n:["Cash Advance"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
-  {n:["Check Cashing"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
-  {n:["Consolidation Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
-  {n:["Credit Builder Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
-  {n:["Credit Unions / Federal"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
-  {n:["Department Stores"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
-  {n:["Furniture and/or Jewelry"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
-  {n:["Gas Cards"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
-  {n:["Gyms / Fitness Centers"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add note, client unerstands will lose membership."},
-  {n:["Health clubs"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Add note, client unerstands will lose membership."},
-  {n:["Installment Loans / Note Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not Issues from Debt Settlement Company. Add Cross Collateral / Repo Note in Sales Force."},
-  {n:["Judgements"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
-  {n:["Lake Lending"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not tied to Collateral."},
-  {n:["Lawsuits"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
-  {n:["Lending Club"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
-  {n:["Lines of Credit"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Must be used like a credit card and include the first page of the statement with client and billing information."},
-  {n:["Medical Debt"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Needs to provide the first page of the statement showing both client and billing details.."},
-  {n:["Merchant Cash Advance Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
-  {n:["Military Credit Unions"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Excludes: Military, Star, Pioneer Loans, BX Omni, and VA Loans.."},
-  {n:["Military Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not endorsed by the government, noted on bottom of website."},
-  {n:["Navy Federal Credit Union"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Verify they are not currently in the military, and they don't have, or have to get secret or top secret clearance. Cannot be endorsed by the government.."},
-  {n:["OMNI Financial"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Military Personal Loans / Not Backed by the Government."},
-  {n:["Online Buy Now - Pay Later"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Clear screenshot of balance acceptable. Check for Wage Assignment (Affirm, Afterpay, Klarna, Online Payback Programs.)."},
-  {n:["Payday Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Check for Wage Assignment."},
-  {n:["Personal Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
-  {n:["Signature Loans"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
-  {n:["Summons"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
-  {n:["Timeshares"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
-  {n:["Together Loans (aka Transform Credit)"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
-  {n:["Transform Credit"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
-  {n:["Unsecured Credit Cards"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
-  {n:["Unsecured Debts"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
-  {n:["USAA Federal Savings Bank"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Accepted by Legacy / Elite Legal Practice (ELP).."},
-  {n:["Utility Bills"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Items such as power, internet, electric, cellular, and cable require a NOTE confirming the client is aware service will be shut off.."},
-  {n:["Velocity"],s:"ok",r:"Legacy / Elite Legal Practice (ELP) accepted list: Acceptable 3rd party."}
+  {n:["3rd Party Collections"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: See unacceptable debt list below."},
+  {n:["ADT Alarm System"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Removal of the system may be required based on its age. Create a NOTE that client is aware the system may be removed."},
+  {n:["Auto Loans (RVs/Moto/Leases//Repos/Balances)"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS / Cannot accept deficiency loans."},
+  {n:["Back Rent"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Client is no longer living in unit."},
+  {n:["Business Debts/Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
+  {n:["Cash Advance"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
+  {n:["Check Cashing"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
+  {n:["Consolidation Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
+  {n:["Credit Builder Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
+  {n:["Credit Unions / Federal"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
+  {n:["Department Stores"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
+  {n:["Furniture and/or Jewelry"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
+  {n:["Gas Cards"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
+  {n:["Gyms / Fitness Centers"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add note, client unerstands will lose membership."},
+  {n:["Health clubs"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add note, client unerstands will lose membership."},
+  {n:["Installment Loans / Note Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Issues from Debt Settlement Company. Add Cross Collateral / Repo Note in Sales Force."},
+  {n:["Judgements"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Lake Lending"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not tied to Collateral."},
+  {n:["Lawsuits"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Lending Club"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
+  {n:["Lines of Credit"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Must be used like a credit card and include the first page of the statement with client and billing information."},
+  {n:["Medical Debt"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Needs to provide the first page of the statement showing both client and billing details.."},
+  {n:["Merchant Cash Advance Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
+  {n:["Military Credit Unions"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Excludes: Military, Star, Pioneer Loans, BX Omni, and VA Loans.."},
+  {n:["Military Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not endorsed by the government, noted on bottom of website."},
+  {n:["Navy Federal Credit Union"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Verify they are not currently in the military, and they don't have, or have to get secret or top secret clearance. Cannot be endorsed by the government.."},
+  {n:["OMNI Financial"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Military Personal Loans / Not Backed by the Government."},
+  {n:["Online Buy Now - Pay Later"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Clear screenshot of balance acceptable. Check for Wage Assignment (Affirm, Afterpay, Klarna, Online Payback Programs.)."},
+  {n:["Payday Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Check for Wage Assignment."},
+  {n:["Personal Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
+  {n:["Signature Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
+  {n:["Summons"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Timeshares"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
+  {n:["Together Loans (aka Transform Credit)"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
+  {n:["Transform Credit"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
+  {n:["Unsecured Credit Cards"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
+  {n:["Unsecured Debts"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
+  {n:["USAA Federal Savings Bank"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
+  {n:["Utility Bills"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Items such as power, internet, electric, cellular, and cable require a NOTE confirming the client is aware service will be shut off.."},
+  {n:["Velocity"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Acceptable 3rd party."}
 ];
 // ─── Consumer Shield: Explicit Accepted Named Creditor Rules ───
 // These prevent broad reject aliases from accidentally blocking normal accepted cards.
@@ -1882,7 +1960,7 @@ function getCSNamedRule(name) {
   return _ruleSearch(name, [...CS_NAMED_REJECT_RULES, ...CS_NAMED_COND_RULES]);
 }
 
-// Legacy / ELP only (LEGACY_REJECT_RULES + LEGACY_ACCEPT_RULES)
+// ELP only (LEGACY_REJECT_RULES + LEGACY_ACCEPT_RULES)
 function getLegacyCredRule(name) {
   return _ruleSearch(name, [...LEGACY_REJECT_RULES, ...LEGACY_ACCEPT_RULES]);
 }
@@ -2045,14 +2123,40 @@ function getLDForthPlanRule(totalDebt) {
 }
 function toggleAcc(bodyId,btnId){const b=$(bodyId),btn=$(btnId);if(!b||!btn)return;const open=b.classList.contains('open');b.classList.toggle('open',!open);btn.classList.toggle('open',!open);}
 let nextId=2;
-const app={sel:'',rows:[newRow(1)],selectedProgramRoute:'',ccApr:27.99};
+const app={sel:'CA',rows:[{id:1,cred:'Visa Credit Card',amount:'10000',dt:'Unsecured',secured:false,collections:false,litigation:false,paid:true,bizUnprof:false}],selectedProgramRoute:'',ccApr:28,fixedMonthlyPayment:null};
 function newRow(id){return{id,cred:'',amount:'',dt:'Unsecured',secured:false,collections:false,litigation:false,paid:true,bizUnprof:false};}
 function getRouterCreditCardAPR(){
-  const el=$('ccAprAssumption');
-  const raw=el?num(el.value):num(app.ccApr||27.99);
-  const apr=raw>0?raw:27.99;
+  const el=$('cmpAprAssumption') || $('ccAprAssumption');
+  const raw=el?num(el.value):num(app.ccApr||28);
+  const apr=Math.min(100,Math.max(5,raw>0?raw:28));
   app.ccApr=apr;
   return apr;
+}
+
+function buildDebtForecast(balance, aprPercent, monthlyPayment, months=36){
+  const b0=Math.max(0,num(balance));
+  const apr=Math.min(100,Math.max(5,num(aprPercent)||28))/100;
+  const pay=Math.max(0,num(monthlyPayment));
+  const mr=apr/12;
+  let bal=b0,totalPaid=0,totalInterest=0,payoffMonth=null;
+  const points=[];
+  const wanted=new Set([3,6,9,12,18,24,36]);
+  for(let m=1;m<=months;m++){
+    if(bal<=0.005){
+      bal=0;
+      if(wanted.has(m)) points.push({month:m,balance:0,totalPaid,totalInterest});
+      continue;
+    }
+    const interest=bal*mr;
+    bal+=interest;
+    const actual=Math.min(pay,bal);
+    bal-=actual;
+    totalPaid+=actual;
+    totalInterest+=interest;
+    if(bal<=0.005){payoffMonth=payoffMonth||m;bal=0;}
+    if(wanted.has(m)) points.push({month:m,balance:bal,totalPaid,totalInterest});
+  }
+  return {balance:b0,apr,monthlyPayment:pay,months,payoffMonth,remainingBalance:bal,totalPaid,totalInterest,points,firstMonthInterest:b0*mr,isGrowing:pay<=b0*mr};
 }
 function calcDN(d,apr){
   const selectedAPR = apr || getRouterCreditCardAPR();
@@ -2065,7 +2169,16 @@ function calcDN(d,apr){
   }
   const current=FundingTierCreditCardCalculator.buildCurrentSituation(d,selectedAPR,{minimumPaymentPercent:.03,lowPercent:.025,highPercent:.035,flatMinimumPayment:35});
   const minOnly=current.minimumOnlyPayoff||{};
-  const fixed=current.fixedPaymentPayoff||{};
+  const defaultFixedPayment=current.selectedMinimumPayment||0;
+  const fixedPaymentOverride=num(app.fixedMonthlyPayment||0);
+  const fixedPayment= fixedPaymentOverride>0 ? fixedPaymentOverride : defaultFixedPayment;
+  const fixed=FundingTierCreditCardCalculator.calculateFixedPaymentPayoff(d, selectedAPR, fixedPayment, {} )||{};
+  const forecast=buildDebtForecast(d, selectedAPR, fixedPayment, 36);
+  const fixedOk = fixed && fixed.ok !== false && fixed.totalPaid != null;
+  const fixedNoPayoffLabel = forecast.isGrowing ? 'No payoff — balance grows' : 'No payoff within 36-month forecast';
+  const fixedTimelineLabel = fixedOk ? (fixed.yearsMonths||'N/A') : fixedNoPayoffLabel;
+  const fixedInterestVal = fixedOk ? (fixed.totalInterest||0) : (forecast.totalInterest||0);
+  const fixedTotalVal = fixedOk ? (fixed.totalPaid||0) : (forecast.totalPaid||0);
   return {
     mp: (minOnly.startingMinimumPayment || minOnly.firstEstimatedMinimumPayment || current.selectedMinimumPayment || 0),
     selectedMinimumPayment: current.selectedMinimumPayment||0,
@@ -2078,12 +2191,15 @@ function calcDN(d,apr){
     apr: current.apr||FundingTierCreditCardCalculator.normalizeAPR(selectedAPR),
     total: minOnly.totalPaid||0,
     interest: minOnly.totalInterest||0,
-    fixedMonths: fixed.months||0,
-    fixedYearsMonths: fixed.yearsMonths||'N/A',
-    fixedTotal: fixed.totalPaid||0,
-    fixedInterest: fixed.totalInterest||0,
-    fixedMonthlyPayment: current.selectedMinimumPayment||0,
-    fixedMonthlyPaymentFormatted: current.selectedMinimumPaymentFormatted,
+    fixedMonths: fixedOk ? (fixed.months||0) : null,
+    fixedYearsMonths: fixedTimelineLabel,
+    fixedNoPayoff: !fixedOk,
+    fixedNoPayoffReason: fixed.reason || fixedNoPayoffLabel,
+    debtForecast: forecast,
+    fixedTotal: fixedTotalVal,
+    fixedInterest: fixedInterestVal,
+    fixedMonthlyPayment: fixedPayment,
+    fixedMonthlyPaymentFormatted: FundingTierCreditCardCalculator.money(fixedPayment),
     minimumRange: current.minimumRange,
     currentSituation: current,
     calculationMode: 'minimum_only_declining_payment',
@@ -2091,14 +2207,14 @@ function calcDN(d,apr){
     minimumOnlyLabel: 'Minimum-only payoff using declining monthly minimum payments',
     fixedPaymentLabel: 'Fixed-payment payoff if the client keeps paying the Month 1 starting minimum every month',
     plainEnglishExplanation: `The ${minOnly.yearsMonths||'minimum-only payoff'} estimate assumes the payment starts at ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo, then recalculates downward as the balance gets smaller. It does not mean the client pays that starting amount every month for the full payoff period.`,
-    fixedPaymentExplanation: `If the client kept paying ${current.selectedMinimumPaymentFormatted}/mo as a fixed payment instead of letting the minimum decline, the estimated payoff time would be ${fixed.yearsMonths||'N/A'} with about ${FundingTierCreditCardCalculator.money(fixed.totalInterest||0)} in estimated interest.`,
+    fixedPaymentExplanation: `If the client kept paying ${FundingTierCreditCardCalculator.money(fixedPayment)}/mo as a fixed payment instead of letting the minimum decline, the estimated payoff time would be ${fixedTimelineLabel} with about ${FundingTierCreditCardCalculator.money(fixedInterestVal)} in estimated interest.`,
     minimumOnlyInterestFormatted: FundingTierCreditCardCalculator.money(minOnly.totalInterest||0),
     minimumOnlyTotalPaidFormatted: FundingTierCreditCardCalculator.money(minOnly.totalPaid||0),
-    fixedInterestFormatted: FundingTierCreditCardCalculator.money(fixed.totalInterest||0),
-    fixedTotalPaidFormatted: FundingTierCreditCardCalculator.money(fixed.totalPaid||0),
-    agentTalkTrack: d > 0 ? `Here is the simple way to look at it. If you stay on the regular minimum-payment path, your estimated starting minimum payment is around ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo based on ${FundingTierCreditCardCalculator.money(d)} at ${((current.apr||0)*100).toFixed(2)}% APR. The catch is that the minimum payment usually goes down as your balance goes down, so even though the first payment starts around ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo, the payoff timeline can stretch to about ${minOnly.yearsMonths||'N/A'} and cost you about ${FundingTierCreditCardCalculator.money(minOnly.totalInterest||0)} in interest. If you kept paying that same starting amount every month as a fixed payment instead of letting it drop, payoff is closer to ${fixed.yearsMonths||'N/A'} with about ${FundingTierCreditCardCalculator.money(fixed.totalInterest||0)} in interest. So the big difference is staying on a declining minimum payment versus keeping a fixed payment.` : '',
+    fixedInterestFormatted: FundingTierCreditCardCalculator.money(fixedInterestVal),
+    fixedTotalPaidFormatted: FundingTierCreditCardCalculator.money(fixedTotalVal),
+    agentTalkTrack: d > 0 ? `Here is the simple way to look at it. If you stay on the regular minimum-payment path, your estimated starting minimum payment is around ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo based on ${FundingTierCreditCardCalculator.money(d)} at ${((current.apr||0)*100).toFixed(2)}% APR. The catch is that the minimum payment usually goes down as your balance goes down, so even though the first payment starts around ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo, the payoff timeline can stretch to about ${minOnly.yearsMonths||'N/A'} and cost you about ${FundingTierCreditCardCalculator.money(minOnly.totalInterest||0)} in interest. If you kept paying that same starting amount every month as a fixed payment instead of letting it drop, payoff is closer to ${fixedTimelineLabel} with about ${FundingTierCreditCardCalculator.money(fixedInterestVal)} in interest. So the big difference is staying on a declining minimum payment versus keeping a fixed payment.` : '',
     minimumOnlyAgentScript: d > 0 ? `Your Month 1 starting minimum is ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo. If you stay on minimum payments only, that payment usually drops as your balance drops, so the payoff timeline stretches out. On this estimate, that path takes about ${minOnly.yearsMonths||'N/A'} and costs about ${FundingTierCreditCardCalculator.money(minOnly.totalInterest||0)} in interest.` : '',
-    fixedPaymentAgentScript: d > 0 ? `If you kept paying the starting minimum amount every month instead of letting it drop, payoff would be much faster — about ${fixed.yearsMonths||'N/A'} — with about ${FundingTierCreditCardCalculator.money(fixed.totalInterest||0)} in interest.` : '',
+    fixedPaymentAgentScript: d > 0 ? `If you kept paying the selected fixed monthly amount every month instead of letting it drop, payoff would be much faster — about ${fixedTimelineLabel} — with about ${FundingTierCreditCardCalculator.money(fixedInterestVal)} in interest.` : '',
     assumption: current.routerText.assumption
   };
 }
@@ -2145,7 +2261,7 @@ function collectFlags(rows, total, sc) {
     if(r.dt === 'Private Student Loan' && sc === 'CA') ldF.push('Private student loans not accepted for CA residents.');
     if(r.dt === 'Private Student Loan' && normName(r.cred).includes('DISCOVER')) ldF.push('Discover private student loans not accepted by Level.');
 
-    // Legacy / ELP
+    // ELP
     if(ps.legacy.status === 'rej') legacyF.push(`${label}: ${ps.legacy.rule}`);
   });
 
@@ -2157,7 +2273,7 @@ function collectFlags(rows, total, sc) {
 }
 function chooseRoute(total, sc, flags) {
   if(!sc) return { route:'', reason:'Select a state to calculate routing.' };
-  const pref = $('featurePriority')?.value || 'best_fit';
+  const pref = 'best_fit';
   const cs = getCSState(sc), ld = getLDState(sc), legacy = getLegacyState(sc);
 
   // ── Availability checks ─────────────────────────────────
@@ -2188,21 +2304,21 @@ function chooseRoute(total, sc, flags) {
 
   // ── $6,000–$6,999 band: Legacy primary, CS fallback ────
   if(total >= 6000 && total <= 6999) {
-    if(legacyOK) return { route:'LEGACY', reason:'Debt between $6,000 and $6,999 routes to Legacy / ELP when state and creditor rules allow.' };
+    if(legacyOK) return { route:'LEGACY', reason:'Debt between $6,000 and $6,999 routes to ELP when state and creditor rules allow.' };
     if(csOK) return { route:'CONSUMER SHIELD', reason:'Debt is in Legacy\'s preferred band but ELP is unavailable — falling back to Consumer Shield.' };
     return { route:'NO OPTION', reason:'No backend available for this debt amount and state combination.' };
   }
 
   // ── Priority: Debt Validation preference ────────────────
   if(total > 6000 && pref === 'debt_validation') {
-    if(legacyOK) return { route:'LEGACY', reason:'Prospect prefers debt validation — Legacy / ELP is available in this state.' };
+    if(legacyOK) return { route:'LEGACY', reason:'Prospect prefers debt validation — ELP is available in this state.' };
     if(csOK)     return { route:'CONSUMER SHIELD', reason:'Prospect prefers debt validation — Legacy unavailable, routing to Consumer Shield.' };
     return { route:'NO OPTION', reason:'Prospect wants debt validation but neither Legacy nor Consumer Shield is available.' };
   }
 
   // ── Priority: Attorney-led / Legal Support ───────────────
   if(pref === 'legal_support') {
-    if(legacyOK) return { route:'LEGACY', reason:'Prospect wants attorney-led support — Legacy / ELP is the right fit and is available.' };
+    if(legacyOK) return { route:'LEGACY', reason:'Prospect wants attorney-led support — ELP is the right fit and is available.' };
     if(ldOK)     return { route:'LEVEL', reason:'Prospect wants legal support but ELP is unavailable — Level Debt attorney model is available in this state.' };
     if(csOK)     return { route:'CONSUMER SHIELD', reason:'Attorney-led programs unavailable — falling back to Consumer Shield.' };
     return { route:'NO OPTION', reason:'No backend available for this state and preference combination.' };
@@ -2210,8 +2326,8 @@ function chooseRoute(total, sc, flags) {
 
   // ── Standard routing: Level → Legacy → CS ───────────────
   if(ldOK)     return { route:'LEVEL', reason: ld.status === 'RED' ? 'Best option is Level Debt under the attorney model in this state.' : 'Best option is Level Debt — serviceable standard state.' };
-  if(legacyOK) return { route:'LEGACY', reason:'Level Debt not available under current routing rules — Legacy / ELP is the next best option.' };
-  if(csOK)     return { route:'CONSUMER SHIELD', reason:'Level Debt and Legacy / ELP are both unavailable — Consumer Shield is the fallback option.' };
+  if(legacyOK) return { route:'LEGACY', reason:'Level Debt not available under current routing rules — ELP is the next best option.' };
+  if(csOK)     return { route:'CONSUMER SHIELD', reason:'Level Debt and ELP are both unavailable — Consumer Shield is the fallback option.' };
   return { route:'NO OPTION', reason:'No backend is serviceable for this state and scenario.' };
 }
 function computeScenario(){
@@ -2323,7 +2439,7 @@ function rowAlerts(row, route) {
     alerts.push({ label:'CS ⚠', tone:'a', detail: ps.cs.rule, program:'CS' });
   }
 
-  // ── Legacy / ELP badges ─────────────────────────────────
+  // ── ELP badges ─────────────────────────────────
   if(ps.legacy.status === 'rej') {
     alerts.push({ label:'ELP ✕', tone:'p', detail: ps.legacy.rule, program:'LEGACY' });
   } else if(ps.legacy.status === 'ok' && ps.legacy.rule) {
@@ -2687,12 +2803,18 @@ function renderPlanCards(c){
     const minDraft = getLDMinDraft(c.total);
     const forthPlanRule = getLDForthPlanRule(c.total);
     const _ldTc = getLDProgramCost(c.total, c.feeRate);
+    const _ldReserve = c.total * 0.50;
+    const _ldFee = c.total * c.feeRate;
+    const _ldFeePct = Math.round(c.feeRate * 100);
+    const _ldModelLabel = c.lds.status === 'RED' ? 'RED / ATTORNEY MODEL STATE' : 'GREEN STATE';
+    const _ldModelClass = c.lds.status === 'RED' ? 'red' : 'green';
     const _ldMaxT = getLDEffectiveMaxTerm(c.total, c.feeRate);
     const selectedTerm = getLDSelectedTerm(c.total, c.feeRate);
     const mp = Math.round(_ldTc / Math.max(1, selectedTerm));
     const isRec = c.route.route === 'LEVEL';
     const comm=getCommForCard(c,'LEVEL');
     const forthTooltip = `<strong>FORTH CRM Plan: ${esc(forthPlanRule.planType)}</strong><br>${esc(forthPlanRule.instruction)}`;
+    const ldPricingTooltip = `<div class="ld-price-pop"><div class="ld-price-pop-hd"><div class="ld-price-pop-title">Pricing Breakdown</div><span class="ld-model-pill ${_ldModelClass}">${_ldModelLabel}</span></div><div class="ld-price-pop-row"><span>Estimated settlement reserve</span><strong>${fmt(_ldReserve)} <span style="color:#64748b;font-weight:850;">50%</span></strong></div><div class="ld-price-pop-row"><span>${c.lds.status==='RED'?'Attorney-model program fee':'Program fee'}</span><strong>${fmt(_ldFee)} <span style="color:#64748b;font-weight:850;">${_ldFeePct}%</span></strong></div><div class="ld-price-pop-row ld-price-pop-total"><span>Total estimated program cost</span><strong>${fmt(_ldTc)}</strong></div><div class="ld-price-pop-note">Estimate only. Results, fees, timelines, settlement amounts, and creditor participation can vary by individual situation.</div></div>`;
     cards.push(`<div class="plan-card-v pc-ld${isRec?' rec':''}">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
@@ -2700,7 +2822,7 @@ function renderPlanCards(c){
             <div class="logo-sm"><img src="${LD_LOGO}" alt="LD"/></div>
             <div><span style="font-size:14px;font-weight:900;">Level Debt</span></div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class="plan-chip-rec">Recommended</span>':'<span class="plan-chip-check">✓</span>'}</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;"><span class="ld-model-pill ${_ldModelClass}">${_ldModelLabel}</span>${isRec?'<span class="plan-chip-rec">Recommended</span>':'<span class="plan-chip-check">✓</span>'}</div>
         </div>
         <div style="border:1.5px solid rgba(15,157,138,.25);border-radius:12px;overflow:visible;position:relative;z-index:50;">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;overflow:visible;">
@@ -2718,7 +2840,7 @@ function renderPlanCards(c){
                 <span class="ttp-body">${forthTooltip}</span>
               </div>
             </div>
-            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div style="font-size:18px;font-weight:900;color:var(--g);line-height:1;">${fmt(_ldTc)}</div></div>
+            <div style="padding:10px 12px;background:rgba(15,157,138,.07);text-align:center;position:relative;overflow:visible;"><div style="font-size:9px;font-weight:700;color:#0b7d6e;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Total</div><div class="ld-total-tip" style="font-size:18px;font-weight:900;color:var(--g);line-height:1;"><span>${fmt(_ldTc)}</span>${ldPricingTooltip}</div></div>
           </div>
         </div>
       </div>
@@ -2743,10 +2865,10 @@ function renderPlanCards(c){
     const csMp=c.csProg?c.csProg.pay:0;
     const ldMp=c.ldAvail?Math.round((total*.5+total*c.feeRate)/getLDMaxTerm(total)):0;
     if(total>0 && (!legacyState._init||legacyState._initTotal!==total)){
-      legacyState.months=legacyDefaultMonths(total,feeRate,csMp,ldMp,legacyState.splitPay);
+      legacyState.months=legacyMaxMonths(total,feeRate,legacyState.splitPay);
       legacyState._init=true;legacyState._initTotal=total;
     }
-    const mo=legacyClampMonths(total,feeRate,legacyState.months||minMo,legacyState.splitPay);legacyState.months=mo;
+    const mo=legacyClampMonths(total,feeRate,legacyState.months||maxMo,legacyState.splitPay);legacyState.months=mo;
     const tc=legacyTotalCost(total,feeRate,mo,legacyState.splitPay);
     const mp=legacyMP(total,feeRate,mo,legacyState.splitPay);const feeLabel=Math.round(feeRate*100);
     const comm=getCommForCard(c,'LEGACY');
@@ -2756,7 +2878,7 @@ function renderPlanCards(c){
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="logo-sm"><img src="${LEGACY_LOGO}" alt="Legacy" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-size:8px;font-weight:800;color:#6d28d9;\'>LCS</span>';"/></div>
-            <div><span style="font-size:14px;font-weight:900;">Legacy / Elite Legal Practice (ELP)</span></div>
+            <div><span style="font-size:14px;font-weight:900;">Elite Legal Practice (ELP)</span></div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class="plan-chip-rec">Recommended</span>':(c.legacyAvail?'<span class="plan-chip-check">✓</span>':'')}</div>
         </div>
@@ -2805,7 +2927,7 @@ function renderPlanCards(c){
   }
 
   $('planCards').innerHTML=cards.length?cards.join(''):`<div style="grid-column:1/-1;border:1px solid rgba(239,68,68,.3);background:#fef2f2;color:#b91c1c;border-radius:12px;padding:14px;font-weight:700;">No program options available for this state and debt scenario.</div>`;
-  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:12px;overflow:hidden;"><div style="background:var(--dk);padding:11px 16px;font-size:13px;font-weight:800;color:#fff;">How the Programs Differ</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Legacy / Elite Legal Practice (ELP)</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$6,000+</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Service Fee</td><td style="padding:10px 14px;">Fixed by program tier</td><td style="padding:10px 14px;">25–27% of enrolled</td><td style="padding:10px 14px;">Adjustable 35–49%</td></tr></tbody></table></div></div>`;
+  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:12px;overflow:hidden;"><div style="background:var(--dk);padding:11px 16px;font-size:13px;font-weight:800;color:#fff;">How the Programs Differ</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Elite Legal Practice (ELP)</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$6,000+</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Service Fee</td><td style="padding:10px 14px;">Fixed by program tier</td><td style="padding:10px 14px;">25–27% of enrolled</td><td style="padding:10px 14px;">Adjustable 35–49%</td></tr></tbody></table></div></div>`;
 }
 
 function renderLDCard(c){
@@ -2884,8 +3006,165 @@ function renderLegacyCard(c){
   }).join('');
 }
 
+
+
+/* === Funding Tier patched program education sections === */
+function ftProgramCloseBox(title, bullets, color){
+  return `<div style="margin-top:14px;background:#fff;border:1.5px solid ${color};border-radius:12px;padding:13px 14px;box-shadow:0 4px 14px rgba(15,23,42,.04);">
+    <div style="font-size:11px;font-weight:950;color:${color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">${title}</div>
+    <ul style="padding-left:18px;display:grid;gap:7px;font-size:12px;color:#334155;line-height:1.65;font-weight:650;">${bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
+  </div>`;
+}
+
+function ftSizzleBox(programKey){
+  const scripts={
+    cs:{
+      title:'Introductory summary script — Debt Validation',
+      script:'What this does is give you a more organized path instead of trying to keep up with multiple accounts on your own. The goal is to review and validate the enrolled debts, help create a predictable monthly structure, and give you a clearer way to move forward based on what you can afford.',
+      bullets:[
+        '“This is designed to create structure and clarity instead of leaving you stuck reacting to every creditor individually.”',
+        '“We are going to look at the debt, the state rules, and the backend fit so we are not guessing.”',
+        '“The biggest benefit is that you get a clear monthly program path instead of trying to manage the stress one account at a time.”'
+      ],
+      note:'Use conditional language. Eligibility, documentation, creditor participation, fees, timing, and results vary by client situation.'
+    },
+    ld:{
+      title:'Introductory summary script — Debt Settlement',
+      script:'Based on what you are showing me, staying where you are may keep you paying interest for a very long time. This program is designed to move you away from the minimum-payment cycle and into a structured settlement path where enrolled unsecured debts may be resolved over a defined timeline, depending on creditor participation and your ability to stay consistent.',
+      bullets:[
+        '“Right now, the issue is not just the balance — it is the interest and the timeline.”',
+        '“Instead of sending money in multiple directions and barely seeing progress, this gives you one structured program path.”',
+        '“The goal is to work toward resolving enrolled debts for less than continuing the current payoff path may cost you, but results depend on the creditors and your file.”'
+      ],
+      note:'Do not promise a specific settlement amount, savings percentage, approval, or credit result. Fees may apply and credit impact may occur.'
+    },
+    legacy:{
+      title:'Introductory summary script — Elite Legal Practice / Debt Waiver',
+      script:'This option is different because it is built around an attorney-led consumer-rights process. Instead of just assuming every debt is accurate and fully enforceable, the law firm can review the accounts, challenge improper or unverifiable debt activity, request validation, dispute inaccurate reporting, and work through legal-resolution steps when appropriate for the file.',
+      bullets:[
+        '“Under consumer-protection laws, collectors generally have to be able to validate what they claim you owe.”',
+        '“If information is inaccurate, incomplete, outdated, duplicated, unverifiable, or reported incorrectly, the law firm can challenge it through the proper dispute and validation process.”',
+        '“That can include reviewing documentation, creditor and collector communications, credit-report tradelines, balances, ownership of the account, and whether the reporting can be supported.”',
+        '“When a tradeline cannot be verified, is inaccurate, or is being reported improperly, the process may support correction, deletion, or other resolution activity — but no specific deletion or removal can be guaranteed.”',
+        '“The value here is that you are not trying to fight this alone. You have a formal process reviewing whether the accounts are valid, accurate, and legally supportable.”'
+      ],
+      note:'This is program education, not legal advice. FDCPA/FCRA-related rights depend on the facts, account type, collector activity, reporting accuracy, and documentation. Do not guarantee removals, deletions, dismissals, or savings.'
+    }
+  };
+  const x=scripts[programKey];
+  if(!x)return '';
+  return `<div class="ft-sizzle-box"><div class="ft-sizzle-kicker">Exact prospect talk track</div><div class="ft-sizzle-title">${x.title}</div><div class="ft-sizzle-script">“${x.script}”</div><ul class="ft-sizzle-list">${x.bullets.map(b=>`<li>${b}</li>`).join('')}</ul><div class="ft-sizzle-note">${x.note}</div></div>`;
+}
+
+function ftUnavailableBox(programName, reason, color){
+  return `<div style="background:#fff7ed;border:1.5px solid rgba(245,158,11,.35);border-radius:12px;padding:12px 14px;margin-bottom:14px;">
+    <div style="font-size:11px;font-weight:950;color:#92400e;text-transform:uppercase;letter-spacing:.45px;margin-bottom:6px;">Not currently routing to ${programName}</div>
+    <div style="font-size:12px;color:#475569;line-height:1.65;font-weight:650;">${esc(reason||'This option is not available for the current state, debt amount, or creditor mix.')}</div>
+  </div>`;
+}
+function ftProgramBlocks(){
+  return {
+    cs:[
+      'Position this as the simplest structured option when the client wants predictable payments and a clear monthly budget.',
+      'Emphasize that it is not a new loan, so the conversation stays focused on organization, validation, and affordability instead of borrowing more money.',
+      'Use this when the prospect is overwhelmed by multiple payments and needs a fixed path that feels easier to understand.',
+      'Set expectations clearly: qualification, creditor/debt eligibility, timing, and results can vary based on the file.'
+    ],
+    ld:[
+      'Position this as a structured debt settlement path for clients who need relief from revolving minimum payments and want one organized monthly program deposit.',
+      'Explain that the goal is to resolve enrolled unsecured debts over a defined timeline, depending on creditor participation and the client\'s ability to stay consistent.',
+      'Use the comparison table to show why minimum-payment behavior can keep the client trapped in interest, while the program gives them a more controlled plan.',
+      'Keep expectations transparent: settlement amounts, timing, fees, credit impact, and creditor participation can vary by account and by client situation.'
+    ],
+    legacy:[
+      'Position this as an attorney-led legal debt dispute and resolution path for clients who want representation and a more formal consumer-rights process.',
+      'Explain that the program works through legal dispute, validation, documentation review, and resolution activity rather than simply offering a loan or basic budgeting plan.',
+      'This can be powerful for prospects who are scared of collector contact, confused by credit-reporting issues, or want a law-firm model involved in the process.',
+      'Set expectations clearly: legal-service fees, file timelines, documentation needs, credit impact, and outcomes can vary. Do not promise removals, dismissals, or specific savings.'
+    ]
+  };
+}
+function renderCSCard(c){
+  const card=$('csProgramCard');
+  if(!card) return;
+  const p=c.csProg || getCsProg(c.total);
+  if(!c.total || !p){card.style.display='none';return;}
+  card.style.display='block';
+  const totalCost=p.term*p.pay;
+  const unavailable = !c.csAvail;
+  const reason = (c.flags&&c.flags.cs&&c.flags.cs[0]) || (c.css&&c.css.status==='BLACKOUT'?'Consumer Shield does not service this state.':'Consumer Shield is not the current routed option for this file.');
+  const blocks=ftProgramBlocks();
+  $('csActiveDetail').innerHTML=`<div style="background:rgba(26,110,216,.06);border:2px solid ${unavailable?'#cbd5e1':'var(--bl)'};border-radius:12px;padding:16px;${unavailable?'opacity:.92;':''}">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:var(--bl);">Consumer Shield Program ${p.k}</span><span style="font-size:12px;color:#64748b;margin-left:10px;">${p.range}</span></div><span class="pill ${unavailable?'p-a':'p-b'}">${unavailable?'Available Review':'Active Program'}</span></div>
+    ${unavailable?ftUnavailableBox('Consumer Shield', reason, 'var(--bl)'):''}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;text-align:center;margin-bottom:14px;">${[['Monthly Payment',fmt(p.pay),'per month'],['Program Length',`${p.term} mo`,'total term'],['Total Program Amount',fmt(totalCost),`${fmt(p.pay)} x ${p.term}`]].map(([l,v,s])=>`<div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">${l}</div><div style="font-size:22px;font-weight:900;color:var(--bl);margin-top:4px;">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${s}</div></div>`).join('')}</div>
+    ${ftProgramCloseBox('How to explain this to the prospect', blocks.cs, 'var(--bl)')}
+    ${ftSizzleBox('cs')}
+    <div style="font-size:11px;color:#92400e;background:#fffbeb;border:1px solid rgba(245,158,11,.32);border-radius:10px;padding:9px 11px;line-height:1.55;font-weight:700;margin-top:12px;">Debt programs are not suitable for everyone. Program eligibility, fees, timing, creditor participation, and results vary by client situation.</div>
+  </div>`;
+  const grid=$('csTileGrid');
+  if(grid) grid.innerHTML=CS_PROGS.map(pr=>`<div class="cs-tile${p&&pr.k===p.k?' act':''}"><div style="font-size:12px;font-weight:800;color:${p&&pr.k===p.k?'var(--bl)':'#64748b'};">Prog ${pr.k}</div><div style="font-size:9px;color:#94a3b8;margin-top:1px;">${pr.range}</div><div style="font-size:18px;font-weight:900;color:${p&&pr.k===p.k?'var(--bl)':'var(--dk)'};margin-top:5px;">${fmt(pr.pay)}</div><div style="font-size:11px;color:#64748b;margin-top:1px;">${pr.term} mo</div></div>`).join('');
+}
+function renderLDCard(c){
+  const card=$('ldProgramCard');
+  if(!card) return;
+  if(!c.total){card.style.display='none';return;}
+  card.style.display='block';
+  const unavailable=!c.ldAvail;
+  const feeRate=(c.lds&&c.lds.status==='RED')?.27:.25;
+  const tc=getLDProgramCost(c.total, feeRate);
+  const minDraftLD=getLDMinDraft(c.total);
+  const termMax=getLDMaxTerm(c.total)||0;
+  const effectiveTerm=c.ldAvail?getLDSelectedTerm(c.total, feeRate):(termMax||0);
+  const mp=effectiveTerm?Math.round(tc/Math.max(1,effectiveTerm)):0;
+  const forthPlanRule=getLDForthPlanRule(c.total);
+  const reason=(c.flags&&c.flags.ld&&c.flags.ld[0]) || (c.lds&&c.lds.status==='BLACKOUT'?'Level Debt does not service this state.':'Level Debt is not available for the current debt amount or creditor mix.');
+  const blocks=ftProgramBlocks();
+  $('ldActiveDetail').innerHTML=`<div style="background:rgba(15,157,138,.06);border:2px solid ${unavailable?'#cbd5e1':'var(--g)'};border-radius:12px;padding:16px;${unavailable?'opacity:.92;':''}">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:#0b7d6e;">Level Debt Program Explanation</span><span style="font-size:12px;color:#64748b;margin-left:10px;">Client-facing quick pitch</span></div><span class="pill ${unavailable?'p-a':'p-g'}">${unavailable?'Not Current Fit':'Settlement'}</span></div>
+    ${unavailable?ftUnavailableBox('Level Debt', reason, '#0b7d6e'):''}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px;text-align:center;">${[['Monthly Payment',mp?fmt(mp):'N/A',effectiveTerm?`${effectiveTerm} mo estimate`:'term not available'],['Program Length',effectiveTerm?`${effectiveTerm} mo`:'N/A','estimated'],['Estimated Program Amount',fmt(tc),'program total'],['Minimum Deposit',minDraftLD?fmt(minDraftLD):'N/A','current minimum']].map(([l,v,s])=>`<div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">${l}</div><div style="font-size:22px;font-weight:900;color:#0b7d6e;margin-top:4px;">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${s}</div></div>`).join('')}</div>
+    <div style="background:#f0fdf4;border:1.5px solid rgba(15,157,138,.28);border-radius:10px;padding:11px 13px;margin-bottom:14px;"><div style="font-size:10px;font-weight:900;color:#0b7d6e;text-transform:uppercase;letter-spacing:.45px;margin-bottom:5px;">FORTH CRM Setup Instruction</div><div style="font-size:13px;font-weight:900;color:#0f172a;margin-bottom:4px;">${forthPlanRule.planType}</div><div style="font-size:12px;color:#334155;font-weight:650;line-height:1.55;">${forthPlanRule.instruction}</div></div>
+    ${ftProgramCloseBox('How to explain this to the prospect', blocks.ld, '#0b7d6e')}
+    ${ftSizzleBox('ld')}
+    <div style="font-size:11px;color:#92400e;background:#fffbeb;border:1px solid rgba(245,158,11,.32);border-radius:10px;padding:9px 11px;line-height:1.55;font-weight:700;margin-top:12px;">Debt settlement is not suitable for everyone. Results vary based on financial situation, fees, creditor participation, enrolled debts, and program adherence. Credit impact may occur.</div>
+  </div>`;
+}
+function renderLegacyCard(c){
+  const card=$('legacyProgramCard');
+  if(!card) return;
+  if(!c.total){card.style.display='none';return;}
+  card.style.display='block';
+  const unavailable=!c.legacyAvail;
+  const total=c.total;
+  const feeRate=legacyState.feeRate;
+  const fallbackMo=legacyDefaultMonths(total,feeRate,c.csProg?c.csProg.pay:0,c.ldAvail?Math.round((total*.5+total*c.feeRate)/Math.max(1,getLDMaxTerm(total))):0,legacyState.splitPay);
+  const mo=legacyClampMonths(total,feeRate,legacyState.months||fallbackMo,legacyState.splitPay);
+  legacyState.months=mo;
+  const tc=legacyTotalCost(total,feeRate,mo,legacyState.splitPay);
+  const mp=legacyMP(total,feeRate,mo,legacyState.splitPay);
+  const feeLabel=Math.round(feeRate*100);
+  const band=getLegacyComm(total);
+  const reason=(c.flags&&c.flags.legacy&&c.flags.legacy[0]) || (c.lgs&&c.lgs.status==='BLACKOUT'?'ELP does not service this state.':'ELP is not available for the current debt amount or creditor mix.');
+  const blocks=ftProgramBlocks();
+  $('legacyActiveDetail').innerHTML=`<div class="legacy-calc" style="${unavailable?'opacity:.92;':''}">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:#6d28d9;">${band?'Band '+band.code:'Elite Legal Practice (ELP)'}</span><span style="font-size:12px;color:#64748b;margin-left:10px;">Attorney-led debt dispute and resolution</span></div><span class="pill ${unavailable?'p-a':'p-p'}">${unavailable?'Not Current Fit':'Active Band'}</span></div>
+    ${unavailable?ftUnavailableBox('ELP', reason, '#6d28d9'):''}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;text-align:center;margin-bottom:14px;">
+      <div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">Monthly Payment</div><div style="font-size:22px;font-weight:900;color:#6d28d9;margin-top:4px;">${fmt(mp)}</div><div style="font-size:11px;color:#94a3b8;">${mo} months</div></div>
+      <div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">Total Program Amount</div><div style="font-size:22px;font-weight:900;color:#6d28d9;margin-top:4px;">${fmt(tc)}</div><div style="font-size:11px;color:#94a3b8;">${feeLabel}% of ${fmt(total)} + admin/draft fees</div></div>
+      <div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">Base Commission</div><div style="font-size:22px;font-weight:900;color:#6d28d9;margin-top:4px;">${band?fmt(legacyCommAtFee(band.total,feeRate)):'N/A'}</div><div style="font-size:11px;color:#94a3b8;">at ${feeLabel}% fee</div></div>
+    </div>
+    ${ftProgramCloseBox('How to explain this to the prospect', blocks.legacy, '#6d28d9')}
+    ${ftSizzleBox('legacy')}
+    <div style="font-size:11px;color:#92400e;background:#fffbeb;border:1px solid rgba(245,158,11,.32);border-radius:10px;padding:9px 11px;line-height:1.55;font-weight:700;margin-top:12px;">This is general program education, not legal advice. Legal outcomes, dispute results, creditor/collector responses, credit impact, fees, and timelines vary by client situation.</div>
+  </div>`;
+  const grid=$('legacyBandGrid');
+  if(grid) grid.innerHTML=LEGACY_COMM.map(b=>{const isAct=band&&b.code===band.code;return `<div class="lc-tile${isAct?' lc-act':''}"><div style="font-size:12px;font-weight:800;color:${isAct?'#6d28d9':'#64748b'};">Band ${b.code}</div><div style="font-size:9px;color:#94a3b8;margin-top:1px;">$${b.min.toLocaleString()}${b.max===Infinity?'+':'–$'+b.max.toLocaleString()}</div><div style="font-size:17px;font-weight:900;color:${isAct?'#6d28d9':'var(--dk)'};margin-top:5px;">${fmt(legacyCommAtFee(b.total,feeRate))}</div><div style="font-size:10px;color:#64748b;margin-top:1px;">comm @ ${feeLabel}%</div><div style="font-size:10px;color:#94a3b8;margin-top:2px;">P2: ${fmt(Math.round(b.p2*(feeRate/0.40)))}${b.p4>0?` · P4: ${fmt(Math.round(b.p4*(feeRate/0.40)))}`:''}</div></div>`}).join('');
+}
+
 const PUBLIC_PROGRAM_NAMES={LEVEL:'Debt Settlement','CONSUMER SHIELD':'Debt Validation',LEGACY:'Debt Waiver'};
-const INTERNAL_PROGRAM_NAMES={LEVEL:'Level Debt', 'CONSUMER SHIELD':'Consumer Shield', LEGACY:'Legacy / Elite Legal Practice (ELP)'};
+const INTERNAL_PROGRAM_NAMES={LEVEL:'Level Debt', 'CONSUMER SHIELD':'Consumer Shield', LEGACY:'Elite Legal Practice (ELP)'};
 function publicProgramName(route){return PUBLIC_PROGRAM_NAMES[route]||'Recommended Program';}
 function internalProgramName(route){return INTERNAL_PROGRAM_NAMES[route]||'Recommended Program';}
 function programRouteAvailable(c,route){
@@ -2940,7 +3219,7 @@ function renderProgramChoice(c){
   const sel=selectedProgramRoute(c);
   const dn=c.dn||{};
   const cs=dn.currentSituation||null;
-  const aprVal=((dn.apr||.2799)*100).toFixed(2);
+  const aprVal=Math.round((dn.apr||.28)*100);
   box.style.display='block';
   box.innerHTML=`<div style="display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:12px;align-items:start;">
     <div>
@@ -2951,7 +3230,7 @@ function renderProgramChoice(c){
       <div style="font-size:12px;color:#64748b;font-weight:600;line-height:1.55;">This controls the Recommended Program column and Prospect Delivery. Public pages/emails show the program type only — not the servicing company name.</div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <label style="font-size:11px;font-weight:900;color:#334155;text-transform:uppercase;letter-spacing:.45px;">Credit Card APR Assumption</label>
-        <input id="ccAprAssumption" class="fi cc-apr-input" type="number" step="0.01" min="1" max="59.99" value="${aprVal}"/>
+        <input id="ccAprAssumption" class="fi cc-apr-input" type="number" step="1" min="5" max="100" value="${aprVal}"/>
         <span style="font-size:11px;color:#64748b;font-weight:700;">Used for Current Situation / Do Nothing payoff math.</span>
       </div>
     </div>
@@ -2976,8 +3255,8 @@ function renderProgramChoice(c){
   if(dd)dd.onchange=()=>{app.selectedProgramRoute=dd.value;render();};
   const aprInput=$('ccAprAssumption');
   if(aprInput){
-    aprInput.onchange=()=>{app.ccApr=num(aprInput.value)||27.99;render();};
-    aprInput.oninput=()=>{app.ccApr=num(aprInput.value)||27.99;};
+    aprInput.onchange=()=>{app.ccApr=Math.min(100,Math.max(5,num(aprInput.value)||28));render();};
+    aprInput.oninput=()=>{app.ccApr=Math.min(100,Math.max(5,num(aprInput.value)||28));};
   }
 }
 
@@ -3008,44 +3287,122 @@ function copyAgentScriptBubble(){
 }
 
 function renderCmpTable(c){
-  const hdrLogo=$('recommendedProgramLogo'),hdrText=$('recommendedProgramHeader');
+  const wrap=$('cmpTableWrap') || $('cmpTable');
+  if(!wrap)return;
   const selRoute=selectedProgramRoute(c);
   const est=programEstimate(c,selRoute);
   const recName=publicProgramName(selRoute);
-  if(hdrText)hdrText.textContent=recName;
-  if(hdrLogo){hdrLogo.style.display='none';hdrLogo.removeAttribute('src');hdrLogo.alt='';}
-  let recMonthly='&mdash;',recMonths='&mdash;',recTotal='&mdash;',recSavings='&mdash;';
-  let fM='&mdash;',fMo='&mdash;',fT='&mdash;',fS='&mdash;';
+  let recMonthly='&mdash;',recMonths='&mdash;',recTotal='&mdash;',recFixedSavings='&mdash;',recDecliningSavings='&mdash;';
+  let fM='&mdash;',fMo='&mdash;',fT='&mdash;',fFixedSavings='&mdash;',fDecliningSavings='&mdash;';
   if(est){
     recMonthly=fmt(est.mp);recMonths=`${est.term} months`;recTotal=fmt(est.tc);
-    recSavings=`<strong style="font-size:15px;color:#0b7d6e;">${fmt(Math.max(0,(c.dn.total||0)-est.tc))}</strong>`;
-    if(est.shortest){fM=fmt(est.shortest.mp);fMo=`${est.shortest.term} months`;fT=fmt(est.shortest.tc);fS=`<strong>${fmt(Math.max(0,(c.dn.total||0)-est.shortest.tc))}</strong>`;}
+    recFixedSavings=`<strong style="font-size:15px;color:#0b7d6e;">${fmt(Math.max(0,(c.dn.fixedTotal||0)-est.tc))}</strong>`;
+    recDecliningSavings=`<strong style="font-size:15px;color:#0b7d6e;">${fmt(Math.max(0,(c.dn.total||0)-est.tc))}</strong>`;
+    if(est.shortest){
+      fM=fmt(est.shortest.mp);fMo=`${est.shortest.term} months`;fT=fmt(est.shortest.tc);
+      fFixedSavings=`<strong>${fmt(Math.max(0,(c.dn.fixedTotal||0)-est.shortest.tc))}</strong>`;
+      fDecliningSavings=`<strong>${fmt(Math.max(0,(c.dn.total||0)-est.shortest.tc))}</strong>`;
+    }
   }
   const dn=c.dn||{};
   renderAgentScriptBubble(dn);
-  const current=dn.currentSituation||null;
   const dnMonths=dn.yearsMonths||(`${dn.months||0} months`);
   const fixedMonths=dn.fixedYearsMonths||'N/A';
-  const mpTooltip=`<span class="tip-wrap" style="margin-left:5px;"><span style="font-size:10px;color:#93c5fd;cursor:help;border-bottom:1px dashed #93c5fd;">est.</span><span class="tip-box">Funding Tier default estimate: 3% of unsecured credit card balance. Assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes. Actual creditor formulas vary.</span></span>`;
+  const fixedPayment=dn.fixedMonthlyPayment||dn.mp||0;
+  const aprVal=Math.round((dn.apr||.28)*100);
   const sayTip=(text)=>`<span class="tip-wrap" style="margin-left:6px;"><span style="font-size:10px;color:#0b7d6e;cursor:help;border-bottom:1px dashed #0b7d6e;font-weight:900;">what to say</span><span class="tip-box">${esc(text)}</span></span>`;
   const minOnlyScript=dn.minimumOnlyAgentScript||`The starting minimum is ${fmt(dn.mp||0)}/mo. If you only pay the required minimum, the payment usually drops as the balance drops. That is why payoff can take ${dnMonths} and cost about ${fmt(dn.interest||0)} in interest.`;
-  const fixedScript=dn.fixedPaymentAgentScript||`If you keep paying the starting ${fmt(dn.mp||0)}/mo every month instead of letting it drop, payoff is about ${fixedMonths} with about ${fmt(dn.fixedInterest||0)} in interest.`;
-  const rows=[
-    ['Month 1 Starting Minimum Payment',`${fmt(dn.mp||0)}${mpTooltip}${sayTip('This is the estimated first required minimum payment. It is not the same as saying you pay this exact amount forever.')}<br><span style="font-size:11px;color:#64748b;font-weight:700;">This is the estimated first required minimum — not a fixed payment forever.</span>`,fM,recMonthly,'mp-row'],
-    ['Payment Behavior',`${dn.paymentBehaviorLabel||'Starts at estimated minimum, then recalculates downward as the balance drops.'}${sayTip('Minimum-only means the required payment usually starts higher and then drops as the balance drops. That lower future payment is what stretches the payoff timeline.')}`,'Fixed payment stays the same monthly','Program payment shown is fixed/structured by selected backend.',''],
-    ['Plain-English Explanation',`<span style="font-size:11px;color:#475569;line-height:1.55;display:block;">${esc(dn.plainEnglishExplanation||'The minimum-only payoff can take a long time because the required minimum payment usually decreases as the balance goes down.')}</span>${sayTip(dn.agentTalkTrack||minOnlyScript)}`,'Fixed payoff assumes the same payment is made every month.','Program payment is structured by the selected backend.',''],
-    ['Total Enrolled Debt',fmt(c.total),fmt(c.total),fmt(c.total),''],
-    ['APR / Interest Assumption',`${((dn.apr||.2799)*100).toFixed(2)}% APR`,est?'0% APR':'&mdash;',selRoute==='LEGACY'?'N/A':(recTotal!=='&mdash;'?'0% APR':'&mdash;'),''],
-    ['Declining Minimum-Only Payoff Time',`${dnMonths}${sayTip(minOnlyScript)}`,fMo,recMonths,''],
-    ['Interest Paid — Declining Minimum',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.interest||0)}</span>${sayTip('This is the estimated interest paid if the client only follows the required minimum payment and lets that payment decline over time.')}`,est?'$0 credit-card interest':'&mdash;',selRoute==='LEGACY'?'N/A':(recTotal!=='&mdash;'?'$0 credit-card interest':'&mdash;'),''],
-    ['Total Paid — Declining Minimum',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.total||0)}</span>`,fT,recTotal,''],
-    ['If Starting Minimum Stayed Fixed',`${fixedMonths}${sayTip(fixedScript)}`,'&mdash;','&mdash;',''],
-    ['Interest Paid — Fixed Starting Minimum',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.fixedInterest||0)}</span>${sayTip('This is the estimated interest if the client keeps paying the Month 1 starting minimum every month instead of reducing the payment as the balance drops.')}`,'&mdash;','&mdash;',''],
-    ['Total Paid — Fixed Starting Minimum',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.fixedTotal||0)}</span>`,'&mdash;','&mdash;',''],
-    ['Est. Savings vs Min Pay','&mdash;',fS,recSavings,'sv'],
-    ['Calculation Assumptions',`<span style="font-size:11px;color:#92400e;line-height:1.45;display:block;">${esc(dn.assumption||'Assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes.')}</span>`,'&mdash;','&mdash;',''],
-  ];
-  $('cmpTable').innerHTML=rows.map(r=>`<tr class="${r[4]}">${r.slice(0,4).map(v=>`<td>${v}</td>`).join('')}</tr>`).join('');
+  const fixedScript=dn.fixedPaymentAgentScript||`If the client pays ${fmt(fixedPayment)} every month as a fixed payment, payoff is about ${fixedMonths} with about ${fmt(dn.fixedInterest||0)} in estimated interest.`;
+
+  const currentHeaderTip=`<span class="tip-wrap cmp-head-tip" style="margin-left:8px;"><span style="font-size:10px;color:#fff;cursor:help;border-bottom:1px dashed rgba(255,255,255,.85);font-weight:900;">hover guide</span><span class="tip-box">This column shows the prospect what happens if they keep the current debt and continue paying creditors directly. Adjust the APR and monthly payment to match what they say they are actually paying. The math assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes. If the payment is too low to cover monthly interest, the table will show that the balance may keep growing instead of showing a fake payoff date.</span></span>`;
+  const th=`<thead><tr>
+    <th style="text-align:left;min-width:180px;">Detail</th>
+    <th style="text-align:left;background:#1e293b;min-width:250px;">Current Situation ${currentHeaderTip}</th>
+    <th style="text-align:left;min-width:160px;">Fastest Payoff</th>
+    <th style="text-align:left;background:rgba(15,157,138,.06);color:#0b7d6e;min-width:200px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span class="best-program-name"><span>${recName}</span><span style="background:var(--g);color:#fff;border-radius:999px;padding:2px 8px;font-size:10px;white-space:nowrap;">Best Option</span></span>
+      </div>
+    </th>
+  </tr></thead>`;
+  const row=(label,current,fast,reco,cls='')=>`<tr class="${cls}"><td>${label}</td><td>${current}</td><td>${fast}</td><td>${reco}</td></tr>`;
+
+  const fixedRows=[
+    row('Total Debt / Program Total',fmt(c.total),fT,recTotal),
+    row('APR / Interest Assumption',`<div class="cmp-num-wrap"><button type="button" class="cmp-step-btn" onclick="ftAdjustCmpApr(-1)">−</button><input id="cmpAprAssumption" class="cmp-input apr-input" type="number" inputmode="numeric" step="1" min="5" max="100" value="${aprVal}" oninput="ftStageCmpApr(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();ftCommitCmpApr(this.value,true)}" onchange="ftCommitCmpApr(this.value,true)" onblur="ftCommitCmpApr(this.value,true)"/><button type="button" class="cmp-step-btn" onclick="ftAdjustCmpApr(1)">+</button><span style="font-size:12px;font-weight:800;color:#64748b;">% APR</span></div>`,'N/A','N/A'),
+    row('Monthly Payment',`<div class="cmp-num-wrap"><button type="button" class="cmp-step-btn" onclick="ftAdjustCmpPay(-25)">−</button><input id="cmpFixedPayment" class="cmp-input" type="number" inputmode="numeric" step="25" min="1" value="${Math.round(fixedPayment)}" onkeydown="if(event.key==='Enter'){event.preventDefault();ftCommitCmpPay(this.value,true)}" onchange="ftCommitCmpPay(this.value,true)" onblur="ftCommitCmpPay(this.value,true)"/><button type="button" class="cmp-step-btn" onclick="ftAdjustCmpPay(25)">+</button><span style="font-size:12px;font-weight:800;color:#64748b;">/mo</span>${sayTip('Use this box to show what happens if the client keeps paying one fixed monthly amount instead of letting minimum payments decline over time. The default is based on the estimated creditor minimum-payment rule.')}</div>`,fM,recMonthly,'mp-row'),
+    row('Interest Amount Paid / Fixed Monthly Payment',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.fixedInterest||0)}</span>${sayTip(fixedScript)}`,est?'$0 credit-card interest':'&mdash;',selRoute==='LEGACY'?'N/A':(recTotal!=='&mdash;'?'$0 credit-card interest':'&mdash;')),
+    row('Fixed Monthly Payment Timeline / # of Months',`${fixedMonths}${sayTip('This is the estimated payoff timeline if the client keeps paying the selected fixed monthly amount every month.')}`,fMo,recMonths),
+    row('Total Paid — Fixed Monthly Payment',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.fixedTotal||0)}</span>`,fT,recTotal),
+    row('Current Situation vs Estimated Debt Relief Savings','&mdash;',fFixedSavings,recFixedSavings,'sv')
+  ].join('');
+
+  const decliningRows=[
+    row('Declining Minimum-Only Payoff Time',`${dnMonths}${sayTip(minOnlyScript)}`,fMo,recMonths),
+    row('Interest Paid — Declining Minimum',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.interest||0)}</span>${sayTip('This estimates interest if the client follows the required minimum payment only and allows that required payment to decline as the balance gets lower.')}`,est?'$0 credit-card interest':'&mdash;',selRoute==='LEGACY'?'N/A':(recTotal!=='&mdash;'?'$0 credit-card interest':'&mdash;')),
+    row('Total Paid — Declining Minimum',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.total||0)}</span>`,fT,recTotal),
+    row('Declining Minimum Payment Total vs Estimated Debt Relief Savings','&mdash;',fDecliningSavings,recDecliningSavings,'sv'),
+    row('Calculation Assumptions',`<span style="font-size:11px;color:#92400e;line-height:1.45;display:block;">${esc(dn.assumption||'Assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes.')}</span>`,'&mdash;','&mdash;')
+  ].join('');
+
+  const forecast=dn.debtForecast||buildDebtForecast(c.total,aprVal,fixedPayment,36);
+  const forecastPoints=forecast.points&&forecast.points.length?forecast.points:[];
+  const maxBal=Math.max(1,c.total||0,...forecastPoints.map(p=>p.balance||0));
+  const forecastRows=forecastPoints.map(p=>{
+    const pct=Math.max(0,Math.min(100,((p.balance||0)/maxBal)*100));
+    const tone=(p.balance||0)>(c.total||0)?'cmp-forecast-bad':'cmp-forecast-good';
+    return `<div class="debt-forecast-row"><div>Month ${p.month}</div><div class="debt-forecast-track"><div class="debt-forecast-fill" style="width:${pct}%;"></div></div><div class="${tone}">${fmt(p.balance||0)}</div></div>`;
+  }).join('');
+  const forecastWarning=forecast.isGrowing
+    ? 'At this payment amount, the payment may not fully cover first-month interest. That means the balance can keep growing even while the client is making payments.'
+    : 'This projection shows the estimated remaining balance at each checkpoint if the client pays the selected fixed monthly amount every month.';
+
+  wrap.innerHTML=`
+    <table class="cmp">${th}<tbody>${fixedRows}</tbody></table>
+    <div style="height:12px;"></div>
+    <details class="cmp-acc">
+      <summary>Declining Minimum Payment Reference - Some creditors reduce automatic minimum pay to keep the APR heavily compounding and debt spiral trap continuing</summary>
+      <div class="cmp-acc-body"><table class="cmp">${th}<tbody>${decliningRows}</tbody></table></div>
+    </details>
+    <details class="cmp-acc">
+      <summary>Debt Forecast Graph — projected balance at 3, 6, 9, 12, 18, 24, and 36 months</summary>
+      <div class="cmp-acc-body">
+        <div class="debt-forecast-box">
+          <div style="font-size:13px;font-weight:950;color:#0f172a;">Projected balance using ${fmt(fixedPayment)}/mo at ${aprVal}% APR</div>
+          <div style="font-size:11px;color:#64748b;font-weight:750;line-height:1.55;margin-top:4px;">Estimate assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes.</div>
+          <div class="debt-forecast-bars">${forecastRows}</div>
+          <div style="margin-top:10px;font-size:11px;color:#92400e;background:#fffbeb;border:1px solid rgba(245,158,11,.3);border-radius:9px;padding:8px 10px;font-weight:750;line-height:1.5;">${forecastWarning}</div>
+        </div>
+      </div>
+    </details>`;
+
+  const clampApr=v=>ftClampApr(v);
+  const aprInput=$('cmpAprAssumption');
+  if(aprInput){
+    const commit=()=>{app.ccApr=clampApr(aprInput.value);render();};
+    aprInput.addEventListener('click',e=>e.stopPropagation());
+    aprInput.addEventListener('mousedown',e=>e.stopPropagation());
+    aprInput.addEventListener('keydown',e=>{
+      if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();ftAdjustCmpApr(e.key==='ArrowUp'?1:-1);}
+      if(e.key==='Enter'){e.preventDefault();commit();}
+    });
+    aprInput.addEventListener('change',commit);
+    aprInput.addEventListener('blur',commit);
+  }
+  
+  const payInput=$('cmpFixedPayment');
+  if(payInput){
+    const commit=()=>{const v=Math.round(num(payInput.value)||0);app.fixedMonthlyPayment=v>0?v:null;render();};
+    payInput.addEventListener('click',e=>e.stopPropagation());
+    payInput.addEventListener('mousedown',e=>e.stopPropagation());
+    payInput.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){e.preventDefault();commit();}
+      if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();const delta=e.shiftKey?100:25;ftAdjustCmpPay(e.key==='ArrowUp'?delta:-delta);}
+    });
+    payInput.addEventListener('change',commit);
+    payInput.addEventListener('blur',commit);
+  }
+  
 }
 function refreshRowVisuals() {
   const c = computeScenario();
@@ -3248,7 +3605,7 @@ function dtBuildPanel(panel,q,idx){const items=q?DT_ALL.filter(x=>x.t.toLowerCas
 function dtPick(idx,item){app.rows[idx].dt=item.t;if(item.t==='Secured Loan'||item.t==='Auto Loan (Secured)')app.rows[idx].secured=true;const wrap=document.querySelector(`[data-dw="${idx}"]`);if(!wrap)return;const inp=wrap.querySelector(`[data-di="${idx}"]`);const panel=wrap.querySelector(`[data-dp="${idx}"]`);const xbtn=wrap.querySelector(`[data-dx="${idx}"]`);if(inp){inp.value='';inp.placeholder=item.t;}if(panel)panel.className='dt-panel';if(xbtn)xbtn.style.display='none';const sel=document.querySelector(`[data-ds="${idx}"]`);if(sel){const s=DT_ST[item.s];sel.querySelector('span').textContent=item.t;sel.className=`dt-sel s-${item.s}`;}refreshRowVisuals();render();}
 function dtSetValue(idx,val){if(!val)return;const wrap=document.querySelector(`[data-dw="${idx}"]`);if(!wrap)return;const inp=wrap.querySelector(`[data-di="${idx}"]`);if(inp)inp.placeholder=val;const sel=document.querySelector(`[data-ds="${idx}"]`);if(sel){const s=DT_REJ.has(val)?'no':DT_COND.has(val)?'cond':'ok';sel.querySelector('span').textContent=val;sel.className=`dt-sel s-${s}`;}}
 function bindDTRows(){app.rows.forEach((_,idx)=>{const wrap=document.querySelector(`[data-dw="${idx}"]`);if(!wrap)return;const inp=wrap.querySelector(`[data-di="${idx}"]`);const panel=wrap.querySelector(`[data-dp="${idx}"]`);const xbtn=wrap.querySelector(`[data-dx="${idx}"]`);const sel=document.querySelector(`[data-ds="${idx}"]`);if(!inp||!panel)return;let ai=-1;const open=q=>{dtBuildPanel(panel,q,idx);panel.className='dt-panel open';ai=-1;};const close=()=>{panel.className='dt-panel';ai=-1;};inp.addEventListener('focus',()=>open(inp.value));inp.addEventListener('input',e=>{const q=e.target.value;if(xbtn)xbtn.style.display=q?'flex':'none';open(q);});inp.addEventListener('blur',()=>setTimeout(close,160));inp.addEventListener('keydown',e=>{if(!panel.classList.contains('open'))return;const els=panel.querySelectorAll('.dt-item');if(e.key==='ArrowDown'){e.preventDefault();ai=Math.min(ai+1,els.length-1);}else if(e.key==='ArrowUp'){e.preventDefault();ai=Math.max(ai-1,-1);}else if(e.key==='Enter'&&ai>=0){e.preventDefault();const q=inp.value;const fl=q?DT_ALL.filter(x=>x.t.toLowerCase().includes(q.toLowerCase())):DT_ALL;if(fl[ai])dtPick(idx,fl[ai]);return;}else if(e.key==='Escape'){close();inp.blur();return;}els.forEach((el,j)=>{el.classList.toggle('dt-act',j===ai);if(j===ai)el.scrollIntoView({block:'nearest'});});});if(xbtn){xbtn.addEventListener('click',()=>{inp.value='';inp.placeholder='Search debt type\u2026';xbtn.style.display='none';app.rows[idx].dt='Unsecured';if(sel)sel.className='dt-sel';inp.focus();open('');refreshRowVisuals();render();});}if(sel){const scb=document.querySelector(`[data-dsc="${idx}"]`);if(scb){scb.addEventListener('click',()=>{app.rows[idx].dt='Unsecured';sel.className='dt-sel';inp.placeholder='Search debt type\u2026';inp.focus();refreshRowVisuals();render();});}}});}
-function searchStates(q){const box=$('stateResults');if(!box)return;if(!q.trim()){box.innerHTML='';box.className='drop';return;}const lq=q.toLowerCase();const matches=STATE_OPTS.filter(s=>s.a.toLowerCase().includes(lq)||s.n.toLowerCase().includes(lq));if(!matches.length){box.innerHTML='';box.className='drop';return;}box.innerHTML=matches.map(s=>`<button type="button" data-sa="${s.a}" data-sl="${esc(s.l)}">${esc(s.l)}</button>`).join('');box.className='drop open';box.querySelectorAll('[data-sa]').forEach(b=>{b.onclick=()=>{_selectingState=true;app.sel=b.dataset.sa;const inp=$('stateSearch');const bx=$('stateResults');if(inp)inp.value=b.dataset.sl||'';if(bx){bx.innerHTML='';bx.className='drop';}render();setTimeout(()=>{_selectingState=false;render();},50);};});}
+function searchStates(q){const box=$('stateResults');if(!box)return;const raw=String(q||'');const lq=raw.trim().toLowerCase();const matches=!lq?STATE_OPTS:STATE_OPTS.filter(s=>s.a.toLowerCase().includes(lq)||s.n.toLowerCase().includes(lq)||s.l.toLowerCase().includes(lq));if(!matches.length){box.innerHTML='';box.className='drop';return;}box.innerHTML=matches.map(s=>`<button type="button" data-sa="${s.a}" data-sl="${esc(s.l)}">${esc(s.l)}</button>`).join('');box.className='drop open';box.querySelectorAll('[data-sa]').forEach(b=>{b.onclick=()=>{_selectingState=true;app.sel=b.dataset.sa;const inp=$('stateSearch');const bx=$('stateResults');if(inp)inp.value=b.dataset.sl||'';if(bx){bx.innerHTML='';bx.className='drop';}render();setTimeout(()=>{_selectingState=false;render();},50);};});}
 function onAmtChange(e){const i=Number(e.target.dataset.i);if(!app.rows[i])return;app.rows[i].amount=e.target.value;render();}
 function addRow(){if(app.rows.length>=MAX_ROWS)return;app.rows.push(newRow(nextId++));renderRows();render();}
 function removeRow(i){if(app.rows.length<=1)return;app.rows.splice(i,1);renderRows();render();}
@@ -3513,14 +3870,154 @@ async function sendPlanDirect(){
   }finally{btn.disabled=false;btn.textContent=orig;}
 }
 
+
+
+// ── Geographic State Coverage Map ─────────────────────────────────────────
+let stateCoverageView='level';
+const STATE_COVERAGE_MAP_STATES=Object.keys(STATE_NAMES).filter(a=>!['GU','PR'].includes(a));
+function stateCoverageStatus(code, view){
+  const ld=getLDState(code), cs=getCSState(code), lg=getLegacyState(code);
+  if(view==='level'){
+    if(ld.status==='BLACKOUT')return{z:0,label:'Level Debt Blackout',cls:'gray',note:'Level Debt does not service this state under the current state rules.'};
+    if(ld.status==='RED')return{z:1,label:'Red / Attorney Model State',cls:'red',note:'Level Debt routes this state under the attorney model rules.'};
+    return{z:2,label:'Green / Standard State',cls:'green',note:'Level Debt routes this state under standard state rules.'};
+  }
+  if(view==='legacy'){
+    if(lg.status==='BLACKOUT')return{z:0,label:'ELP Blackout',cls:'gray',note:'Elite Legal Practice does not service this state under the current state rules.'};
+    return{z:2,label:'ELP Serviceable',cls:'green',note:'Elite Legal Practice is serviceable in this state under current state rules.'};
+  }
+  if(view==='cs'){
+    if(cs.status==='BLACKOUT')return{z:0,label:'Consumer Shield Blackout',cls:'gray',note:'Consumer Shield does not service this state under the current state rules.'};
+    return{z:2,label:'Consumer Shield Serviceable',cls:'blue',note:'Consumer Shield is serviceable in this state under current state rules.'};
+  }
+  const count=(ld.status!=='BLACKOUT'?1:0)+(lg.status!=='BLACKOUT'?1:0)+(cs.status!=='BLACKOUT'?1:0);
+  return{z:count,label:count===3?'All 3 Backends':count===2?'2 Backends':count===1?'1 Backend':'No Backend',cls:count===3?'green':count===2?'blue':count===1?'red':'gray',note:`${count} backend${count===1?'':'s'} currently serviceable by state rule.`};
+}
+function stateCoverageColorscale(view){
+  if(view==='level')return [[0,'#cbd5e1'],[0.24,'#cbd5e1'],[0.25,'#ef4444'],[0.49,'#ef4444'],[0.50,'#0f9d8a'],[1,'#0f9d8a']];
+  if(view==='all')return [[0,'#cbd5e1'],[0.24,'#cbd5e1'],[0.25,'#ef4444'],[0.49,'#ef4444'],[0.50,'#1a6ed8'],[0.74,'#1a6ed8'],[0.75,'#0f9d8a'],[1,'#0f9d8a']];
+  if(view==='cs')return [[0,'#cbd5e1'],[0.49,'#cbd5e1'],[0.50,'#1a6ed8'],[1,'#1a6ed8']];
+  if(view==='legacy')return [[0,'#cbd5e1'],[0.49,'#cbd5e1'],[0.50,'#0b1f47'],[1,'#0b1f47']];
+  return [[0,'#cbd5e1'],[0.49,'#cbd5e1'],[0.50,'#0f9d8a'],[1,'#0f9d8a']];
+}
+function stateCoverageLegendHtml(view){
+  if(view==='level')return '<span><i class="state-cov-dot" style="background:#0f9d8a"></i>Green / Standard</span><span><i class="state-cov-dot" style="background:#ef4444"></i>Red / Attorney Model</span><span><i class="state-cov-dot" style="background:#cbd5e1"></i>Blackout</span>';
+  if(view==='legacy')return '<span><i class="state-cov-dot" style="background:#0b1f47"></i>ELP Serviceable — dark blue</span><span><i class="state-cov-dot" style="background:#facc15"></i>Yellow state labels</span><span><i class="state-cov-dot" style="background:#cbd5e1"></i>ELP Blackout</span>';
+  if(view==='cs')return '<span><i class="state-cov-dot" style="background:#1a6ed8"></i>Consumer Shield Serviceable</span><span><i class="state-cov-dot" style="background:#cbd5e1"></i>Consumer Shield Blackout</span>';
+  return '<span><i class="state-cov-dot" style="background:#0f9d8a"></i>All 3</span><span><i class="state-cov-dot" style="background:#1a6ed8"></i>2 Backends</span><span><i class="state-cov-dot" style="background:#ef4444"></i>1 Backend</span><span><i class="state-cov-dot" style="background:#cbd5e1"></i>No Backend</span>';
+}
+function renderStateCoverageDetail(code){
+  const box=$('stateCoverageDetail');
+  if(!box)return;
+  const c=code||app.sel||'CA';
+  const ld=getLDState(c), cs=getCSState(c), lg=getLegacyState(c);
+  const pill=(txt,cls)=>`<span class="state-cov-pill ${cls}">${txt}</span>`;
+  const ldCls=ld.status==='BLACKOUT'?'gray':ld.status==='RED'?'red':'green';
+  const csCls=cs.status==='BLACKOUT'?'gray':'blue';
+  const lgCls=lg.status==='BLACKOUT'?'gray':'green';
+  box.innerHTML=`<div class="state-cov-detail-title">${c} — ${esc(STATE_NAMES[c]||c)}</div>
+    <div style="display:grid;gap:8px;">
+      <div><div style="font-size:10px;font-weight:950;color:#64748b;text-transform:uppercase;letter-spacing:.45px;margin-bottom:4px;">Level Debt</div>${pill(ld.status==='RED'?'Red / Attorney Model':ld.status==='BLACKOUT'?'Blackout':'Green / Standard',ldCls)}</div>
+      <div><div style="font-size:10px;font-weight:950;color:#64748b;text-transform:uppercase;letter-spacing:.45px;margin-bottom:4px;">Elite Legal Practice</div>${pill(lg.status==='BLACKOUT'?'Blackout':'Serviceable',lgCls)}</div>
+      <div><div style="font-size:10px;font-weight:950;color:#64748b;text-transform:uppercase;letter-spacing:.45px;margin-bottom:4px;">Consumer Shield</div>${pill(cs.status==='BLACKOUT'?'Blackout':'Serviceable',csCls)}</div>
+    </div>
+    <button type="button" class="state-cov-use" onclick="useCoverageState('${c}')">Use ${c} in Router</button>
+    <div class="state-cov-note">State coverage is a routing guide only. Final program fit may still depend on enrolled debt amount, creditor type, hardship, account status, documentation, and backend acceptance.</div>`;
+}
+
+const STATE_COVERAGE_CENTERS={
+  AL:[32.8067,-86.7911],AK:[61.3707,-152.4044],AZ:[33.7298,-111.4312],AR:[34.9697,-92.3731],CA:[36.1162,-119.6816],CO:[39.0598,-105.3111],CT:[41.5978,-72.7554],DE:[39.3185,-75.5071],DC:[38.9072,-77.0369],FL:[27.7663,-81.6868],GA:[33.0406,-83.6431],HI:[21.0943,-157.4983],ID:[44.2405,-114.4788],IL:[40.3495,-88.9861],IN:[39.8494,-86.2583],IA:[42.0115,-93.2105],KS:[38.5266,-96.7265],KY:[37.6681,-84.6701],LA:[31.1695,-91.8678],ME:[44.6939,-69.3819],MD:[39.0639,-76.8021],MA:[42.2302,-71.5301],MI:[43.3266,-84.5361],MN:[45.6945,-93.9002],MS:[32.7416,-89.6787],MO:[38.4561,-92.2884],MT:[46.9219,-110.4544],NE:[41.1254,-98.2681],NV:[38.3135,-117.0554],NH:[43.4525,-71.5639],NJ:[40.2989,-74.5210],NM:[34.8405,-106.2485],NY:[42.1657,-74.9481],NC:[35.6301,-79.8064],ND:[47.5289,-99.7840],OH:[40.3888,-82.7649],OK:[35.5653,-96.9289],OR:[44.5720,-122.0709],PA:[40.5908,-77.2098],RI:[41.6809,-71.5118],SC:[33.8569,-80.9450],SD:[44.2998,-99.4388],TN:[35.7478,-86.6923],TX:[31.0545,-97.5635],UT:[40.1500,-111.8624],VT:[44.0459,-72.7107],VA:[37.7693,-78.1700],WA:[47.4009,-121.4905],WV:[38.4912,-80.9545],WI:[44.2685,-89.6165],WY:[42.7560,-107.3025]
+};
+function stateCoverageBackendNames(code,view){
+  const names=[];
+  const ld=getLDState(code), lg=getLegacyState(code), cs=getCSState(code);
+  if((view==='all'||view==='level') && ld.status!=='BLACKOUT') names.push(ld.status==='RED'?'LD-Red':'LD');
+  if((view==='all'||view==='legacy') && lg.status!=='BLACKOUT') names.push('ELP');
+  if((view==='all'||view==='cs') && cs.status!=='BLACKOUT') names.push('CS');
+  return names;
+}
+function selectCoverageState(code){
+  if(!STATE_NAMES[code]) return;
+  app.sel=code;
+  const inp=$('stateSearch');
+  if(inp) inp.value=`${code} - ${STATE_NAMES[code]}`;
+  renderStateCoverageDetail(code);
+  render();
+}
+function renderStateCoverageMap(view){
+  stateCoverageView=view||stateCoverageView||'level';
+  document.querySelectorAll('[data-cov-view]').forEach(b=>b.classList.toggle('active',b.dataset.covView===stateCoverageView));
+  const legend=$('stateCoverageLegend');if(legend)legend.innerHTML=stateCoverageLegendHtml(stateCoverageView);
+  renderStateCoverageDetail(app.sel||'CA');
+  const map=$('stateCoverageMap');if(!map)return;
+  if(!window.Plotly){
+    map.innerHTML='<div style="padding:28px;font-size:13px;color:#92400e;font-weight:800;line-height:1.55;background:#fffbeb;border-radius:14px;">The geographic map needs Plotly to load from cdn.plot.ly. If your deployment blocks that CDN, allow it or host Plotly locally.</div>';
+    return;
+  }
+  const z=STATE_COVERAGE_MAP_STATES.map(st=>stateCoverageStatus(st,stateCoverageView).z);
+  const text=STATE_COVERAGE_MAP_STATES.map(st=>`${st} - ${STATE_NAMES[st]}<br>${stateCoverageStatus(st,stateCoverageView).label}`);
+  const labelStates=STATE_COVERAGE_MAP_STATES.filter(st=>STATE_COVERAGE_CENTERS[st]);
+  const labelHover=labelStates.map(st=>`${st} - ${STATE_NAMES[st]}<br>${stateCoverageStatus(st,stateCoverageView).label}<br>Click to select`);
+  const labelColors=labelStates.map(st=>{
+    if(stateCoverageView==='legacy') return getLegacyState(st).status==='BLACKOUT' ? '#475569' : '#facc15';
+    return '#0f172a';
+  });
+  const labelSizes=labelStates.map(st=>stateCoverageView==='legacy' && getLegacyState(st).status!=='BLACKOUT' ? 10 : 9);
+  const data=[
+    {type:'choropleth',locationmode:'USA-states',locations:STATE_COVERAGE_MAP_STATES,z,zmin:0,zmax:stateCoverageView==='all'?3:2,colorscale:stateCoverageColorscale(stateCoverageView),showscale:false,marker:{line:{color:stateCoverageView==='legacy'?'#ffffff':'#ffffff',width:stateCoverageView==='legacy'?1.2:1}},text,customdata:STATE_COVERAGE_MAP_STATES,hovertemplate:'%{text}<br>Click to select<extra></extra>'},
+    {type:'scattergeo',mode:'text',lon:labelStates.map(st=>STATE_COVERAGE_CENTERS[st][1]),lat:labelStates.map(st=>STATE_COVERAGE_CENTERS[st][0]),text:labelStates,customdata:labelStates,hovertext:labelHover,textposition:'middle center',hovertemplate:'%{hovertext}<extra></extra>',textfont:{size:labelSizes,color:labelColors,family:'Arial Black, Arial, sans-serif'},showlegend:false}
+  ];
+  const layout={geo:{scope:'usa',projection:{type:'albers usa'},showlakes:false,showland:true,landcolor:'#f8fafc',bgcolor:'#ffffff'},margin:{l:0,r:0,t:0,b:0},paper_bgcolor:'#ffffff',plot_bgcolor:'#ffffff',dragmode:'pan',annotations:[{xref:'paper',yref:'paper',x:.01,y:.01,showarrow:false,text:'Click any state or state abbreviation to load backend coverage details.',font:{size:10,color:'#64748b'},align:'left'}]};
+  Plotly.react(map,data,layout,{displayModeBar:true,scrollZoom:true,responsive:true,displaylogo:false,modeBarButtonsToRemove:['lasso2d','select2d']});
+  map.on('plotly_click',ev=>{const pt=ev?.points?.[0];const code=pt?.location||pt?.customdata;if(code)selectCoverageState(code);});
+}
+function toggleStateCoverageMenu(force){
+  const menu=$('stateCoverageMega'),btn=$('stateCoverageBtn');if(!menu)return;
+  const open=typeof force==='boolean'?force:!menu.classList.contains('open');
+  menu.classList.toggle('open',open);menu.setAttribute('aria-hidden',open?'false':'true');if(btn)btn.classList.toggle('open',open);
+  if(open)setTimeout(()=>renderStateCoverageMap(stateCoverageView||'level'),80);
+}
+function useCoverageState(code){
+  if(!STATE_NAMES[code])return;
+  app.sel=code;const inp=$('stateSearch');if(inp)inp.value=`${code} - ${STATE_NAMES[code]}`;
+  toggleStateCoverageMenu(false);render();
+}
+
+// Reliable APR/payment adjuster helpers for Current Situation table
+function ftClampApr(v){return Math.min(100,Math.max(5,Math.round(num(v)||28)));}
+function ftStageCmpApr(v){
+  const raw=num(v);
+  if(raw>0) app.ccApr=Math.min(100,Math.max(5,Math.round(raw)));
+}
+function ftCommitCmpApr(v,rerender=true){
+  const next=ftClampApr(v);
+  app.ccApr=next;
+  const i=$('cmpAprAssumption'); if(i) i.value=next;
+  const hidden=$('ccAprAssumption'); if(hidden) hidden.value=next;
+  if(rerender) render();
+}
+function ftAdjustCmpApr(delta){
+  const i=$('cmpAprAssumption');
+  const visibleVal = i ? num(i.value) : 0;
+  const base = visibleVal || num(app.ccApr||28) || 28;
+  const next = ftClampApr(base + (delta||0));
+  app.ccApr=next;
+  if(i) i.value=next;
+  const hidden=$('ccAprAssumption'); if(hidden) hidden.value=next;
+  render();
+}
+function ftCommitCmpPay(v,rerender=true){const pay=Math.round(num(v)||0);app.fixedMonthlyPayment=pay>0?pay:null;const i=$('cmpFixedPayment');if(i&&pay>0)i.value=pay;if(rerender)render();}
+function ftAdjustCmpPay(delta){const i=$('cmpFixedPayment');const base=num(i?.value)||app.fixedMonthlyPayment||0;ftCommitCmpPay(Math.max(1,base+(delta||0)),true);}
+
 function toggleSupportFab(force){const p=$('supportFabPanel');if(!p)return;const open=typeof force==='boolean'?force:!p.classList.contains('open');p.classList.toggle('open',open);}
 function toggleDeliveryFab(force){const p=$('deliveryFabPanel');if(!p)return;const open=typeof force==='boolean'?force:!p.classList.contains('open');p.classList.toggle('open',open);}
 function init(){
   populateLanguageSelector();
   loadGoogleTranslateScript();
   const ss=$('stateSearch');if(ss){
+    ss.value = 'CA - California';
     ss.addEventListener('input',e=>{if(_selectingState)return;syncStateFromInput(false);searchStates(e.target.value||'');render();});
-    ss.addEventListener('focus',e=>searchStates(e.target.value||''));
+    ss.addEventListener('focus',e=>searchStates(''));
     ss.addEventListener('blur',()=>{if(_selectingState)return;syncStateFromInput(true);render();});
     ss.addEventListener('keydown',e=>{if(e.key==='Enter'){syncStateFromInput(true);const sr=$('stateResults');if(sr){sr.innerHTML='';sr.className='drop';}render();}});
   }
@@ -3528,8 +4025,7 @@ function init(){
   const ub=$('urlBtn');if(ub)ub.addEventListener('click',generateUrlOnlyDirect);
   const sb=$('sendBtn');if(sb)sb.addEventListener('click',sendPlanDirect);
   const ab=$('addBtn');if(ab)ab.addEventListener('click',addRow);
-  const fp=$('featurePriority');if(fp)fp.addEventListener('change',render);
-  document.addEventListener('click',e=>{if(!e.target.closest('.ci')&&!e.target.closest('[data-cr]'))document.querySelectorAll('[data-cr]').forEach(b=>{b.innerHTML='';b.className='drop';});if(!e.target.closest('.dt-inp')&&!e.target.closest('.dt-panel'))document.querySelectorAll('.dt-panel').forEach(p=>p.className='dt-panel');if(!e.target.closest('#stateSearch')&&!e.target.closest('#stateResults')){const sr=$('stateResults');if(sr){sr.innerHTML='';sr.className='drop';}}});
+  document.addEventListener('click',e=>{if(!e.target.closest('.ci')&&!e.target.closest('[data-cr]'))document.querySelectorAll('[data-cr]').forEach(b=>{b.innerHTML='';b.className='drop';});if(!e.target.closest('.dt-inp')&&!e.target.closest('.dt-panel'))document.querySelectorAll('.dt-panel').forEach(p=>p.className='dt-panel');if(!e.target.closest('#stateSearch')&&!e.target.closest('#stateResults')){const sr=$('stateResults');if(sr){sr.innerHTML='';sr.className='drop';}}if(!e.target.closest('#stateCoverageMega')&&!e.target.closest('#stateCoverageBtn'))toggleStateCoverageMenu(false);});
   renderRows();render();
   setInterval(renderClocks,1000);
 }
@@ -3676,7 +4172,6 @@ if(planContainer){
   </div>
 </div>
 <script src="/agents/scripting-and-lead-handling.js"></script>
-<script src="/agents/closing-machine.js"></script>
 
   
 </body>
