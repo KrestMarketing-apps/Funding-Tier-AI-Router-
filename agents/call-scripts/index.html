@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Funding Tier — Program Call Scripts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--g:#0f9d8a;--gd:#0b7d6e;--dk:#0f172a;--bl:#1a6ed8;--am:#f59e0b;--rd:#ef4444;--pp:#6d28d9;--br:#e2e8f0;--bg:#f8fafc;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--dk);min-height:100vh;}
+
+/* ---------- Topbar (matches Deal Router) ---------- */
+.topbar{position:sticky;top:0;z-index:80;background:linear-gradient(135deg,var(--dk) 0%,#0b3b50 42%,#0f9d8a 100%);box-shadow:0 4px 24px rgba(15,23,42,.22);}
+.topbar-inner{max-width:1180px;margin:0 auto;padding:12px 20px 0;}
+.topbar-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.brand-logo{height:30px;width:auto;}
+.brand-txt-main{font-size:17px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.1;}
+.brand-txt-sub{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px;font-weight:600;letter-spacing:.2px;}
+.topbar-meta{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.meta-badge{font-size:11px;font-weight:800;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:5px 11px;letter-spacing:.3px;white-space:nowrap;}
+
+/* ---------- Tabs — sharp angled diagonal edges ---------- */
+/* Each tab is a parallelogram (skewed right edge at 30°). They overlap so the
+   diagonals align edge-to-edge. Inner content is un-skewed to stay upright. */
+.tabs{display:flex;margin-top:16px;padding-left:2px;align-items:flex-end;flex-wrap:wrap;row-gap:4px;}
+.tab{appearance:none;border:none;cursor:pointer;font-family:inherit;
+  position:relative;
+  background:rgba(255,255,255,.07);
+  color:rgba(255,255,255,.74);
+  font-size:13px;font-weight:800;
+  height:46px;padding:0 30px 0 22px;margin-right:-16px;
+  display:flex;align-items:center;
+  transform:skewX(-30deg);
+  border-top-left-radius:10px;border-top-right-radius:4px;
+  transition:background .18s,color .18s,filter .18s,height .18s;
+  clip-path:none;}
+.tab:first-child{border-top-left-radius:12px;}
+/* un-skew the label so text stays straight */
+.tab > .tab-inner{transform:skewX(30deg);display:flex;align-items:center;gap:9px;white-space:nowrap;}
+.tab:hover{filter:brightness(1.18);color:#fff;z-index:5;}
+.tab .tab-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;transform:rotate(45deg);}
+.tab .tab-sub{font-size:9.5px;font-weight:700;opacity:.6;margin-left:1px;letter-spacing:.2px;}
+
+/* IDLE state — each tab carries a muted version of its own brand gradient */
+.tab-qual{background:linear-gradient(115deg,rgba(71,85,105,.5) 0%,rgba(30,41,59,.5) 70%);}
+.tab-set {background:linear-gradient(115deg,rgba(62,224,196,.28) 0%,rgba(15,157,138,.3) 50%,rgba(11,125,110,.3) 100%);}
+.tab-res {background:linear-gradient(115deg,rgba(91,155,240,.28) 0%,rgba(26,110,216,.3) 50%,rgba(21,89,176,.3) 100%);}
+.tab-val {background:linear-gradient(115deg,rgba(164,114,240,.28) 0%,rgba(109,40,217,.3) 50%,rgba(88,28,135,.3) 100%);}
+.tab:not(.active){color:rgba(255,255,255,.82);}
+.tab:not(.active) .tab-dot{opacity:.85;}
+
+/* active state — full-saturation gradient, lifted, sharper, white text */
+.tab.active{color:#fff;z-index:10;height:50px;box-shadow:0 -2px 16px rgba(0,0,0,.28);}
+.tab.active .tab-sub{opacity:.85;color:rgba(255,255,255,.9);}
+.tab.active .tab-dot{background:#fff !important;box-shadow:0 0 0 3px rgba(255,255,255,.3);opacity:1;}
+/* subtle top highlight strip to mark the selected tab */
+.tab.active::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.55);}
+
+/* Per-program full gradients (active), Level Debt = green inverted */
+.tab-qual.active{background:linear-gradient(115deg,#475569 0%,#1e293b 70%);}
+.tab-set.active {background:linear-gradient(115deg,#3ee0c4 0%,#0f9d8a 46%,#0b7d6e 100%);}
+.tab-res.active {background:linear-gradient(115deg,#5b9bf0 0%,#1a6ed8 48%,#1559b0 100%);}
+.tab-val.active {background:linear-gradient(115deg,#a472f0 0%,#6d28d9 50%,#581c87 100%);}
+
+/* idle dot colors */
+.dot-qual{background:#94a3b8;}
+.dot-set{background:var(--g);}
+.dot-res{background:var(--bl);}
+.dot-val{background:var(--pp);}
+
+@media(max-width:720px){
+  .tab{transform:none;margin-right:2px;padding:0 16px;border-radius:10px 10px 0 0;}
+  .tab > .tab-inner{transform:none;}
+  .tab .tab-dot{transform:rotate(45deg);}
+}
+
+/* ---------- Main ---------- */
+main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
+.panel{display:none;}
+.panel.active{display:block;animation:fade .2s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+/* Program header */
+.prog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+.prog-overline{font-size:10px;font-weight:900;color:var(--gd);text-transform:uppercase;letter-spacing:.07em;}
+.prog-title{font-family:"Poppins",sans-serif;font-size:26px;font-weight:900;color:var(--dk);letter-spacing:-.6px;line-height:1.1;margin-top:3px;}
+.prog-partner{font-size:13px;color:#64748b;font-weight:600;margin-top:4px;}
+.prog-pills{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 11px;font-size:11px;font-weight:800;white-space:nowrap;}
+.p-g{background:rgba(15,157,138,.12);color:var(--gd);border:1px solid rgba(15,157,138,.3);}
+.p-b{background:#eff6ff;color:var(--bl);border:1px solid rgba(26,110,216,.3);}
+.p-p{background:rgba(109,40,217,.12);color:var(--pp);border:1px solid rgba(109,40,217,.3);}
+.p-a{background:#fffbeb;color:#92400e;border:1px solid rgba(245,158,11,.3);}
+
+/* Version toggle */
+.ver-toggle{display:inline-flex;background:#fff;border:1.5px solid var(--br);border-radius:12px;padding:4px;gap:4px;margin-bottom:20px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(15,23,42,.05);}
+.ver-btn{appearance:none;border:none;cursor:pointer;font-family:inherit;background:transparent;color:#64748b;font-size:12.5px;font-weight:800;padding:8px 15px;border-radius:9px;display:flex;align-items:center;gap:7px;transition:all .15s;white-space:nowrap;}
+.ver-btn:hover{background:var(--bg);color:var(--dk);}
+.ver-btn.active{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;box-shadow:0 4px 12px rgba(15,157,138,.28);}
+.ver-btn.active.b-bl{background:linear-gradient(135deg,var(--bl),#1559b0);box-shadow:0 4px 12px rgba(26,110,216,.28);}
+.ver-num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.08);font-size:10px;font-weight:900;}
+.ver-btn.active .ver-num{background:rgba(255,255,255,.22);}
+
+.version{display:none;}
+.version.active{display:block;animation:fade .2s ease;}
+.ver-meta{font-size:13px;color:#475569;font-weight:600;line-height:1.6;background:#fff;border:1px solid var(--br);border-left:3px solid var(--g);border-radius:10px;padding:12px 15px;margin-bottom:18px;}
+.ver-meta.m-bl{border-left-color:var(--bl);}
+.ver-meta.m-pp{border-left-color:var(--pp);}
+.ver-meta b{color:var(--dk);}
+
+/* Cards / stages */
+.card{background:#fff;border:1px solid var(--br);border-radius:16px;padding:20px 22px;box-shadow:0 2px 8px rgba(15,23,42,.05);margin-bottom:16px;}
+.stage-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid var(--g);}
+.stage-num{flex-shrink:0;width:30px;height:30px;border-radius:9px;background:var(--dk);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;font-family:"Poppins",sans-serif;}
+.stage-name{font-size:15px;font-weight:900;color:var(--dk);}
+.stage-hd.h-bl{border-bottom-color:var(--bl);}
+.stage-hd.h-bl .stage-num{background:var(--bl);}
+.stage-hd.h-pp{border-bottom-color:var(--pp);}
+.stage-hd.h-pp .stage-num{background:var(--pp);}
+
+/* Phone script bubble (matches Deal Router .agent-script-bubble) */
+.say{margin:0 0 12px;padding:16px 18px;border-radius:16px;border:2px solid rgba(15,157,138,.26);background:linear-gradient(135deg,#f8fffd 0%,#ecfdf5 52%,#eff6ff 100%);box-shadow:0 6px 18px rgba(15,23,42,.06);}
+.say.s-bl{border-color:rgba(26,110,216,.26);background:linear-gradient(135deg,#f8fbff 0%,#eff6ff 52%,#ecfdf5 100%);}
+.say.s-pp{border-color:rgba(109,40,217,.26);background:linear-gradient(135deg,#fcfaff 0%,#f5f3ff 52%,#eff6ff 100%);}
+.say-kicker{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:999px;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;}
+.say.s-bl .say-kicker{background:linear-gradient(135deg,var(--bl),#1559b0);}
+.say.s-pp .say-kicker{background:linear-gradient(135deg,var(--pp),#581c87);}
+.say-text{font-size:15.5px;line-height:1.7;color:#1e293b;font-weight:600;}
+.say-text + .say-text{margin-top:11px;padding-top:11px;border-top:1px solid rgba(15,157,138,.16);}
+
+/* Direction (agent, not read aloud) */
+.do{display:flex;gap:9px;align-items:flex-start;font-size:13px;font-weight:600;line-height:1.6;color:#475569;background:var(--bg);border:1px dashed #cbd5e1;border-radius:10px;padding:10px 13px;margin:0 0 12px;}
+.do::before{content:"DO";flex-shrink:0;font-size:9px;font-weight:900;color:#64748b;background:#fff;border:1px solid var(--br);border-radius:5px;padding:2px 5px;letter-spacing:.5px;margin-top:1px;}
+
+/* Numbered process inside a stage */
+.steps{list-style:none;counter-reset:s;display:grid;gap:9px;}
+.steps li{position:relative;padding-left:34px;font-size:14px;line-height:1.65;color:#1e293b;font-weight:600;}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:7px;background:rgba(15,157,138,.12);color:var(--gd);font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;}
+.s-bl-steps li::before{background:rgba(26,110,216,.12);color:var(--bl);}
+
+/* Branch box (state-based attorney model) */
+.branch{border-radius:12px;overflow:hidden;border:1.5px solid var(--br);margin:4px 0 12px;}
+.branch-row{padding:13px 16px;}
+.branch-row + .branch-row{border-top:1.5px solid var(--br);}
+.branch-if{background:rgba(15,157,138,.05);}
+.branch-else{background:#fffdf7;}
+.branch-tag{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:999px;margin-bottom:8px;}
+.tag-if{background:rgba(15,157,138,.14);color:var(--gd);}
+.tag-else{background:#fef3c7;color:#92400e;}
+.branch-say{font-size:14px;line-height:1.65;color:#1e293b;font-weight:650;font-style:italic;}
+.branch-note{font-size:12px;color:#64748b;font-weight:700;margin-top:7px;}
+
+/* ============================================================ */
+/*  State selector → dynamic attorney-model script (Level Debt)  */
+/* ============================================================ */
+.state-select-wrap{margin-top:6px;}
+.state-select-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.state-select-lbl{font-size:12px;font-weight:800;color:#64748b;display:flex;align-items:center;gap:6px;}
+.state-select-lbl .ss-ico{font-size:14px;}
+.state-select{height:34px;padding:0 32px 0 11px;border:1.5px solid var(--br);border-radius:9px;
+  font-family:inherit;font-size:13px;font-weight:700;color:var(--dk);background:#fff;cursor:pointer;outline:none;
+  transition:border-color .15s,box-shadow .15s;max-width:200px;}
+.state-select:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(15,157,138,.1);}
+/* status pill that reflects the chosen state's model */
+.state-status{display:none;align-items:center;gap:6px;border-radius:999px;padding:5px 11px;font-size:11px;font-weight:900;white-space:nowrap;}
+.state-status.show{display:inline-flex;}
+.state-status.is-atty{background:rgba(109,40,217,.1);color:var(--pp);border:1.5px solid rgba(109,40,217,.35);}
+.state-status.is-std{background:rgba(15,157,138,.1);color:var(--gd);border:1.5px solid rgba(15,157,138,.35);}
+.state-status.is-black{background:#fef2f2;color:#b91c1c;border:1.5px solid rgba(239,68,68,.4);}
+
+/* dynamic script output */
+.state-script{margin-top:12px;display:none;}
+.state-script.show{display:block;animation:fade .25s ease;}
+.state-script .ss-fee{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:900;border-radius:7px;padding:3px 10px;margin-bottom:9px;}
+.ss-fee.f-atty{background:rgba(109,40,217,.1);color:var(--pp);border:1px solid rgba(109,40,217,.3);}
+.ss-fee.f-std{background:rgba(15,157,138,.1);color:var(--gd);border:1px solid rgba(15,157,138,.3);}
+.state-empty{margin-top:10px;font-size:12px;color:#94a3b8;font-weight:600;}
+.state-black-note{margin-top:12px;display:none;background:#fef2f2;border:1.5px solid rgba(239,68,68,.32);border-radius:12px;padding:13px 15px;font-size:13px;font-weight:700;color:#b91c1c;line-height:1.6;}
+.state-black-note.show{display:block;animation:fade .25s ease;}
+
+/* Compliance banner */
+.compliance{border-radius:12px;padding:14px 16px;margin:0 0 16px;font-size:13px;line-height:1.6;font-weight:600;}
+.cmp-warn{background:#fffbeb;border:1px solid rgba(245,158,11,.32);color:#92400e;}
+.cmp-stop{background:#fef2f2;border:1px solid rgba(239,68,68,.32);color:#b91c1c;}
+.cmp-info{background:#eff6ff;border:1px solid rgba(26,110,216,.28);color:#1e3a8a;}
+.compliance .cmp-hd{font-weight:900;display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:13px;}
+.compliance ul{margin:6px 0 0;padding-left:18px;display:grid;gap:4px;}
+.compliance code{background:rgba(0,0,0,.06);border-radius:5px;padding:1px 6px;font-size:12px;font-weight:700;font-family:inherit;}
+
+/* Data table (term tiers, etc) */
+.dtbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;}
+.dtbl th,.dtbl td{padding:9px 13px;border:1px solid var(--br);text-align:left;}
+.dtbl thead th{background:var(--dk);color:#fff;font-weight:800;font-size:12px;}
+.dtbl tbody tr:nth-child(even) td{background:var(--bg);}
+.dtbl td:last-child{font-weight:800;color:var(--gd);}
+
+/* chips list (states, debt types) */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.chip{font-size:11px;font-weight:800;padding:4px 9px;border-radius:7px;background:#fff;border:1px solid var(--br);color:#334155;}
+.chip.bad{background:#fef2f2;border-color:rgba(239,68,68,.3);color:#b91c1c;}
+.chip.atty{background:rgba(109,40,217,.08);border-color:rgba(109,40,217,.3);color:var(--pp);}
+
+.subhd{font-size:12px;font-weight:900;color:#334155;text-transform:uppercase;letter-spacing:.05em;margin:18px 0 8px;}
+.lead{font-size:13.5px;color:#475569;font-weight:600;line-height:1.6;margin-bottom:4px;}
+
+/* Objection table */
+.obj{width:100%;border-collapse:collapse;font-size:13px;}
+.obj th,.obj td{padding:11px 14px;border:1px solid var(--br);vertical-align:top;text-align:left;}
+.obj thead th{background:var(--dk);color:#fff;font-weight:800;font-size:12px;}
+.obj tbody tr:nth-child(even) td{background:var(--bg);}
+.obj td:first-child{font-weight:800;color:var(--dk);width:32%;}
+.obj td:last-child{font-style:italic;color:#334155;}
+
+/* placeholder slot */
+.placeholder{border:2px dashed var(--br);border-radius:14px;padding:28px;text-align:center;color:#94a3b8;font-weight:700;font-size:14px;background:#fff;}
+.placeholder b{display:block;color:#64748b;font-size:15px;margin-bottom:5px;}
+
+/* collect block (verify fields) */
+.collect{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;margin-top:6px;}
+.collect span{font-size:12px;font-weight:700;color:#334155;background:var(--bg);border:1px solid var(--br);border-radius:8px;padding:7px 11px;}
+
+.footer-note{text-align:center;font-size:12px;color:#94a3b8;font-weight:600;margin-top:30px;line-height:1.6;}
+
+/* ---------- Router reference callout ---------- */
+.router-ref{display:flex;gap:12px;align-items:flex-start;border-radius:12px;padding:13px 16px;margin:0 0 16px;
+  background:linear-gradient(135deg,var(--dk) 0%,#0b3b50 55%,#0f9d8a 100%);color:#fff;box-shadow:0 8px 20px rgba(15,23,42,.18);}
+.router-ref-icon{flex-shrink:0;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:17px;}
+.router-ref-body{flex:1;}
+.router-ref-hd{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#86efac;margin-bottom:3px;}
+.router-ref-txt{font-size:13px;font-weight:600;line-height:1.6;color:rgba(255,255,255,.92);}
+.router-ref-txt b{color:#fff;}
+.router-ref a{color:#86efac;font-weight:800;text-decoration:none;border-bottom:1px solid rgba(134,239,172,.4);}
+
+/* inline "check router" chip */
+.router-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:var(--gd);background:rgba(15,157,138,.1);border:1px solid rgba(15,157,138,.3);border-radius:999px;padding:2px 9px;vertical-align:middle;white-space:nowrap;}
+
+/* ---------- Qualification: routing matrix ---------- */
+.route-matrix{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;}
+.route-matrix th,.route-matrix td{padding:11px 13px;border:1px solid var(--br);text-align:left;vertical-align:middle;}
+.route-matrix thead th{background:var(--dk);color:#fff;font-weight:800;font-size:12px;}
+.route-matrix td:first-child{font-weight:900;color:var(--dk);white-space:nowrap;}
+.route-matrix .rt-prog{display:inline-flex;align-items:center;gap:6px;font-weight:800;padding:3px 9px;border-radius:7px;font-size:11.5px;margin:2px 3px 2px 0;}
+.rt-val{background:rgba(109,40,217,.1);color:var(--pp);border:1px solid rgba(109,40,217,.28);}
+.rt-res{background:#eff6ff;color:var(--bl);border:1px solid rgba(26,110,216,.28);}
+.rt-set{background:rgba(15,157,138,.1);color:var(--gd);border:1px solid rgba(15,157,138,.28);}
+
+/* gate checklist */
+.gate{display:grid;gap:10px;margin-top:6px;}
+.gate-item{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--br);border-radius:12px;padding:13px 15px;background:#fff;}
+.gate-num{flex-shrink:0;width:26px;height:26px;border-radius:8px;background:var(--dk);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;font-family:"Poppins",sans-serif;}
+.gate-body{flex:1;}
+.gate-q{font-size:14px;font-weight:800;color:var(--dk);margin-bottom:4px;}
+.gate-why{font-size:12.5px;color:#64748b;font-weight:600;line-height:1.55;}
+.gate-fail{font-size:12px;color:#b91c1c;font-weight:700;margin-top:6px;background:#fef2f2;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:6px 10px;display:inline-block;}
+
+/* ============================================================ */
+/*  QUALIFICATION — distinct "command center" treatment          */
+/* ============================================================ */
+#panel-qualification{--ink:#0a1424;--steel:#1e293b;--mint:#0f9d8a;}
+.qual-hero{position:relative;border-radius:20px;overflow:hidden;
+  background:
+    radial-gradient(1200px 300px at 12% -40%,rgba(15,157,138,.5),transparent 60%),
+    linear-gradient(125deg,#0a1424 0%,#0f2540 48%,#103f4a 100%);
+  padding:26px 28px;margin-bottom:22px;box-shadow:0 18px 48px rgba(10,20,36,.32);border:1px solid rgba(255,255,255,.06);}
+.qual-hero::after{content:"";position:absolute;top:0;right:0;bottom:0;width:46%;pointer-events:none;
+  background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 26px);
+  -webkit-mask:linear-gradient(90deg,transparent,#000 60%);mask:linear-gradient(90deg,transparent,#000 60%);}
+.qual-hero-tag{display:inline-flex;align-items:center;gap:8px;padding:5px 13px;border-radius:999px;
+  background:rgba(15,157,138,.18);border:1px solid rgba(52,211,178,.4);color:#5eead4;
+  font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;}
+.qual-hero-tag .pulse{width:8px;height:8px;border-radius:50%;background:#34d3b2;animation:pulse 1.8s infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,178,.6);}70%{box-shadow:0 0 0 9px rgba(52,211,178,0);}100%{box-shadow:0 0 0 0 rgba(52,211,178,0);}}
+.qual-hero h1{font-family:"Poppins",sans-serif;font-size:30px;font-weight:900;color:#fff;letter-spacing:-.7px;line-height:1.05;margin-bottom:8px;position:relative;}
+.qual-hero p{font-size:14px;color:rgba(255,255,255,.82);font-weight:600;line-height:1.6;max-width:640px;position:relative;}
+.qual-hero p b{color:#5eead4;}
+.qual-hero-rule{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px;position:relative;}
+.qhr-item{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:800;color:#fff;}
+.qhr-ico{width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+#panel-qualification .card{border-radius:14px;border-left:4px solid var(--mint);}
+#panel-qualification .stage-hd{border-bottom-color:var(--ink);}
+#panel-qualification .stage-num{background:linear-gradient(135deg,#0f2540,#103f4a);}
+.qual-mand{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;letter-spacing:.06em;
+  text-transform:uppercase;color:#0b7d6e;background:rgba(15,157,138,.12);border:1px solid rgba(15,157,138,.3);
+  border-radius:6px;padding:3px 8px;margin-left:8px;vertical-align:middle;}
+.phase-band{display:flex;align-items:center;gap:14px;margin:26px 0 14px;}
+.phase-band .pb-num{flex-shrink:0;font-family:"Poppins",sans-serif;font-size:13px;font-weight:900;color:#fff;
+  background:linear-gradient(135deg,#0a1424,#103f4a);padding:7px 14px;border-radius:9px;letter-spacing:.04em;}
+.phase-band .pb-txt{font-size:13px;font-weight:900;color:var(--dk);text-transform:uppercase;letter-spacing:.06em;}
+.phase-band .pb-line{flex:1;height:2px;background:linear-gradient(90deg,var(--mint),transparent);border-radius:2px;}
+.phase-band.credit .pb-num{background:linear-gradient(135deg,#7f1d1d,#b91c1c);}
+.phase-band.credit .pb-txt{color:#b91c1c;}
+.phase-band.credit .pb-line{background:linear-gradient(90deg,#ef4444,transparent);}
+.confirm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:6px;}
+.confirm-item{border:1.5px solid var(--br);border-radius:11px;padding:12px 14px;background:#fff;position:relative;}
+.confirm-item::before{content:"✓";position:absolute;top:12px;right:13px;width:20px;height:20px;border-radius:6px;
+  background:rgba(15,157,138,.12);color:#0b7d6e;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;}
+.confirm-item .ci-t{font-size:13px;font-weight:900;color:var(--dk);margin-bottom:3px;padding-right:26px;}
+.confirm-item .ci-d{font-size:11.5px;color:#64748b;font-weight:600;line-height:1.5;}
+
+/* ============================================================ */
+/*  Accordion behavior for numbered stage cards                  */
+/* ============================================================ */
+.card.acc .stage-hd{cursor:pointer;user-select:none;margin-bottom:0;transition:margin .25s ease;}
+.card.acc.open .stage-hd{margin-bottom:14px;}
+
+/* Big, obvious open/close control with explicit label */
+.card.acc .stage-hd .acc-caret{margin-left:auto;flex-shrink:0;
+  display:inline-flex;align-items:center;gap:8px;
+  height:34px;padding:0 13px;border-radius:999px;
+  background:#0f172a;color:#fff;
+  font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;
+  box-shadow:0 3px 10px rgba(15,23,42,.22);
+  transition:background .18s,box-shadow .18s,transform .12s;}
+.card.acc .stage-hd .acc-caret:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(15,23,42,.3);}
+.card.acc .stage-hd .acc-caret .acc-chev{font-size:15px;line-height:1;transition:transform .25s ease;}
+.card.acc .stage-hd .acc-caret .acc-label::after{content:"Show";}
+/* OPEN state — turns brand green with "Hide" + flipped chevron */
+.card.acc.open .stage-hd .acc-caret{background:linear-gradient(135deg,var(--g),var(--gd));box-shadow:0 4px 12px rgba(15,157,138,.34);}
+.card.acc.open .stage-hd .acc-caret .acc-chev{transform:rotate(180deg);}
+.card.acc.open .stage-hd .acc-caret .acc-label::after{content:"Hide";}
+/* per-tab open color */
+#panel-resolution .card.acc.open .stage-hd .acc-caret{background:linear-gradient(135deg,var(--bl),#1559b0);box-shadow:0 4px 12px rgba(26,110,216,.34);}
+#panel-validation .card.acc.open .stage-hd .acc-caret{background:linear-gradient(135deg,var(--pp),#581c87);box-shadow:0 4px 12px rgba(109,40,217,.34);}
+
+.card.acc .acc-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease;overflow:hidden;}
+.card.acc.open .acc-body{grid-template-rows:1fr;}
+.card.acc .acc-body > .acc-inner{min-height:0;overflow:hidden;}
+/* collapsed cards: clear closed affordance — left bar + faint dim */
+.card.acc{transition:box-shadow .2s ease,opacity .2s ease;}
+.card.acc:not(.open){opacity:.96;}
+.card.acc:not(.open) .stage-hd{border-bottom-color:transparent;}
+@media(prefers-reduced-motion:reduce){.card.acc .acc-body,.card.acc .stage-hd,.card.acc .acc-caret .acc-chev{transition:none;}}
+@media(max-width:520px){
+  .card.acc .stage-hd .acc-caret{padding:0 10px;height:30px;}
+  .card.acc .stage-hd .acc-caret .acc-label{display:none;}
+}
+
+@media(max-width:640px){
+  .prog-title{font-size:22px;}
+  .tab{padding:10px 14px;font-size:12.5px;}
+  .say-text{font-size:14.5px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-head">
+      <img class="brand-logo" src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" alt="Funding Tier"/>
+      <div>
+        <div class="brand-txt-main">Program Call Scripts</div>
+        <div class="brand-txt-sub">Agent Master Framework &amp; Training Reference</div>
+      </div>
+      <div class="topbar-meta">
+        <span class="meta-badge">Internal Use Only</span>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab tab-qual active" role="tab" data-panel="qualification" onclick="showTab('qualification',this)">
+        <span class="tab-inner"><span class="tab-dot dot-qual"></span>Qualification<span class="tab-sub">Start Here</span></span>
+      </button>
+      <button class="tab tab-set" role="tab" data-panel="settlement" onclick="showTab('settlement',this)">
+        <span class="tab-inner"><span class="tab-dot dot-set"></span>Debt Settlement<span class="tab-sub">Level Debt</span></span>
+      </button>
+      <button class="tab tab-res" role="tab" data-panel="resolution" onclick="showTab('resolution',this)">
+        <span class="tab-inner"><span class="tab-dot dot-res"></span>Debt Resolution<span class="tab-sub">Elite Legal Practice</span></span>
+      </button>
+      <button class="tab tab-val" role="tab" data-panel="validation" onclick="showTab('validation',this)">
+        <span class="tab-inner"><span class="tab-dot dot-val"></span>Debt Validation<span class="tab-sub">Consumer Shield</span></span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================================================= -->
+<!-- TAB 0 — QUALIFICATION (Start Here) -->
+<!-- ============================================================= -->
+<section class="panel active" id="panel-qualification">
+  <div class="qual-hero">
+    <span class="qual-hero-tag"><span class="pulse"></span>Mandatory · Run on every call</span>
+    <h1>All-Around Qualification</h1>
+    <p>This is the front door for <b>every prospect, every program, every call</b>. These questions are always asked, and the confirmations after the credit pull are always verified. Nothing gets pitched until a prospect clears these gates and the <b>AI Deal Router</b> confirms the route.</p>
+    <div class="qual-hero-rule">
+      <div class="qhr-item"><span class="qhr-ico">💵</span>$4k+ → Validation</div>
+      <div class="qhr-item"><span class="qhr-ico">⚖️</span>$6k+ → Validation or Resolution</div>
+      <div class="qhr-item"><span class="qhr-ico">🤝</span>$7k+ → any of all three</div>
+    </div>
+  </div>
+
+  <div class="router-ref">
+    <div class="router-ref-icon">🧭</div>
+    <div class="router-ref-body">
+      <div class="router-ref-hd">Always confirm in the Router</div>
+      <div class="router-ref-txt">This tab is the talk-track. The <b>AI Deal Router</b> is the source of truth for every rule check — state eligibility, accepted creditors/debt types, attorney-model status, term, and the final program decision. Enter the state and debts in the Router and <b>let it confirm the route</b> before you pitch. When this script says <span class="router-chip">↗ check Router</span>, switch to the Router and verify.</div>
+    </div>
+  </div>
+
+  <div class="ver-toggle" id="tog-qualification">
+    <button class="ver-btn active" onclick="showVer('qualification','qual-v1',this)" style="background:linear-gradient(135deg,#1e293b,#0b3b50);color:#fff;box-shadow:0 4px 12px rgba(15,23,42,.28);"><span class="ver-num">1</span>Universal Pre-Qualification</button>
+  </div>
+
+  <div class="version active" id="ver-qual-v1">
+    <div class="ver-meta"><b>Universal pre-qualification gate.</b> Every prospect clears these gates first. A "no" on unsecured debt, income, willingness, or ability is a hard stop. Already enrolled elsewhere is <b>not</b> a stop — it's an obstacle to overcome with a better monthly. Once gates pass, route by debt amount and confirm in the Router.</div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">1</div><div class="stage-name">Open &amp; Set the Frame</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Hi, this is [Agent Name] on a recorded line. Thanks for taking a minute — am I speaking with [Client Name]?"</div>
+        <div class="say-text">"Great. I just need to ask a few quick questions to understand your situation and see which of our programs — if any — is the right fit for you. Fair enough?"</div>
+      </div>
+      <div class="do">Frame it as a fit-check, not a pitch. You're qualifying, not selling yet.</div>
+    </div>
+
+    <div class="phase-band">
+      <span class="pb-num">PHASE 1</span>
+      <span class="pb-txt">Always Ask — Before Any Pitch</span>
+      <span class="pb-line"></span>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">2</div><div class="stage-name">Universal Gates — All Must Pass<span class="qual-mand">Always asked</span></div></div>
+      <div class="lead">Ask these five before discussing any program. A "no" on gates A–D is a hard stop. Gate E (already enrolled) is the exception — an obstacle to overcome, not a disqualifier.</div>
+      <div class="gate">
+        <div class="gate-item">
+          <div class="gate-num">A</div>
+          <div class="gate-body">
+            <div class="gate-q">Is the debt unsecured?</div>
+            <div class="gate-why">All three programs work <b>unsecured</b> debt only — credit cards, personal loans, medical, collections, etc. Secured debt (auto loans, mortgages) and cross-collateralized accounts don't qualify. <span class="router-chip">↗ check Router</span> for accepted vs. rejected debt types and creditors.</div>
+            <div class="gate-fail">No unsecured debt → not a fit. Do not enroll.</div>
+          </div>
+        </div>
+        <div class="gate-item">
+          <div class="gate-num">B</div>
+          <div class="gate-body">
+            <div class="gate-q">Are they employed or do they have steady income?</div>
+            <div class="gate-why">"Are you currently employed, self-employed, retired, or receiving another steady source of income?" A program only works if there's reliable income behind the monthly deposit.</div>
+            <div class="gate-fail">No income source → cannot sustain the program.</div>
+          </div>
+        </div>
+        <div class="gate-item">
+          <div class="gate-num">C</div>
+          <div class="gate-body">
+            <div class="gate-q">Willingness — are they currently trying to pay this debt down?</div>
+            <div class="gate-why">"Are you currently making payments on these debts, or trying to?" You're confirming they take the debt seriously and want to resolve it — payment <b>willingness</b>.</div>
+          </div>
+        </div>
+        <div class="gate-item">
+          <div class="gate-num">D</div>
+          <div class="gate-body">
+            <div class="gate-q">Ability — can they afford at least ~$250/month?</div>
+            <div class="gate-why">"If we could set up a single, more manageable monthly amount, would something around $250 a month be workable for you?" ELP and Level Debt both require a <b>$250 minimum monthly</b> — payment <b>ability</b>. This is the make-or-break affordability gate.</div>
+            <div class="gate-fail">Can't do ~$250/mo → likely only Consumer Shield (lower tiers); confirm in Router.</div>
+          </div>
+        </div>
+        <div class="gate-item">
+          <div class="gate-num">E</div>
+          <div class="gate-body">
+            <div class="gate-q">Are they already enrolled in another debt-relief program?<span class="qual-mand" style="color:#1559b0;background:rgba(26,110,216,.1);border-color:rgba(26,110,216,.3);">Obstacle — not a stop</span></div>
+            <div class="gate-why">"Are you currently enrolled in any other debt settlement, debt relief, or credit program right now?" If yes — this is <b>not</b> a disqualifier. They're already paying someone every month, which means there's willingness and ability there. The play is to win them over with a <b>better deal — usually a lower monthly</b>, depending on which program they qualify for.</div>
+            <div class="gate-do" style="font-size:12px;color:#0b7d6e;font-weight:700;margin-top:7px;background:rgba(15,157,138,.08);border:1px solid rgba(15,157,138,.28);border-radius:8px;padding:7px 11px;">"That actually tells me you're serious about handling this — which is great. A lot of those programs lock people into a payment that's higher than it needs to be. Let me find out what you're paying now, because depending on which of our programs fits, we may be able to do this for less per month and still get you to the finish line."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">3</div><div class="stage-name">Capture Debt &amp; State</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Roughly how much total unsecured debt are we working with? And which state are you in?"</div>
+      </div>
+      <div class="do">Enter the <b>total debt</b> and <b>state</b> into the AI Deal Router now. The Router applies the blackout/eligibility rules per program and tells you the route. The amount bands below are the starting logic — <span class="router-chip">↗ the Router confirms the final decision</span>.</div>
+    </div>
+
+    <div class="phase-band credit">
+      <span class="pb-num">PHASE 2</span>
+      <span class="pb-txt">Confirm After the Credit Pull</span>
+      <span class="pb-line"></span>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">4</div><div class="stage-name">Confirm These After Pulling Credit<span class="qual-mand">Always confirmed</span></div></div>
+      <div class="lead">The credit report is the source of truth on the debt. After the pull, confirm each of these with the prospect and against the report before routing. These details drive the Router's decision and the program's accuracy.</div>
+      <div class="confirm-grid">
+        <div class="confirm-item"><div class="ci-t">Total unsecured balance</div><div class="ci-d">"Your total unsecured balances are about $____ — does that sound right, or are we missing anything?" Confirms the routing band.</div></div>
+        <div class="confirm-item"><div class="ci-t">Debt is unsecured</div><div class="ci-d">Verify each account is unsecured. Exclude auto loans, mortgages, secured and cross-collateralized accounts.</div></div>
+        <div class="confirm-item"><div class="ci-t">Accounts &amp; balances per creditor</div><div class="ci-d">Confirm each creditor and balance shown is one the prospect wants reviewed. Flag anything missing.</div></div>
+        <div class="confirm-item"><div class="ci-t">Account minimums</div><div class="ci-d">Each individual account meets the program minimum ($100 CS / $200 Level Debt). <span class="router-chip">↗ check Router</span></div></div>
+        <div class="confirm-item"><div class="ci-t">Excluded creditors / debt types</div><div class="ci-d">Cross-check creditors against the Router's accepted/rejected lists before committing to a program.</div></div>
+        <div class="confirm-item"><div class="ci-t">Current minimum payments</div><div class="ci-d">"Your current minimums look like about $____ /mo." Confirms the pain and frames the $250 affordability.</div></div>
+        <div class="confirm-item"><div class="ci-t">State eligibility</div><div class="ci-d">Confirm the verified state isn't blocked for the chosen program. <span class="router-chip">↗ check Router</span></div></div>
+        <div class="confirm-item"><div class="ci-t">Other program enrollment</div><div class="ci-d">If another debt-relief program shows, confirm their current monthly. Use it as the number to beat — not a reason to stop.</div></div>
+      </div>
+    </div>
+
+    <div class="phase-band">
+      <span class="pb-num">PHASE 3</span>
+      <span class="pb-txt">Route &amp; Confirm in the Router</span>
+      <span class="pb-line"></span>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">5</div><div class="stage-name">Route by Debt Amount</div></div>
+      <table class="route-matrix">
+        <thead><tr><th>Total unsecured debt</th><th>Eligible program(s)</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>$4,000 – $5,999</td>
+            <td><span class="rt-prog rt-val">Debt Validation · Consumer Shield</span></td>
+            <td>Primary route for this band. Min debt $4,000; each account ≥ $100.</td>
+          </tr>
+          <tr>
+            <td>$6,000 – $6,999</td>
+            <td><span class="rt-prog rt-val">Validation · Consumer Shield</span><span class="rt-prog rt-res">Resolution · ELP</span></td>
+            <td>Both eligible. ELP joins at $6,000 (requires $250/mo, bank verified, open to legal program).</td>
+          </tr>
+          <tr>
+            <td>$7,000+</td>
+            <td><span class="rt-prog rt-val">Validation</span><span class="rt-prog rt-res">Resolution</span><span class="rt-prog rt-set">Settlement</span></td>
+            <td>Any of all three. Level Debt joins at $7,000. Router picks best fit by state, debt type &amp; affordability.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="router-ref" style="margin-top:14px;">
+        <div class="router-ref-icon">⚖️</div>
+        <div class="router-ref-body">
+          <div class="router-ref-hd">State rules differ by program — the Router enforces them</div>
+          <div class="router-ref-txt">Each program has its own blocked states (and Level Debt has an attorney-model list that changes the fee). Don't memorize them on the call — enter the state in the Router and it tells you which programs are live and what the term/fee are. <span class="router-chip" style="color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);">↗ check Router</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">6</div><div class="stage-name">Per-Program Final Gates (Router-verified)</div></div>
+      <div class="lead">Once the amount band points to a program, the Router checks these specific requirements before the route is valid:</div>
+      <table class="dtbl">
+        <thead><tr><th>Program</th><th>Final gates the Router checks</th></tr></thead>
+        <tbody>
+          <tr><td>Debt Validation<br>(Consumer Shield)</td><td>Debt ≥ $4,000 · each account ≥ $100 · state not blocked (NC, PA, CO, WA, CT, NJ, OR, TX)</td></tr>
+          <tr><td>Debt Resolution<br>(ELP)</td><td>Debt ≥ $6,000 · ≥ $250/mo · bank verified · open to a legal program · state not blocked (ID, ND, GA)</td></tr>
+          <tr><td>Debt Settlement<br>(Level Debt)</td><td>Debt ≥ $7,000 · ≥ $200/account · $250/mo min deposit · accepted creditors/types · not a blackout state · attorney-model fee if applicable</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">7</div><div class="stage-name">Transition to the Program Script</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Based on everything you've shared, the right fit for you looks like [program]. Let me walk you through exactly how it works."</div>
+      </div>
+      <div class="do">Once the Router confirms the route, switch to the matching tab — <b>Settlement</b>, <b>Resolution</b>, or <b>Validation</b> — and run that script. If the Router disqualifies all three, thank them and close politely; do not pitch a program they can't be routed to.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- TAB 1 — DEBT SETTLEMENT (Level Debt) -->
+<!-- ============================================================= -->
+<section class="panel" id="panel-settlement">
+  <div class="prog-head">
+    <div>
+      <div class="prog-overline">Program 01 · Debt Settlement</div>
+      <h1 class="prog-title">Debt Settlement</h1>
+      <div class="prog-partner">Backend partner: Level Debt · A debt settlement program — not debt validation</div>
+    </div>
+    <div class="prog-pills">
+      <span class="pill p-g">$7,000+ min debt</span>
+      <span class="pill p-g">$200 / account min</span>
+      <span class="pill p-a">State-based attorney model</span>
+    </div>
+  </div>
+
+  <div class="ver-toggle" id="tog-settlement">
+    <button class="ver-btn active" onclick="showVer('settlement','set-v1',this)"><span class="ver-num">1</span>Standard Inbound</button>
+  </div>
+
+  <!-- Version 1 -->
+  <div class="version active" id="ver-set-v1">
+    <div class="router-ref">
+      <div class="router-ref-icon">🧭</div>
+      <div class="router-ref-body">
+        <div class="router-ref-hd">Confirm the route in the Router first</div>
+        <div class="router-ref-txt">Run the <b>Qualification</b> tab and the <b>AI Deal Router</b> before this script. Enter the state and debts so the Router confirms Level Debt is eligible, flags any excluded creditors, sets the <b>attorney-model fee</b>, and locks the <b>term</b>. Wherever you see <span class="router-chip">↗ check Router</span> below, verify there.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">1</div><div class="stage-name">Open &amp; Build Rapport</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Hi, this is [Agent Name] on a recorded line. Thanks for taking a minute — am I speaking with [Client Name]?"</div>
+        <div class="say-text">"Great. You reached out about getting relief from your debt, and I want to walk you through how our program works and see if it's the right fit. Fair enough?"</div>
+      </div>
+      <div class="do">Smile through the phone. Get an early "yes" before moving on.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">2</div><div class="stage-name">Discover &amp; Qualify</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Roughly how much total debt are we working with, and what kind — credit cards, personal loans, medical, collections?"</div>
+        <div class="say-text">"And what's been the hardest part — the interest, the minimum payments, the collection calls?"</div>
+      </div>
+      <div class="do">Qualify against the backend: total enrolled debt must be <b>$7,000+</b> with at least <b>$200 per account</b>. Confirm debt types are accepted and creditors aren't excluded. Confirm the state is <b>not a blackout state</b>. Note the state — you need it for the attorney-model branch and the fee %.</div>
+
+      <div class="subhd">Accepted debt types</div>
+      <div class="chips">
+        <span class="chip">Unsecured debt</span><span class="chip">Unsecured personal loan</span><span class="chip">Unsecured line of credit</span><span class="chip">Medical bill</span><span class="chip">Payday loan</span><span class="chip">Tribal loan</span><span class="chip">Cell phone bill</span><span class="chip">Repossession deficiency</span><span class="chip">Back rent (collections)</span><span class="chip">Business debt</span><span class="chip">Judgment</span><span class="chip">Private student loan</span>
+      </div>
+      <div class="subhd">Blackout states — cannot enroll</div>
+      <div class="chips">
+        <span class="chip bad">AK</span><span class="chip bad">HI</span><span class="chip bad">ME</span><span class="chip bad">MT</span><span class="chip bad">ND</span><span class="chip bad">OR</span><span class="chip bad">PR</span><span class="chip bad">RI</span><span class="chip bad">SC</span><span class="chip bad">SD</span><span class="chip bad">UT</span><span class="chip bad">VT</span><span class="chip bad">WV</span><span class="chip bad">WI</span><span class="chip bad">GU</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">3</div><div class="stage-name">Educate</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script — Approved Opener</div>
+        <div class="say-text">"Based on what you've shared, you may fit a debt settlement program focused on resolving your balances over time. Let me explain how it works."</div>
+        <div class="say-text">"Instead of paying the full balance plus years of interest, we negotiate directly with your creditors to settle your debts for less than what you currently owe. It's not a loan and it's not consolidation — nothing new to borrow. And just so it's clear, this is debt settlement, not debt validation."</div>
+      </div>
+      <div class="do">Pause and let it land before presenting the mechanics.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">4</div><div class="stage-name">Present the Program</div></div>
+      <ol class="steps">
+        <li>"Instead of paying creditors directly, you make one monthly <b>deposit</b> into a dedicated account that <b>you own and control</b> — currently a minimum of $250 a month."</li>
+        <li>"As those deposits build, our negotiators settle your debts one at a time for less than the full balance. Keep in mind creditor response varies, and not all debts qualify."</li>
+        <li>"You're only charged the program fee as we work your enrolled debt — there are no upfront fees to start."</li>
+        <li>"Your program fee is a percentage of your enrolled debt, and we'll go over your exact number and your monthly deposit before you commit to anything."</li>
+      </ol>
+
+      <div class="subhd">Select the prospect's state — the script updates automatically <span class="router-chip">↗ confirm in Router</span></div>
+      <div class="state-select-wrap">
+        <div class="state-select-row">
+          <span class="state-select-lbl"><span class="ss-ico">📍</span>Prospect's state</span>
+          <select class="state-select" id="ldState" onchange="updateLdState()">
+            <option value="">— Select a state —</option>
+            <option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option>
+            <option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option>
+            <option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="FL">Florida</option>
+            <option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option>
+            <option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option>
+            <option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option>
+            <option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option>
+            <option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option>
+            <option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option>
+            <option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option>
+            <option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option>
+            <option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option>
+            <option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option>
+            <option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option>
+            <option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option>
+            <option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option>
+            <option value="WI">Wisconsin</option><option value="WY">Wyoming</option>
+            <option value="DC">Washington D.C.</option>
+          </select>
+          <span class="state-status" id="ldStateStatus"></span>
+        </div>
+
+        <div class="state-empty" id="ldStateEmpty">Pick a state to load the correct script.</div>
+
+        <div class="state-black-note" id="ldStateBlack"></div>
+
+        <div class="state-script" id="ldStateScript">
+          <span class="ss-fee" id="ldFeePill"></span>
+          <div class="say">
+            <div class="say-kicker">Phone Script — Present the Program</div>
+            <div class="say-text" id="ldScriptText"></div>
+          </div>
+          <div class="branch-note" id="ldScriptNote"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">5</div><div class="stage-name">Set Honest Expectations — Required Disclosures</div></div>
+      <div class="compliance cmp-info">
+        <div class="cmp-hd">Say these out loud — required by compliance</div>
+        These four disclosures must be delivered verbally on the recorded line.
+      </div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"I want to be straight with you on a few things. Your <b>settlement results vary by creditor and by file</b> — I can't promise a specific amount. Because you'll be settling rather than paying as originally agreed, this program <b>may negatively impact your credit</b> in the short term. And <b>not all debt types, creditors, or states qualify</b> — that's why we check. This is debt settlement, not debt validation."</div>
+      </div>
+      <div class="compliance cmp-stop">
+        <div class="cmp-hd">Never say — prohibited phrases</div>
+        <ul>
+          <li><code>guarantee savings</code> · <code>guaranteed settlement</code></li>
+          <li><code>we will eliminate your debt</code></li>
+          <li><code>your credit will improve</code></li>
+          <li><code>you cannot be sued</code></li>
+          <li><code>instant approval</code> / <code>guaranteed approval</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">6</div><div class="stage-name">Handle Objections</div></div>
+      <div class="lead">Acknowledge → reframe with a fact → redirect to the next step. Never argue.</div>
+      <table class="obj">
+        <thead><tr><th>Client says…</th><th>Agent responds…</th></tr></thead>
+        <tbody>
+          <tr><td>"Is this a loan?"</td><td>"No — it's not a loan and it's not consolidation. It's a debt settlement program. We negotiate your balances down rather than having you borrow anything new."</td></tr>
+          <tr><td>"Will this hurt my credit?"</td><td>"Because you're settling rather than paying as originally agreed, it may impact your credit in the short term. The goal is to get you debt-free and rebuild from a stronger position. Results vary by file."</td></tr>
+          <tr><td>"How much will I save?"</td><td>"I can't promise a specific number — settlement results vary by creditor and by account. What I can do is show you your exact monthly deposit and timeline so you can decide."</td></tr>
+          <tr><td>"Can you guarantee it?"</td><td>"I can't guarantee a settlement amount — every creditor is different. What I can guarantee is exactly how the program works and how we go to bat for you."</td></tr>
+          <tr><td>"I need to think about it."</td><td>"Of course. What's on your mind — the monthly deposit, the timeline, or how settlement works? Let's clear that up right now."</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">7</div><div class="stage-name">Close &amp; Set the Term</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Based on what you've told me, you're exactly who this program is built for. Let's get you qualified so I can show you your exact monthly deposit, your total, and your timeline. Takes just a few minutes."</div>
+      </div>
+      <div class="do">Read the client's term straight from their debt tier — this is set by the backend, don't improvise it. <span class="router-chip">↗ check Router</span></div>
+      <table class="dtbl">
+        <thead><tr><th>Enrolled debt</th><th>Program term</th></tr></thead>
+        <tbody>
+          <tr><td>$7,000 – $9,999</td><td>24 months</td></tr>
+          <tr><td>$10,000 – $12,499</td><td>30 months</td></tr>
+          <tr><td>$12,500 – $14,999</td><td>36 months</td></tr>
+          <tr><td>$15,000 – $24,999</td><td>42 months</td></tr>
+          <tr><td>$25,000 – $34,999</td><td>48 months</td></tr>
+          <tr><td>$35,000 – $49,999</td><td>54 months</td></tr>
+          <tr><td>$50,000+</td><td>60 months</td></tr>
+        </tbody>
+      </table>
+      <div class="compliance cmp-warn" style="margin-top:14px;">
+        <div class="cmp-hd">FORTH CRM setup</div>
+        Under $35,000 → use the <b>Debt Settlement Enrollment Plan</b>. $35,000+ and the client wants a lower monthly → use the <b>Override Plan</b> for terms beyond 48 months to lower the monthly deposit. Minimum monthly program deposit is <b>$250</b>.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- TAB 2 — DEBT RESOLUTION (Elite Legal Practice) -->
+<!-- ============================================================= -->
+<section class="panel" id="panel-resolution">
+  <div class="prog-head">
+    <div>
+      <div class="prog-overline">Program 02 · Debt Resolution</div>
+      <h1 class="prog-title">Debt Resolution</h1>
+      <div class="prog-partner">Backend partner: Elite Legal Practice (ELP) · A law firm providing legal debt dispute &amp; resolution — not a loan, not settlement, not consolidation</div>
+    </div>
+    <div class="prog-pills">
+      <span class="pill p-b">Law firm · 50 states</span>
+      <span class="pill p-b">Unsecured debt</span>
+      <span class="pill p-a">SSN + banking collected</span>
+    </div>
+  </div>
+
+  <div class="ver-toggle" id="tog-resolution">
+    <button class="ver-btn b-bl active" onclick="showVer('resolution','res-v1',this)"><span class="ver-num">1</span>Personal Loan Callback → Pivot</button>
+    <button class="ver-btn b-bl" onclick="showVer('resolution','res-v2',this)"><span class="ver-num">2</span>Direct Resolution &amp; GOTA</button>
+  </div>
+
+  <!-- Version 1 — Loan Callback -->
+  <div class="version active" id="ver-res-v1">
+    <div class="ver-meta m-bl"><b>Personal Loan Offer Callback.</b> Caller is returning a voicemail about a possible personal loan (up to $36,000). The loan is almost always declined — this script qualifies, runs a soft credit pull, and pivots cleanly into a debt resolution review with ELP. <b>ELP Client Care: 800-718-9606 · clientcare@elitelegalpractice.com</b></div>
+
+    <div class="router-ref">
+      <div class="router-ref-icon">🧭</div>
+      <div class="router-ref-body">
+        <div class="router-ref-hd">Confirm ELP eligibility in the Router</div>
+        <div class="router-ref-txt">Before pivoting to ELP, confirm in the <b>AI Deal Router</b>: debt ≥ $6,000, $250/mo affordability, bank verified, open to a legal program, and the state isn't blocked (ID, ND, GA). The Router is the source of truth on whether ELP is a valid route. <span class="router-chip">↗ check Router</span></div>
+      </div>
+    </div>
+
+    <div class="compliance cmp-warn">
+      <div class="cmp-hd">⚠ This script collects sensitive data on a recorded line</div>
+      Full SSN and full checking/routing numbers are captured below. Collect SSN only at the credit-pull step and banking only <b>after</b> the client decides to enroll and terms are reviewed. Handle per your data-security / PCI policy and recorded-line retention rules.
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">1</div><div class="stage-name">Intro — Inbound Callback from Voicemail</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Good morning / good afternoon, this is _____ on a recorded line. Are you calling back about the voicemail regarding a possible personal loan offer of up to $36,000?"</div>
+        <div class="say-text"><b>If yes:</b> "Perfect, I can help with that. Who am I speaking with today?"</div>
+        <div class="say-text"><b>Once name confirmed:</b> "Hi {{client_name}}, thanks for calling back. I'm going to get a quick understanding of what you're looking for, then we'll review what may be available. If a personal loan option is available and makes sense, I'll walk you through it. If not, we may be able to review other hardship assistance options that could still help with unsecured balances or outstanding bills. Fair enough?"</div>
+        <div class="say-text">"In order to get you program information, what is a good email address that I can put on file?"</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">2</div><div class="stage-name">Consent to Review Options</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Before we get started, do I have your permission to review possible loan options and, if a loan is not available or not the best fit, discuss other financial assistance options that may apply to your situation?"</div>
+        <div class="say-text"><b>If no:</b> "No problem. We can keep this focused strictly on the possible personal loan offer."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">3</div><div class="stage-name">Opening Questions &amp; Intentions</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"How much are you hoping to finance in total?" · "What's the main purpose of the funds — paying off credit cards, personal loans, medical bills, outstanding bills, or something else?" · "How quickly are you hoping to get this handled?"</div>
+        <div class="say-text">"I'm going to cover a few basic details so we can figure out what may be available. If we find something affordable and it makes sense, I'll explain everything clearly before you make any decision. Sound fair?"</div>
+      </div>
+      <div class="do"><b>System step — always search the phone number first.</b> Then ask: "Did the voicemail or notice include a pre-approval code, reference code, or callback code?" If yes, pull the file by code; if no, search by phone number and basic info.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">4</div><div class="stage-name">Employment, Income &amp; Changes</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Let's touch briefly on your income so we can understand what options may fit. Are you employed, self-employed, retired, or receiving another steady source of income?" · "What's your position or line of work?" · "How long in that income source?" · "About how much do you take home per month after taxes?" · "How often are you paid?" · "Any other household income to consider?"</div>
+        <div class="say-text">"Have you had any major changes in income over the past few years? Do you expect it to increase, decrease, or stay about the same over the next year or two?"</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">5</div><div class="stage-name">Transition to Soft Credit Pull</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Thank you for sharing that. Based on what you've told me, we're headed in the right direction. The next step is a soft credit review. This lets us verify the accounts, balances, and overall picture so we can give you accurate numbers before you make any decision."</div>
+        <div class="say-text">"This does not impact your credit score. It simply lets us review the accounts connected to the possible loan offer or any other option that may apply."</div>
+        <div class="say-text"><b>Authorization:</b> "{{client_name}}, in order to pull your credit report, I'm required to record and save your authorization. Do you give us permission to obtain your credit report for the purpose of reviewing possible loan options and financial assistance options?"</div>
+      </div>
+      <div class="compliance cmp-warn">
+        <div class="cmp-hd">⚠ Sensitive data — verify only after authorization</div>
+        Collect / verify: Name · Date of birth · <b>Full SSN</b> · Phone · Email · Home address · 5-digit ZIP. Handle SSN per data-security policy.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">6</div><div class="stage-name">Account &amp; Credit Report Review</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Now we'll do a quick review of the accounts showing on your credit. We want to make sure everything you want considered is showing correctly — if anything's missing, let me know."</div>
+        <div class="say-text">"Your total unsecured balances are roughly $____. Does that sound right? The current minimum payments look like around $____ per month — accurate, or are you paying more? Is that monthly amount making things tight? Where would you prefer to see your monthly payment if an option were available?"</div>
+      </div>
+      <div class="do">Credit discovery quick facts: how long to build the balances, mostly minimum payments?, was it interest or an income/expense change?, best-ever credit and how long ago.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">7</div><div class="stage-name">Expense Review &amp; Goals</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Now I just need to understand your monthly expenses so we don't look at anything that would overextend you — best estimate is fine."</div>
+      </div>
+      <div class="collect">
+        <span>House / rent</span><span>Utilities</span><span>Phone</span><span>Cable / internet</span><span>Insurance</span><span>Car payment</span><span>Food / groceries</span><span>Medical</span><span>Other major</span>
+      </div>
+      <div class="say s-bl" style="margin-top:12px;">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Have your basic costs been going up — food, gas, utilities, insurance, medical? That's something we're seeing a lot. The goal is to make sure any option actually fits your budget instead of creating more pressure."</div>
+        <div class="say-text">"What's your main goal right now — lowest possible monthly payment, getting balances handled faster, improving your debt-to-income ratio, freeing up cash flow, or more financial breathing room?"</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">8</div><div class="stage-name">Process, Hold &amp; Submit</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Here's how the process works. We first review the file for a personal loan option. If the lending side can provide something affordable and appropriate, I'll explain the loan clearly. If traditional financing isn't available, or the loan wouldn't actually improve your situation, we may also review other hardship assistance options for unsecured balances."</div>
+        <div class="say-text">"I'm going to submit this for review now — only takes a few minutes. Is it okay if I place you on a brief hold while I review the results?"</div>
+      </div>
+      <div class="do">Place client on brief hold. Submit loan application / review results.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">9</div><div class="stage-name">Result Branch — Loan Available vs. Pivot</div></div>
+      <div class="branch">
+        <div class="branch-row branch-if">
+          <span class="branch-tag tag-if">✓ Loan option available</span>
+          <div class="branch-say">"Thanks for holding, {{client_name}}. Based on the review, we may have a personal loan option available. I'll go over the amount, estimated payment, terms, and next steps clearly so you can decide if it makes sense."</div>
+          <div class="branch-note">Review: loan amount · estimated payment · term · APR/rate range · fees · funding timeline · next steps · no-obligation disclosure. "Does that sound like something you'd like to continue reviewing?"</div>
+        </div>
+        <div class="branch-row branch-else">
+          <span class="branch-tag tag-else">○ Loan NOT available / not a fit — pivot</span>
+          <div class="branch-say">"Thanks for holding. I want to be upfront — based on the review, the personal loan is either not available or doesn't appear to be the best fit based on the balances, income, credit profile, or affordability. But that doesn't mean there are no options. We may be able to review a hardship assistance or debt resolution option for your unsecured balances."</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">10</div><div class="stage-name">Transition to Debt Resolution</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Just to be clear, this is not a loan. It's a separate type of program designed for unsecured debts — credit cards, personal loans, or certain other balances. The goal is to review whether your unsecured balances can be addressed in a way that improves monthly cash flow and helps you work toward resolving the accounts."</div>
+        <div class="say-text"><b>Why a loan may not be available:</b> "The main issue is usually that the balances, credit utilization, income-to-debt ratio, or current payment pressure make traditional financing difficult. That's very common — a lot of people are making payments on time but still can't qualify for a loan that actually helps because the debt load is too high."</div>
+        <div class="say-text"><b>Positive reframe:</b> "The good news is we may still be able to look at an option that focuses on resolving the unsecured balances instead of putting you into another loan that could make the monthly pressure worse."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">11</div><div class="stage-name">Explain Debt Resolution &amp; ELP</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"This would be a debt resolution review. The purpose is to look at the unsecured accounts, determine what options may be available, and see whether a program could help address those balances. Depending on the program, there may be legal, creditor communication, dispute, negotiation, or resolution services involved. I'll explain the exact structure before you make any decision. Again, this is not a loan, and no specific result is guaranteed."</div>
+        <div class="say-text"><b>ELP transition (only if applicable):</b> "One option we may review is through Elite Legal Practice, also known as ELP. ELP is a law firm that provides legal debt dispute and resolution services. If this applies, they may help dispute, review, and work toward resolving eligible unsecured accounts. Before anything is finalized, you'd receive documents explaining the services, fees, payment schedule, client responsibilities, and potential credit impact."</div>
+      </div>
+      <div class="compliance cmp-info">
+        <div class="cmp-hd">Required compliance language — say clearly</div>
+        <ul>
+          <li>"This is not debt consolidation."</li>
+          <li>"This is not a loan."</li>
+          <li>"This is not a guarantee that any creditor will accept a specific outcome."</li>
+          <li>"Depending on your credit standing and account status, this may have a temporary negative effect on your credit."</li>
+          <li>"You are not being told to stop paying creditors. Any decision about payments is ultimately yours."</li>
+          <li>"Program fees are for services and are not payments to your creditors unless specifically stated in the agreement."</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">12</div><div class="stage-name">Transition to Enrollment &amp; Payment Setup</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"If this makes sense and you feel comfortable moving forward, we can review the documents together and make sure you understand everything before signing. Before that, I want to make sure the monthly payment is manageable and the accounts listed are the ones you want reviewed."</div>
+        <div class="say-text">"We'll review the payment schedule and make sure the draft date works with your income. You don't have to pay anything upfront today unless the agreement specifically requires it — in many cases clients schedule the first payment around their next payday. Depending on approval and program rules, payments may be monthly or split biweekly."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">13</div><div class="stage-name">Banking Info — Only After Decision to Enroll</div></div>
+      <div class="compliance cmp-warn">
+        <div class="cmp-hd">⚠ Collect banking only after the client decides to move forward and terms are reviewed</div>
+        Checking account only. Handle per data-security / PCI policy.
+      </div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"To finalize enrollment, we'd need the checking account information you want used for the program payment. This is only collected after you decide to move forward and after the terms are reviewed."</div>
+      </div>
+      <div class="collect">
+        <span>Name on account</span><span>Routing number</span><span>Account number</span><span>5-digit ZIP</span><span>Account owner authorization</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">14</div><div class="stage-name">Document Review &amp; Final Confirmation</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"I'm going to send the agreement for electronic signature — you may receive it by email or text. We'll review the important sections together; if you have any questions, stop me at any time."</div>
+      </div>
+      <div class="do">Review points: services · Limited Power of Attorney (if applicable) · fee structure · payment schedule · client rights &amp; responsibilities · credit impact disclosure · accounts enrolled · cancellation rights · communication authorization · banking authorization · not-a-loan disclosure · fees-are-not-creditor-payments disclosure.</div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script — Final Confirmation</div>
+        <div class="say-text">"Before you sign, I want to confirm a few things clearly: Do you understand this is not a loan? That the program fees are for services and not payments to your creditors? That this may have a temporary negative effect on your credit? That you have not been instructed to stop paying your creditors? Do you confirm the accounts listed are the ones you want included, and that the payment schedule works for you?"</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">15</div><div class="stage-name">Closing</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Congratulations, you're finished with the enrollment documents. You'll receive a signed copy by email, along with follow-up information from the client care team. If you receive creditor calls, letters, emails, or legal notices, report them right away so the team can guide you properly. Do you have any final questions for me?"</div>
+        <div class="say-text"><b>Client Care:</b> "Client Care can be reached at 800-718-9606 or clientcare@elitelegalpractice.com."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Version 2 — Direct / GOTA -->
+  <div class="version" id="ver-res-v2">
+    <div class="ver-meta m-bl"><b>Direct Debt Resolution &amp; Go-Over-The-Agreement (GOTA).</b> Prospect is already engaged on debt resolution — no loan-callback pivot needed. This is the program explainer plus the condensed agreement walkthrough through signature and close. Pairs naturally as the back-half depth after Version 1's pivot.</div>
+
+    <div class="compliance cmp-warn">
+      <div class="cmp-hd">⚠ Agent notes on ELP's provided language</div>
+      <ul>
+        <li>The Capital One / Discover card-exclusion line is an <b>example</b>, not a fixed rule — confirm which cards are actually excluded for this client; don't read those two names as if they always apply.</li>
+        <li>Outcome claims ("debt waived/deleted including late payments," "may receive compensation for violations") are ELP's wording — deliver as ELP frames them and never expand into a guarantee.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">1</div><div class="stage-name">About the Program</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Let me explain how the ELP program works. ELP is a nationwide law firm with representation in all 50 states. They're A+ rated with the BBB and have just been nominated for an Ethics Award. They work with over 10,000 clients, focusing exclusively on disputing unsecured debt lines — credit cards, credit unions, personal loans, medical debts, auto loans with third-party collectors, and more."</div>
+        <div class="say-text">"The goal is to legally challenge and waive the debt enrolled by identifying false, inaccurate, or unverified information — using consumer protection laws like the Credit Card Act of 2009."</div>
+        <div class="say-text">"As part of this process: accounts enrolled are placed in 'dispute status' with the credit bureaus, which is a neutral, non-negative status. Once the debt is invalidated, the trade line is deleted from your credit report — that includes negative late payments. This is a legal process, which is why we work with professionals. On average, accounts are resolved within 24–48 months, though timelines can vary based on your individual case."</div>
+        <div class="say-text">"This program is ideal for someone in your situation, where credit utilization is too high and affects your financial flexibility. By reducing that utilization, you'll be in a much stronger position moving forward."</div>
+      </div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script — Important Note</div>
+        <div class="say-text">"The only drawback is that the enrolled credit cards will be closed — but we've left your [e.g. Capital One and Discover] cards out of the program, so you'll still have access to those for emergencies or essential spending."</div>
+        <div class="say-text">"Also, when you become a law firm client today, you have immediate representation and defense. That means if a creditor calls you, tell them you've hired Elite Legal and to call your lawyer. If they keep contacting you after that, report it — any calls, emails, or texts can be considered harassment. Reporting these violations to Elite Legal can significantly increase the velocity in waiving the debt, and it's possible you can also receive compensation for any violation."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">2</div><div class="stage-name">Go Over The Agreement — Send &amp; Orient</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"I'm sending the agreement now. It'll take you straight to the first signature field — you can close out of that signature box for now. If you scroll up, you'll see the agreement with 'Elite Legal Practice' at the top. We're going to go through it together. I'm reading a shortened, condensed version, but if you have any questions, stop me so we can address them as they come."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">3</div><div class="stage-name">Services &amp; Authority</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script — Services</div>
+        <div class="say-text">"ELP is a law firm that provides legal services, including: stopping creditor harassment through a cease-and-desist function; disputing all accounts with your creditors to force compliance with federal law; defending any lawsuit brought against you by a creditor with no additional or hidden fees; and filing lawsuits against creditors that violate your rights by harassing you or reporting erroneous information to the bureaus."</div>
+        <div class="say-text"><b>Limited Power of Attorney:</b> "With your signature, you grant ELP the Limited Power of Attorney to take all acts reasonably necessary to fulfill those services."</div>
+        <div class="say-text"><b>Receipt of Summons:</b> "If you receive a court summons for any enrolled account after retaining ELP, you agree to submit a complete copy as soon as possible. ELP will assign you an attorney licensed in your jurisdiction to represent you, at no additional fee."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">4</div><div class="stage-name">Fees, Not-a-Loan &amp; Program Type</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text"><b>Fee for Services:</b> "The fees charged by ELP are for legal services and will not be used to pay your creditors or otherwise settle your debts. Do you understand that? And do you understand that this is not a loan?"</div>
+        <div class="say-text"><b>Timeline on Accounts:</b> "In the rare event of a negotiation, ELP retains the right to limit a refund on a case-by-case basis of the fees designated to that specific debt. You can choose to have ELP continue working that account until it reaches a conclusion instead of taking a refund."</div>
+        <div class="say-text"><b>Debt Settlement or Management:</b> "ELP is not a debt settlement or debt management company. It's a full-service law firm providing legal debt dispute and resolution services."</div>
+        <div class="say-text"><b>Cross-Collateralized &amp; Secured Debts:</b> "A secured debt has property attached that can be repossessed if unpaid. A cross-collateralized debt has another account attached that it can access for payments. If these apply to you, we highly recommend you change banks as soon as you enroll."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">5</div><div class="stage-name">Rights, Protections &amp; Firm Details</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text"><b>Your Rights &amp; Responsibilities:</b> "You agree to allow ELP to serve as your attorneys and represent you in your dispute. You can terminate this relationship at any time."</div>
+        <div class="say-text"><b>Electronic Authorization:</b> "You acknowledge ELP may contact you by email, text, mail, or telephone."</div>
+        <div class="say-text"><b>Professional Liability Insurance:</b> "ELP maintains $1,000,000.00 per claim, ensuring you're protected against any mistake by the attorneys representing you."</div>
+        <div class="say-text"><b>Confidentiality &amp; Licensing:</b> "ELP keeps your information confidential, as required of a law firm. ELP is a California law firm that employs attorneys in every state to assist clients nationwide."</div>
+        <div class="say-text"><b>Performance of Legal Services:</b> "ELP performs services on your behalf and its fees are for the performance of such services — again, not going toward your monthly debt payments, and this is not a loan. Do you understand?"</div>
+        <div class="say-text"><b>Assignments:</b> "The firm may bring in additional help for non-legal services such as client services, and reserves the right to contract portions of this agreement, such as processing your payments."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">6</div><div class="stage-name">Acknowledgement &amp; Understanding</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"By signing, you agree you've chosen to enter into this representation by Elite Legal Practice, and you have not been told by ELP to stop paying your creditors or otherwise default on any obligation."</div>
+        <div class="say-text"><b>Read-back:</b> "'The attorney fees I am paying will go to Elite Legal Practice and not to my creditors. The fees do not accumulate towards a settlement, and they will not be used to pay my creditors/debts, and this is not a loan.' Again — you're paying ELP to legally dispute or resolve your debt. You are not paying ELP to pay your debt. Do you understand?"</div>
+        <div class="say-text"><b>Credit impact:</b> "The next one says, 'Depending on my current credit standing, this program may have a temporary negative effect on my credit.' When inaccuracies are identified, accounts may be formally removed from the reporting agencies, paving the path to a healthier financial outlook. Do you understand? Does that all make sense?"</div>
+      </div>
+      <div class="compliance cmp-info">
+        <div class="cmp-hd">Client rights &amp; responsibilities (read)</div>
+        "You're entitled to be treated with courtesy and consideration at all times by your lawyers and their staff." · "The client is expected to treat the lawyer and staff with courtesy and consideration."
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">7</div><div class="stage-name">Review Enrolled Accounts, Info &amp; Payment</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Please scroll to the List of Enrolled Accounts — here are the accounts we'll be enrolling with ELP. Review and confirm the correct accounts are listed."</div>
+        <div class="say-text">"Next, Client Information — review and confirm it's correct. Then your Payment Schedule — review and confirm you agree. If you ever need to change an upcoming payment or plan, we require a written request via email or phone at least 5 business days in advance."</div>
+        <div class="say-text">"Lastly, the banking information you provided for the Electronic Payment Authorization — review and confirm it's correct."</div>
+      </div>
+      <div class="do">Make sure the client clicks <b>Complete Documents</b>.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">8</div><div class="stage-name">Closing</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Congratulations — we're finished! You now have legal representation and defense. If a creditor calls you after we hang up, tell them you've hired Elite Legal and to call your lawyer at (800) 718-9606. Let's save that number in your phone together."</div>
+        <div class="say-text">"You'll receive a welcome packet via email, logins to your client portal, and updates shortly. Do you have any final questions for me? ELP will call you today or the next business day to complete your Welcome Call. Thank you for your patience, and congratulations again!"</div>
+        <div class="say-text"><b>ELP:</b> +1 (800) 718-9606 · clientcare@elitelegalpractice.com</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================= -->
+<!-- TAB 3 — DEBT VALIDATION (Consumer Shield) -->
+<!-- ============================================================= -->
+<section class="panel" id="panel-validation">
+  <div class="prog-head">
+    <div>
+      <div class="prog-overline">Program 03 · Debt Validation</div>
+      <h1 class="prog-title">Debt Validation</h1>
+      <div class="prog-partner">Consumer Shield (Shield Services) · A debt validation program — 4-prong approach</div>
+    </div>
+    <div class="prog-pills">
+      <span class="pill p-p">Validation-based</span>
+      <span class="pill p-p">4-prong approach</span>
+      <span class="pill p-p">NLLG law firm membership</span>
+    </div>
+  </div>
+
+  <div class="ver-toggle" id="tog-validation">
+    <button class="ver-btn active" onclick="showVer('validation','val-v1',this)" style="background:linear-gradient(135deg,var(--pp),#581c87);color:#fff;box-shadow:0 4px 12px rgba(109,40,217,.28);"><span class="ver-num">1</span>Standard Inbound</button>
+  </div>
+
+  <div class="version active" id="ver-val-v1">
+    <div class="ver-meta m-pp"><b>Standard Inbound / Warm Lead.</b> Prospect raised their hand about debt relief. Consumer Shield is a debt validation program built on the consumer's legal right to make collectors prove a debt is valid, accurate, and legally theirs to collect.</div>
+
+    <div class="router-ref">
+      <div class="router-ref-icon">🧭</div>
+      <div class="router-ref-body">
+        <div class="router-ref-hd">Confirm Consumer Shield eligibility in the Router</div>
+        <div class="router-ref-txt">Best fit for the <b>$4,000–$5,999</b> band, and a fallback above that. Confirm in the <b>AI Deal Router</b>: debt ≥ $4,000, each account ≥ $100, and the state isn't blocked (NC, PA, CO, WA, CT, NJ, OR, TX). <span class="router-chip">↗ check Router</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">1</div><div class="stage-name">Open &amp; Build Rapport</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Hi, this is [Agent Name] on a recorded line. Thanks for taking a moment — am I speaking with [Client Name]?"</div>
+        <div class="say-text">"Great. You raised your hand about getting some relief from your debt, and I want to walk you through exactly how our program helps people get back on solid ground. Sound good?"</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">2</div><div class="stage-name">Discover</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"So I can point you in the right direction — roughly how much debt are we talking about, and what kind? Credit cards, personal loans, collections?"</div>
+        <div class="say-text">"And what's been the hardest part — the calls from collectors, the interest piling up, or just feeling stuck?"</div>
+      </div>
+      <div class="do">Listen more than you talk. Note dollar amount, debt types, and their emotional pain point — you'll mirror it back later.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">3</div><div class="stage-name">Educate — Debt Validation</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Here's something most people don't realize: under the law, a debt collector has to be able to prove a debt is actually valid, accurate, and legally theirs to collect. A lot of them can't. Our program — Consumer Shield — is built on that right. It's called debt validation."</div>
+        <div class="say-text">"Instead of just paying whatever they say you owe, we make them prove it. When they can't, that debt can be disputed and removed."</div>
+      </div>
+      <div class="do">Pause here. Let it land. This is the "aha" moment.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">4</div><div class="stage-name">Present the 4-Prong Approach</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"The way the program works, you're actually getting four things working for you at the same time — we call it our 4-prong approach."</div>
+      </div>
+      <ol class="steps">
+        <li><b>Validate &amp; resolve your debt.</b> "We help dispute and resolve your debt, working it down toward a zero balance, and we get those items removed from your credit report. We also watch the collectors closely for any violations."</li>
+        <li><b>Lower your everyday bills.</b> "We help bring down your most common monthly expenses — things like your electric, cable and internet, and cell phone bill."</li>
+        <li><b>Build your credit back up.</b> "You get a secured credit-builder tradeline that reports your on-time payments to all three credit bureaus, so you're building positive history the whole way through."</li>
+        <li><b>Legal protection.</b> "You're protected with a membership to a national litigation law firm — one of the largest in the country with an A+ BBB rating — so you've got real legal muscle in your corner."</li>
+      </ol>
+      <div class="say s-pp" style="margin-top:12px;">
+        <div class="say-kicker">Phone Script — Tie It Back</div>
+        <div class="say-text">"So while we're clearing the old debt, we're also lowering your bills, rebuilding your credit, and keeping you legally protected — all at once."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">5</div><div class="stage-name">Handle Objections</div></div>
+      <table class="obj">
+        <thead><tr><th>Client says…</th><th>Agent responds…</th></tr></thead>
+        <tbody>
+          <tr><td>"Is this a loan?"</td><td>"No — this isn't a loan and it isn't consolidation. It's a debt validation program. We make collectors prove the debt is valid, and work to resolve it down toward zero."</td></tr>
+          <tr><td>"Will this hurt my credit?"</td><td>"As we work through validation, you also have our credit-builder reporting positive, on-time history to all three bureaus — so we're building you back up at the same time. Results vary by client."</td></tr>
+          <tr><td>"How do I know this is legit?"</td><td>"Totally fair. You're protected by a membership to a national litigation law firm with an A+ BBB rating. You're never doing this alone."</td></tr>
+          <tr><td>"I can't afford anything right now."</td><td>"I hear you — that's exactly why we also work to lower your everyday bills like electric, internet, and your phone. The goal is to put money back in your pocket."</td></tr>
+          <tr><td>"Can you guarantee my debt goes to zero?"</td><td>"I can't promise a specific result — every debt is different and outcomes vary. What I can tell you is exactly how the process works and how hard we work on your behalf."</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">6</div><div class="stage-name">Close &amp; Set Expectations</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Based on everything you've told me, you're exactly the kind of person this program is built for. The next step is simple — let's get you qualified so I can show you exactly what your program would look like. It only takes a few minutes. Sound good?"</div>
+        <div class="say-text">"Here's what happens next: we'll get your enrollment set up, your dedicated team gets to work on validating and disputing your debts, your credit-builder starts reporting, and your law-firm membership goes active. I'll walk you through every step so you're never in the dark."</div>
+      </div>
+      <div class="compliance cmp-warn">
+        <div class="cmp-hd">Compliance reminders</div>
+        Use "work toward" and "may" rather than promises. Outcomes vary by client. This is debt validation, not settlement or consolidation. Verify NLLG / BBB-rating claims against current approved compliance language before stating them on a recorded line.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="footer-note">
+  Internal training reference · Funding Tier · Verify all partner, legal, and BBB-rating claims against current approved compliance language before use on live recorded calls.
+</div>
+
+</main>
+
+<script>
+function showTab(panel, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+panel).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>initAccordions(document.getElementById('panel-'+panel)),60);
+}
+function showVer(panel, ver, btn){
+  document.querySelectorAll('#panel-'+panel+' .version').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('#tog-'+panel+' .ver-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ver-'+ver).classList.add('active');
+  btn.classList.add('active');
+  setTimeout(()=>initAccordions(document.getElementById('ver-'+ver)),60);
+}
+
+/* ---- Accordion: convert numbered stage cards, first open, scroll-aware ---- */
+function convertCard(card){
+  if(card.dataset.acc==='1') return;
+  var hd = card.querySelector(':scope > .stage-hd');
+  if(!hd || !hd.querySelector('.stage-num')) return;
+  card.dataset.acc='1';
+  card.classList.add('acc');
+  // caret — large labeled toggle
+  var caret=document.createElement('span');
+  caret.className='acc-caret';
+  caret.innerHTML='<span class="acc-label"></span><span class="acc-chev">\u2304</span>';
+  caret.setAttribute('role','button');
+  caret.setAttribute('aria-label','Toggle section');
+  hd.appendChild(caret);
+  // wrap everything after the header into a collapsible body
+  var body=document.createElement('div');body.className='acc-body';
+  var inner=document.createElement('div');inner.className='acc-inner';
+  var n=hd.nextSibling;
+  while(n){ var next=n.nextSibling; inner.appendChild(n); n=next; }
+  body.appendChild(inner);
+  card.appendChild(body);
+  hd.addEventListener('click',function(){
+    card.classList.toggle('open');
+  });
+}
+function initAccordions(scope){
+  scope = scope || document;
+  var cards = Array.prototype.slice.call(scope.querySelectorAll('.card'))
+    .filter(function(c){ var h=c.querySelector(':scope > .stage-hd'); return h && h.querySelector('.stage-num'); });
+  cards.forEach(convertCard);
+  // For each version block in scope: first stage open, the rest collapsed
+  var versions = Array.prototype.slice.call(scope.querySelectorAll('.version'));
+  if(scope.classList && scope.classList.contains('version')) versions = [scope];
+  if(!versions.length) versions = [scope];
+  versions.forEach(function(ver){
+    var list = Array.prototype.slice.call(ver.querySelectorAll('.card.acc'));
+    list.forEach(function(c,i){ if(i===0) c.classList.add('open'); else c.classList.remove('open'); });
+  });
+}
+
+/* Scroll focus removed — first stage open by default, rest open only on click. */
+function bootAccordions(){
+  document.querySelectorAll('.panel').forEach(function(p){ initAccordions(p); });
+}
+window.addEventListener('load', bootAccordions);
+
+/* ---- Level Debt state selector → dynamic attorney-model script ---- */
+var LD_ATTORNEY = ["CT","GA","LA","MN","NV","NH","NJ","ND","OH","PA","TN","WA","WY"];
+var LD_BLACKOUT = ["AK","RI","VT","WV","OR","GU","HI","ME","MT","PR","SC","SD","UT","WI"];
+var US_STATE_NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",DC:"Washington D.C."};
+
+function updateLdState(){
+  var sel = document.getElementById('ldState');
+  if(!sel) return;
+  var st = sel.value;
+  var statusEl = document.getElementById('ldStateStatus');
+  var emptyEl  = document.getElementById('ldStateEmpty');
+  var scriptEl = document.getElementById('ldStateScript');
+  var blackEl  = document.getElementById('ldStateBlack');
+  var feePill  = document.getElementById('ldFeePill');
+  var txtEl    = document.getElementById('ldScriptText');
+  var noteEl   = document.getElementById('ldScriptNote');
+  var name = US_STATE_NAMES[st] || st;
+
+  // reset
+  statusEl.className = 'state-status';
+  emptyEl.style.display = 'none';
+  scriptEl.classList.remove('show');
+  blackEl.classList.remove('show');
+
+  if(!st){ emptyEl.style.display=''; statusEl.classList.remove('show'); return; }
+
+  // Blackout — Level Debt can't service
+  if(LD_BLACKOUT.indexOf(st) !== -1){
+    statusEl.classList.add('show','is-black');
+    statusEl.textContent = '⛔ ' + name + ' — Blackout for Level Debt';
+    blackEl.classList.add('show');
+    blackEl.innerHTML = '<b>'+name+' is a Level Debt blackout state.</b> Do not present Level Debt here. Route the prospect to Debt Resolution (ELP) or Debt Validation (Consumer Shield) instead, and confirm eligibility in the Router. <span class="router-chip">↗ check Router</span>';
+    return;
+  }
+
+  // Attorney-model state — reference the law firm / attorneys + POA letters
+  if(LD_ATTORNEY.indexOf(st) !== -1){
+    statusEl.classList.add('show','is-atty');
+    statusEl.textContent = '⚖️ ' + name + ' — Attorney Model';
+    feePill.className = 'ss-fee f-atty';
+    feePill.innerHTML = 'Program fee: <b>27%</b> of enrolled debt &nbsp;·&nbsp; Attorney-model state';
+    txtEl.innerHTML =
+      '"Here\u2019s some great news for you in '+name+' — your program comes with our <b>national expert attorney network</b> built right in. That means experienced attorneys, not just negotiators, go to work directly with your creditors on your behalf, at no extra cost to you. '+
+      'We handle the heavy lifting: you\u2019ll authorize the attorneys to step in and negotiate for you, so the calls and the back-and-forth become <i>their</i> job, not yours. '+
+      'You make one simple monthly deposit into an account you own and control, and the attorney negotiation service works to settle your enrolled debts for less than what you owe — it\u2019s all included in your program."';
+    noteEl.innerHTML = 'Attorney-model state: frame the <b>national expert attorney network</b> and the included attorney negotiation service as a benefit. The authorization the client signs lets the attorneys negotiate on their behalf. Fee is <b>27%</b> of enrolled debt. <span class="router-chip">↗ confirm in Router</span>';
+    scriptEl.classList.add('show');
+    return;
+  }
+
+  // Standard (non-attorney) state
+  statusEl.classList.add('show','is-std');
+  statusEl.textContent = '✓ ' + name + ' — Standard Model';
+  feePill.className = 'ss-fee f-std';
+  feePill.innerHTML = 'Program fee: <b>25%</b> of enrolled debt &nbsp;·&nbsp; Standard state';
+  txtEl.innerHTML =
+    '"In '+name+', you\u2019ll have a dedicated negotiations team managing your program and your account from start to finish. '+
+    'You make one monthly deposit into an account you own and control, and as those deposits build, our negotiators work to settle your enrolled debts for less than the full balance — results vary by creditor and by file, and not all debts qualify."';
+  noteEl.innerHTML = 'Standard state: <b>do not</b> reference a law firm, attorneys, or power of attorney letters. Fee is <b>25%</b> of enrolled debt. <span class="router-chip">↗ confirm in Router</span>';
+  scriptEl.classList.add('show');
+}
+</script>
+</body>
+</html>
