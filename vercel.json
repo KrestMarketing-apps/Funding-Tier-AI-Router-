@@ -6,6 +6,10 @@
       "destination": "/api/plan?slug=:slug"
     },
     {
+      "source": "/agents/call-scripts",
+      "destination": "/agents/call-scripts/index.html"
+    },
+    {
       "source": "/credit-card-calculator",
       "destination": "/credit-card-calculator.html"
     },
