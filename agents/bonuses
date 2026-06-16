@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Funding Tier — Bonuses &amp; Spiffs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{--g:#0f9d8a;--gd:#0b7d6e;--dk:#0f172a;--bl:#1a6ed8;--am:#f59e0b;--rd:#ef4444;--br:#e2e8f0;--bg:#f8fafc;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--dk);min-height:100vh;}
+.topbar{position:sticky;top:0;z-index:80;background:linear-gradient(135deg,var(--dk) 0%,#0b3b50 42%,#0f9d8a 100%);box-shadow:0 4px 24px rgba(15,23,42,.22);}
+.topbar-inner{max-width:1180px;margin:0 auto;padding:12px 20px 16px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand img{height:32px;width:auto;}
+.brand-title{font-size:17px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.1;}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.42);margin-top:2px;font-weight:600;letter-spacing:.2px;}
+.back-link{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:7px 14px;border-radius:9px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);color:#fff;font-size:12px;font-weight:800;text-decoration:none;white-space:nowrap;transition:background .15s;}
+.back-link:hover{background:rgba(255,255,255,.2);}
+
+main{max-width:1180px;margin:0 auto;padding:26px 20px 70px;}
+.page-head{margin-bottom:22px;}
+.page-kicker{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;}
+.page-title{font-family:"Poppins",sans-serif;font-size:30px;font-weight:900;color:var(--dk);letter-spacing:-.6px;line-height:1.08;}
+.page-lede{font-size:14px;color:#475569;font-weight:550;line-height:1.6;margin-top:8px;max-width:680px;}
+
+.card{background:#fff;border:1px solid var(--br);border-radius:18px;box-shadow:0 2px 10px rgba(15,23,42,.05);overflow:hidden;margin-bottom:18px;}
+
+.sect-hd{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;color:#fff;}
+.sect-hd-l{display:flex;align-items:center;gap:11px;min-width:0;}
+.sect-ico{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.16);font-size:19px;flex-shrink:0;}
+.sect-name{font-size:16px;font-weight:900;line-height:1.15;}
+.sect-desc{font-size:11px;color:rgba(255,255,255,.78);font-weight:600;margin-top:2px;line-height:1.4;}
+.sect-tag{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 10px;white-space:nowrap;flex-shrink:0;}
+
+.hd-daily{background:linear-gradient(135deg,#0f9d8a,#0b7d6e);}
+.hd-monthly{background:linear-gradient(135deg,#16a34a,#15803d);}
+.hd-balanced{background:linear-gradient(135deg,#22c55e,#16a34a);}
+.hd-ld{background:linear-gradient(135deg,#0f9d8a,#047857);}
+.hd-policy{background:linear-gradient(135deg,#0f172a,#0b3b50,#0f9d8a);}
+
+.callout{padding:11px 20px;font-size:12px;font-weight:600;line-height:1.65;border-bottom:1px solid var(--br);}
+.callout strong{font-weight:900;}
+.callout-g{background:#f0fdf4;color:#166534;border-bottom-color:rgba(15,157,138,.2);}
+.callout-a{background:#fffbeb;color:#92400e;border-bottom-color:rgba(245,158,11,.25);}
+
+.tbl-scroll{overflow-x:auto;}
+table.spiff{width:100%;border-collapse:collapse;}
+table.spiff th{padding:10px 16px;background:var(--dk);color:rgba(255,255,255,.72);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;text-align:left;white-space:nowrap;}
+table.spiff td{padding:12px 16px;border-bottom:1px solid var(--br);vertical-align:middle;font-size:13px;color:#334155;}
+table.spiff tr:last-child td{border-bottom:none;}
+table.spiff tr:nth-child(even) td{background:var(--bg);}
+.td-type{font-weight:800;color:var(--dk);}
+.amt{font-weight:900;font-size:15px;white-space:nowrap;}
+.amt-g{color:var(--g);}
+.amt-d{color:#0b7d6e;}
+
+.tag{display:inline-block;font-size:9px;font-weight:800;border-radius:999px;padding:3px 8px;white-space:nowrap;margin-right:2px;}
+.tag.cs{background:rgba(26,110,216,.12);color:var(--bl);border:1px solid rgba(26,110,216,.25);}
+.tag.elp{background:rgba(109,40,217,.12);color:#6d28d9;border:1px solid rgba(109,40,217,.25);}
+.tag.ld{background:rgba(15,157,138,.12);color:#0b7d6e;border:1px solid rgba(15,157,138,.25);}
+.tag.all{background:var(--bg);color:#475569;border:1px solid var(--br);}
+
+.policy-body{padding:18px 20px;line-height:1.75;font-size:13px;color:#334155;}
+.policy-lead{font-weight:900;color:var(--dk);margin-bottom:10px;font-size:14px;}
+.policy-body ul{padding-left:20px;display:grid;gap:8px;}
+
+.foot-note{margin-top:8px;font-size:11px;color:#64748b;line-height:1.6;text-align:center;font-weight:550;}
+
+@media(max-width:640px){
+  .page-title{font-size:24px;}
+  table.spiff th,table.spiff td{padding:10px 12px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" alt="Funding Tier"/>
+      <div>
+        <div class="brand-title">Bonuses &amp; Spiffs</div>
+        <div class="brand-sub">Agent Incentive Reference</div>
+      </div>
+    </div>
+    <a class="back-link" href="/">← Back to AI Deal Router</a>
+  </div>
+</header>
+
+<main>
+  <div class="page-head">
+    <span class="page-kicker">🎅 Agent Earnings</span>
+    <h1 class="page-title">Bonuses &amp; Spiffs</h1>
+    <p class="page-lede">Daily, monthly, and book-mix bonuses stack on top of base commission. Hit the thresholds below to earn more on the deals you are already writing. Shield Services (Debt Validation) and Elite Legal Practice (Debt Resolution) earn the same bonus tiers. All payouts are subject to the clawback and chargeback policy at the bottom of this page.</p>
+  </div>
+
+  <!-- Daily Deal Bonus -->
+  <section class="card">
+    <div class="sect-hd hd-daily">
+      <div class="sect-hd-l">
+        <span class="sect-ico">⚡</span>
+        <div>
+          <div class="sect-name">Daily Deal Bonus</div>
+          <div class="sect-desc">Per-deal bonus × qualifying deals that day</div>
+        </div>
+      </div>
+      <span class="sect-tag">Daily</span>
+    </div>
+    <div class="callout callout-g">
+      ⓘ Bonus is <strong>per deal × qualifying deals that day</strong> — e.g. <strong>3 deals = +$50 each ($150 total)</strong> · <strong>5 deals = +$75 each ($375 total)</strong>.
+    </div>
+    <div class="tbl-scroll">
+      <table class="spiff">
+        <thead><tr><th>Bonus Type</th><th>Daily Threshold</th><th>Applies To</th><th>Bonus Amount</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="td-type">Daily Deal Bonus</td>
+            <td>3 deals in one day</td>
+            <td><span class="tag cs">Shield Services (Debt Validation)</span> <span class="tag elp">Elite Legal Practice (Debt Resolution)</span></td>
+            <td><span class="amt amt-g">+$50 /deal</span></td>
+          </tr>
+          <tr>
+            <td class="td-type">Daily Deal Bonus</td>
+            <td>5+ deals in one day</td>
+            <td><span class="tag cs">Shield Services (Debt Validation)</span> <span class="tag elp">Elite Legal Practice (Debt Resolution)</span></td>
+            <td><span class="amt amt-g">+$75 /deal</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Monthly Volume Bonus -->
+  <section class="card">
+    <div class="sect-hd hd-monthly">
+      <div class="sect-hd-l">
+        <span class="sect-ico">📈</span>
+        <div>
+          <div class="sect-name">Monthly Volume Bonus</div>
+          <div class="sect-desc">Hit monthly thresholds to stack volume bonuses</div>
+        </div>
+      </div>
+      <span class="sect-tag">Monthly</span>
+    </div>
+    <div class="tbl-scroll">
+      <table class="spiff">
+        <thead><tr><th>Bonus Type</th><th>Monthly Threshold</th><th>Applies To</th><th>Bonus Amount</th></tr></thead>
+        <tbody>
+          <tr><td class="td-type">Monthly Volume</td><td>8 deals/mo</td><td><span class="tag cs">Shield Services (Debt Validation)</span> <span class="tag elp">Elite Legal Practice (Debt Resolution)</span></td><td><span class="amt amt-g">+$300</span></td></tr>
+          <tr><td class="td-type">Monthly Volume</td><td>12 deals/mo</td><td><span class="tag cs">Shield Services (Debt Validation)</span> <span class="tag elp">Elite Legal Practice (Debt Resolution)</span></td><td><span class="amt amt-g">+$600</span></td></tr>
+          <tr><td class="td-type">Monthly Volume</td><td>17 deals/mo</td><td><span class="tag cs">Shield Services (Debt Validation)</span> <span class="tag elp">Elite Legal Practice (Debt Resolution)</span></td><td><span class="amt amt-g">+$1,000</span></td></tr>
+          <tr><td class="td-type">Monthly Volume</td><td>23 deals/mo</td><td><span class="tag cs">Shield Services (Debt Validation)</span> <span class="tag elp">Elite Legal Practice (Debt Resolution)</span></td><td><span class="amt amt-g">+$1,500</span></td></tr>
+          <tr><td class="td-type">Monthly Volume</td><td>30+ deals/mo</td><td><span class="tag cs">Shield Services (Debt Validation)</span> <span class="tag elp">Elite Legal Practice (Debt Resolution)</span></td><td><span class="amt amt-g">+$2,250</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Balanced Book Bonus -->
+  <section class="card">
+    <div class="sect-hd hd-balanced">
+      <div class="sect-hd-l">
+        <span class="sect-ico">⚖️</span>
+        <div>
+          <div class="sect-name">Balanced Book Bonus</div>
+          <div class="sect-desc">Maintain proper CS/DS deal mix to earn book bonuses</div>
+        </div>
+      </div>
+      <span class="sect-tag">Monthly</span>
+    </div>
+    <div class="callout callout-a">
+      ⓘ Requires a proper mix of <strong>Debt Settlement (Level / future DS programs)</strong> against your <strong>validation &amp; resolution</strong> book. The mix % counts <strong>both Shield Services (Debt Validation) and Elite Legal Practice (Debt Resolution)</strong> deals together. Being too validation/resolution-heavy sacrifices LD volume tier bonuses — keep a balanced book.
+    </div>
+    <div class="tbl-scroll">
+      <table class="spiff">
+        <thead><tr><th>Bonus Type</th><th>Validation + Resolution Mix</th><th>Min Deals</th><th>DS Program</th><th>Bonus Amount</th></tr></thead>
+        <tbody>
+          <tr><td class="td-type">Balanced Book</td><td>30%+ validation/resolution mix</td><td>5+ deals</td><td><span class="tag ld">Level DS / Future DS</span></td><td><span class="amt amt-g">+$100</span></td></tr>
+          <tr><td class="td-type">Balanced Book</td><td>50%+ validation/resolution mix</td><td>5+ deals</td><td><span class="tag ld">Level DS / Future DS</span></td><td><span class="amt amt-g">+$250</span></td></tr>
+          <tr><td class="td-type">Balanced Book</td><td>70%+ validation/resolution mix</td><td>5+ deals</td><td><span class="tag ld">Level DS / Future DS</span></td><td><span class="amt amt-g">+$500</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- LD Enrollment Bonus -->
+  <section class="card">
+    <div class="sect-hd hd-ld">
+      <div class="sect-hd-l">
+        <span class="sect-ico">🏆</span>
+        <div>
+          <div class="sect-name">LD Enrollment Bonus</div>
+          <div class="sect-desc">Level Debt daily enrolled volume threshold bonus</div>
+        </div>
+      </div>
+      <span class="sect-tag">Daily</span>
+    </div>
+    <div class="tbl-scroll">
+      <table class="spiff">
+        <thead><tr><th>Bonus Type</th><th>Daily Enrolled Volume</th><th>Applies To</th><th>Bonus Amount</th></tr></thead>
+        <tbody>
+          <tr><td class="td-type">LD Enrollment</td><td>$75,000+ enrolled/day</td><td><span class="tag ld">Level Debt</span></td><td><span class="amt amt-d">+$75</span></td></tr>
+          <tr><td class="td-type">LD Enrollment</td><td>$100,000+ enrolled/day</td><td><span class="tag ld">Level Debt</span></td><td><span class="amt amt-d">+$125</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Bonus Policy -->
+  <section class="card">
+    <div class="sect-hd hd-policy">
+      <div class="sect-hd-l">
+        <span class="sect-ico">🛡️</span>
+        <div>
+          <div class="sect-name">Bonus Policy &amp; Accounting Controls</div>
+          <div class="sect-desc">Read this before accounting or payout decisions are finalized</div>
+        </div>
+      </div>
+      <span class="sect-tag">Policy</span>
+    </div>
+    <div class="policy-body">
+      <div class="policy-lead">All bonus payouts are subject to Funding Tier clawback and chargeback policy.</div>
+      <ul>
+        <li>Daily, monthly, balanced-book, and Level Debt volume bonuses are all subject to review before payout.</li>
+        <li>Chargeback liability is enforced across the board on a daily basis, and any open risk period can delay or reverse a bonus payout.</li>
+        <li>Accounting should treat bonus amounts as provisional until the related files have fully cleared the applicable clawback and chargeback windows.</li>
+        <li>This policy applies uniformly to avoid reconciliation issues, overpayment errors, and incorrect bonus accruals.</li>
+      </ul>
+    </div>
+  </section>
+
+  <p class="foot-note">Internal agent reference. Bonus structures, thresholds, and payout amounts are subject to change. Confirm current figures with your team lead before quoting earnings.</p>
+</main>
+
+</body>
+</html>
