@@ -100,6 +100,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
 .ver-btn:hover{background:var(--bg);color:var(--dk);}
 .ver-btn.active{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;box-shadow:0 4px 12px rgba(15,157,138,.28);}
 .ver-btn.active.b-bl{background:linear-gradient(135deg,var(--bl),#1559b0);box-shadow:0 4px 12px rgba(26,110,216,.28);}
+#tog-validation .ver-btn.active{background:linear-gradient(135deg,var(--pp),#581c87);box-shadow:0 4px 12px rgba(109,40,217,.28);}
 .ver-num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.08);font-size:10px;font-weight:900;}
 .ver-btn.active .ver-num{background:rgba(255,255,255,.22);}
 
@@ -179,6 +180,22 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
 .state-empty{margin-top:10px;font-size:12px;color:#94a3b8;font-weight:600;}
 .state-black-note{margin-top:12px;display:none;background:#fef2f2;border:1.5px solid rgba(239,68,68,.32);border-radius:12px;padding:13px 15px;font-size:13px;font-weight:700;color:#b91c1c;line-height:1.6;}
 .state-black-note.show{display:block;animation:fade .25s ease;}
+
+/* ============================================================ */
+/*  FDCPA / grounds-for-dismissal grid (ELP sizzle)              */
+/* ============================================================ */
+.grounds-intro{font-size:14px;font-weight:700;color:#1e293b;line-height:1.65;background:linear-gradient(135deg,#f8fbff,#eff6ff);
+  border:1.5px solid rgba(26,110,216,.22);border-left:4px solid var(--bl);border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+.grounds-intro b{color:var(--bl);}
+.grounds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:11px;}
+.ground{border:1.5px solid var(--br);border-radius:13px;padding:14px;background:#fff;position:relative;transition:box-shadow .18s,border-color .18s,transform .12s;}
+.ground:hover{box-shadow:0 8px 22px rgba(26,110,216,.12);border-color:rgba(26,110,216,.35);transform:translateY(-2px);}
+.ground-ico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid rgba(26,110,216,.25);
+  display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:9px;}
+.ground-t{font-size:13.5px;font-weight:900;color:var(--dk);margin-bottom:5px;line-height:1.3;}
+.ground-d{font-size:12px;color:#475569;font-weight:600;line-height:1.55;}
+.ground-law{display:inline-block;margin-top:8px;font-size:10px;font-weight:900;letter-spacing:.04em;color:var(--bl);
+  background:rgba(26,110,216,.1);border:1px solid rgba(26,110,216,.25);border-radius:6px;padding:2px 8px;text-transform:uppercase;}
 
 /* Compliance banner */
 .compliance{border-radius:12px;padding:14px 16px;margin:0 0 16px;font-size:13px;line-height:1.6;font-weight:600;}
@@ -578,11 +595,312 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
   </div>
 
   <div class="ver-toggle" id="tog-settlement">
-    <button class="ver-btn active" onclick="showVer('settlement','set-v1',this)"><span class="ver-num">1</span>Standard Inbound</button>
+    <button class="ver-btn active" onclick="showVer('settlement','set-v1',this)"><span class="ver-num">1</span>Inbound Ad / Text Response</button>
+    <button class="ver-btn" onclick="showVer('settlement','set-v2',this)"><span class="ver-num">2</span>Loan Swap / Denial Pivot</button>
+    <button class="ver-btn" onclick="showVer('settlement','set-v3',this)"><span class="ver-num">3</span>Direct Script</button>
   </div>
 
-  <!-- Version 1 -->
+  <!-- Version 1 — Inbound Ad / Text Response (DEFAULT) — FULL STANDALONE -->
   <div class="version active" id="ver-set-v1">
+    <div class="ver-meta"><b>Inbound Ad / Text Response.</b> Prospect is calling in after responding to an ad or replying to a text about a debt-relief / hardship-relief program. Complete standalone script — open through close.</div>
+
+    <div class="router-ref">
+      <div class="router-ref-icon">🧭</div>
+      <div class="router-ref-body">
+        <div class="router-ref-hd">Qualify &amp; confirm the route in the Router</div>
+        <div class="router-ref-txt">Run the <b>Qualification</b> tab first. For Level Debt, confirm in the <b>Router</b>: debt ≥ $7,000, $200/account, $250/mo deposit, accepted creditors, and the state isn't a blackout. The Router also sets the attorney-model fee and term. <span class="router-chip">↗ check Router</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">1</div><div class="stage-name">Open — Acknowledge Their Inquiry</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Hi, this is [Agent Name] on a recorded line — thanks for reaching out. Am I speaking with [Client Name]?"</div>
+        <div class="say-text">"Perfect. I'm following up because you responded to our information about a <b>debt-relief and hardship-relief program</b> — you're looking for help getting on top of your debt, is that right?"</div>
+        <div class="say-text">"You're in the right place. Let me ask a few quick questions to understand your situation, then I'll walk you through exactly how our program works. Fair enough?"</div>
+      </div>
+      <div class="do">They opted in — warm lead. Smile through the phone, confirm the program they inquired about, and get an early "yes."</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">2</div><div class="stage-name">Discover &amp; Qualify</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Roughly how much total unsecured debt are we working with — credit cards, personal loans, medical, collections? And which state are you in?"</div>
+        <div class="say-text">"What's been the hardest part — the interest, the minimum payments, the collection calls, or just feeling stuck?"</div>
+        <div class="say-text">"And if we could set up one simpler, more manageable monthly amount, what would that mean for you?"</div>
+      </div>
+      <div class="do">Qualify against the backend: total enrolled debt <b>$7,000+</b>, at least <b>$200 per account</b>, can do <b>$250/mo</b>, not a blackout state. Note the state — you need it for the attorney-model branch in stage 5. <span class="router-chip">↗ check Router</span></div>
+      <div class="subhd">Accepted debt types</div>
+      <div class="chips">
+        <span class="chip">Unsecured debt</span><span class="chip">Unsecured personal loan</span><span class="chip">Unsecured line of credit</span><span class="chip">Medical bill</span><span class="chip">Payday loan</span><span class="chip">Tribal loan</span><span class="chip">Cell phone bill</span><span class="chip">Repossession deficiency</span><span class="chip">Back rent (collections)</span><span class="chip">Business debt</span><span class="chip">Judgment</span><span class="chip">Private student loan</span>
+      </div>
+      <div class="subhd">Blackout states — cannot enroll</div>
+      <div class="chips">
+        <span class="chip bad">AK</span><span class="chip bad">HI</span><span class="chip bad">ME</span><span class="chip bad">MT</span><span class="chip bad">ND</span><span class="chip bad">OR</span><span class="chip bad">PR</span><span class="chip bad">RI</span><span class="chip bad">SC</span><span class="chip bad">SD</span><span class="chip bad">UT</span><span class="chip bad">VT</span><span class="chip bad">WV</span><span class="chip bad">WI</span><span class="chip bad">GU</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">3</div><div class="stage-name">Educate</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Here's how it works. Instead of paying the full balance plus years of interest, we negotiate directly with your creditors to settle your debts for less than what you currently owe. It's not a loan, and it's not consolidation — nothing new to borrow. And just so it's clear, this is debt settlement, not debt validation."</div>
+      </div>
+      <div class="do">Pause and let it land before presenting the mechanics.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">4</div><div class="stage-name">Present the Program</div></div>
+      <ol class="steps">
+        <li>"Instead of paying creditors directly, you make one monthly <b>deposit</b> into a dedicated account that <b>you own and control</b> — currently a minimum of $250 a month."</li>
+        <li>"As those deposits build, our negotiators settle your debts one at a time for less than the full balance. Keep in mind creditor response varies, and not all debts qualify."</li>
+        <li>"You're only charged the program fee as we work your enrolled debt — there are no upfront fees to start."</li>
+        <li>"Your program fee is a percentage of your enrolled debt, and we'll go over your exact number and your monthly deposit before you commit to anything."</li>
+      </ol>
+      <div class="subhd">Select the prospect's state — the script updates automatically <span class="router-chip">↗ confirm in Router</span></div>
+      <div class="state-select-wrap">
+        <div class="state-select-row">
+          <span class="state-select-lbl"><span class="ss-ico">📍</span>Prospect's state</span>
+          <select class="state-select" id="ldState1" onchange="updateLdState('1')">
+            <option value="">— Select a state —</option>
+            <option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option>
+            <option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option>
+            <option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="FL">Florida</option>
+            <option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option>
+            <option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option>
+            <option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option>
+            <option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option>
+            <option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option>
+            <option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option>
+            <option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option>
+            <option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option>
+            <option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option>
+            <option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option>
+            <option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option>
+            <option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option>
+            <option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option>
+            <option value="WI">Wisconsin</option><option value="WY">Wyoming</option>
+            <option value="DC">Washington D.C.</option>
+          </select>
+          <span class="state-status" id="ldStateStatus1"></span>
+        </div>
+        <div class="state-empty" id="ldStateEmpty1">Pick a state to load the correct script.</div>
+        <div class="state-black-note" id="ldStateBlack1"></div>
+        <div class="state-script" id="ldStateScript1">
+          <span class="ss-fee" id="ldFeePill1"></span>
+          <div class="say">
+            <div class="say-kicker">Phone Script — Present the Program</div>
+            <div class="say-text" id="ldScriptText1"></div>
+          </div>
+          <div class="branch-note" id="ldScriptNote1"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">5</div><div class="stage-name">Set Honest Expectations — Required Disclosures</div></div>
+      <div class="compliance cmp-info">
+        <div class="cmp-hd">Say these out loud — required by compliance</div>
+        These disclosures must be delivered verbally on the recorded line.
+      </div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"I want to be straight with you on a few things. Your <b>settlement results vary by creditor and by file</b> — I can't promise a specific amount. Because you'll be settling rather than paying as originally agreed, this program <b>may negatively impact your credit</b> in the short term. And <b>not all debt types, creditors, or states qualify</b> — that's why we check. This is debt settlement, not debt validation."</div>
+      </div>
+      <div class="compliance cmp-stop">
+        <div class="cmp-hd">Never say — prohibited phrases</div>
+        <ul>
+          <li><code>guarantee savings</code> · <code>guaranteed settlement</code></li>
+          <li><code>we will eliminate your debt</code></li>
+          <li><code>your credit will improve</code></li>
+          <li><code>you cannot be sued</code></li>
+          <li><code>instant approval</code> / <code>guaranteed approval</code></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">6</div><div class="stage-name">Handle Objections</div></div>
+      <div class="lead">Acknowledge → reframe with a fact → redirect to the next step. Never argue.</div>
+      <table class="obj">
+        <thead><tr><th>Client says…</th><th>Agent responds…</th></tr></thead>
+        <tbody>
+          <tr><td>"Is this a loan?"</td><td>"No — it's not a loan and it's not consolidation. It's a debt settlement program. We negotiate your balances down rather than having you borrow anything new."</td></tr>
+          <tr><td>"Will this hurt my credit?"</td><td>"Because you're settling rather than paying as originally agreed, it may impact your credit in the short term. The goal is to get you debt-free and rebuild from a stronger position. Results vary by file."</td></tr>
+          <tr><td>"How much will I save?"</td><td>"I can't promise a specific number — settlement results vary by creditor and by account. What I can do is show you your exact monthly deposit and timeline so you can decide."</td></tr>
+          <tr><td>"Can you guarantee it?"</td><td>"I can't guarantee a settlement amount — every creditor is different. What I can guarantee is exactly how the program works and how we go to bat for you."</td></tr>
+          <tr><td>"I need to think about it."</td><td>"Of course. What's on your mind — the monthly deposit, the timeline, or how settlement works? Let's clear that up right now."</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">7</div><div class="stage-name">Close &amp; Set the Term</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Based on what you've told me, you're exactly who this program is built for. Let's get you qualified so I can show you your exact monthly deposit, your total, and your timeline. Takes just a few minutes."</div>
+      </div>
+      <div class="do">Read the client's term straight from their debt tier — this is set by the backend, don't improvise it. <span class="router-chip">↗ check Router</span></div>
+      <table class="dtbl">
+        <thead><tr><th>Enrolled debt</th><th>Program term</th></tr></thead>
+        <tbody>
+          <tr><td>$7,000 – $9,999</td><td>24 months</td></tr>
+          <tr><td>$10,000 – $12,499</td><td>30 months</td></tr>
+          <tr><td>$12,500 – $14,999</td><td>36 months</td></tr>
+          <tr><td>$15,000 – $24,999</td><td>42 months</td></tr>
+          <tr><td>$25,000 – $34,999</td><td>48 months</td></tr>
+          <tr><td>$35,000 – $49,999</td><td>54 months</td></tr>
+          <tr><td>$50,000+</td><td>60 months</td></tr>
+        </tbody>
+      </table>
+      <div class="compliance cmp-warn" style="margin-top:14px;">
+        <div class="cmp-hd">FORTH CRM setup</div>
+        Under $35,000 → use the <b>Debt Settlement Enrollment Plan</b>. $35,000+ and the client wants a lower monthly → use the <b>Override Plan</b> for terms beyond 48 months to lower the monthly deposit. Minimum monthly program deposit is <b>$250</b>.
+      </div>
+    </div>
+  </div>
+
+  <!-- Version 2 — Loan Swap / Denial Pivot — FULL STANDALONE -->
+  <div class="version" id="ver-set-v2">
+    <div class="ver-meta"><b>Loan Swap / Denial Pivot.</b> Prospect called about a personal / hardship loan and was declined or it isn't the right fit. Complete standalone script — pivot through close.</div>
+
+    <div class="router-ref">
+      <div class="router-ref-icon">🧭</div>
+      <div class="router-ref-body">
+        <div class="router-ref-hd">Confirm Level Debt eligibility in the Router</div>
+        <div class="router-ref-txt">Confirm debt ≥ $7,000, $200/account, $250/mo deposit, accepted creditors, and a non-blackout state. The Router sets the attorney-model fee and term. <span class="router-chip">↗ check Router</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">1</div><div class="stage-name">Deliver the Loan Outcome</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Thanks for your patience while I reviewed everything. I want to be upfront with you — based on the balances, income, and current payment load, a traditional loan either isn't available right now or wouldn't actually improve your situation. Honestly, taking on another loan on top of this debt usually makes the monthly pressure worse, not better."</div>
+        <div class="say-text">"But here's the good news — that's not your only option, and it may not even be your best one."</div>
+      </div>
+      <div class="do">Be honest and reassuring, not apologetic. The denial is the setup for a better solution.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">2</div><div class="stage-name">Pivot to Debt Settlement &amp; Qualify</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Instead of borrowing more, there's a program that works to <b>settle</b> your unsecured debts for less than what you currently owe — so you're resolving the balances, not just shifting them into a new loan. It's not a loan and it's not consolidation."</div>
+        <div class="say-text">"A lot of people who can't qualify for a loan are actually perfect candidates for this — because the same high debt load that blocks the loan is exactly what this program is built to tackle. Let me confirm a couple of things — what's your total unsecured debt, and which state are you in?"</div>
+      </div>
+      <div class="do">Re-confirm against the backend: <b>$7,000+</b> total, <b>$200+</b> per account, <b>$250/mo</b> ability, not a blackout state. Note the state for stage 4. <span class="router-chip">↗ check Router</span></div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">3</div><div class="stage-name">Present the Program</div></div>
+      <ol class="steps">
+        <li>"Instead of paying creditors directly, you make one monthly <b>deposit</b> into a dedicated account that <b>you own and control</b> — currently a minimum of $250 a month."</li>
+        <li>"As those deposits build, our negotiators settle your debts one at a time for less than the full balance. Keep in mind creditor response varies, and not all debts qualify."</li>
+        <li>"You're only charged the program fee as we work your enrolled debt — there are no upfront fees to start."</li>
+        <li>"Your program fee is a percentage of your enrolled debt, and we'll go over your exact number and your monthly deposit before you commit to anything."</li>
+      </ol>
+      <div class="subhd">Select the prospect's state — the script updates automatically <span class="router-chip">↗ confirm in Router</span></div>
+      <div class="state-select-wrap">
+        <div class="state-select-row">
+          <span class="state-select-lbl"><span class="ss-ico">📍</span>Prospect's state</span>
+          <select class="state-select" id="ldState2" onchange="updateLdState('2')">
+            <option value="">— Select a state —</option>
+            <option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option>
+            <option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option>
+            <option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="FL">Florida</option>
+            <option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option>
+            <option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option>
+            <option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option>
+            <option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option>
+            <option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option>
+            <option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option>
+            <option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option>
+            <option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option>
+            <option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option>
+            <option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option>
+            <option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option>
+            <option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option>
+            <option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option>
+            <option value="WI">Wisconsin</option><option value="WY">Wyoming</option>
+            <option value="DC">Washington D.C.</option>
+          </select>
+          <span class="state-status" id="ldStateStatus2"></span>
+        </div>
+        <div class="state-empty" id="ldStateEmpty2">Pick a state to load the correct script.</div>
+        <div class="state-black-note" id="ldStateBlack2"></div>
+        <div class="state-script" id="ldStateScript2">
+          <span class="ss-fee" id="ldFeePill2"></span>
+          <div class="say">
+            <div class="say-kicker">Phone Script — Present the Program</div>
+            <div class="say-text" id="ldScriptText2"></div>
+          </div>
+          <div class="branch-note" id="ldScriptNote2"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">4</div><div class="stage-name">Set Honest Expectations — Required Disclosures</div></div>
+      <div class="compliance cmp-info">
+        <div class="cmp-hd">Say these out loud — required by compliance</div>
+        These disclosures must be delivered verbally on the recorded line.
+      </div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"I want to be straight with you on a few things. Your <b>settlement results vary by creditor and by file</b> — I can't promise a specific amount. Because you'll be settling rather than paying as originally agreed, this program <b>may negatively impact your credit</b> in the short term. And <b>not all debt types, creditors, or states qualify</b> — that's why we check. This is debt settlement, not debt validation."</div>
+      </div>
+      <div class="compliance cmp-stop">
+        <div class="cmp-hd">Never say — prohibited phrases</div>
+        <ul>
+          <li><code>guarantee savings</code> · <code>guaranteed settlement</code></li>
+          <li><code>we will eliminate your debt</code></li>
+          <li><code>your credit will improve</code></li>
+          <li><code>you cannot be sued</code></li>
+          <li><code>instant approval</code> / <code>guaranteed approval</code></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">5</div><div class="stage-name">Handle Objections</div></div>
+      <div class="lead">Acknowledge → reframe with a fact → redirect to the next step. Never argue.</div>
+      <table class="obj">
+        <thead><tr><th>Client says…</th><th>Agent responds…</th></tr></thead>
+        <tbody>
+          <tr><td>"Is this a loan?"</td><td>"No — it's not a loan and it's not consolidation. It's a debt settlement program. We negotiate your balances down rather than having you borrow anything new."</td></tr>
+          <tr><td>"Will this hurt my credit?"</td><td>"Because you're settling rather than paying as originally agreed, it may impact your credit in the short term. The goal is to get you debt-free and rebuild from a stronger position. Results vary by file."</td></tr>
+          <tr><td>"How much will I save?"</td><td>"I can't promise a specific number — settlement results vary by creditor and by account. What I can do is show you your exact monthly deposit and timeline so you can decide."</td></tr>
+          <tr><td>"Can you guarantee it?"</td><td>"I can't guarantee a settlement amount — every creditor is different. What I can guarantee is exactly how the program works and how we go to bat for you."</td></tr>
+          <tr><td>"I need to think about it."</td><td>"Of course. What's on your mind — the monthly deposit, the timeline, or how settlement works? Let's clear that up right now."</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="stage-hd"><div class="stage-num">6</div><div class="stage-name">Close &amp; Set the Term</div></div>
+      <div class="say">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Based on what you've told me, you're exactly who this program is built for. Let's get you qualified so I can show you your exact monthly deposit, your total, and your timeline. Takes just a few minutes."</div>
+      </div>
+      <div class="do">Read the client's term straight from their debt tier — this is set by the backend, don't improvise it. <span class="router-chip">↗ check Router</span></div>
+      <table class="dtbl">
+        <thead><tr><th>Enrolled debt</th><th>Program term</th></tr></thead>
+        <tbody>
+          <tr><td>$7,000 – $9,999</td><td>24 months</td></tr>
+          <tr><td>$10,000 – $12,499</td><td>30 months</td></tr>
+          <tr><td>$12,500 – $14,999</td><td>36 months</td></tr>
+          <tr><td>$15,000 – $24,999</td><td>42 months</td></tr>
+          <tr><td>$25,000 – $34,999</td><td>48 months</td></tr>
+          <tr><td>$35,000 – $49,999</td><td>54 months</td></tr>
+          <tr><td>$50,000+</td><td>60 months</td></tr>
+        </tbody>
+      </table>
+      <div class="compliance cmp-warn" style="margin-top:14px;">
+        <div class="cmp-hd">FORTH CRM setup</div>
+        Under $35,000 → use the <b>Debt Settlement Enrollment Plan</b>. $35,000+ and the client wants a lower monthly → use the <b>Override Plan</b> for terms beyond 48 months to lower the monthly deposit. Minimum monthly program deposit is <b>$250</b>.
+      </div>
+    </div>
+  </div>
+
+  <!-- Version 3 — Direct Script (existing, with state selector) -->
+  <div class="version" id="ver-set-v3">
     <div class="router-ref">
       <div class="router-ref-icon">🧭</div>
       <div class="router-ref-body">
@@ -757,19 +1075,217 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
       <div class="prog-partner">Backend partner: Elite Legal Practice (ELP) · A law firm providing legal debt dispute &amp; resolution — not a loan, not settlement, not consolidation</div>
     </div>
     <div class="prog-pills">
-      <span class="pill p-b">Law firm · 50 states</span>
+      <span class="pill p-b">Law firm</span>
       <span class="pill p-b">Unsecured debt</span>
-      <span class="pill p-a">SSN + banking collected</span>
+      <span class="pill p-a">Not all states — verify in Router</span>
     </div>
   </div>
 
   <div class="ver-toggle" id="tog-resolution">
-    <button class="ver-btn b-bl active" onclick="showVer('resolution','res-v1',this)"><span class="ver-num">1</span>Personal Loan Callback → Pivot</button>
-    <button class="ver-btn b-bl" onclick="showVer('resolution','res-v2',this)"><span class="ver-num">2</span>Direct Resolution &amp; GOTA</button>
+    <button class="ver-btn b-bl active" onclick="showVer('resolution','res-v1',this)"><span class="ver-num">1</span>Inbound Ad / Text Response</button>
+    <button class="ver-btn b-bl" onclick="showVer('resolution','res-v2',this)"><span class="ver-num">2</span>Loan Swap / Denial Pivot</button>
+    <button class="ver-btn b-bl" onclick="showVer('resolution','res-v3',this)"><span class="ver-num">3</span>Direct Resolution &amp; GOTA</button>
   </div>
 
-  <!-- Version 1 — Loan Callback -->
+  <!-- Version 1 — Inbound Ad / Text Response (DEFAULT) -->
   <div class="version active" id="ver-res-v1">
+    <div class="ver-meta m-bl"><b>Inbound Ad / Text Response.</b> Prospect is calling in after responding to an ad or replying to a text about a debt-relief / hardship-relief program. Complete standalone script — open through enrollment. <b>ELP Client Care: 800-718-9606 · clientcare@elitelegalpractice.com</b></div>
+
+    <div class="router-ref">
+      <div class="router-ref-icon">🧭</div>
+      <div class="router-ref-body">
+        <div class="router-ref-hd">Qualify &amp; confirm ELP eligibility in the Router</div>
+        <div class="router-ref-txt">Run the <b>Qualification</b> tab first. For ELP, confirm in the <b>Router</b>: debt ≥ $6,000, $250/mo affordability, bank verified, open to a legal program, and the state isn't blocked (ID, ND, GA). <span class="router-chip">↗ check Router</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">1</div><div class="stage-name">Open — Acknowledge Their Inquiry</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Hi, this is [Agent Name] on a recorded line — thanks for reaching out. Am I speaking with [Client Name]?"</div>
+        <div class="say-text">"Perfect. I'm following up because you responded to our information about a <b>debt-relief and hardship-relief program</b> — you're looking for some help getting on top of your debt, is that right?"</div>
+        <div class="say-text">"You're in exactly the right place. Let me ask a few quick questions to understand your situation, then I'll walk you through how our program can help. Fair enough?"</div>
+      </div>
+      <div class="do">They opted in — warm lead. Confirm the program they inquired about before qualifying.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">2</div><div class="stage-name">Discover &amp; Qualify</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"So I can point you in the right direction — roughly how much total unsecured debt are we talking about? Credit cards, personal loans, medical bills, collections? And which state are you in?"</div>
+        <div class="say-text">"And what's been the hardest part — the interest, the minimum payments, the collection calls, or just feeling stuck?"</div>
+      </div>
+      <div class="do">Confirm ELP fit: debt ≥ <b>$6,000</b>, <b>$250/mo</b> affordability, bank verified, open to a legal program, state not blocked (ID, ND, GA). <span class="router-chip">↗ check Router</span></div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">3</div><div class="stage-name">About the Program</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Let me explain how the ELP program works. ELP is a law firm that's A+ rated with the BBB and has just been nominated for an Ethics Award. They work with over 10,000 clients, focusing exclusively on disputing unsecured debt lines — credit cards, credit unions, personal loans, medical debts, auto loans with third-party collectors, and more."</div>
+        <div class="say-text">"The goal is to legally challenge and waive the debt enrolled by identifying false, inaccurate, or unverified information — using consumer protection laws like the Credit Card Act of 2009."</div>
+        <div class="say-text">"As part of this process: accounts enrolled are placed in 'dispute status' with the credit bureaus, which is a neutral, non-negative status. Once the debt is invalidated, the trade line is deleted from your credit report — that includes negative late payments. This is a legal process, which is why we work with professionals. On average, accounts are resolved within 24–48 months, though timelines can vary based on your individual case."</div>
+        <div class="say-text">"This program is ideal for someone in your situation, where credit utilization is too high and affects your financial flexibility. By reducing that utilization, you'll be in a much stronger position moving forward."</div>
+      </div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script — Important Note</div>
+        <div class="say-text">"The only drawback is that the enrolled credit cards will be closed — but we've left your [e.g. Capital One and Discover] cards out of the program, so you'll still have access to those for emergencies or essential spending."</div>
+        <div class="say-text">"Also, when you become a law firm client today, you have immediate representation and defense. That means if a creditor calls you, tell them you've hired Elite Legal and to call your lawyer. If they keep contacting you after that, report it — any calls, emails, or texts can be considered harassment. Reporting these violations to Elite Legal can significantly increase the velocity in waiving the debt, and it's possible you can also receive compensation for any violation."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">4</div><div class="stage-name">Why Debts Get Dismissed — The Legal Grounds</div></div>
+      <div class="grounds-intro">
+        Here's the part that gives the program its teeth. The collection industry is sloppy — debts get bought, sold, and re-sold for pennies, and along the way records get lost, mangled, or never properly transferred. Federal law puts the burden of proof on <b>them</b>, not your client. ELP's attorneys go hunting for the breakdowns below, and any one of them can be grounds to challenge or invalidate a debt.
+      </div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script — Build the Value</div>
+        <div class="say-text">"Let me tell you why this works. Under federal law — the Fair Debt Collection Practices Act — a collector has to <b>prove</b> a debt is valid, accurate, and legally theirs to collect. The catch is, most of these debts have been bought and sold so many times that the paperwork is a mess. When ELP's attorneys demand proper validation and the collector can't produce it, that debt can be challenged and wiped out. We're not asking them nicely — we're holding them to the law."</div>
+      </div>
+      <div class="subhd">Grounds ELP's attorneys look for</div>
+      <div class="grounds-grid">
+        <div class="ground">
+          <div class="ground-ico">📄</div>
+          <div class="ground-t">Failure to validate the debt</div>
+          <div class="ground-d">Once disputed, the collector must produce proof you owe the exact amount they claim. Many can't — they bought the account without complete records.</div>
+          <span class="ground-law">FDCPA §809</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">🔗</div>
+          <div class="ground-t">Broken chain of ownership</div>
+          <div class="ground-d">Debt is sold from buyer to buyer. If they can't show an unbroken paper trail proving they legally own it, they may have no standing to collect.</div>
+          <span class="ground-law">Standing to collect</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">🧾</div>
+          <div class="ground-t">Inaccurate or unverifiable amounts</div>
+          <div class="ground-d">Wrong balances, padded interest, or fees that don't match the original agreement. If the number can't be verified, the reporting can be challenged.</div>
+          <span class="ground-law">FCRA §611</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">⏰</div>
+          <div class="ground-t">Time-barred / past statute</div>
+          <div class="ground-d">Old debts can fall outside the legal window to sue on them. Collectors who misrepresent a time-barred debt as currently enforceable are violating the law.</div>
+          <span class="ground-law">Statute of limitations</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">📵</div>
+          <div class="ground-t">Harassment &amp; abusive contact</div>
+          <div class="ground-d">Repeated calls, calls at odd hours, threats, or contacting you after you're represented are violations — each one can strengthen your case and may carry penalties.</div>
+          <span class="ground-law">FDCPA §806–807</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">🚫</div>
+          <div class="ground-t">Continuing to contact after cease</div>
+          <div class="ground-d">Once you're a represented client and the collector is notified, continued direct contact is a violation — which can accelerate resolution and create leverage.</div>
+          <span class="ground-law">FDCPA §805</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">⚖️</div>
+          <div class="ground-t">False or misleading representations</div>
+          <div class="ground-d">Misstating the amount, the legal status, or who they are. The law prohibits deceptive collection tactics — and these surface more often than people think.</div>
+          <span class="ground-law">FDCPA §807</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">📊</div>
+          <div class="ground-t">Improper credit reporting</div>
+          <div class="ground-d">Reporting a disputed or unverified debt, duplicate listings, or re-aging an old account. Inaccurate reporting is challengeable and can lead to deletion.</div>
+          <span class="ground-law">FCRA</span>
+        </div>
+      </div>
+      <div class="say s-bl" style="margin-top:14px;">
+        <div class="say-kicker">Phone Script — Bring It Home</div>
+        <div class="say-text">"So while a regular person calling a collector gets nowhere, ELP's attorneys come at it from the legal side — demanding validation, auditing the paperwork, and documenting every violation along the way. Every misstep they find works in your favor. That's how accounts get challenged, disputed, and resolved — and it's all handled by the legal team, not you."</div>
+      </div>
+      <div class="compliance cmp-info">
+        <div class="cmp-hd">Keep it accurate</div>
+        These are the legal grounds ELP's attorneys pursue — not a promise that any specific debt will be dismissed. Outcomes depend on the individual file and the collector's records. Never guarantee a result.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">5</div><div class="stage-name">Go Over The Agreement — Send &amp; Orient</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"I'm sending the agreement now. It'll take you straight to the first signature field — you can close out of that signature box for now. If you scroll up, you'll see the agreement with 'Elite Legal Practice' at the top. We're going to go through it together. I'm reading a shortened, condensed version, but if you have any questions, stop me so we can address them as they come."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">6</div><div class="stage-name">Services &amp; Authority</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script — Services</div>
+        <div class="say-text">"ELP is a law firm that provides legal services, including: stopping creditor harassment through a cease-and-desist function; disputing all accounts with your creditors to force compliance with federal law; defending any lawsuit brought against you by a creditor with no additional or hidden fees; and filing lawsuits against creditors that violate your rights by harassing you or reporting erroneous information to the bureaus."</div>
+        <div class="say-text"><b>Limited Power of Attorney:</b> "With your signature, you grant ELP the Limited Power of Attorney to take all acts reasonably necessary to fulfill those services."</div>
+        <div class="say-text"><b>Receipt of Summons:</b> "If you receive a court summons for any enrolled account after retaining ELP, you agree to submit a complete copy as soon as possible. ELP will assign you an attorney licensed in your jurisdiction to represent you, at no additional fee."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">7</div><div class="stage-name">Fees, Not-a-Loan &amp; Program Type</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text"><b>Fee for Services:</b> "The fees charged by ELP are for legal services and will not be used to pay your creditors or otherwise settle your debts. Do you understand that? And do you understand that this is not a loan?"</div>
+        <div class="say-text"><b>Timeline on Accounts:</b> "In the rare event of a negotiation, ELP retains the right to limit a refund on a case-by-case basis of the fees designated to that specific debt. You can choose to have ELP continue working that account until it reaches a conclusion instead of taking a refund."</div>
+        <div class="say-text"><b>Debt Settlement or Management:</b> "ELP is not a debt settlement or debt management company. It's a full-service law firm providing legal debt dispute and resolution services."</div>
+        <div class="say-text"><b>Cross-Collateralized &amp; Secured Debts:</b> "A secured debt has property attached that can be repossessed if unpaid. A cross-collateralized debt has another account attached that it can access for payments. If these apply to you, we highly recommend you change banks as soon as you enroll."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">8</div><div class="stage-name">Rights, Protections &amp; Firm Details</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text"><b>Your Rights &amp; Responsibilities:</b> "You agree to allow ELP to serve as your attorneys and represent you in your dispute. You can terminate this relationship at any time."</div>
+        <div class="say-text"><b>Electronic Authorization:</b> "You acknowledge ELP may contact you by email, text, mail, or telephone."</div>
+        <div class="say-text"><b>Professional Liability Insurance:</b> "ELP maintains $1,000,000.00 per claim, ensuring you're protected against any mistake by the attorneys representing you."</div>
+        <div class="say-text"><b>Confidentiality &amp; Licensing:</b> "ELP keeps your information confidential, as required of a law firm. ELP is a California law firm that works with licensed attorneys to assist eligible clients."</div>
+        <div class="say-text"><b>Performance of Legal Services:</b> "ELP performs services on your behalf and its fees are for the performance of such services — again, not going toward your monthly debt payments, and this is not a loan. Do you understand?"</div>
+        <div class="say-text"><b>Assignments:</b> "The firm may bring in additional help for non-legal services such as client services, and reserves the right to contract portions of this agreement, such as processing your payments."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">9</div><div class="stage-name">Acknowledgement &amp; Understanding</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"By signing, you agree you've chosen to enter into this representation by Elite Legal Practice, and you have not been told by ELP to stop paying your creditors or otherwise default on any obligation."</div>
+        <div class="say-text"><b>Read-back:</b> "'The attorney fees I am paying will go to Elite Legal Practice and not to my creditors. The fees do not accumulate towards a settlement, and they will not be used to pay my creditors/debts, and this is not a loan.' Again — you're paying ELP to legally dispute or resolve your debt. You are not paying ELP to pay your debt. Do you understand?"</div>
+        <div class="say-text"><b>Credit impact:</b> "The next one says, 'Depending on my current credit standing, this program may have a temporary negative effect on my credit.' When inaccuracies are identified, accounts may be formally removed from the reporting agencies, paving the path to a healthier financial outlook. Do you understand? Does that all make sense?"</div>
+      </div>
+      <div class="compliance cmp-info">
+        <div class="cmp-hd">Client rights &amp; responsibilities (read)</div>
+        "You're entitled to be treated with courtesy and consideration at all times by your lawyers and their staff." · "The client is expected to treat the lawyer and staff with courtesy and consideration."
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">10</div><div class="stage-name">Review Enrolled Accounts, Info &amp; Payment</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Please scroll to the List of Enrolled Accounts — here are the accounts we'll be enrolling with ELP. Review and confirm the correct accounts are listed."</div>
+        <div class="say-text">"Next, Client Information — review and confirm it's correct. Then your Payment Schedule — review and confirm you agree. If you ever need to change an upcoming payment or plan, we require a written request via email or phone at least 5 business days in advance."</div>
+        <div class="say-text">"Lastly, the banking information you provided for the Electronic Payment Authorization — review and confirm it's correct."</div>
+      </div>
+      <div class="do">Make sure the client clicks <b>Complete Documents</b>.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">11</div><div class="stage-name">Closing</div></div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Congratulations — we're finished! You now have legal representation and defense. If a creditor calls you after we hang up, tell them you've hired Elite Legal and to call your lawyer at (800) 718-9606. Let's save that number in your phone together."</div>
+        <div class="say-text">"You'll receive a welcome packet via email, logins to your client portal, and updates shortly. Do you have any final questions for me? ELP will call you today or the next business day to complete your Welcome Call. Thank you for your patience, and congratulations again!"</div>
+        <div class="say-text"><b>ELP:</b> +1 (800) 718-9606 · clientcare@elitelegalpractice.com</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Version 2 — Loan Swap / Denial Pivot -->
+  <div class="version" id="ver-res-v2">
     <div class="ver-meta m-bl"><b>Personal Loan Offer Callback.</b> Caller is returning a voicemail about a possible personal loan (up to $36,000). The loan is almost always declined — this script qualifies, runs a soft credit pull, and pivots cleanly into a debt resolution review with ELP. <b>ELP Client Care: 800-718-9606 · clientcare@elitelegalpractice.com</b></div>
 
     <div class="router-ref">
@@ -967,22 +1483,19 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
   </div>
 
   <!-- Version 2 — Direct / GOTA -->
-  <div class="version" id="ver-res-v2">
+  <div class="version" id="ver-res-v3">
     <div class="ver-meta m-bl"><b>Direct Debt Resolution &amp; Go-Over-The-Agreement (GOTA).</b> Prospect is already engaged on debt resolution — no loan-callback pivot needed. This is the program explainer plus the condensed agreement walkthrough through signature and close. Pairs naturally as the back-half depth after Version 1's pivot.</div>
 
-    <div class="compliance cmp-warn">
-      <div class="cmp-hd">⚠ Agent notes on ELP's provided language</div>
-      <ul>
-        <li>The Capital One / Discover card-exclusion line is an <b>example</b>, not a fixed rule — confirm which cards are actually excluded for this client; don't read those two names as if they always apply.</li>
-        <li>Outcome claims ("debt waived/deleted including late payments," "may receive compensation for violations") are ELP's wording — deliver as ELP frames them and never expand into a guarantee.</li>
-      </ul>
+    <div class="compliance cmp-info">
+      <div class="cmp-hd">Card-exclusion example &amp; outcome wording</div>
+      The Capital One / Discover line in the script is an <b>example</b> — confirm which cards are actually excluded for this client. Deliver ELP's outcome wording as framed and never expand it into a guarantee.
     </div>
 
     <div class="card">
       <div class="stage-hd h-bl"><div class="stage-num">1</div><div class="stage-name">About the Program</div></div>
       <div class="say s-bl">
         <div class="say-kicker">Phone Script</div>
-        <div class="say-text">"Let me explain how the ELP program works. ELP is a nationwide law firm with representation in all 50 states. They're A+ rated with the BBB and have just been nominated for an Ethics Award. They work with over 10,000 clients, focusing exclusively on disputing unsecured debt lines — credit cards, credit unions, personal loans, medical debts, auto loans with third-party collectors, and more."</div>
+        <div class="say-text">"Let me explain how the ELP program works. ELP is a law firm that's A+ rated with the BBB and has just been nominated for an Ethics Award. They work with over 10,000 clients, focusing exclusively on disputing unsecured debt lines — credit cards, credit unions, personal loans, medical debts, auto loans with third-party collectors, and more."</div>
         <div class="say-text">"The goal is to legally challenge and waive the debt enrolled by identifying false, inaccurate, or unverified information — using consumer protection laws like the Credit Card Act of 2009."</div>
         <div class="say-text">"As part of this process: accounts enrolled are placed in 'dispute status' with the credit bureaus, which is a neutral, non-negative status. Once the debt is invalidated, the trade line is deleted from your credit report — that includes negative late payments. This is a legal process, which is why we work with professionals. On average, accounts are resolved within 24–48 months, though timelines can vary based on your individual case."</div>
         <div class="say-text">"This program is ideal for someone in your situation, where credit utilization is too high and affects your financial flexibility. By reducing that utilization, you'll be in a much stronger position moving forward."</div>
@@ -995,7 +1508,77 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
     </div>
 
     <div class="card">
-      <div class="stage-hd h-bl"><div class="stage-num">2</div><div class="stage-name">Go Over The Agreement — Send &amp; Orient</div></div>
+      <div class="stage-hd h-bl"><div class="stage-num">2</div><div class="stage-name">Why Debts Get Dismissed — The Legal Grounds</div></div>
+      <div class="grounds-intro">
+        Here's the part that gives the program its teeth. The collection industry is sloppy — debts get bought, sold, and re-sold for pennies, and along the way records get lost, mangled, or never properly transferred. Federal law puts the burden of proof on <b>them</b>, not your client. ELP's attorneys go hunting for the breakdowns below, and any one of them can be grounds to challenge or invalidate a debt.
+      </div>
+      <div class="say s-bl">
+        <div class="say-kicker">Phone Script — Build the Value</div>
+        <div class="say-text">"Let me tell you why this works. Under federal law — the Fair Debt Collection Practices Act — a collector has to <b>prove</b> a debt is valid, accurate, and legally theirs to collect. The catch is, most of these debts have been bought and sold so many times that the paperwork is a mess. When ELP's attorneys demand proper validation and the collector can't produce it, that debt can be challenged and wiped out. We're not asking them nicely — we're holding them to the law."</div>
+      </div>
+      <div class="subhd">Grounds ELP's attorneys look for</div>
+      <div class="grounds-grid">
+        <div class="ground">
+          <div class="ground-ico">📄</div>
+          <div class="ground-t">Failure to validate the debt</div>
+          <div class="ground-d">Once disputed, the collector must produce proof you owe the exact amount they claim. Many can't — they bought the account without complete records.</div>
+          <span class="ground-law">FDCPA §809</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">🔗</div>
+          <div class="ground-t">Broken chain of ownership</div>
+          <div class="ground-d">Debt is sold from buyer to buyer. If they can't show an unbroken paper trail proving they legally own it, they may have no standing to collect.</div>
+          <span class="ground-law">Standing to collect</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">🧾</div>
+          <div class="ground-t">Inaccurate or unverifiable amounts</div>
+          <div class="ground-d">Wrong balances, padded interest, or fees that don't match the original agreement. If the number can't be verified, the reporting can be challenged.</div>
+          <span class="ground-law">FCRA §611</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">⏰</div>
+          <div class="ground-t">Time-barred / past statute</div>
+          <div class="ground-d">Old debts can fall outside the legal window to sue on them. Collectors who misrepresent a time-barred debt as currently enforceable are violating the law.</div>
+          <span class="ground-law">Statute of limitations</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">📵</div>
+          <div class="ground-t">Harassment &amp; abusive contact</div>
+          <div class="ground-d">Repeated calls, calls at odd hours, threats, or contacting you after you're represented are violations — each one can strengthen your case and may carry penalties.</div>
+          <span class="ground-law">FDCPA §806–807</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">🚫</div>
+          <div class="ground-t">Continuing to contact after cease</div>
+          <div class="ground-d">Once you're a represented client and the collector is notified, continued direct contact is a violation — which can accelerate resolution and create leverage.</div>
+          <span class="ground-law">FDCPA §805</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">⚖️</div>
+          <div class="ground-t">False or misleading representations</div>
+          <div class="ground-d">Misstating the amount, the legal status, or who they are. The law prohibits deceptive collection tactics — and these surface more often than people think.</div>
+          <span class="ground-law">FDCPA §807</span>
+        </div>
+        <div class="ground">
+          <div class="ground-ico">📊</div>
+          <div class="ground-t">Improper credit reporting</div>
+          <div class="ground-d">Reporting a disputed or unverified debt, duplicate listings, or re-aging an old account. Inaccurate reporting is challengeable and can lead to deletion.</div>
+          <span class="ground-law">FCRA</span>
+        </div>
+      </div>
+      <div class="say s-bl" style="margin-top:14px;">
+        <div class="say-kicker">Phone Script — Bring It Home</div>
+        <div class="say-text">"So while a regular person calling a collector gets nowhere, ELP's attorneys come at it from the legal side — demanding validation, auditing the paperwork, and documenting every violation along the way. Every misstep they find works in your favor. That's how accounts get challenged, disputed, and resolved — and it's all handled by the legal team, not you."</div>
+      </div>
+      <div class="compliance cmp-info">
+        <div class="cmp-hd">Keep it accurate</div>
+        These are the legal grounds ELP's attorneys pursue — not a promise that any specific debt will be dismissed. Outcomes depend on the individual file and the collector's records. Never guarantee a result.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-bl"><div class="stage-num">3</div><div class="stage-name">Go Over The Agreement — Send &amp; Orient</div></div>
       <div class="say s-bl">
         <div class="say-kicker">Phone Script</div>
         <div class="say-text">"I'm sending the agreement now. It'll take you straight to the first signature field — you can close out of that signature box for now. If you scroll up, you'll see the agreement with 'Elite Legal Practice' at the top. We're going to go through it together. I'm reading a shortened, condensed version, but if you have any questions, stop me so we can address them as they come."</div>
@@ -1003,7 +1586,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
     </div>
 
     <div class="card">
-      <div class="stage-hd h-bl"><div class="stage-num">3</div><div class="stage-name">Services &amp; Authority</div></div>
+      <div class="stage-hd h-bl"><div class="stage-num">4</div><div class="stage-name">Services &amp; Authority</div></div>
       <div class="say s-bl">
         <div class="say-kicker">Phone Script — Services</div>
         <div class="say-text">"ELP is a law firm that provides legal services, including: stopping creditor harassment through a cease-and-desist function; disputing all accounts with your creditors to force compliance with federal law; defending any lawsuit brought against you by a creditor with no additional or hidden fees; and filing lawsuits against creditors that violate your rights by harassing you or reporting erroneous information to the bureaus."</div>
@@ -1013,7 +1596,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
     </div>
 
     <div class="card">
-      <div class="stage-hd h-bl"><div class="stage-num">4</div><div class="stage-name">Fees, Not-a-Loan &amp; Program Type</div></div>
+      <div class="stage-hd h-bl"><div class="stage-num">5</div><div class="stage-name">Fees, Not-a-Loan &amp; Program Type</div></div>
       <div class="say s-bl">
         <div class="say-kicker">Phone Script</div>
         <div class="say-text"><b>Fee for Services:</b> "The fees charged by ELP are for legal services and will not be used to pay your creditors or otherwise settle your debts. Do you understand that? And do you understand that this is not a loan?"</div>
@@ -1024,20 +1607,20 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
     </div>
 
     <div class="card">
-      <div class="stage-hd h-bl"><div class="stage-num">5</div><div class="stage-name">Rights, Protections &amp; Firm Details</div></div>
+      <div class="stage-hd h-bl"><div class="stage-num">6</div><div class="stage-name">Rights, Protections &amp; Firm Details</div></div>
       <div class="say s-bl">
         <div class="say-kicker">Phone Script</div>
         <div class="say-text"><b>Your Rights &amp; Responsibilities:</b> "You agree to allow ELP to serve as your attorneys and represent you in your dispute. You can terminate this relationship at any time."</div>
         <div class="say-text"><b>Electronic Authorization:</b> "You acknowledge ELP may contact you by email, text, mail, or telephone."</div>
         <div class="say-text"><b>Professional Liability Insurance:</b> "ELP maintains $1,000,000.00 per claim, ensuring you're protected against any mistake by the attorneys representing you."</div>
-        <div class="say-text"><b>Confidentiality &amp; Licensing:</b> "ELP keeps your information confidential, as required of a law firm. ELP is a California law firm that employs attorneys in every state to assist clients nationwide."</div>
+        <div class="say-text"><b>Confidentiality &amp; Licensing:</b> "ELP keeps your information confidential, as required of a law firm. ELP is a California law firm that works with licensed attorneys to assist eligible clients."</div>
         <div class="say-text"><b>Performance of Legal Services:</b> "ELP performs services on your behalf and its fees are for the performance of such services — again, not going toward your monthly debt payments, and this is not a loan. Do you understand?"</div>
         <div class="say-text"><b>Assignments:</b> "The firm may bring in additional help for non-legal services such as client services, and reserves the right to contract portions of this agreement, such as processing your payments."</div>
       </div>
     </div>
 
     <div class="card">
-      <div class="stage-hd h-bl"><div class="stage-num">6</div><div class="stage-name">Acknowledgement &amp; Understanding</div></div>
+      <div class="stage-hd h-bl"><div class="stage-num">7</div><div class="stage-name">Acknowledgement &amp; Understanding</div></div>
       <div class="say s-bl">
         <div class="say-kicker">Phone Script</div>
         <div class="say-text">"By signing, you agree you've chosen to enter into this representation by Elite Legal Practice, and you have not been told by ELP to stop paying your creditors or otherwise default on any obligation."</div>
@@ -1051,7 +1634,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
     </div>
 
     <div class="card">
-      <div class="stage-hd h-bl"><div class="stage-num">7</div><div class="stage-name">Review Enrolled Accounts, Info &amp; Payment</div></div>
+      <div class="stage-hd h-bl"><div class="stage-num">8</div><div class="stage-name">Review Enrolled Accounts, Info &amp; Payment</div></div>
       <div class="say s-bl">
         <div class="say-kicker">Phone Script</div>
         <div class="say-text">"Please scroll to the List of Enrolled Accounts — here are the accounts we'll be enrolling with ELP. Review and confirm the correct accounts are listed."</div>
@@ -1062,7 +1645,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
     </div>
 
     <div class="card">
-      <div class="stage-hd h-bl"><div class="stage-num">8</div><div class="stage-name">Closing</div></div>
+      <div class="stage-hd h-bl"><div class="stage-num">9</div><div class="stage-name">Closing</div></div>
       <div class="say s-bl">
         <div class="say-kicker">Phone Script</div>
         <div class="say-text">"Congratulations — we're finished! You now have legal representation and defense. If a creditor calls you after we hang up, tell them you've hired Elite Legal and to call your lawyer at (800) 718-9606. Let's save that number in your phone together."</div>
@@ -1091,10 +1674,181 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px;}
   </div>
 
   <div class="ver-toggle" id="tog-validation">
-    <button class="ver-btn active" onclick="showVer('validation','val-v1',this)" style="background:linear-gradient(135deg,var(--pp),#581c87);color:#fff;box-shadow:0 4px 12px rgba(109,40,217,.28);"><span class="ver-num">1</span>Standard Inbound</button>
+    <button class="ver-btn active" onclick="showVer('validation','val-v1',this)"><span class="ver-num">1</span>Inbound Ad / Text Response</button>
+    <button class="ver-btn" onclick="showVer('validation','val-v2',this)"><span class="ver-num">2</span>Loan Swap / Denial Pivot</button>
+    <button class="ver-btn" onclick="showVer('validation','val-v3',this)"><span class="ver-num">3</span>Direct Script</button>
   </div>
 
   <div class="version active" id="ver-val-v1">
+    <div class="ver-meta m-pp"><b>Inbound Ad / Text Response.</b> Prospect is calling in after responding to an ad or replying to a text about a debt-relief / hardship-relief program. Complete standalone script — open through close.</div>
+
+    <div class="router-ref">
+      <div class="router-ref-icon">🧭</div>
+      <div class="router-ref-body">
+        <div class="router-ref-hd">Confirm Consumer Shield eligibility in the Router</div>
+        <div class="router-ref-txt">Confirm in the <b>Router</b>: debt ≥ $4,000, each account ≥ $100, and the state isn't blocked (NC, PA, CO, WA, CT, NJ, OR, TX). <span class="router-chip">↗ check Router</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">1</div><div class="stage-name">Open — Acknowledge Their Inquiry</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Hi, this is [Agent Name] on a recorded line — thanks for reaching out. Am I speaking with [Client Name]?"</div>
+        <div class="say-text">"Perfect. I'm following up because you responded to our information about a <b>debt-relief and hardship-relief program</b> — you're looking for some help getting on top of your debt, is that right?"</div>
+        <div class="say-text">"You're in exactly the right place. Let me ask a few quick questions to understand your situation, then I'll walk you through how our program helps. Sound good?"</div>
+      </div>
+      <div class="do">They opted in — warm lead. Confirm the program they inquired about before qualifying.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">2</div><div class="stage-name">Discover &amp; Qualify</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"So I can point you in the right direction — roughly how much debt are we talking about, and what kind? Credit cards, personal loans, collections? And which state are you in?"</div>
+        <div class="say-text">"And what's been the hardest part — the calls from collectors, the interest piling up, or just feeling stuck?"</div>
+      </div>
+      <div class="do">Listen more than you talk. Note the dollar amount, debt types, state, and emotional pain point. Confirm debt ≥ <b>$4,000</b>, each account ≥ <b>$100</b>, state not blocked. <span class="router-chip">↗ check Router</span></div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">3</div><div class="stage-name">Educate — Debt Validation</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Here's something most people don't realize: under the law, a debt collector has to be able to prove a debt is actually valid, accurate, and legally theirs to collect. A lot of them can't. Our program — Consumer Shield — is built on that right. It's called debt validation."</div>
+        <div class="say-text">"Instead of just paying whatever they say you owe, we make them prove it. When they can't, that debt can be disputed and removed."</div>
+      </div>
+      <div class="do">Pause here. Let it land. This is the "aha" moment.</div>
+    </div>
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">4</div><div class="stage-name">Present the 4-Prong Approach</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"The way the program works, you're actually getting four things working for you at the same time — we call it our 4-prong approach."</div>
+      </div>
+      <ol class="steps">
+        <li><b>Validate &amp; resolve your debt.</b> "We help dispute and resolve your debt, working it down toward a zero balance, and we get those items removed from your credit report. We also watch the collectors closely for any violations."</li>
+        <li><b>Lower your everyday bills.</b> "We help bring down your most common monthly expenses — things like your electric, cable and internet, and cell phone bill."</li>
+        <li><b>Build your credit back up.</b> "You get a secured credit-builder tradeline that reports your on-time payments to all three credit bureaus, so you're building positive history the whole way through."</li>
+        <li><b>Legal protection.</b> "You're protected with a membership to a national litigation law firm — one of the largest in the country with an A+ BBB rating — so you've got real legal muscle in your corner."</li>
+      </ol>
+      <div class="say s-pp" style="margin-top:12px;">
+        <div class="say-kicker">Phone Script — Tie It Back</div>
+        <div class="say-text">"So while we're clearing the old debt, we're also lowering your bills, rebuilding your credit, and keeping you legally protected — all at once."</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">5</div><div class="stage-name">Handle Objections</div></div>
+      <table class="obj">
+        <thead><tr><th>Client says…</th><th>Agent responds…</th></tr></thead>
+        <tbody>
+          <tr><td>"Is this a loan?"</td><td>"No — this isn't a loan and it isn't consolidation. It's a debt validation program. We make collectors prove the debt is valid, and work to resolve it down toward zero."</td></tr>
+          <tr><td>"Will this hurt my credit?"</td><td>"As we work through validation, you also have our credit-builder reporting positive, on-time history to all three bureaus — so we're building you back up at the same time. Results vary by client."</td></tr>
+          <tr><td>"How do I know this is legit?"</td><td>"Totally fair. You're protected by a membership to a national litigation law firm with an A+ BBB rating. You're never doing this alone."</td></tr>
+          <tr><td>"I can't afford anything right now."</td><td>"I hear you — that's exactly why we also work to lower your everyday bills like electric, internet, and your phone. The goal is to put money back in your pocket."</td></tr>
+          <tr><td>"Can you guarantee my debt goes to zero?"</td><td>"I can't promise a specific result — every debt is different and outcomes vary. What I can tell you is exactly how the process works and how hard we work on your behalf."</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">6</div><div class="stage-name">Close &amp; Set Expectations</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Based on everything you've told me, you're exactly the kind of person this program is built for. The next step is simple — let's get you qualified so I can show you exactly what your program would look like. It only takes a few minutes. Sound good?"</div>
+        <div class="say-text">"Here's what happens next: we'll get your enrollment set up, your dedicated team gets to work on validating and disputing your debts, your credit-builder starts reporting, and your law-firm membership goes active. I'll walk you through every step so you're never in the dark."</div>
+      </div>
+      <div class="compliance cmp-warn">
+        <div class="cmp-hd">Compliance reminders</div>
+        Use "work toward" and "may" rather than promises. Outcomes vary by client. This is debt validation, not settlement or consolidation. Verify NLLG / BBB-rating claims against current approved compliance language before stating them on a recorded line.
+      </div>
+    </div>
+  </div>
+
+  <div class="version" id="ver-val-v2">
+    <div class="ver-meta m-pp"><b>Loan Swap / Denial Pivot.</b> Prospect called about a personal / hardship loan and was declined or it isn't the right fit. Complete standalone script — pivot through close.</div>
+
+    <div class="router-ref">
+      <div class="router-ref-icon">🧭</div>
+      <div class="router-ref-body">
+        <div class="router-ref-hd">Confirm Consumer Shield eligibility in the Router</div>
+        <div class="router-ref-txt">Confirm in the <b>Router</b>: debt ≥ $4,000, each account ≥ $100, and the state isn't blocked (NC, PA, CO, WA, CT, NJ, OR, TX). <span class="router-chip">↗ check Router</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">1</div><div class="stage-name">Deliver the Loan Outcome</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Thanks for your patience while I reviewed everything. I want to be straight with you — based on the balances, income, and current payment load, a traditional loan either isn't available right now or wouldn't actually improve your situation. Taking on another loan on top of this debt usually adds pressure instead of relieving it."</div>
+        <div class="say-text">"But that's not your only option — and there's something that may fit you a lot better."</div>
+      </div>
+      <div class="do">Honest and reassuring. The denial sets up a better solution.</div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">2</div><div class="stage-name">Pivot to Debt Validation &amp; Qualify</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Instead of borrowing more, there's a program built around your legal right to make collectors <b>prove</b> the debt is valid, accurate, and actually theirs to collect. When they can't, that debt can be disputed and removed. It's not a loan and it's not consolidation."</div>
+        <div class="say-text">"A lot of people who can't get a loan are perfect candidates for this — because we're not adding debt, we're challenging the debt you already have. Let me confirm a couple of things — what's your total debt, and which state are you in?"</div>
+      </div>
+      <div class="do">Re-confirm against Consumer Shield's gates: debt ≥ <b>$4,000</b>, each account ≥ <b>$100</b>, state not blocked. <span class="router-chip">↗ check Router</span></div>
+    </div>
+
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">3</div><div class="stage-name">Educate — Debt Validation</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Here's something most people don't realize: under the law, a debt collector has to be able to prove a debt is actually valid, accurate, and legally theirs to collect. A lot of them can't. Our program — Consumer Shield — is built on that right. It's called debt validation."</div>
+        <div class="say-text">"Instead of just paying whatever they say you owe, we make them prove it. When they can't, that debt can be disputed and removed."</div>
+      </div>
+      <div class="do">Pause here. Let it land. This is the "aha" moment.</div>
+    </div>
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">4</div><div class="stage-name">Present the 4-Prong Approach</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"The way the program works, you're actually getting four things working for you at the same time — we call it our 4-prong approach."</div>
+      </div>
+      <ol class="steps">
+        <li><b>Validate &amp; resolve your debt.</b> "We help dispute and resolve your debt, working it down toward a zero balance, and we get those items removed from your credit report. We also watch the collectors closely for any violations."</li>
+        <li><b>Lower your everyday bills.</b> "We help bring down your most common monthly expenses — things like your electric, cable and internet, and cell phone bill."</li>
+        <li><b>Build your credit back up.</b> "You get a secured credit-builder tradeline that reports your on-time payments to all three credit bureaus, so you're building positive history the whole way through."</li>
+        <li><b>Legal protection.</b> "You're protected with a membership to a national litigation law firm — one of the largest in the country with an A+ BBB rating — so you've got real legal muscle in your corner."</li>
+      </ol>
+      <div class="say s-pp" style="margin-top:12px;">
+        <div class="say-kicker">Phone Script — Tie It Back</div>
+        <div class="say-text">"So while we're clearing the old debt, we're also lowering your bills, rebuilding your credit, and keeping you legally protected — all at once."</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">5</div><div class="stage-name">Handle Objections</div></div>
+      <table class="obj">
+        <thead><tr><th>Client says…</th><th>Agent responds…</th></tr></thead>
+        <tbody>
+          <tr><td>"Is this a loan?"</td><td>"No — this isn't a loan and it isn't consolidation. It's a debt validation program. We make collectors prove the debt is valid, and work to resolve it down toward zero."</td></tr>
+          <tr><td>"Will this hurt my credit?"</td><td>"As we work through validation, you also have our credit-builder reporting positive, on-time history to all three bureaus — so we're building you back up at the same time. Results vary by client."</td></tr>
+          <tr><td>"How do I know this is legit?"</td><td>"Totally fair. You're protected by a membership to a national litigation law firm with an A+ BBB rating. You're never doing this alone."</td></tr>
+          <tr><td>"I can't afford anything right now."</td><td>"I hear you — that's exactly why we also work to lower your everyday bills like electric, internet, and your phone. The goal is to put money back in your pocket."</td></tr>
+          <tr><td>"Can you guarantee my debt goes to zero?"</td><td>"I can't promise a specific result — every debt is different and outcomes vary. What I can tell you is exactly how the process works and how hard we work on your behalf."</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="stage-hd h-pp"><div class="stage-num">6</div><div class="stage-name">Close &amp; Set Expectations</div></div>
+      <div class="say s-pp">
+        <div class="say-kicker">Phone Script</div>
+        <div class="say-text">"Based on everything you've told me, you're exactly the kind of person this program is built for. The next step is simple — let's get you qualified so I can show you exactly what your program would look like. It only takes a few minutes. Sound good?"</div>
+        <div class="say-text">"Here's what happens next: we'll get your enrollment set up, your dedicated team gets to work on validating and disputing your debts, your credit-builder starts reporting, and your law-firm membership goes active. I'll walk you through every step so you're never in the dark."</div>
+      </div>
+      <div class="compliance cmp-warn">
+        <div class="cmp-hd">Compliance reminders</div>
+        Use "work toward" and "may" rather than promises. Outcomes vary by client. This is debt validation, not settlement or consolidation. Verify NLLG / BBB-rating claims against current approved compliance language before stating them on a recorded line.
+      </div>
+    </div>
+  </div>
+
+  <div class="version" id="ver-val-v3">
     <div class="ver-meta m-pp"><b>Standard Inbound / Warm Lead.</b> Prospect raised their hand about debt relief. Consumer Shield is a debt validation program built on the consumer's legal right to make collectors prove a debt is valid, accurate, and legally theirs to collect.</div>
 
     <div class="router-ref">
@@ -1255,17 +2009,18 @@ var LD_ATTORNEY = ["CT","GA","LA","MN","NV","NH","NJ","ND","OH","PA","TN","WA","
 var LD_BLACKOUT = ["AK","RI","VT","WV","OR","GU","HI","ME","MT","PR","SC","SD","UT","WI"];
 var US_STATE_NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",DC:"Washington D.C."};
 
-function updateLdState(){
-  var sel = document.getElementById('ldState');
+function updateLdState(suffix){
+  suffix = suffix || '';
+  var sel = document.getElementById('ldState'+suffix);
   if(!sel) return;
   var st = sel.value;
-  var statusEl = document.getElementById('ldStateStatus');
-  var emptyEl  = document.getElementById('ldStateEmpty');
-  var scriptEl = document.getElementById('ldStateScript');
-  var blackEl  = document.getElementById('ldStateBlack');
-  var feePill  = document.getElementById('ldFeePill');
-  var txtEl    = document.getElementById('ldScriptText');
-  var noteEl   = document.getElementById('ldScriptNote');
+  var statusEl = document.getElementById('ldStateStatus'+suffix);
+  var emptyEl  = document.getElementById('ldStateEmpty'+suffix);
+  var scriptEl = document.getElementById('ldStateScript'+suffix);
+  var blackEl  = document.getElementById('ldStateBlack'+suffix);
+  var feePill  = document.getElementById('ldFeePill'+suffix);
+  var txtEl    = document.getElementById('ldScriptText'+suffix);
+  var noteEl   = document.getElementById('ldScriptNote'+suffix);
   var name = US_STATE_NAMES[st] || st;
 
   // reset
