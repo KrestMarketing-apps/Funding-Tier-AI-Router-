@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+  "api/generate-plan.js": {
+    "maxDuration": 45
+  }
+},
   "rewrites": [
     {
       "source": "/plan/:slug",
