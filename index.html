@@ -3640,10 +3640,8 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
     doc.rect(x+i*stepW,y,stepW+0.6,h,'F');
   }
 }
-  
-  async function buildPdf(){
-  const c=computeScenario();
-  if(!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION'))return;
+
+  async function buildPlanPdfDoc(c){
   const fn=$('fName').value.trim()||'Client', ln=$('lName').value.trim()||'';
   const fullName=`${fn} ${ln}`.trim();
   const{jsPDF}=window.jspdf;
@@ -3782,6 +3780,13 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
     doc.text(`Page ${p} of ${pageCount}`,pageW-margin,pageH-4,{align:'right'});
   }
 
+  return doc;
+}
+
+async function buildPdf(){
+  const c=computeScenario();
+  if(!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION'))return;
+  const doc=await buildPlanPdfDoc(c);
   const blob=doc.output('blob');
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -3789,6 +3794,13 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
   document.body.appendChild(a);a.click();a.remove();
   URL.revokeObjectURL(url);
 }
+
+async function buildPlanPdfBase64(c){
+  const doc=await buildPlanPdfDoc(c);
+  const dataUri=doc.output('datauristring');
+  return dataUri.split(',')[1];
+}
+ 
 function closeSendModal(){$('sendModal').classList.remove('open');}
 async function sendEmailConfirmed(){
   closeSendModal();
