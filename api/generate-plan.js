@@ -21,8 +21,17 @@ export default async function handler(req, res) {
   }
   try {
     const {
-      firstName = 'Client', lastName = '', email = '', state = '', totalDebt = 0,
-      doNothing = {}, shortest = {}, recommended = {}, route = '', routeReason = '', rows = []
+      firstName = 'Client',
+      lastName = '',
+      email = '',
+      state = '',
+      totalDebt = 0,
+      doNothing = {},
+      shortest = {},
+      recommended = {},
+      route = '',
+      routeReason = '',
+      rows = []
     } = req.body || {};
 
     const fullName = `${firstName} ${lastName}`.trim();
@@ -32,8 +41,20 @@ export default async function handler(req, res) {
     const savings = Math.max(0, Number(doNothing.totalPayback || 0) - Number(recommended.totalCost || 0));
 
     const planData = {
-      slug, firstName, lastName, fullName, email, state, totalDebt,
-      doNothing, shortest, recommended, route, routeReason, rows, savings,
+      slug,
+      firstName,
+      lastName,
+      fullName,
+      email,
+      state,
+      totalDebt,
+      doNothing,
+      shortest,
+      recommended,
+      route,
+      routeReason,
+      rows,
+      savings,
       createdAt: new Date().toISOString()
     };
 
@@ -45,8 +66,17 @@ export default async function handler(req, res) {
     const origin = getOrigin(req);
     const pageUrl = `${origin}/plan/${slug}`;
 
-    return res.status(200).json({ ok: true, slug, pageUrl, dataUrl: dataBlob.url, route });
+    return res.status(200).json({
+      ok: true,
+      slug,
+      pageUrl,
+      dataUrl: dataBlob.url,
+      route
+    });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: error.message || 'Server error' });
+    return res.status(500).json({
+      ok: false,
+      error: error.message || 'Server error'
+    });
   }
 }
