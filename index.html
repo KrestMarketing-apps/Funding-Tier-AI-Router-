@@ -2169,7 +2169,7 @@ function calcDN(d,apr){
   }
   const current=FundingTierCreditCardCalculator.buildCurrentSituation(d,selectedAPR,{minimumPaymentPercent:.03,lowPercent:.025,highPercent:.035,flatMinimumPayment:35});
   const minOnly=current.minimumOnlyPayoff||{};
-  const defaultFixedPayment=current.selectedMinimumPayment||0;
+  const defaultFixedPayment = minOnly.startingMinimumPayment || minOnly.firstEstimatedMinimumPayment || current.selectedMinimumPayment || 0;
   const fixedPaymentOverride=num(app.fixedMonthlyPayment||0);
   const fixedPayment= fixedPaymentOverride>0 ? fixedPaymentOverride : defaultFixedPayment;
   const fixed=FundingTierCreditCardCalculator.calculateFixedPaymentPayoff(d, selectedAPR, fixedPayment, {} )||{};
@@ -3774,16 +3774,16 @@ function buildFullPayload(sendEmail){
     deliverPdfToEmail:!!sendEmail,
     deliveryMode:sendEmail?'email_and_pdf':'url_only',
     doNothing:{
-      monthlyPayment:Math.round(c.dn.mp),
+      monthlyPayment:Math.round(c.dn.fixedMonthlyPayment||c.dn.mp),
       startingMinimumPayment:Math.round(c.dn.startingMinimumPayment||c.dn.mp),
       startingMinimumPaymentFormatted:c.dn.startingMinimumPaymentFormatted||fmt(c.dn.mp),
       startingMinimumLabel:c.dn.startingMinimumLabel||'Month 1 starting minimum payment',
       minimumOnlyPaymentBehavior:c.dn.paymentBehaviorLabel,
       minimumOnlyLabel:c.dn.minimumOnlyLabel||'Minimum-only payoff using declining monthly minimum payments',
-      monthsToPayoff:Math.round(c.dn.months),
-      yearsMonths:c.dn.yearsMonths,
-      totalPayback:Math.round(c.dn.total),
-      interestCost:Math.round(c.dn.interest||0),
+      monthsToPayoff:Math.round(c.dn.fixedMonths||0),
+      yearsMonths:c.dn.fixedYearsMonths,
+      totalPayback:Math.round(c.dn.fixedTotal),
+      interestCost:Math.round(c.dn.fixedInterest||0),
       apr:c.dn.apr,
       aprPercent:Math.round((c.dn.apr||0)*10000)/100,
       fixedMonthlyPayment:Math.round(c.dn.fixedMonthlyPayment||c.dn.selectedMinimumPayment||c.dn.mp),
