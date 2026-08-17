@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Funding Tier — Backend Payout Timing (Admin)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&family=Inconsolata:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --g:#14b8a6;--gd:#0d9488;
+  --bl:#3b82f6;--pu:#a78bfa;
+  --am:#fbbf24;--rd:#f87171;
+  --bg:#0a0f1a;--panel:#0f172a;--panel2:#111f36;
+  --br:rgba(255,255,255,.08);--br2:rgba(255,255,255,.14);
+  --tx:#e2e8f0;--tx2:#94a3b8;--tx3:#64748b;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;}
+.topbar{position:sticky;top:0;z-index:80;background:linear-gradient(135deg,#050810 0%,#0b1a2e 50%,#0a2e28 100%);border-bottom:1px solid var(--br2);}
+.topbar-inner{max-width:1200px;margin:0 auto;padding:14px 20px 18px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand img{height:30px;}
+.brand-title{font-size:16px;font-weight:900;color:#fff;}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+.admin-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:rgba(248,113,113,.14);border:1px solid rgba(248,113,113,.35);color:#fca5a5;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;}
+
+main{max-width:1200px;margin:0 auto;padding:28px 20px 80px;}
+.page-head{margin-bottom:26px;}
+.page-title{font-family:"Poppins",sans-serif;font-size:27px;font-weight:900;letter-spacing:-.5px;color:#fff;}
+.page-lede{font-size:13.5px;color:var(--tx2);font-weight:500;line-height:1.7;margin-top:8px;max-width:800px;}
+
+.card{background:var(--panel);border:1px solid var(--br);border-radius:16px;overflow:hidden;margin-bottom:22px;box-shadow:0 8px 28px rgba(0,0,0,.32);}
+.card-hd{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--br);background:linear-gradient(120deg,rgba(20,184,166,.10),rgba(13,148,136,.03) 60%,transparent);}
+.card-hd .name{font-size:17px;font-weight:900;color:#fff;}
+.card-hd .sub{font-size:11px;opacity:.6;font-weight:600;margin-top:2px;color:var(--tx2);}
+.hd-ld{border-left:4px solid var(--g);} .hd-ld .name{color:var(--g);}
+.hd-cs{border-left:4px solid var(--g);} .hd-cs .name{color:var(--g);}
+.hd-lg{border-left:4px solid var(--g);} .hd-lg .name{color:var(--g);}
+.card-body{padding:22px;}
+
+.bank-badge{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:11px;background:linear-gradient(120deg,rgba(20,184,166,.14),rgba(13,148,136,.05));border:1px solid rgba(20,184,166,.28);flex-shrink:0;}
+.bank-badge .ico{width:30px;height:30px;border-radius:8px;background:rgba(20,184,166,.12);display:flex;align-items:center;justify-content:center;font-size:15px;}
+.bank-badge .lbl{font-size:9px;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;}
+.bank-badge .val{font-size:13px;font-weight:900;color:#fff;margin-top:1px;}
+
+.flow{display:flex;align-items:stretch;gap:14px;overflow-x:auto;padding:4px 0 8px;margin-top:18px;}
+.flow-step{flex:1;min-width:190px;position:relative;padding:16px 18px;background:linear-gradient(160deg,rgba(20,184,166,.10),rgba(13,148,136,.03) 55%,rgba(15,23,42,.5));border:1px solid rgba(20,184,166,.22);border-radius:12px;}
+.flow-step::after{content:'→';position:absolute;right:-21px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:900;color:var(--tx3);}
+.flow-step:last-child::after{content:'';}
+.flow-lbl{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;color:#ffffff;margin-bottom:8px;}
+.flow-val{font-family:'Inconsolata',monospace;font-size:16px;font-weight:700;color:#fff;line-height:1.35;}
+.flow-note{font-size:11px;color:var(--tx2);margin-top:6px;line-height:1.55;}
+.flow-step.receive{border-color:rgba(20,184,166,.5);background:linear-gradient(160deg,rgba(20,184,166,.18),rgba(13,148,136,.08) 55%,rgba(15,23,42,.5));}
+.flow-step.receive .flow-val{color:var(--g);}
+.flow-step.agent{border-color:rgba(20,184,166,.4);background:linear-gradient(160deg,rgba(13,148,136,.22),rgba(20,184,166,.06) 55%,rgba(15,23,42,.5));}
+.flow-step.agent .flow-val{color:var(--g);}
+
+.buffer-table{width:100%;border-collapse:collapse;margin-top:18px;font-size:12.5px;}
+.buffer-table th{padding:10px 14px;background:var(--panel2);color:var(--tx2);font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;text-align:left;border-bottom:1px solid var(--br2);}
+.buffer-table td{padding:12px 14px;border-bottom:1px solid var(--br);color:var(--tx);font-family:'Inconsolata',monospace;}
+.buf-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800;background:rgba(20,184,166,.14);color:var(--g);border:1px solid rgba(20,184,166,.3);font-family:'DM Sans',sans-serif;}
+
+.acc{margin-top:14px;border:1px solid var(--br2);border-radius:11px;overflow:hidden;background:var(--panel2);}
+.acc summary{list-style:none;cursor:pointer;padding:12px 16px;font-size:12px;font-weight:800;color:var(--tx2);display:flex;align-items:center;justify-content:space-between;gap:12px;user-select:none;}
+.acc summary::-webkit-details-marker{display:none;}
+.acc summary .ic{color:var(--am);}
+.acc summary::after{content:'⌄';font-size:15px;color:var(--tx3);transition:transform .15s;}
+.acc[open] summary::after{transform:rotate(180deg);}
+.acc-body{padding:0 16px 16px;}
+
+.quote{padding:11px 13px;border-radius:9px;background:rgba(255,255,255,.03);border-left:2.5px solid var(--g);font-size:12px;color:var(--tx2);font-style:italic;line-height:1.7;margin-bottom:10px;}
+.quote:last-child{margin-bottom:0;}
+.quote .src{display:block;margin-top:6px;font-size:9.5px;font-style:normal;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;}
+.warn{padding:11px 13px;border-radius:9px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);font-size:12px;color:#fde68a;font-weight:550;line-height:1.65;margin-bottom:10px;}
+.warn:last-child{margin-bottom:0;}
+.warn.risk{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.22);color:#fecaca;}
+
+.disb-scroll{overflow-x:auto;margin-top:6px;border-radius:10px;border:1px solid var(--br2);}
+table.disb{width:100%;border-collapse:collapse;font-size:11.5px;min-width:620px;font-family:'Inconsolata',monospace;}
+table.disb th{padding:9px 12px;background:var(--panel);color:var(--tx3);font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;text-align:left;white-space:nowrap;font-family:'DM Sans',sans-serif;}
+table.disb td{padding:9px 12px;border-bottom:1px solid var(--br);white-space:nowrap;color:var(--tx2);}
+table.disb tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+table.disb .holiday{color:var(--rd);font-weight:800;}
+table.disb .double td{background:rgba(20,184,166,.06)!important;}
+
+.source-note{margin-top:24px;padding:16px 18px;background:var(--panel2);border:1px solid var(--br2);border-radius:12px;color:var(--tx2);font-size:11px;line-height:1.8;}
+.source-note strong{color:#fff;}
+
+.example-box{margin-top:18px;padding:16px 18px;border-radius:13px;background:linear-gradient(135deg,rgba(20,184,166,.09),rgba(13,148,136,.02) 60%,rgba(15,23,42,.4));border:1px solid rgba(20,184,166,.24);}
+.example-title{font-size:11.5px;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.example-sub{font-size:11px;color:var(--tx2);font-weight:600;margin-bottom:14px;line-height:1.5;}
+.example-flow{display:flex;align-items:center;gap:10px;overflow-x:auto;padding:2px 0 4px;}
+.ex-step{flex:0 0 auto;min-width:128px;padding:11px 14px;border-radius:10px;background:rgba(15,23,42,.55);border:1px solid var(--br2);text-align:center;}
+.ex-step.highlight{border-color:rgba(20,184,166,.5);background:rgba(20,184,166,.12);}
+.ex-step.agent{border-color:rgba(20,184,166,.6);background:rgba(20,184,166,.18);}
+.ex-date{font-family:'Inconsolata',monospace;font-size:15px;font-weight:700;color:var(--g);}
+.ex-lbl{font-size:10px;color:var(--tx2);font-weight:700;margin-top:4px;line-height:1.4;}
+.ex-arrow{flex:0 0 auto;font-size:16px;font-weight:900;color:var(--tx3);}
+.example-scenario-label{font-size:10px;font-weight:800;color:var(--g);text-transform:uppercase;letter-spacing:.4px;margin:14px 0 8px;}
+.example-scenario-label:first-child{margin-top:0;}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" alt="Funding Tier"/>
+      <div>
+        <div class="brand-title">Backend Payout Timing</div>
+        <div class="brand-sub">Internal Cash-Flow Reference</div>
+      </div>
+    </div>
+    <span class="admin-badge">🔒 Admin Only — Not Agent-Facing</span>
+  </div>
+</header>
+
+<main>
+  <div class="page-head">
+    <h1 class="page-title">Who Pays Us, When, and Our Float Risk</h1>
+    <p class="page-lede">Real disbursement timing per backend, cross-referenced against agent payout dates. Agent-facing tools intentionally show only the resulting payout date — this page is the internal record of the cash-flow buffer behind it.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-hd hd-ld">
+      <div><div class="name">Level Debt — Debt Settlement</div><div class="sub">JKB Financial, Inc. d/b/a Level Debt</div></div>
+      <div class="bank-badge">
+        <div class="ico">🏦</div>
+        <div><div class="lbl">Receiving Bank</div><div class="val">Wells Fargo</div></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-lbl">Client Action</div>
+          <div class="flow-val">Payment 1 clears</div>
+          <div class="flow-note">Tracked in two half-month windows</div>
+        </div>
+        <div class="flow-step receive">
+          <div class="flow-lbl">Funding Tier Receives</div>
+          <div class="flow-val">~25th same mo / ~10th next mo</div>
+          <div class="flow-note">8.0% of enrolled debt, upfront</div>
+        </div>
+        <div class="flow-step agent">
+          <div class="flow-lbl">FT Agent Paid</div>
+          <div class="flow-val">1st or 15th of following mo</div>
+          <div class="flow-note">Buffer applied after FT confirms receipt</div>
+        </div>
+      </div>
+
+      <table class="buffer-table">
+        <thead><tr><th>Payment 1 Clears</th><th>FT Receives</th><th>FT Agent Paid</th><th>Buffer</th></tr></thead>
+        <tbody>
+          <tr><td>1st – 15th</td><td>~25th same month</td><td>1st of following month</td><td><span class="buf-pill">~6 days</span></td></tr>
+          <tr><td>16th – EOM</td><td>~10th of following month</td><td>15th of following month</td><td><span class="buf-pill">~5 days</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="example-box">
+        <div class="example-title">📅 Example Scenario — January 2026</div>
+        <div class="example-sub">Level Debt has two payout windows depending on when in the month the client's first draft clears.</div>
+
+        <div class="example-scenario-label">Scenario A — clears Jan 1st–15th</div>
+        <div class="example-flow">
+          <div class="ex-step"><div class="ex-date">Jan 8</div><div class="ex-lbl">Client's Payment 1 Clears</div></div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-step highlight"><div class="ex-date">Jan 25</div><div class="ex-lbl">FT Receives 8% ACH</div></div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-step agent"><div class="ex-date">Feb 1</div><div class="ex-lbl">FT Agent Paid</div></div>
+        </div>
+
+        <div class="example-scenario-label">Scenario B — clears Jan 16th–31st</div>
+        <div class="example-flow">
+          <div class="ex-step"><div class="ex-date">Jan 22</div><div class="ex-lbl">Client's Payment 1 Clears</div></div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-step highlight"><div class="ex-date">Feb 10</div><div class="ex-lbl">FT Receives 8% ACH</div></div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-step agent"><div class="ex-date">Feb 15</div><div class="ex-lbl">FT Agent Paid</div></div>
+        </div>
+      </div>
+
+      <details class="acc">
+        <summary><span><span class="ic">⚠</span>&nbsp; Contract Quotes &amp; Risk Notes</span></summary>
+        <div class="acc-body">
+          <div class="quote">"Marketing Affiliate shall be paid 8.0% upfront of the enrolled debt amount... Payout will be taken back or 'clawed back' if the second payment isn't cleared."<span class="src">Affiliate Agreement §4.1</span></div>
+          <div class="quote">"June 25th Marketing Affiliate shall be paid 8.0% for all debt that cleared their first monthly draft between June 1st and June 15th. July 10th the Marketing Affiliate shall be paid 8.0% for all debt that cleared their first monthly draft between June 16th and June 30th."<span class="src">Affiliate Agreement §4.1.1 — worked example</span></div>
+          <div class="warn">Contract inconsistency on file: §4.1's general text says payouts happen "during the first week of the month," which contradicts the §4.1.1 worked example (~25th / ~10th). We are building agent payout timing around the worked example, per internal decision — worth clarifying directly with Level Debt if this matters for a future renegotiation.</div>
+          <div class="warn risk">Chargeback risk: the full 8.0% upfront payout is clawed back in full if the client's 2nd monthly draft does not clear. This is the fastest-paying backend and the one with the most upfront-payment exposure per file.</div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd hd-cs">
+      <div><div class="name">Shield Services — Debt Validation</div><div class="sub">Consumer Shield, LLC</div></div>
+      <div class="bank-badge">
+        <div class="ico">🏦</div>
+        <div><div class="lbl">Receiving Bank</div><div class="val">Capital One</div></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-lbl">Client Action</div>
+          <div class="flow-val">Payment clears (any month)</div>
+          <div class="flow-note">$40/mo admin fee deducted first</div>
+        </div>
+        <div class="flow-step receive">
+          <div class="flow-lbl">Funding Tier Receives</div>
+          <div class="flow-val">By the 15th of next month</div>
+          <div class="flow-note">100% of remainder (mo 1–4), 65/35 split (mo 5+)</div>
+        </div>
+        <div class="flow-step agent">
+          <div class="flow-lbl">FT Agent Paid</div>
+          <div class="flow-val">20th of following month</div>
+          <div class="flow-note">5-day buffer after FT receipt</div>
+        </div>
+      </div>
+
+      <table class="buffer-table">
+        <thead><tr><th>Payment Clears</th><th>FT Receives</th><th>FT Agent Paid</th><th>Buffer</th></tr></thead>
+        <tbody>
+          <tr><td>Any day, that month</td><td>15th of following month</td><td>20th of following month</td><td><span class="buf-pill">~5 days</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="example-box">
+        <div class="example-title">📅 Example Scenario — January 2026</div>
+        <div class="example-sub">Consumer Shield has one fixed monthly ACH date, regardless of which day in the month the payment clears.</div>
+        <div class="example-flow">
+          <div class="ex-step"><div class="ex-date">Jan 12</div><div class="ex-lbl">Client's Payment Clears</div></div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-step highlight"><div class="ex-date">Feb 15</div><div class="ex-lbl">FT Receives ACH</div></div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-step agent"><div class="ex-date">Feb 20</div><div class="ex-lbl">FT Agent Paid</div></div>
+        </div>
+      </div>
+
+      <details class="acc">
+        <summary><span><span class="ic">⚠</span>&nbsp; Contract Quotes &amp; Risk Notes</span></summary>
+        <div class="acc-body">
+          <div class="quote">"The company shall be entitled to $40 per customer per month as an administration fee on all deals. The remaining portion of the first 4 monthly payments shall go 100% to the marketing company. Starting with the 5th monthly payment, the monthly payment shall be split 65% to the company and 35% to the marketing company of all revenues collected."<span class="src">Service Marketing Agreement §2</span></div>
+          <div class="quote">"Commission payments will be made via ACH once a month by the 15th of the following month for all cleared payments."<span class="src">Service Marketing Agreement §2</span></div>
+          <div class="warn">This is the cleanest, most predictable backend — a single fixed monthly ACH date, no rolling/weekly cohorts. Buffer to agent payout is a straightforward 5 days.</div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd hd-lg">
+      <div><div class="name">Legacy Capital Services — Debt Resolution</div><div class="sub">Elite Legal Practice (ELP) · UBS Bank Wire origin</div></div>
+      <div class="bank-badge">
+        <div class="ico">🏦</div>
+        <div><div class="lbl">Receiving Bank</div><div class="val">BlueVine</div></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-lbl">Client Action</div>
+          <div class="flow-val">Payment clears (weekly cohort)</div>
+          <div class="flow-note">Tracked in ~4-day cleared windows</div>
+        </div>
+        <div class="flow-step receive">
+          <div class="flow-lbl">Funding Tier Receives</div>
+          <div class="flow-val">~12–19 days after clearing</div>
+          <div class="flow-note">Statement ~10 days later, ACH ~2 days after that</div>
+        </div>
+        <div class="flow-step agent">
+          <div class="flow-lbl">FT Agent Paid</div>
+          <div class="flow-val">20th of following month</div>
+          <div class="flow-note">Safe buffer even for late-window clears</div>
+        </div>
+      </div>
+
+      <div class="example-box">
+        <div class="example-title">📅 Example Scenario — January 2026</div>
+        <div class="example-sub">Legacy Capital runs on rolling ~weekly cleared cohorts rather than one fixed date — the FT payout date shifts with each window, but the FT Agent Paid date stays fixed and safely covers it.</div>
+        <div class="example-flow">
+          <div class="ex-step"><div class="ex-date">Jan 5–9</div><div class="ex-lbl">Client's Cleared Window</div></div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-step"><div class="ex-date">Jan 19</div><div class="ex-lbl">Statement Date</div></div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-step highlight"><div class="ex-date">Jan 21</div><div class="ex-lbl">FT Receives ACH</div></div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-step agent"><div class="ex-date">Feb 20</div><div class="ex-lbl">FT Agent Paid</div></div>
+        </div>
+      </div>
+
+      <details class="acc" open>
+        <summary><span>📅&nbsp; 2026 Disbursement Schedule (sample rows)</span></summary>
+        <div class="acc-body">
+          <div class="disb-scroll">
+            <table class="disb">
+              <thead><tr><th>Cleared Start</th><th>Cleared End</th><th>Statement Date</th><th>ACH Distro</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr class="double"><td>4/27/2026</td><td>5/1/2026</td><td>5/11/2026</td><td>5/13/2026</td><td>Second May deposit</td></tr>
+                <tr><td>5/4/2026</td><td>5/8/2026</td><td>5/18/2026</td><td>5/20/2026</td><td>—</td></tr>
+                <tr><td>5/11/2026</td><td>5/15/2026</td><td>5/25/2026</td><td class="holiday">5/27/2026</td><td>Banking holiday — 1 day later</td></tr>
+                <tr><td>5/18/2026</td><td>5/22/2026</td><td>6/1/2026</td><td>6/3/2026</td><td>—</td></tr>
+                <tr class="double"><td>5/26/2026</td><td>5/29/2026</td><td>6/8/2026</td><td>6/10/2026</td><td>Second June deposit</td></tr>
+                <tr><td>6/29/2026</td><td>7/3/2026</td><td>7/13/2026</td><td>7/15/2026</td><td>Second July deposit</td></tr>
+                <tr><td>7/27/2026</td><td>7/31/2026</td><td>8/10/2026</td><td>8/12/2026</td><td>Second August deposit</td></tr>
+                <tr><td>8/24/2026</td><td>8/28/2026</td><td>9/7/2026</td><td class="holiday">9/9/2026</td><td>Second Sept. deposit + holiday</td></tr>
+                <tr><td>9/28/2026</td><td>10/2/2026</td><td>10/12/2026</td><td class="holiday">10/14/2026</td><td>Second Oct. deposit + holiday</td></tr>
+                <tr><td>10/26/2026</td><td>10/30/2026</td><td>11/9/2026</td><td class="holiday">11/12/2026</td><td>Second Nov. deposit + holiday</td></tr>
+                <tr><td>11/23/2026</td><td>11/27/2026</td><td>12/7/2026</td><td>12/9/2026</td><td>Second December deposit</td></tr>
+                <tr><td>12/28/2026</td><td>1/1/2026</td><td>1/11/2027</td><td>1/13/2027</td><td>Second January deposit</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="flow-note" style="margin-top:8px;">Representative rows including every "second deposit" and holiday-shifted date. Full weekly calendar on file with accounting.</div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span><span class="ic">⚠</span>&nbsp; Risk Notes</span></summary>
+        <div class="acc-body">
+          <div class="warn">This is the only backend on a rolling <strong style="color:#fde68a">weekly</strong> disbursement cadence rather than a single monthly date — worth monitoring separately from the other two since the buffer needs to safely cover the latest possible clear-date within each week's cohort.</div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div class="source-note">
+    <strong>Source documents on file:</strong> Consumer Shield Service Marketing Agreement (signed 3/17/2026) · Level Debt Affiliate Agreement (JKB Financial Inc., effective 2/23/26) · LCS 2026 Disbursement Schedule (May–Dec 2026).<br/>
+    <strong>Purpose:</strong> agent-facing tools (AI Deal Router, Commission Simulator) show only the resulting agent payout date — this page is the internal record of why those dates were chosen and where the cash-flow buffer sits, for accounting and leadership reference only.
+  </div>
+</main>
+
+</body>
+</html>
