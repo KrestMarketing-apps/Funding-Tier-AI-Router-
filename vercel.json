@@ -1,10 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-  "api/generate-plan.js": {
-    "maxDuration": 45
-  }
-},
+    "api/generate-plan.js": {
+      "maxDuration": 45
+    }
+  },
   "rewrites": [
     {
       "source": "/plan/:slug",
@@ -69,6 +69,10 @@
     {
       "source": "/vendors/lead-vendor-guidelines/warm-call-transfers/:path*",
       "destination": "https://funding-tier-vendors.vercel.app/vendors/lead-vendor-guidelines/warm-call-transfers/:path*"
+    },
+    {
+      "source": "/admins/Backend-Payout-Process",
+      "destination": "/admins/backend-payout-timing.html"
     }
   ]
 }
