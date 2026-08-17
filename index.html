@@ -7,7 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
 :root{--g:#0f9d8a;--gd:#0b7d6e;--dk:#0f172a;--bl:#1a6ed8;--am:#f59e0b;--rd:#ef4444;--br:#e2e8f0;--bg:#f8fafc;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -3611,16 +3613,181 @@ function addRow(){if(app.rows.length>=MAX_ROWS)return;app.rows.push(newRow(nextI
 function removeRow(i){if(app.rows.length<=1)return;app.rows.splice(i,1);renderRows();render();}
 let lastScenario=null;
 function render(){const c=computeScenario();lastScenario=c;$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCommCompare(c);renderCSCard(c);renderLDCard(c);renderLegacyCard(c);renderPlanCards(c);renderProgramChoice(c);renderCmpTable(c);renderClocks();const can=!!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION');['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}
-async function buildPdf(){const c=computeScenario();if(!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION'))return;const fn=$('fName').value.trim()||'Client',ln=$('lName').value.trim()||'';const fullName=`${fn} ${ln}`.trim();const{jsPDF}=window.jspdf;const doc=new jsPDF();let y=20;doc.setFontSize(20);doc.setTextColor(15,157,138);doc.text('Funding Tier - Debt Resolution Summary',14,y);y+=10;doc.setFontSize(11);doc.setTextColor(0,0,0);doc.text(`Prepared for: ${fullName}`,14,y);y+=7;const selRoute=selectedProgramRoute(c);const est=programEstimate(c,selRoute);const progType=publicProgramName(selRoute);doc.text(`State: ${app.sel}  |  Program: ${progType}`,14,y);y+=10;if(est){doc.setFontSize(12);doc.setTextColor(15,157,138);doc.text(`${progType} Program`,14,y);y+=7;doc.setFontSize(10);doc.setTextColor(71,85,105);doc.text(`Monthly: ${fmt(est.mp)}  |  Term: ${est.term} months  |  Total: ${fmt(est.tc)}`,14,y);y+=10;}const tRows=[['Month 1 Starting Minimum',fmt(c.dn.mp),est&&est.shortest?fmt(est.shortest.mp):'--',est?fmt(est.mp):'--'],['Payment Behavior','Minimum declines as balance drops','Fixed monthly','Structured program payment'],['Total Debt',fmt(c.total),fmt(c.total),fmt(c.total)],['Declining Min Payoff',c.dn.yearsMonths||`${c.dn.months} mo`,est&&est.shortest?`${est.shortest.term} mo`:'--',est?`${est.term} mo`:'--'],['Interest - Declining Min',fmt(c.dn.interest||0),'--','--'],['Total Paid - Declining Min',fmt(c.dn.total||0),'--','--'],['If Starting Min Stayed Fixed',c.dn.fixedYearsMonths||'N/A','--','--'],['Interest - Fixed Start Min',fmt(c.dn.fixedInterest||0),'--','--'],['Total Paid - Fixed Start Min',fmt(c.dn.fixedTotal||0),'--','--'],['Est. Savings','--',est&&est.shortest?fmt(Math.max(0,c.dn.total-est.shortest.tc)):'--',est?fmt(Math.max(0,c.dn.total-est.tc)):'--']];const hdrs=['Detail','Current Situation','Fastest Payoff','Recommended'];const cx=[14,64,114,162];const rh=10;doc.setFillColor(241,245,249);doc.rect(14,y,182,rh,'F');doc.setFontSize(7);doc.setTextColor(51,65,85);hdrs.forEach((h,i)=>doc.text(doc.splitTextToSize(h,44),cx[i]+2,y+4));y+=14;tRows.forEach((row,ri)=>{const isSav=ri===4;if(isSav){doc.setFillColor(15,157,138);doc.rect(14,y,182,rh,'F');}else if(ri%2===1){doc.setFillColor(248,250,252);doc.rect(14,y,182,rh,'F');}row.forEach((cell,ci)=>{if(isSav){doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');}else if(ri===3&&ci===1){doc.setTextColor(239,68,68);doc.setFont(undefined,'bold');}else{doc.setTextColor(15,23,42);doc.setFont(undefined,'normal');}doc.setFontSize(8);doc.text(String(cell),cx[ci]+2,y+6);});y+=rh;});const blob=doc.output('blob');const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Funding-Tier-Debt-Resolution.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
-function showSendModal(){
+async function loadImageAsDataURL(url){
+  try{
+    const res = await fetch(url, {mode:'cors'});
+    if(!res.ok) throw new Error('logo fetch failed');
+    const blob = await res.blob();
+    return await new Promise((resolve,reject)=>{
+      const reader = new FileReader();
+      reader.onload = ()=>resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }catch(e){
+    return null; // caller falls back to a text wordmark
+  }
+}
+
+function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
+  const steps=48, stepW=w/steps;
+  for(let i=0;i<steps;i++){
+    const t=i/(steps-1);
+    const r=Math.round(fromRGB[0]+(toRGB[0]-fromRGB[0])*t);
+    const g=Math.round(fromRGB[1]+(toRGB[1]-fromRGB[1])*t);
+    const b=Math.round(fromRGB[2]+(toRGB[2]-fromRGB[2])*t);
+    doc.setFillColor(r,g,b);
+    doc.rect(x+i*stepW,y,stepW+0.6,h,'F');
+  }
+}
+  
+  async function buildPdf(){
   const c=computeScenario();
-  const email=$('pEmail').value.trim();
-  if(!email){$('pEmail').style.borderColor='var(--rd)';$('pEmail').placeholder='Email required!';setTimeout(()=>{$('pEmail').style.borderColor='';$('pEmail').placeholder='prospect@email.com';},3000);return;}
-  if(!(c.recommended&&app.sel&&c.total>0)){alert('Complete the scenario first.');return;}
-  const fn=$('fName').value.trim()||'Prospect',ln=$('lName').value.trim()||'';
-  $('modalEmail').textContent=email;
-  $('modalName').textContent=`${fn} ${ln}`.trim()||'Prospect';
-  $('sendModal').classList.add('open');
+  if(!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION'))return;
+  const fn=$('fName').value.trim()||'Client', ln=$('lName').value.trim()||'';
+  const fullName=`${fn} ${ln}`.trim();
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const pageW=210, pageH=297, margin=14;
+  const NAVY=[15,23,42], TEAL=[15,157,138], TEAL_DK=[11,125,110], RED=[239,68,68], GRAY=[100,116,139], AMBER=[146,64,14];
+
+  const selRoute=selectedProgramRoute(c);
+  const est=programEstimate(c,selRoute);
+  const progType=publicProgramName(selRoute);
+  const fixedMp=Math.round(c.dn.fixedMonthlyPayment||c.dn.mp);
+  const fixedMoLabel=c.dn.fixedYearsMonths||`${c.dn.fixedMonths||0} mo`;
+
+  // ── Header banner ──
+  pdfGradientBand(doc,0,0,pageW,38,NAVY,TEAL);
+  const logoDataUrl=await loadImageAsDataURL('https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png');
+  if(logoDataUrl){
+    try{ doc.addImage(logoDataUrl,'PNG',margin,9,34,18,undefined,'FAST'); }
+    catch(e){ doc.setFont(undefined,'bold');doc.setFontSize(16);doc.setTextColor(255,255,255);doc.text('FUNDING TIER',margin,20); }
+  } else {
+    doc.setFont(undefined,'bold');doc.setFontSize(16);doc.setTextColor(255,255,255);doc.text('FUNDING TIER',margin,20);
+  }
+  doc.setFont(undefined,'bold');doc.setFontSize(17);doc.setTextColor(255,255,255);
+  doc.text('Debt Resolution Summary',pageW-margin,17,{align:'right'});
+  doc.setFont(undefined,'normal');doc.setFontSize(9);doc.setTextColor(220,240,235);
+  doc.text('AI Deal Router · Personalized Estimate',pageW-margin,24,{align:'right'});
+
+  let y=50;
+
+  // ── Prepared-for line ──
+  doc.setFont(undefined,'bold');doc.setFontSize(12);doc.setTextColor(...NAVY);
+  doc.text(`Prepared for: ${fullName}`,margin,y);
+  doc.setFont(undefined,'normal');doc.setFontSize(10);doc.setTextColor(...GRAY);
+  doc.text(`State: ${app.sel}   |   Program: ${progType}`,margin,y+6);
+  y+=16;
+
+  // ── Highlight metric cards ──
+  const cardW=(pageW-margin*2-9)/4, cardH=24, cardY=y;
+  const cards=[
+    {label:'TOTAL DEBT REVIEWED',val:fmt(c.total),accent:NAVY},
+    {label:'CURRENT MONTHLY PAYMENT',val:fmt(fixedMp),accent:RED},
+    {label:est?'RECOMMENDED PAYMENT':'PAYMENT',val:est?fmt(est.mp):'--',accent:TEAL},
+    {label:est?'PROGRAM LENGTH':'LENGTH',val:est?`${est.term} mo`:'--',accent:TEAL}
+  ];
+  cards.forEach((card,i)=>{
+    const cx=margin+i*(cardW+3);
+    doc.setDrawColor(...card.accent);doc.setLineWidth(0.6);
+    doc.roundedRect(cx,cardY,cardW,cardH,2,2,'S');
+    doc.setFont(undefined,'bold');doc.setFontSize(7);doc.setTextColor(...GRAY);
+    doc.text(card.label,cx+3,cardY+7,{maxWidth:cardW-6});
+    doc.setFont(undefined,'bold');doc.setFontSize(14);doc.setTextColor(...card.accent);
+    doc.text(card.val,cx+3,cardY+18);
+  });
+  y=cardY+cardH+12;
+
+  // ── Program summary strip ──
+  if(est){
+    doc.setFillColor(...TEAL);doc.roundedRect(margin,y,pageW-margin*2,16,2,2,'F');
+    doc.setFont(undefined,'bold');doc.setFontSize(11);doc.setTextColor(255,255,255);
+    doc.text(`${progType} Program`,margin+5,y+6.5);
+    doc.setFont(undefined,'normal');doc.setFontSize(9);
+    doc.text(`Monthly: ${fmt(est.mp)}   |   Term: ${est.term} months   |   Total: ${fmt(est.tc)}`,margin+5,y+12.5);
+    y+=24;
+  }
+
+  // ── Primary comparison table (fixed-payment based — this is the fix) ──
+  const primaryRows=[
+    ['Monthly Payment',fmt(fixedMp),est&&est.shortest?fmt(est.shortest.mp):'--',est?fmt(est.mp):'--'],
+    ['Payment Behavior','Fixed monthly payment','Fixed monthly','Structured program payment'],
+    ['Total Debt',fmt(c.total),fmt(c.total),fmt(c.total)],
+    ['Months to Payoff',fixedMoLabel,est&&est.shortest?`${est.shortest.term} mo`:'--',est?`${est.term} mo`:'--'],
+    ['Interest Paid',fmt(c.dn.fixedInterest||0),'--','--'],
+    ['Total Paid',fmt(c.dn.fixedTotal||0),'--','--'],
+    ['Est. Savings','--',est&&est.shortest?fmt(Math.max(0,(c.dn.fixedTotal||0)-est.shortest.tc)):'--',est?fmt(Math.max(0,(c.dn.fixedTotal||0)-est.tc)):'--'],
+  ];
+  doc.autoTable({
+    startY:y,
+    head:[['Detail','Current Situation','Fastest Payoff','Recommended']],
+    body:primaryRows,
+    margin:{left:margin,right:margin},
+    styles:{fontSize:8.5,cellPadding:3,textColor:[15,23,42],lineColor:[226,232,240],lineWidth:0.2},
+    headStyles:{fillColor:NAVY,textColor:255,fontStyle:'bold',halign:'left'},
+    alternateRowStyles:{fillColor:[248,250,252]},
+    columnStyles:{1:{textColor:RED,fontStyle:'bold'}},
+    didParseCell:(data)=>{
+      if(data.row.index===primaryRows.length-1){
+        data.cell.styles.fillColor=TEAL;
+        data.cell.styles.textColor=255;
+        data.cell.styles.fontStyle='bold';
+      }
+    }
+  });
+  y=doc.lastAutoTable.finalY+10;
+
+  // ── Secondary: declining minimum-payment reference ──
+  if(y>250){doc.addPage();y=20;}
+  doc.setFont(undefined,'bold');doc.setFontSize(9);doc.setTextColor(...GRAY);
+  doc.text('DECLINING MINIMUM PAYMENT REFERENCE',margin,y);
+  doc.setFont(undefined,'normal');doc.setFontSize(7.5);
+  doc.text('Some creditors reduce the automatic minimum payment as the balance drops, which can extend payoff and increase interest.',margin,y+4,{maxWidth:pageW-margin*2});
+  y+=10;
+  const secondaryRows=[
+    ['Month 1 Starting Minimum',fmt(c.dn.mp)],
+    ['Declining Min Payoff',c.dn.yearsMonths||`${c.dn.months||0} mo`],
+    ['Interest - Declining Min',fmt(c.dn.interest||0)],
+    ['Total Paid - Declining Min',fmt(c.dn.total||0)],
+  ];
+  doc.autoTable({
+    startY:y,
+    body:secondaryRows,
+    margin:{left:margin,right:margin},
+    theme:'plain',
+    styles:{fontSize:8,cellPadding:2,textColor:[100,116,139]},
+    columnStyles:{0:{fontStyle:'bold',textColor:[51,65,85]},1:{halign:'right'}}
+  });
+  y=doc.lastAutoTable.finalY+10;
+
+  // ── Assumptions note ──
+  if(y>265){doc.addPage();y=20;}
+  const noteText=c.dn.assumption||'Assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes.';
+  const noteLines=doc.splitTextToSize(noteText,pageW-margin*2-8);
+  const noteH=noteLines.length*4+6;
+  doc.setFillColor(255,251,235);doc.setDrawColor(245,158,11);
+  doc.roundedRect(margin,y,pageW-margin*2,noteH,2,2,'FD');
+  doc.setFont(undefined,'normal');doc.setFontSize(8);doc.setTextColor(...AMBER);
+  doc.text(noteLines,margin+4,y+5.5);
+
+  // ── Footer on every page ──
+  const pageCount=doc.internal.getNumberOfPages();
+  for(let p=1;p<=pageCount;p++){
+    doc.setPage(p);
+    doc.setFillColor(...NAVY);
+    doc.rect(0,pageH-10,pageW,10,'F');
+    doc.setFont(undefined,'normal');doc.setFontSize(7.5);doc.setTextColor(255,255,255);
+    doc.text('Funding Tier · Debt Resolution Estimator',margin,pageH-4);
+    doc.text(`Page ${p} of ${pageCount}`,pageW-margin,pageH-4,{align:'right'});
+  }
+
+  const blob=doc.output('blob');
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='Funding-Tier-Debt-Resolution.pdf';
+  document.body.appendChild(a);a.click();a.remove();
+  URL.revokeObjectURL(url);
 }
 function closeSendModal(){$('sendModal').classList.remove('open');}
 async function sendEmailConfirmed(){
