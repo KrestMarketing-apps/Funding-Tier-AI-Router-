@@ -3900,13 +3900,39 @@ function _prospectKey(){return [$('fName').value.trim(),$('lName').value.trim(),
 function _modalShow(viewId){['modalConfirmView','modalSendingView','modalSuccessView','modalErrorView'].forEach(id=>{const el=$(id);if(el)el.style.display=id===viewId?'block':'none';});const m=$('sendModal');if(m)m.style.display='flex';}
 function _progressTo(pct,label){const p=$('modalProgress'),l=$('modalProgressLabel');if(p)p.style.width=pct+'%';if(l)l.textContent=label||'';}
 function _showSuccessModal(pageUrl,email){const se=$('modalSuccessEmail');if(se)se.textContent=email&&email!=='(no email)'?'Sent to '+email:'Plan URL generated';const ur=$('modalUrlRow'),ui=$('modalUrlInput'),ul=$('modalUrlLink');if(pageUrl&&ur&&ui&&ul){ui.value=pageUrl;ul.href=pageUrl;ur.style.display='block';}_modalShow('modalSuccessView');}
-async function _callAPI(sendEmail){
-  const c=computeScenario();const email=$('pEmail').value.trim();const key=_prospectKey();
+
+  async function _callAPI(sendEmail){
+  const c=computeScenario();
+  const email=$('pEmail').value.trim();
+  const key=_prospectKey();
   if(!sendEmail&&_lastPlanUrl&&_lastPlanKey===key)return{ok:true,pageUrl:_lastPlanUrl,cached:true};
+
   const payload=buildFullPayload(sendEmail);
   const res=await fetch('/api/generate-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.error||'Server error');
+  const data=await res.json();
+  if(!res.ok||!data.ok)throw new Error(data.error||'Server error');
   if(data.pageUrl){_lastPlanUrl=data.pageUrl;_lastPlanKey=key;}
+
+  if(sendEmail){
+    if(!email) throw new Error('Missing recipient email.');
+    const pdfBase64=await buildPlanPdfBase64(c);
+    const fn=$('fName').value.trim()||'Client';
+    const emailRes=await fetch('/api/send-savings-email',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        to:email,
+        firstName:fn,
+        pageUrl:data.pageUrl,
+        filename:'Funding-Tier-Debt-Resolution.pdf',
+        pdfBase64
+      })
+    });
+    const emailData=await emailRes.json();
+    if(!emailRes.ok||!emailData.ok) throw new Error(emailData.error||'Email failed to send.');
+    data.emailSent=true;
+  }
+
   return data;
 }
 function retryConfirm(){_modalShow('modalConfirmView');}
