@@ -2547,17 +2547,16 @@ function renderClocks(){
   </div>`;
 }
 
-const UNIVERSAL_CLAWBACK = 'No clawback for ordinary cancellation — if a client simply stops paying, remaining commission or residual just stops. If a client formally disputes or charges back any payment, at any point in the program, all commission and any bonus already paid on that file will be clawed back. This is rare, applied uniformly across all programs as a matter of business integrity.';
+const UNIVERSAL_CLAWBACK = 'No clawback for ordinary cancellation — if a client simply stops paying, remaining commission just stops. If a client formally disputes or charges back any payment, at any point in the program, all commission and any bonus already paid on that file will be clawed back. This is rare, applied uniformly across all programs as a matter of business integrity.';
 
 function getCommForCard(c,key){
   const total=c.total;
   if(key==='CS'&&c.csAvail&&c.csProg){
     const bandTotal=c.csProg.comm.total;
-    const each=Math.floor(bandTotal/3), last=bandTotal-(each*2);
     return{
-      base:bandTotal, baseWhen:'Following month after Payment 1 clears',
-      residual:[each,each,last], residualWhen:['As Payment 1 clears','As Payment 2 clears','As Payment 3 clears'],
-      grandTotal:bandTotal*2,
+      base:bandTotal,
+      baseWhen:'20th of the month after Payment 1 clears',
+      grandTotal:bandTotal,
       clawback:UNIVERSAL_CLAWBACK,
       note:`Flat rate. Program ${c.csProg.k}`, isLD:false
     };
@@ -2565,8 +2564,8 @@ function getCommForCard(c,key){
   if(key==='LEVEL'&&c.ldAvail){
     const base=Math.round(total*0.010),t2=Math.round(total*0.0115),t3=Math.round(total*0.013);
     return{
-      base, baseWhen:'20th of Month 3 (after 2 deposits clear)',
-      residual:null, grandTotal:base,
+      base, baseWhen:'1st of the following month (Payment 1 clears 1st\u201315th) or 15th of the following month (clears 16th\u2013end of month)',
+      grandTotal:base,
       clawback:UNIVERSAL_CLAWBACK,
       note:`T1 ${fmt(base)} · T2 ${fmt(t2)} · T3 ${fmt(t3)}`,
       isLD:true, t2, t3
@@ -2575,11 +2574,10 @@ function getCommForCard(c,key){
   if(key==='LEGACY'&&c.legacyAvail){
     const band=getLegacyComm(total);if(!band)return null;
     const bandTotal=legacyCommAtFee(band.total,legacyState.feeRate);
-    const each=Math.floor(bandTotal/3), last=bandTotal-(each*2);
     return{
-      base:bandTotal, baseWhen:'Following month after Payment 1 clears',
-      residual:[each,each,last], residualWhen:['As Payment 1 clears','As Payment 2 clears','As Payment 3 clears'],
-      grandTotal:bandTotal*2,
+      base:bandTotal,
+      baseWhen:'20th of the month after Payment 1 clears',
+      grandTotal:bandTotal,
       clawback:UNIVERSAL_CLAWBACK,
       note:`Band ${band.code} @ ${Math.round(legacyState.feeRate*100)}% fee`, isLD:false
     };
@@ -2596,34 +2594,29 @@ function commContentHtml(comm,isRec){
     rows=`<tr style="border-bottom:1px solid rgba(255,255,255,.10);">
       <td style="padding:10px 12px;color:#fff;font-weight:800;">Tier 1</td>
       <td style="padding:10px 12px;font-size:18px;font-weight:900;color:#86efac;text-align:right;">${fmt(comm.base)}</td>
-      <td style="padding:10px 12px;text-align:right;"><span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.82);white-space:nowrap;">${comm.baseWhen}</span></td>
+      <td style="padding:10px 12px;text-align:right;max-width:150px;"><span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.82);">${comm.baseWhen}</span></td>
     </tr>
     <tr style="border-bottom:1px solid rgba(255,255,255,.10);opacity:.92;">
       <td style="padding:10px 12px;color:rgba(255,255,255,.82);font-weight:800;">Tier 2</td>
       <td style="padding:10px 12px;font-size:16px;font-weight:900;color:#5eead4;text-align:right;">${fmt(comm.t2)}</td>
-      <td style="padding:10px 12px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.62);font-weight:700;white-space:nowrap;">$1M–$1.99M/mo</span></td>
+      <td style="padding:10px 12px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.62);font-weight:700;">$1M–$1.99M/mo</span></td>
     </tr>
     <tr>
       <td style="padding:10px 12px;color:rgba(255,255,255,.7);font-weight:800;">Tier 3</td>
       <td style="padding:10px 12px;font-size:16px;font-weight:900;color:#2dd4bf;text-align:right;">${fmt(comm.t3)}</td>
-      <td style="padding:10px 12px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.62);font-weight:700;white-space:nowrap;">$2M+/mo</span></td>
+      <td style="padding:10px 12px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.62);font-weight:700;">$2M+/mo</span></td>
     </tr>`;
   } else {
-    rows=`<tr style="border-bottom:1px solid rgba(255,255,255,.10);">
+    rows=`<tr>
       <td style="padding:10px 12px;color:#fff;font-weight:800;">Base</td>
       <td style="padding:10px 12px;font-size:18px;font-weight:900;color:#86efac;text-align:right;">${fmt(comm.base)}</td>
-      <td style="padding:10px 12px;text-align:right;"><span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.82);white-space:nowrap;">${comm.baseWhen}</span></td>
-    </tr>
-    ${comm.residual.map((amt,i)=>`<tr style="${i===comm.residual.length-1?'':'border-bottom:1px solid rgba(255,255,255,.10);'}">
-      <td style="padding:8px 12px;color:rgba(255,255,255,.82);font-weight:700;font-size:11px;">Residual M${i+1}</td>
-      <td style="padding:8px 12px;font-size:14px;font-weight:800;color:#5eead4;text-align:right;">${fmt(amt)}</td>
-      <td style="padding:8px 12px;text-align:right;"><span style="font-size:10px;color:rgba(255,255,255,.62);font-weight:700;white-space:nowrap;">${comm.residualWhen[i]}</span></td>
-    </tr>`).join('')}`;
+      <td style="padding:10px 12px;text-align:right;max-width:150px;"><span style="font-size:11px;font-weight:800;color:rgba(255,255,255,.82);">${comm.baseWhen}</span></td>
+    </tr>`;
   }
   return `<div class="comm-block-inner">
     <div class="comm-inline-hd">Agent Commission <span style="font-size:20px;font-weight:900;color:#86efac;margin-left:6px;">${fmt(comm.grandTotal)}</span></div>
     <div style="border:1px solid rgba(255,255,255,.14);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.05);min-height:150px;">
-      <table style="width:100%;border-collapse:collapse;">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
         <thead><tr style="background:rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.10);">
           <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:800;color:rgba(255,255,255,.70);text-transform:uppercase;letter-spacing:.5px;">Payment</th>
           <th style="padding:8px 12px;text-align:right;font-size:10px;font-weight:800;color:rgba(255,255,255,.70);text-transform:uppercase;letter-spacing:.5px;">Amount</th>
