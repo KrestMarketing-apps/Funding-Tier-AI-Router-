@@ -2588,7 +2588,6 @@ function getCommForCard(c,key){
 function commContentHtml(comm,isRec){
   if(!comm)return `<div style="font-size:11px;color:rgba(255,255,255,.72);padding:4px 0;">Commission data not available for this scenario.</div>`;
   let noteLine=comm.note?`<div style="font-size:10px;color:rgba(255,255,255,.76);font-weight:700;margin-top:10px;line-height:1.55;">${comm.note}</div>`:'';
-  let riskLine=comm.clawback?`<div style="font-size:10px;color:#d1fae5;font-weight:700;margin-top:6px;line-height:1.55;">* ${comm.clawback}</div>`:'';
   let rows='';
   if(comm.isLD){
     rows=`<tr style="border-bottom:1px solid rgba(255,255,255,.10);">
