@@ -78,5 +78,10 @@
       "source": "/operating-model",
       "destination": "https://funding-tier-profit-engine.vercel.app/operating-model"
     }
+{
+      "source": "/admins/operating-model",
+      "destination": "https://funding-tier-profit-engine.vercel.app/operating-model"
+    },
+    
   ]
 }
