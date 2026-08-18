@@ -73,10 +73,10 @@
     {
       "source": "/admins/Backend-Payout-Process",
       "destination": "/admins/backend-payout-timing.html"
-    }
+    },
     {
-  "source": "/operating-model",
-  "destination": "https://funding-tier-profit-engine.vercel.app/operating-model"
-}
+      "source": "/operating-model",
+      "destination": "https://funding-tier-profit-engine.vercel.app/operating-model"
+    }
   ]
 }
