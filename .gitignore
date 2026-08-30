@@ -1,0 +1,4 @@
+
+# Incident evidence — contains consumer PII. NEVER commit (this repo is public).
+_incident/
+node_modules/

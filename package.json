@@ -1,8 +1,5 @@
 {
   "dependencies": {
-    "@vercel/blob": "^2.3.3",
-    "puppeteer-core": "^22.0.0",
-    "@sparticuz/chromium": "^121.0.0",
-    "funding-tier-brand-system": "git+https://github.com/KrestMarketing-apps/funding-tier-brand-system.git"
+    "@vercel/blob": "^2.3.3"
   }
 }
