@@ -7,8 +7,12 @@
   },
   "rewrites": [
     {
-      "source": "/plan/:slug",
-      "destination": "/api/plan?slug=:slug"
+      "source": "/plan/:name/:token",
+      "destination": "/api/plan?token=:token"
+    },
+    {
+      "source": "/plan/:token",
+      "destination": "/api/plan?token=:token"
     },
     {
       "source": "/agents/call-scripts",
@@ -23,64 +27,35 @@
       "destination": "/agents/legacy-capital-program-calculator.html"
     },
     {
-      "source": "/agents/commission-simulator",
-      "destination": "https://funding-tier-profit-engine.vercel.app/commission-simulator"
-    },
-    {
-      "source": "/agents/commission-simulator/:path*",
-      "destination": "https://funding-tier-profit-engine.vercel.app/commission-simulator/:path*"
-    },
-    {
       "source": "/admins/legacy-capital-billable-payout-simulator",
       "destination": "/admins/legacy-capital-billable-payout-simulator.html"
     },
     {
-      "source": "/admins/profit-engine",
-      "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine"
-    },
-    {
-      "source": "/admins/profit-engine/:path*",
-      "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*"
-    },
-    {
-      "source": "/profit-engine",
-      "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine"
-    },
-    {
-      "source": "/profit-engine/:path*",
-      "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*"
-    },
-    {
-      "source": "/iblusend",
-      "destination": "https://iblusend-hub.vercel.app/"
-    },
-    {
-      "source": "/iblusend/:path*",
-      "destination": "https://iblusend-hub.vercel.app/:path*"
-    },
-    {
-      "source": "/vendors/lead-vendor-guidelines/warm-call-transfers",
-      "destination": "https://funding-tier-vendors.vercel.app/vendors/lead-vendor-guidelines/warm-call-transfers/"
-    },
-    {
-      "source": "/vendors/lead-vendor-guidelines/warm-call-transfers/",
-      "destination": "https://funding-tier-vendors.vercel.app/vendors/lead-vendor-guidelines/warm-call-transfers/"
-    },
-    {
-      "source": "/vendors/lead-vendor-guidelines/warm-call-transfers/:path*",
-      "destination": "https://funding-tier-vendors.vercel.app/vendors/lead-vendor-guidelines/warm-call-transfers/:path*"
-    },
-    {
       "source": "/admins/Backend-Payout-Process",
       "destination": "/admins/backend-payout-timing.html"
-    },
+    }
+  ],
+  "headers": [
     {
-      "source": "/operating-model",
-      "destination": "https://funding-tier-profit-engine.vercel.app/operating-model"
-    },
-    {
-      "source": "/admins/operating-model",
-      "destination": "https://funding-tier-profit-engine.vercel.app/operating-model"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
+      ]
     }
   ]
 }

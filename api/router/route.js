@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { put } from '@vercel/blob';
 
 async function updateGhlContact(contactId, fields = {}) {
@@ -156,6 +157,12 @@ function buildPlanData({ firstName, lastName, email, state, rows }) {
 }
 
 export async function POST(req) {
+  const expected = process.env.ROUTER_SHARED_SECRET;
+  if (!expected || req.headers.get('x-router-secret') !== expected) {
+    return new Response(JSON.stringify({ error: 'Not found' }), {
+      status: 404, headers: { 'Content-Type': 'application/json' } });
+  }
+
   try {
     const body = await req.json();
 
@@ -207,22 +214,20 @@ export async function POST(req) {
       rows,
     });
 
-    const timestamp = Date.now();
-    const slug = `${slugify(`${firstName} ${lastName} debt resolution plan`)}-${timestamp}`;
+    const slug = randomUUID();
     const planId = slug;
 
     const blob = await put(
       `plans/${slug}.json`,
       JSON.stringify(planData, null, 2),
       {
-        access: 'public',
-        addRandomSuffix: false,
+        access: 'private',
         contentType: 'application/json',
       }
     );
 
 const baseUrl = 'https://ai.fundingtier.com';
-const planUrl = `${baseUrl}/plan/${slug}`;
+const planUrl = `${baseUrl}/plan/client/${slug}`;
 const pdfUrl = `${baseUrl}/api/generate-pdf?dataUrl=${encodeURIComponent(blob.url)}`;
     const generatedAt = new Date().toISOString();
 

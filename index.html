@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0f9b8e" />
+
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Funding Tier — AI Deal Router</title>
@@ -3691,6 +3696,22 @@ async function buildPdf(){
   URL.revokeObjectURL(url);
 }
 
+async function downloadPlanPdf(){
+  try{
+    const c=computeScenario();
+    if(!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION')){
+      alert('Select a program and add creditor rows before downloading the plan.');
+      return;
+    }
+    const doc=await buildPlanPdfDoc(c);
+    const f=(document.getElementById('fName')?.value||'').trim();
+    const l=(document.getElementById('lName')?.value||'').trim();
+    const who=[f,l].join('-').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'client';
+    doc.save(`funding-tier-debt-resolution-plan-${who}.pdf`);
+  }catch(err){
+    alert('Could not build the PDF: '+(err&&err.message||'unknown error'));
+  }
+}
 async function buildPlanPdfBase64(c){
   const doc=await buildPlanPdfDoc(c);
   const dataUri=doc.output('datauristring');
@@ -3750,6 +3771,7 @@ async function sendEmailConfirmed(){
             <div style="font-size:11px;color:#64748b;margin-top:1px;">Dynamic program page generated for ${($('fName').value.trim()||'Prospect')+' '+($('lName').value.trim()||'')}.</div>
           </div>
         </div>
+        <button onclick="downloadPlanPdf()" class="btn btn-g" style="font-size:11px;padding:6px 12px;">⬇ Download PDF</button>
         ${data.pageUrl?`<button id="planLink" class="btn btn-g" style="font-size:11px;padding:6px 12px;">View Page ↗</button>`:''}
         <button onclick="document.getElementById('planResultBox').style.display='none'" style="border:none;background:none;cursor:pointer;font-size:16px;color:#94a3b8;padding:0;font-family:inherit;">&times;</button>
       </div>`;

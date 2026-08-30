@@ -105,6 +105,11 @@ async function updateContactPdfUrl(params: {
 }
 
 export async function POST(req: NextRequest) {
+  const expected = process.env.ROUTER_SHARED_SECRET;
+  if (!expected || req.headers.get("x-router-secret") !== expected) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   try {
     const body = await req.json();
     const contactId = toSafeString(body.contactId);
@@ -122,7 +127,7 @@ export async function POST(req: NextRequest) {
       `router-pdfs/${contactId}-${Date.now()}.pdf`,
       pdfBuffer,
       {
-        access: "public",
+        access: "private",
         contentType: "application/pdf",
       }
     );

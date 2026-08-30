@@ -1,3 +1,5 @@
+import { get } from '@vercel/blob';
+
 function currency(value) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -15,29 +17,43 @@ function escapeHtml(value = '') {
     .replaceAll("'", '&#39;');
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const EXPIRED_HTML =
+  '<h1>This plan link has expired.</h1>' +
+  '<p>Please contact your Funding Tier representative for an updated copy.</p>';
+
 export default async function handler(req, res) {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
   try {
-    let dataUrl = req.query.dataUrl;
-    const slug = req.query.slug;
+    // Lookup is by token only. The /plan/:name/ segment is cosmetic and is
+    // never read here. There is no caller-supplied URL to fetch.
+    const token = String(req.query.token || '').trim();
 
-    // Uses your current public Blob host
-    if (!dataUrl && slug) {
-      dataUrl = `https://xcbefibugdiyl6le.public.blob.vercel-storage.com/plans/${slug}.json`;
-    }
-
-    if (!dataUrl) {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    if (!token) {
       return res.status(400).send('<h1>Missing plan data.</h1>');
     }
 
-    const fetchRes = await fetch(dataUrl);
+    // Legacy name-and-timestamp links are intentionally dead. Show the same
+    // expiry page rather than a broken-looking error.
+    if (!UUID_RE.test(token)) {
+      return res.status(410).send(EXPIRED_HTML);
+    }
 
-    if (!fetchRes.ok) {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    const result = await get(`plans/${token}.json`, { access: 'private' });
+
+    if (!result || result.statusCode !== 200 || !result.stream) {
       return res.status(404).send('<h1>Plan data not found.</h1>');
     }
 
-    const data = await fetchRes.json();
+    const data = JSON.parse(await new Response(result.stream).text());
+
+    if (data.expiresAt && Date.now() > Date.parse(data.expiresAt)) {
+      return res.status(410).send(EXPIRED_HTML);
+    }
 
     const {
       firstName = 'Client',
@@ -62,6 +78,10 @@ export default async function handler(req, res) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0f9b8e" />
   <title>${escapeHtml(fullName)} - Debt Resolution Plan</title>
   <style>
     body {
@@ -390,7 +410,7 @@ export default async function handler(req, res) {
         </div>
         <div class="kpi kpi-green">
           <div class="label">New Program Plan Length</div>
-          <div class="value">${recommended.term ? `${recommended.term} mo` : '—'}</div>
+          <div class="value">${recommended.term ? `${escapeHtml(recommended.term)} mo` : '—'}</div>
         </div>
       </div>
 
@@ -419,9 +439,9 @@ export default async function handler(req, res) {
             </tr>
             <tr>
               <td>Months to Payoff</td>
-              <td>${doNothing.monthsToPayoff || '—'} months</td>
-              <td>${shortest.term || '—'} months</td>
-              <td class="best-col">${recommended.term || '—'} months</td>
+              <td>${escapeHtml(doNothing.monthsToPayoff || '—')} months</td>
+              <td>${escapeHtml(shortest.term || '—')} months</td>
+              <td class="best-col">${escapeHtml(recommended.term || '—')} months</td>
             </tr>
             <tr>
               <td>Estimated Interest Rate</td>
