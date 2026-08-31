@@ -228,7 +228,6 @@ export async function POST(req) {
 
 const baseUrl = 'https://ai.fundingtier.com';
 const planUrl = `${baseUrl}/plan/client/${slug}`;
-const pdfUrl = `${baseUrl}/api/generate-pdf?dataUrl=${encodeURIComponent(blob.url)}`;
     const generatedAt = new Date().toISOString();
 
     const ghlUpdate = await updateGhlContact(contactId, {
@@ -240,10 +239,6 @@ const pdfUrl = `${baseUrl}/api/generate-pdf?dataUrl=${encodeURIComponent(blob.ur
         {
           key: 'debt_resolution_plan_id',
           field_value: planId,
-        },
-        {
-          key: 'debt_resolution_pdf_url',
-          field_value: pdfUrl,
         },
         {
           key: 'debt_resolution_plan_url',
@@ -263,17 +258,11 @@ const pdfUrl = `${baseUrl}/api/generate-pdf?dataUrl=${encodeURIComponent(blob.ur
         email,
         state,
       },
-      blob: {
-        url: blob.url,
-        pathname: blob.pathname,
-      },
       writtenFields: {
         debt_resolution_plan_last_generated_timestamp: generatedAt,
         debt_resolution_plan_id: planId,
-        debt_resolution_pdf_url: pdfUrl,
         debt_resolution_plan_url: planUrl,
       },
-      ghlResponse: ghlUpdate.text,
     });
   } catch (error) {
     return Response.json(
