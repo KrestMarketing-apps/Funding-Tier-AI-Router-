@@ -84,21 +84,13 @@ export const creditorMatcher = {
       rule: "Not accepted by Level Debt."
     },
     {
-      key: "STATE_EMPLOYEE_CU",
-      aliases: [
-        "STATE EMPLOYEE CREDIT UNION",
-        "STATE EMPLOYEES CREDIT UNION",
-        "STATE EMPLOYEES C U",
-        "STATE EMPLOYEES CU",
-        "STATEEMP",
-        "SECU",
-        "STATE EMPLOYEE CU"
-      ],
-      rule: "All State Employee Credit Union variants are not accepted."
-    },
-    {
       key: "AQUA_FINANCE",
       aliases: ["AQUA FINANCE"],
+      rule: "Not accepted by Level Debt."
+    },
+    {
+      key: "ARMY_AIR_FORCE_EXCHANGE",
+      aliases: ["ARMY AIR FORCE EXCHANGE", "ARMY AIRFORCE EXCHANGE", "ARMY AND AIR FORCE EXCHANGE SERVICE", "AAFES", "ARMY AIRFOCE EXCHANGE"],
       rule: "Not accepted by Level Debt."
     },
     {
@@ -159,6 +151,11 @@ export const creditorMatcher = {
       rule: "Not accepted by Level Debt."
     },
     {
+      key: "EDUC_EMP_CU",
+      aliases: ["EDUC EMP CU", "EDUCATIONAL EMPLOYEES CREDIT UNION", "EDUCATIONAL EMPLOYEES CU", "EDUCATIONAL EMPLOYEES FEDERAL CREDIT UNION"],
+      rule: "Not accepted by Level Debt."
+    },
+    {
       key: "ENERBANK",
       aliases: ["ENERBANK", "ENERBANK USA"],
       rule: "Not accepted by Level Debt."
@@ -186,6 +183,11 @@ export const creditorMatcher = {
     {
       key: "FORTERA_CU",
       aliases: ["FORTERA CREDIT UNION", "FORTERA CU"],
+      rule: "Not accepted by Level Debt."
+    },
+    {
+      key: "FUTURE_GREEN_SERVICES",
+      aliases: ["FUTURE GREEN SERVICES", "FUTURE GREEN"],
       rule: "Not accepted by Level Debt."
     },
     {
@@ -244,6 +246,11 @@ export const creditorMatcher = {
       rule: "Not accepted by Level Debt."
     },
     {
+      key: "LENDKEY",
+      aliases: ["LENDKEY TECHNOLOGIES", "LENDKEY"],
+      rule: "Not accepted by Level Debt."
+    },
+    {
       key: "LHPCC_TRUST",
       aliases: ["LHPCC TRUST I", "LHPCC"],
       rule: "Not accepted by Level Debt."
@@ -261,6 +268,11 @@ export const creditorMatcher = {
     {
       key: "MILITARY_STAR",
       aliases: ["MILITARY STAR", "EXCHANGE CREDIT PROGRAM"],
+      rule: "Not accepted by Level Debt."
+    },
+    {
+      key: "MOHELA",
+      aliases: ["MOHELA", "MISSOURI HIGHER EDUCATION LOAN AUTHORITY"],
       rule: "Not accepted by Level Debt."
     },
     {
@@ -300,7 +312,7 @@ export const creditorMatcher = {
     },
     {
       key: "PREFERRED_LOANS",
-      aliases: ["PREFERRED LOANS", "PREFERRED"],
+      aliases: ["PREFERRED LOANS", "PREFERRED", "PREFERRED CR", "PREFERRED CREDIT"],
       rule: "Not accepted by Level Debt."
     },
     {
@@ -310,7 +322,7 @@ export const creditorMatcher = {
     },
     {
       key: "RED_RIVER_CREDIT",
-      aliases: ["RED RIVER CREDIT", "REDRIVERCR"],
+      aliases: ["RED RIVER CREDIT", "REDRIVERCR", "RED RIVER CU", "RED RIVER CREDIT UNION"],
       rule: "Not accepted by Level Debt."
     },
     {
@@ -359,6 +371,26 @@ export const creditorMatcher = {
       rule: "Not accepted by Level Debt."
     },
     {
+      key: "ST_THOMAS_FCU",
+      aliases: ["ST THOMAS FEDERAL CREDIT UNION", "ST THOMAS FCU", "SAINT THOMAS FEDERAL CREDIT UNION"],
+      rule: "Not accepted by Level Debt."
+    },
+    {
+      key: "STATE_DEPARTMENT_FCU",
+      aliases: ["STATE DEPARTMENT FCU", "STATE DEPARTMENT FEDERAL CREDIT UNION", "SDFCU"],
+      rule: "Not accepted by Level Debt."
+    },
+    {
+      key: "STREAM_FINANCIAL",
+      aliases: ["STREAM FINANCIAL", "STREAM FINANCE"],
+      rule: "Not accepted by Level Debt."
+    },
+    {
+      key: "SUN_LOANS",
+      aliases: ["SUN LOANS", "SUN LOAN", "SUN LOAN COMPANY"],
+      rule: "Not accepted by Level Debt."
+    },
+    {
       key: "SUNSET_FINANCIAL",
       aliases: ["SUNSET FINANCIAL", "SUNSET FINANCE"],
       rule: "Not accepted by Level Debt."
@@ -387,6 +419,19 @@ export const creditorMatcher = {
       key: "YENDO",
       aliases: ["YENDO"],
       rule: "Not accepted by Level Debt."
+    },
+    {
+      key: "STATE_EMPLOYEE_CU",
+      aliases: [
+        "STATE EMPLOYEE CREDIT UNION",
+        "STATE EMPLOYEES CREDIT UNION",
+        "STATE EMPLOYEES C U",
+        "STATE EMPLOYEES CU",
+        "STATEEMP",
+        "SECU",
+        "STATE EMPLOYEE CU"
+      ],
+      rule: "All State Employee Credit Union variants are not accepted."
     }
   ],
 
