@@ -3,61 +3,124 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
 <meta name="robots" content="noindex, nofollow">
 <title>Sign in · Funding Tier</title>
 <style>
+  /* Brand teal through deep cyan. Light-first, redefined whole for dark so no
+     colour is ever left resolving against the wrong ground. */
   :root{
-    --ground:#f4f6f8; --surface:#fff; --line:#d6dce4; --text:#141a22;
-    --mid:#4a5666; --dim:#6d7a8b; --accent:#0c6f6b; --danger:#a8322a;
+    --g1:#0F8F86; --g2:#17B8AC; --g3:#0B6B7A;
+    --ground:#eef3f5; --surface:rgba(255,255,255,.86); --field:#f4f8f9;
+    --line:#dbe4ea; --line-strong:#c8d4dd;
+    --text:#0f1720; --mid:#46535f; --dim:#6b7986;
+    --danger:#a8322a; --ring:rgba(23,184,172,.2);
+    --glow-a:rgba(23,184,172,.30); --glow-b:rgba(11,107,122,.24);
   }
-  @media (prefers-color-scheme: dark){
-    :root{--ground:#10151b;--surface:#171d25;--line:#2c3542;--text:#e4e9ef;
-          --mid:#a8b3c1;--dim:#7e8b9b;--accent:#46bdb5;--danger:#ec8378}
-  }
+  /* Pinned light, to match the toolkit header.
+     The header sits on top of light tools, so it is pinned; letting sign-in
+     follow the OS would mean signing in on a dark screen and landing on a
+     light one. To follow the OS again, restore this block:
+
+       @media (prefers-color-scheme: dark){
+         :root{
+           --g1:#2ED3C4; --g2:#3FE0CF; --g3:#1B8FA8;
+           --ground:#080d12; --surface:rgba(16,23,31,.82); --field:rgba(255,255,255,.04);
+           --line:#1e2731; --line-strong:#2b3742;
+           --text:#e6edf3; --mid:#a3b1bf; --dim:#7a8896;
+           --danger:#f08b80; --ring:rgba(46,211,196,.22);
+           --glow-a:rgba(46,211,196,.20); --glow-b:rgba(27,143,168,.20);
+         }
+       }
+  */
   *{box-sizing:border-box}
-  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:1.5rem;
-       background:var(--ground);color:var(--text);
-       font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px}
-  .card{width:100%;max-width:25rem;background:var(--surface);border:1px solid var(--line);
-        border-radius:12px;padding:2rem;box-shadow:0 1px 2px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.05)}
-  .mark{width:48px;height:48px;margin:0 auto 1.25rem;display:block;border-radius:8px}
-  h1{font-size:1.3rem;margin:0 0 .4rem;text-align:center;letter-spacing:-.01em}
-  .sub{color:var(--mid);text-align:center;margin:0 0 1.5rem;font-size:.95rem;line-height:1.5}
-  label{display:block;font-size:.85rem;font-weight:600;margin-bottom:.4rem;color:var(--mid)}
-  input{width:100%;padding:.7rem .85rem;font:inherit;color:var(--text);
-        background:var(--ground);border:1px solid var(--line);border-radius:7px}
-  input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
-  button{width:100%;margin-top:1rem;padding:.75rem 1rem;font:inherit;font-weight:600;
-         color:#fff;background:var(--accent);border:0;border-radius:7px;cursor:pointer}
-  button:disabled{opacity:.6;cursor:default}
+
+  body{
+    margin:0; min-height:100vh; display:grid; place-items:center; padding:1.5rem;
+    background:var(--ground); color:var(--text); position:relative; overflow-x:hidden;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:16px;
+  }
+  /* Two soft brand-coloured lights behind the card. Static — a moving
+     background on a sign-in screen is decoration pretending to be progress. */
+  body::before,body::after{
+    content:""; position:fixed; border-radius:50%; filter:blur(90px);
+    pointer-events:none; z-index:0;
+  }
+  body::before{width:44rem;height:44rem;top:-18rem;left:-14rem;background:var(--glow-a)}
+  body::after{width:38rem;height:38rem;bottom:-16rem;right:-12rem;background:var(--glow-b)}
+
+  .card{
+    position:relative; z-index:1; width:100%; max-width:25rem;
+    background:var(--surface); border:1px solid var(--line);
+    -webkit-backdrop-filter:saturate(180%) blur(20px);
+    backdrop-filter:saturate(180%) blur(20px);
+    border-radius:18px; padding:2.25rem 2rem;
+    box-shadow:0 2px 4px rgba(2,24,26,.05), 0 24px 60px -18px rgba(2,24,26,.30);
+    overflow:hidden;
+  }
+  /* Gradient hairline across the top edge of the card. */
+  .card::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,transparent,var(--g1) 18%,var(--g2) 50%,var(--g3) 82%,transparent);
+  }
+
+  .ring{width:56px;height:56px;margin:0 auto 1.25rem;padding:2px;border-radius:16px;
+        background:linear-gradient(135deg,var(--g2),var(--g3));display:block;
+        box-shadow:0 6px 20px -8px var(--ring)}
+  .ring img{width:100%;height:100%;border-radius:14px;display:block;background:var(--ground)}
+
+  h1{font-size:1.4rem;margin:0 0 .4rem;text-align:center;letter-spacing:-.02em}
+  .sub{color:var(--mid);text-align:center;margin:0 0 1.6rem;font-size:.95rem;line-height:1.55}
+
+  label{display:block;font-size:.8rem;font-weight:700;margin-bottom:.45rem;color:var(--mid);
+        letter-spacing:.04em;text-transform:uppercase}
+  input{width:100%;padding:.8rem .9rem;font:inherit;color:var(--text);
+        background:var(--field);border:1px solid var(--line-strong);border-radius:10px;
+        transition:border-color .15s ease,box-shadow .15s ease}
+  input:focus{outline:none;border-color:var(--g1);box-shadow:0 0 0 3px var(--ring)}
+
+  button{width:100%;margin-top:1.1rem;padding:.8rem 1rem;font:inherit;font-weight:650;
+         color:#fff;background:linear-gradient(120deg,var(--g1),var(--g2) 55%,var(--g3));
+         border:0;border-radius:10px;cursor:pointer;letter-spacing:.01em;
+         box-shadow:0 8px 22px -12px var(--ring);
+         transition:filter .15s ease,transform .05s ease}
+  button:hover{filter:brightness(1.07)}
+  button:active{transform:translateY(1px)}
+  button:disabled{opacity:.65;cursor:default;filter:none}
+  button:focus-visible{outline:2px solid var(--g1);outline-offset:2px}
+
   .msg{margin-top:1.1rem;font-size:.92rem;line-height:1.55;color:var(--mid);text-align:center}
   .msg.bad{color:var(--danger)}
-  .foot{margin-top:1.5rem;text-align:center;font-size:.8rem;color:var(--dim);line-height:1.5}
+  .foot{margin-top:1.6rem;text-align:center;font-size:.78rem;color:var(--dim);line-height:1.55}
 
   /* Sent confirmation */
   .sent{text-align:center}
-  .tick{width:46px;height:46px;margin:0 auto 1rem;border-radius:50%;display:grid;place-items:center;
-        background:var(--accent);color:#fff;font-size:1.5rem;line-height:1}
-  .sent h2{font-size:1.15rem;margin:0 0 .5rem;letter-spacing:-.01em}
+  .tick{width:52px;height:52px;margin:0 auto 1.1rem;border-radius:50%;display:grid;
+        place-items:center;color:#fff;font-size:1.6rem;line-height:1;
+        background:linear-gradient(135deg,var(--g2),var(--g3));
+        box-shadow:0 8px 24px -10px var(--ring)}
+  .sent h2{font-size:1.2rem;margin:0 0 .5rem;letter-spacing:-.015em}
   .sent p{margin:0 0 .35rem;color:var(--mid);line-height:1.55;font-size:.95rem}
-  .addr{display:block;margin:.5rem 0 .9rem;padding:.6rem .75rem;border:1px solid var(--line);
-        border-radius:7px;background:var(--ground);font-weight:600;word-break:break-all;
-        color:var(--text);font-size:.95rem}
-  .again{margin-top:.4rem;background:none;border:0;padding:.4rem;color:var(--accent);
-         font:inherit;font-size:.9rem;font-weight:600;cursor:pointer;text-decoration:underline;width:auto}
-  .spin{display:inline-block;width:14px;height:14px;margin-right:.5rem;vertical-align:-2px;
+  .addr{display:block;margin:.65rem 0 1rem;padding:.7rem .8rem;border-radius:10px;
+        background:var(--field);border:1px solid var(--line-strong);
+        font-weight:650;word-break:break-all;color:var(--text);font-size:.95rem}
+  .again{margin-top:.4rem;background:none;border:0;padding:.4rem;color:var(--g1);
+         font:inherit;font-size:.9rem;font-weight:650;cursor:pointer;
+         text-decoration:underline;width:auto;box-shadow:none}
+  .again:hover{filter:none;color:var(--g2)}
+
+  .spin{display:inline-block;width:14px;height:14px;margin-right:.55rem;vertical-align:-2px;
         border:2px solid currentColor;border-right-color:transparent;border-radius:50%;
         animation:spin .7s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
-  @media (prefers-reduced-motion: reduce){.spin{animation:none}}
-  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+  @media (prefers-reduced-motion: reduce){.spin{animation:none}*{transition:none!important}}
 </style>
 </head>
 <body>
   <main class="card">
     <!-- The real Funding Tier mark, already in this repo and already reachable
          without a session (it is in OPEN_FILES in middleware.ts). -->
-    <img class="mark" src="/apple-touch-icon.png" alt="Funding Tier" width="48" height="48">
+    <span class="ring"><img src="/apple-touch-icon.png" alt="Funding Tier"></span>
 
     <div id="panel-form">
       <h1>Sign in</h1>

@@ -111,6 +111,10 @@ const RULES: Array<{ prefix: string; roles: Role[] }> = [
   // the page that calls it. Admin-only here would break agents mid-call.
   { prefix: "/api/generate-plan", roles: ["admin", "agent"] },
 
+  // The toolkit header asks who you are and what you may open. It filters by
+  // role server-side, so an agent's browser never receives the admin entries.
+  { prefix: "/api/me", roles: ["admin", "agent"] },
+
   // Admin-only for now. Both would fall here anyway under the default, but
   // saying so out loud means the next person can tell "decided" from "nobody
   // got round to it" — and flipping either one is a one-word edit.
@@ -132,7 +136,12 @@ const PUBLIC: Array<{ prefix: string; why: string }> = [
   // Sign-in itself, and the endpoints it posts to.
   { prefix: "/login", why: "the sign-in page" },
   { prefix: "/no-access", why: "the wrong-level page" },
-  { prefix: "/api/auth", why: "request-link and callback" },
+  { prefix: "/api/auth", why: "request-link, callback and sign-out" },
+
+  // The toolkit script itself carries no data — everything it shows comes
+  // from /api/me, which is gated. Public so it can load on the sign-in page
+  // and from tools on other Vercel projects.
+  { prefix: "/toolkit.js", why: "shared header, contains no data of its own" },
 
   // Vercel's own cron target. Protected by CRON_SECRET, not by session.
   { prefix: "/api/cleanup-plans", why: "cron, guarded by CRON_SECRET" },
