@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sign in · Funding Tier</title>
+<style>
+  :root{
+    --ground:#f4f6f8; --surface:#fff; --line:#d6dce4; --text:#141a22;
+    --mid:#4a5666; --dim:#6d7a8b; --accent:#0c6f6b; --danger:#a8322a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--ground:#10151b;--surface:#171d25;--line:#2c3542;--text:#e4e9ef;
+          --mid:#a8b3c1;--dim:#7e8b9b;--accent:#46bdb5;--danger:#ec8378}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:1.5rem;
+       background:var(--ground);color:var(--text);
+       font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px}
+  .card{width:100%;max-width:25rem;background:var(--surface);border:1px solid var(--line);
+        border-radius:12px;padding:2rem;box-shadow:0 1px 2px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.05)}
+  .mark{width:44px;height:44px;margin:0 auto 1.25rem;display:block}
+  h1{font-size:1.3rem;margin:0 0 .4rem;text-align:center;letter-spacing:-.01em}
+  .sub{color:var(--mid);text-align:center;margin:0 0 1.5rem;font-size:.95rem;line-height:1.5}
+  label{display:block;font-size:.85rem;font-weight:600;margin-bottom:.4rem;color:var(--mid)}
+  input{width:100%;padding:.7rem .85rem;font:inherit;color:var(--text);
+        background:var(--ground);border:1px solid var(--line);border-radius:7px}
+  input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+  button{width:100%;margin-top:1rem;padding:.75rem 1rem;font:inherit;font-weight:600;
+         color:#fff;background:var(--accent);border:0;border-radius:7px;cursor:pointer}
+  button:disabled{opacity:.6;cursor:default}
+  .msg{margin-top:1.1rem;font-size:.92rem;line-height:1.55;color:var(--mid);text-align:center}
+  .msg.bad{color:var(--danger)}
+  .foot{margin-top:1.5rem;text-align:center;font-size:.8rem;color:var(--dim);line-height:1.5}
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+  <main class="card">
+    <svg class="mark" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#2f8f83" stroke-width="7"/>
+      <path d="M32 34h36M32 50h26M32 66h18" stroke="#2f8f83" stroke-width="7" stroke-linecap="round"/>
+    </svg>
+
+    <h1>Sign in</h1>
+    <p class="sub">Enter your work email and we'll send you a link. No password to remember.</p>
+
+    <form id="form" novalidate>
+      <label for="email">Work email</label>
+      <input id="email" name="email" type="email" autocomplete="email"
+             inputmode="email" autocapitalize="off" spellcheck="false"
+             placeholder="you@fundingtier.com" required>
+      <button id="go" type="submit">Send me a link</button>
+    </form>
+
+    <p class="msg" id="msg" role="status" aria-live="polite"></p>
+
+    <p class="foot">Links work once and expire after 15 minutes.<br>
+      Access is recorded against your Funding Tier account.</p>
+  </main>
+
+<script>
+(function () {
+  var form = document.getElementById("form");
+  var input = document.getElementById("email");
+  var button = document.getElementById("go");
+  var msg = document.getElementById("msg");
+
+  // Carried through so the link can land where the person was headed.
+  var next = new URLSearchParams(location.search).get("next") || "";
+
+  function say(text, bad) {
+    msg.textContent = text;
+    msg.className = bad ? "msg bad" : "msg";
+  }
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var email = input.value.trim();
+    if (!email) { say("Enter your work email.", true); input.focus(); return; }
+
+    button.disabled = true;
+    say("Sending…");
+
+    try {
+      var res = await fetch("/api/auth/request" + (next ? "?next=" + encodeURIComponent(next) : ""), {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: email })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      say(data.message || "If that address is on file, a sign-in link is on its way.", !res.ok);
+      if (res.ok) form.hidden = true;
+    } catch (err) {
+      say("Could not reach the server. Check your connection and try again.", true);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  input.focus();
+})();
+</script>
+</body>
+</html>

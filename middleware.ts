@@ -148,16 +148,11 @@ const DELEGATED = ["/profit-engine", "/agent-tools"];
 /**
  * Where someone with no session gets sent.
  *
- * The router has no sign-in page of its own yet, so for now this points at
- * Agent Tools, which does. All three projects share SESSION_SECRET and the
- * ft_session cookie on this domain, so signing in there authenticates the
- * whole router at that person's level.
- *
- * Change to "/login" the moment the magic-link page ships. Until then the
- * path someone was originally reaching for is lost on the round trip — they
- * land on Agent Tools rather than back where they started.
+ * /login takes an email and sends a one-time link, so nobody needs the CRM
+ * open. Opening a tool from inside GoHighLevel still works and mints the same
+ * cookie — two doors, one session.
  */
-const SIGN_IN: string = "/agent-tools";
+const SIGN_IN: string = "/login";
 
 /** Assets that must resolve before a session exists, or the login page is bare. */
 const OPEN_FILES = new Set([
