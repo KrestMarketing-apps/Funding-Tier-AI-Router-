@@ -4,10 +4,77 @@
 // over a standard Request. Returning a Response short-circuits; returning
 // nothing lets the request through to the static file or serverless function.
 //
-// Web Crypto only — no node:crypto, no dependencies — because lib/session.ts
-// has to run unchanged here and in the two Next apps.
+// SELF-CONTAINED ON PURPOSE. No imports — this repo has no tsconfig, no
+// @types/node and no build step of its own, and an import here has to survive
+// both Vercel's type-check and its edge bundler. The session-reading half of
+// lib/session.ts is mirrored below instead.
+//
+//   Source of truth: Funding-Tier-Profit-Engine/lib/session.ts
+//   If the token format changes there, change it here in the same commit.
+//   Verification only — nothing in this file mints a session.
 
-import { COOKIE, readSession, type Role, type Session } from "./lib/session";
+// Edge middleware only ever sees process.env, and this repo has no node types.
+declare const process: { env: Record<string, string | undefined> };
+
+type Role = "admin" | "agent";
+
+type Session = {
+  email: string;
+  name?: string;
+  role: Role;
+  loc?: string;
+  exp: number;
+};
+
+const COOKIE = "ft_session";
+
+const te = new TextEncoder();
+
+function b64urlDecode(s: string): string {
+  const padded = s.replace(/-/g, "+").replace(/_/g, "/");
+  return atob(padded + "=".repeat((4 - (padded.length % 4)) % 4));
+}
+
+async function hmac(payload: string, secret: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    te.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, te.encode(payload));
+  const bytes = new Uint8Array(sig);
+  let s = "";
+  for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+/** Length-independent compare, so a wrong signature leaks no timing signal. */
+function safeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let d = 0;
+  for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return d === 0;
+}
+
+async function readSession(
+  token: string | undefined,
+  secret: string
+): Promise<Session | null> {
+  if (!token) return null;
+  const [payload, sig] = token.split(".");
+  if (!payload || !sig) return null;
+  if (!safeEqual(sig, await hmac(payload, secret))) return null;
+  try {
+    const session = JSON.parse(b64urlDecode(payload)) as Session;
+    if (!session?.exp || session.exp < Date.now()) return null;
+    if (session.role !== "admin" && session.role !== "agent") return null;
+    return session;
+  } catch {
+    return null;
+  }
+}
 
 export const config = {
   // Everything. Exclusions are decided in code below, where they can carry a
@@ -31,8 +98,24 @@ const RULES: Array<{ prefix: string; roles: Role[] }> = [
   { prefix: "/api/agents", roles: ["admin", "agent"] },
 
   // The deal router itself and the tools agents use on live calls.
+  //
+  // "/" has to be listed separately from "/index.html": cleanUrls is on, so
+  // middleware sees the bare "/" and never the filename. Note that matches()
+  // only ever equals "/" exactly — it cannot swallow the whole site, because
+  // no real path starts with "//".
+  { prefix: "/", roles: ["admin", "agent"] },
   { prefix: "/index.html", roles: ["admin", "agent"] },
   { prefix: "/knowledgebase", roles: ["admin", "agent"] },
+
+  // The deal router posts here to build a plan, so it needs the same level as
+  // the page that calls it. Admin-only here would break agents mid-call.
+  { prefix: "/api/generate-plan", roles: ["admin", "agent"] },
+
+  // Admin-only for now. Both would fall here anyway under the default, but
+  // saying so out loud means the next person can tell "decided" from "nobody
+  // got round to it" — and flipping either one is a one-word edit.
+  { prefix: "/legacy-support", roles: ["admin"] },
+  { prefix: "/credit-card-calculator", roles: ["admin"] }, // still being built
 ];
 
 /**
@@ -61,6 +144,20 @@ const PUBLIC: Array<{ prefix: string; why: string }> = [
  * mean two login redirects fighting each other.
  */
 const DELEGATED = ["/profit-engine", "/agent-tools"];
+
+/**
+ * Where someone with no session gets sent.
+ *
+ * The router has no sign-in page of its own yet, so for now this points at
+ * Agent Tools, which does. All three projects share SESSION_SECRET and the
+ * ft_session cookie on this domain, so signing in there authenticates the
+ * whole router at that person's level.
+ *
+ * Change to "/login" the moment the magic-link page ships. Until then the
+ * path someone was originally reaching for is lost on the round trip — they
+ * land on Agent Tools rather than back where they started.
+ */
+const SIGN_IN: string = "/agent-tools";
 
 /** Assets that must resolve before a session exists, or the login page is bare. */
 const OPEN_FILES = new Set([
@@ -98,7 +195,9 @@ function redirect(request: Request, path: string, search = ""): Response {
   });
 }
 
-export default async function middleware(request: Request): Promise<Response | undefined> {
+export default async function middleware(
+  request: Request
+): Promise<Response | undefined> {
   const secret = process.env.SESSION_SECRET;
   if (!secret) {
     // Fail closed. A router with no secret cannot tell anyone apart, and the
@@ -118,7 +217,10 @@ export default async function middleware(request: Request): Promise<Response | u
   // Vercel's own plumbing — never ours to gate.
   if (pathname.startsWith("/_vercel")) return;
 
-  const session: Session | null = await readSession(readCookie(request, COOKIE), secret);
+  const session: Session | null = await readSession(
+    readCookie(request, COOKIE),
+    secret
+  );
 
   const rule = RULES.find((r) => matches(pathname, r.prefix));
   const allowed: Role[] = rule ? rule.roles : ["admin"]; // unlisted ⇒ admin only
@@ -133,6 +235,9 @@ export default async function middleware(request: Request): Promise<Response | u
 
   if (session) return redirect(request, "/no-access");
 
-  const next = pathname === "/" ? "" : `?next=${encodeURIComponent(pathname)}`;
-  return redirect(request, "/login", next);
+  const next =
+    SIGN_IN === "/login" && pathname !== "/"
+      ? `?next=${encodeURIComponent(pathname)}`
+      : "";
+  return redirect(request, SIGN_IN, next);
 }
