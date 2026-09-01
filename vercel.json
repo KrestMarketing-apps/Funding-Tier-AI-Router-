@@ -12,6 +12,7 @@
     { "source": "/agents/legacy-capital-program-calculator", "destination": "/agents/legacy-capital-program-calculator.html" },
     { "source": "/admins/legacy-capital-billable-payout-simulator", "destination": "/admins/legacy-capital-billable-payout-simulator.html" },
     { "source": "/admins/Backend-Payout-Process", "destination": "/admins/backend-payout-timing.html" },
+    { "source": "/admins/operating-model", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/operating-model" },
     { "source": "/profit-engine", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine" },
     { "source": "/profit-engine/:path*", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*" },
     { "source": "/agent-tools", "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools" },
