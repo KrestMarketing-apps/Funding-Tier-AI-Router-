@@ -10,9 +10,57 @@
  *    - Stipulation enforcement
  *    - Support contact resolution
  *
- *  Last updated: September 22, 2025
+ *  Last updated: September 1, 2026
+ *  Previous revision: September 22, 2025
+ *
+ *  SOURCE OF RECORD
+ *    "Elite Legal Practice — Acceptable Debts 2026"
+ *    Document owner: Sara Mitz, Affiliate Support Manager
+ *    Tabs: Debt List | Excluded Companies | Included Companies
+ *
+ *  TWO RULES THAT GOVERN EVERYTHING BELOW
+ *
+ *  1. DEBT TYPE OUTRANKS THE LENDER LIST.
+ *     ELP's lender lists are NOT exhaustive. If a debt type is
+ *     ineligible, it stays ineligible even when the lender does
+ *     not appear on the excluded list. Never return ACCEPT just
+ *     because a lender is unlisted.
+ *
+ *  2. LENDER NAMES ARE MATCHED ONE-FOR-ONE.
+ *     Every name on the excluded and included lists is a distinct
+ *     legal entity. "Lake Lending" is NOT "Willow Lake Lending".
+ *     "Velocity Recoveries" is NOT "Velocity Lending Solution".
+ *     Matching is exact on a normalized string, plus an explicit
+ *     alias list. There is no substring fallback. See matchCompany().
+ *
+ *  3. DEBT TYPES AND COMPANY NAMES ARE TWO SEPARATE LAYERS.
+ *     ACCEPTABLE_DEBTS / UNACCEPTABLE_DEBT_TYPES hold debt categories and
+ *     are matched against the DEBT TYPE only. COMPANIES_ACCEPTED /
+ *     COMPANIES_NOT_ACCEPTED hold named entities and are matched against
+ *     the CREDITOR NAME only. Never query one with the other. Both layers
+ *     are evaluated on every lookup and a rejection in either one rejects
+ *     the account, so an accepted lender carrying an ineligible debt type
+ *     is still ineligible, and an eligible debt type from an excluded
+ *     lender is still excluded.
+ *
+ *  4. 3RD PARTY COLLECTIONS IS A CHECKABLE CONDITION, NOT A WARNING.
+ *     Business debt, auto loans/repos, merchant cash advances and
+ *     timeshares are enrollable ONLY in verified 3rd party collections.
+ *     Pass `inThirdPartyCollections` to enrollmentEligibilityCheck():
+ *       true      → the condition is satisfied, the account clears
+ *       false     → hard blocker
+ *       undefined → CONDITIONAL, the agent must answer it
  * ============================================================
  */
+
+export const KB_REVISION = {
+  revision: "2026-09-01",
+  previousRevision: "2025-09-22",
+  sourceDocument: "Elite Legal Practice — Acceptable Debts 2026",
+  documentOwner: "Sara Mitz, Affiliate Support Manager",
+  partner: "Elite Legal Practice (ELP)",
+  affiliate: "Legacy Capital Services",
+};
 
 // ─────────────────────────────────────────────────────────────
 //  1. PROGRAM MINIMUMS
@@ -32,53 +80,226 @@ export const PROGRAM_MINIMUMS = {
 export const RESTRICTED_STATES = ["ID", "ND", "GA"];
 
 // ─────────────────────────────────────────────────────────────
-//  3. ACCEPTABLE DEBT TYPES
+//  3. LEGAL REPRESENTATION FEES
+//     Applies to Judgments, Lawsuits and Summons ONLY.
+//
+//     The client must already be enrolled. ELP does not accept a
+//     judgment, lawsuit or summons that existed BEFORE enrollment
+//     under any circumstance — that is a hard reject, not a fee.
+//
+//     $675  the client is enrolled AND the legal action is received
+//           within the first year of enrollment
+//     $850  the specific debt being sued on was never enrolled
+//           (client is enrolled, that debt is not)
+//     Either tier may be spread over 2 months.
+// ─────────────────────────────────────────────────────────────
+
+export const LEGAL_FEES = {
+  appliesTo: ["Judgments", "Lawsuits", "Summons"],
+  enrolledWithinFirstYear: 675,
+  debtNotEnrolled: 850,
+  spreadMonths: 2,
+  preEnrollmentAccepted: false,
+  previousFlatFee: 650, // superseded 2026-09-01 — do not quote
+};
+
+/**
+ * Resolve the legal representation fee for a judgment / lawsuit / summons.
+ * @param {object} params
+ * @param {boolean} params.clientEnrolled     Client is enrolled in the program.
+ * @param {boolean} params.debtEnrolled       The specific debt being sued on is enrolled.
+ * @param {boolean} params.receivedPreEnrollment  Legal action predates enrollment.
+ * @param {number}  [params.monthsSinceEnrollment]
+ * @returns {{ status:"REJECT"|"FEE", fee:number|null, spreadMonths:number|null, reason:string }}
+ */
+export function getLegalFee({
+  clientEnrolled,
+  debtEnrolled,
+  receivedPreEnrollment,
+  monthsSinceEnrollment,
+} = {}) {
+  if (receivedPreEnrollment || clientEnrolled === false) {
+    return {
+      status: "REJECT",
+      fee: null,
+      spreadMonths: null,
+      reason:
+        "The client must be enrolled BEFORE the judgment, lawsuit or summons is received. Pre-enrollment legal actions are not accepted by ELP.",
+    };
+  }
+  if (debtEnrolled === false) {
+    return {
+      status: "FEE",
+      fee: LEGAL_FEES.debtNotEnrolled,
+      spreadMonths: LEGAL_FEES.spreadMonths,
+      reason:
+        "The debt being sued on was never enrolled. $850 legal representation fee, may be spread over 2 months.",
+    };
+  }
+  const withinFirstYear =
+    monthsSinceEnrollment === undefined || monthsSinceEnrollment === null
+      ? true
+      : monthsSinceEnrollment <= 12;
+  if (withinFirstYear) {
+    return {
+      status: "FEE",
+      fee: LEGAL_FEES.enrolledWithinFirstYear,
+      spreadMonths: LEGAL_FEES.spreadMonths,
+      reason:
+        "Enrolled debt, legal action received within the first year of enrollment. $675 legal representation fee, may be spread over 2 months.",
+    };
+  }
+  return {
+    status: "FEE",
+    fee: LEGAL_FEES.enrolledWithinFirstYear,
+    spreadMonths: LEGAL_FEES.spreadMonths,
+    reason:
+      "Enrolled debt, legal action received after the first year of enrollment. ELP has not published a rate for this case — confirm with Affiliate Support before quoting.",
+    needsConfirmation: true,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+//  4. INELIGIBLE DEBT TYPES THAT OUTRANK THE LENDER LIST
+//
+//     Per ELP (Sept 2026): "While some lenders may not appear on
+//     the Unaccepted Lender List, the debt type itself is
+//     ineligible. All individual lenders may not be specifically
+//     listed."
+//
+//     If a debt matches one of these, it is rejected regardless of
+//     whether the lender is on any list — including UNKNOWN lenders.
+// ─────────────────────────────────────────────────────────────
+
+export const GOVERNING_INELIGIBLE_TYPES = [
+  {
+    key: "TRIBAL",
+    label: "Tribal Loans",
+    aliases: ["tribal", "tribal loan", "tribal loans", "tribal lender", "tribal lending"],
+    reason: "Tribal loans are ineligible for ELP regardless of lender.",
+  },
+  {
+    key: "HOME_IMPROVEMENT",
+    label: "Home Improvement Loans",
+    aliases: [
+      "home improvement", "home improvement loan", "home improvement loans",
+      "roofing loan", "roof financing", "window financing", "kitchen remodel loan",
+      "structural attachment", "hvac loan",
+    ],
+    reason:
+      "Home improvement loans and structural attachments are ineligible for ELP regardless of lender.",
+  },
+  {
+    key: "STUDENT",
+    label: "Student Loans",
+    aliases: ["student loan", "student loans", "federal student loan", "private student loan", "education loan"],
+    reason: "Student loans (federal or private) are ineligible for ELP regardless of lender.",
+  },
+];
+
+/**
+ * Consolidation is handled separately — it is NOT a clean blanket reject.
+ *
+ * ELP's Sept 2026 verbal guidance says "consolidation loans are not accepted",
+ * but the same spreadsheet explicitly ACCEPTS "Consolidation/Negotiation Loans"
+ * and "Transform Credit / Together Loans" when they are not issued by a debt
+ * settlement company and are $3,000 or more.
+ *
+ * Until ELP resolves that in writing, consolidation returns CONDITIONAL with a
+ * mandatory confirmation step. It never auto-accepts and it never auto-rejects.
+ * See PENDING_ELP_CONFIRMATION below.
+ */
+export const CONSOLIDATION_RULE = {
+  key: "CONSOLIDATION",
+  label: "Consolidation / Negotiation Loans",
+  aliases: [
+    "consolidation loan", "consolidation loans", "debt consolidation",
+    "negotiation loan", "negotiation loans", "consolidation/negotiation loans",
+  ],
+  status: "CONDITIONAL",
+  requiresConfirmation: true,
+  stipulations:
+    "Must NOT be issued by a debt settlement company. No loans under $3,000. No monthly memberships.",
+  warning:
+    "CONFLICT — ELP guidance (Sept 2026) states consolidation loans are not accepted, but the same document accepts Consolidation/Negotiation Loans and Transform Credit at $3,000+. Confirm with Affiliate Support before enrolling.",
+};
+
+// ─────────────────────────────────────────────────────────────
+//  5. ACCEPTABLE DEBT TYPES
 // ─────────────────────────────────────────────────────────────
 
 export const ACCEPTABLE_DEBTS = [
   {
     type: "3rd Party Collections",
-    stipulations: "See unacceptable debt list. Must not be tribal, business, or otherwise excluded.",
+    stipulations: "Excludes student loans and 3rd party tribal loans.",
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
-    type: "Alarm System",
-    alternateNames: ["ADT Alarm System"],
-    stipulations: "Removal of the system may be required based on its age.",
+    type: "Alarm Systems",
+    alternateNames: ["Alarm System", "ADT Alarm System", "ADT"],
+    stipulations: "System may need to be removed due to its age. Note this with the client.",
     requiresNote: true,
     noteText: "Client is aware the system may be removed.",
     requiresSalesforceAction: false,
   },
   {
-    type: "Auto Loans",
-    alternateNames: ["RV Loans", "Motorcycle Loans", "Leases", "Repos", "Repo Balances"],
-    stipulations: "MUST BE IN 3RD PARTY COLLECTIONS. Cannot accept deficiency loans.",
+    type: "Auto Loans & Repossessions",
+    alternateNames: ["Auto Loans", "RV Loans", "Motorcycle Loans", "Leases", "Repos", "Repossessions"],
+    stipulations: "MUST BE IN 3RD PARTY COLLECTIONS ONLY. Cannot accept deficiency loans.",
     mustBeInCollections: true,
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
     type: "Back Rent",
-    stipulations: "Client must no longer be living in the unit.",
+    stipulations: "Client must no longer be living in the rental unit.",
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
-    type: "Cash Advance",
+    type: "Business Debts",
+    alternateNames: ["Business Loans", "Business Credit Cards", "Business Debts/Loans"],
+    stipulations: "MUST BE IN 3RD PARTY COLLECTIONS ONLY. Business debt not in 3rd party collections is rejected.",
+    mustBeInCollections: true,
+    conditional: true,
+    requiresNote: false,
+    requiresSalesforceAction: false,
+    revisionNote:
+      "2026-09-01: Debt List tab lists business debt as not accepted; Included Companies tab accepts it in 3rd party collections. Resolved in favor of 3rd-party-collections-only per ELP.",
+  },
+  {
+    type: "Cash Advances",
+    alternateNames: ["Cash Advance"],
     stipulations: null,
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
-    type: "Check Cashing",
+    type: "Certificates of Deposit (CDs)",
+    alternateNames: ["Certificate of Deposit", "CD", "CDs"],
+    stipulations: "Right to offset note required.",
+    requiresNote: true,
+    noteText: "Right to offset note recorded.",
+    requiresSalesforceAction: false,
+    addedInRevision: "2026-09-01",
+  },
+  {
+    type: "Check Cashing Debts",
+    alternateNames: ["Check Cashing"],
     stipulations: null,
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
-    type: "Consolidation Loans",
-    stipulations: "Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.",
+    type: "Consolidation/Negotiation Loans",
+    alternateNames: ["Consolidation Loans", "Negotiation Loans"],
+    stipulations:
+      "Must NOT be issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.",
+    conditional: true,
+    requiresConfirmation: true,
+    confirmationReason: CONSOLIDATION_RULE.warning,
+    minimumBalance: 3000,
     requiresNote: false,
     requiresSalesforceAction: false,
   },
@@ -90,124 +311,150 @@ export const ACCEPTABLE_DEBTS = [
     salesforceAction: "Add Cross Collateral / Repo Note",
   },
   {
-    type: "Credit Unions / Federal",
+    type: "Credit Unions & Federal Banks",
+    alternateNames: ["Credit Unions / Federal", "Credit Union", "Federal Bank"],
     stipulations: "Add Cross Collateral / Repo Note in Salesforce.",
     requiresNote: false,
     requiresSalesforceAction: true,
     salesforceAction: "Add Cross Collateral / Repo Note",
   },
   {
-    type: "Department Stores",
-    stipulations: "Add Repo Note / Case in Salesforce.",
-    requiresNote: false,
-    requiresSalesforceAction: true,
-    salesforceAction: "Add Repo Note / Case",
-  },
-  {
-    type: "Furniture Loans",
-    alternateNames: ["Jewelry Loans", "Furniture and/or Jewelry"],
-    stipulations: "Unsecured only. Add Repo Note in Salesforce.",
+    type: "Department Store Cards",
+    alternateNames: ["Department Stores"],
+    stipulations: "Add Repo Note in Salesforce.",
     requiresNote: false,
     requiresSalesforceAction: true,
     salesforceAction: "Add Repo Note",
   },
   {
-    type: "Gas Cards",
+    type: "Furniture & Jewelry Loans",
+    alternateNames: ["Furniture Loans", "Jewelry Loans", "Furniture and/or Jewelry", "Backyard Accessories"],
+    stipulations:
+      "Covers furniture, backyard accessories and jewelry. Repo note required. Must not be part of the original title/lien holder.",
+    requiresNote: false,
+    requiresSalesforceAction: true,
+    salesforceAction: "Add Repo Note",
+  },
+  {
+    type: "Gas Station Cards",
+    alternateNames: ["Gas Cards"],
     stipulations: null,
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
-    type: "Gyms / Fitness Centers",
-    alternateNames: ["Health Clubs"],
-    stipulations: "If disputed, note that client will lose membership.",
+    type: "Gym & Fitness Memberships",
+    alternateNames: ["Gyms / Fitness Centers", "Gym Membership", "Fitness Center"],
+    stipulations: "If disputed, the client should understand they may lose the membership.",
     requiresNote: true,
-    noteText: "Client understands they will lose membership.",
+    noteText: "Client understands they may lose their membership.",
     requiresSalesforceAction: false,
   },
   {
-    type: "Installment Loans",
-    alternateNames: ["Note Loans"],
-    stipulations: "Not issued by a debt settlement company. Add Cross Collateral / Repo Note in Salesforce.",
+    type: "Health Club Memberships",
+    alternateNames: ["Health Clubs", "Health Club"],
+    stipulations: "If disputed, the client should understand they may lose the membership.",
+    requiresNote: true,
+    noteText: "Client understands they may lose their membership.",
+    requiresSalesforceAction: false,
+  },
+  {
+    type: "Installment & Note Loans",
+    alternateNames: ["Installment Loans", "Note Loans", "Installment Loans / Note Loans"],
+    stipulations:
+      "Cannot be issued by a debt settlement company. Add Cross Collateral / Repo Note in Salesforce.",
     requiresNote: false,
     requiresSalesforceAction: true,
     salesforceAction: "Add Cross Collateral / Repo Note",
   },
   {
-    type: "Judgements",
-    stipulations: "Debt must already be enrolled. Judgement must come AFTER enrollment. $650 legal representation fee — must be paid prior to representation — can be spread over 2 months.",
-    legalFee: 650,
-    legalFeeSpreadMonths: 2,
+    type: "Judgments",
+    alternateNames: ["Judgements", "Judgment"],
+    stipulations:
+      "Client must be enrolled PRIOR to receiving the judgment. $675 legal fee if received within the first year of enrollment on an enrolled debt; $850 if the debt itself is not enrolled. Either may be spread over 2 months.",
     mustBePostEnrollment: true,
+    usesLegalFeeSchedule: true,
+    legalFeeEnrolledWithinFirstYear: 675,
+    legalFeeDebtNotEnrolled: 850,
+    legalFeeSpreadMonths: 2,
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
     type: "Lawsuits",
-    stipulations: "Debt must already be enrolled. Lawsuit must come AFTER enrollment. $650 legal representation fee — must be paid prior to representation — can be spread over 2 months.",
-    legalFee: 650,
-    legalFeeSpreadMonths: 2,
+    stipulations:
+      "Client must be enrolled PRIOR to receiving the lawsuit. $675 legal fee if received within the first year of enrollment on an enrolled debt; $850 if the debt itself is not enrolled. Either may be spread over 2 months.",
     mustBePostEnrollment: true,
+    usesLegalFeeSchedule: true,
+    legalFeeEnrolledWithinFirstYear: 675,
+    legalFeeDebtNotEnrolled: 850,
+    legalFeeSpreadMonths: 2,
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
-    type: "Lending Club",
-    stipulations: "Not secured to collateral and/or not secured to home.",
+    type: "Summons",
+    stipulations:
+      "Client must be enrolled PRIOR to receiving the summons. $675 legal fee if received within the first year of enrollment on an enrolled debt; $850 if the debt itself is not enrolled. Either may be spread over 2 months.",
+    mustBePostEnrollment: true,
+    usesLegalFeeSchedule: true,
+    legalFeeEnrolledWithinFirstYear: 675,
+    legalFeeDebtNotEnrolled: 850,
+    legalFeeSpreadMonths: 2,
+    requiresNote: false,
+    requiresSalesforceAction: false,
+  },
+  {
+    type: "Lending Club Loans",
+    alternateNames: ["Lending Club", "LendingClub"],
+    stipulations: "Must be unsecured — not tied to collateral and not tied to the home.",
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
     type: "Lines of Credit",
-    alternateNames: ["Lines of Unsecured Credit"],
-    stipulations: "Must be used like a credit card. Must include the first page of the statement showing both client and billing information.",
+    alternateNames: ["Line of Credit", "Lines of Unsecured Credit"],
+    stipulations:
+      "Must function like a credit card. Provide the first page of the statement showing client and billing information.",
     documentRequired: "First page of statement with client and billing info",
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
     type: "Medical Debt",
-    stipulations: "Must NOT be currently receiving treatment. Must provide the first page of the statement showing both client and billing details.",
+    stipulations:
+      "First page of the statement required showing client and billing details. Client must NOT be receiving ongoing treatment.",
     documentRequired: "First page of statement with client and billing info",
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
-    type: "Merchant Cash Advance Loans",
-    stipulations: "MUST BE IN 3RD PARTY COLLECTIONS.",
+    type: "Merchant Cash Advances",
+    alternateNames: ["Merchant Cash Advance Loans", "MCA"],
+    stipulations: "MUST BE IN 3RD PARTY COLLECTIONS ONLY.",
     mustBeInCollections: true,
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
     type: "Military Credit Unions",
-    stipulations: "Excludes: Military Star, Pioneer Loans, BX Omni, and VA Loans.",
+    stipulations: "Excludes Military Star, Pioneer Loans, BX Omni and VA Loans.",
     excludedLenders: ["Military Star", "Pioneer Loans", "BX Omni", "VA Loans"],
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
     type: "Military Loans",
-    stipulations: "Verify client is NOT currently active military. Verify client does NOT have or will need secret or top secret clearance. Cannot be endorsed by the government.",
+    stipulations:
+      "Must NOT be government-endorsed. Verify the client is not currently active military and does not have or require secret / top secret clearance.",
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
-    type: "Navy Federal Credit Union",
-    stipulations: "Verify not currently active military. No secret or top secret clearance. Cannot be government-endorsed.",
-    requiresNote: false,
-    requiresSalesforceAction: false,
-  },
-  {
-    type: "OMNI Financial",
-    stipulations: "Military personal loans only. Must NOT be backed by the government.",
-    requiresNote: false,
-    requiresSalesforceAction: false,
-  },
-  {
-    type: "Online Buy Now - Pay Later",
-    alternateNames: ["Affirm", "Afterpay", "Klarna", "Online Payback Programs"],
-    stipulations: "Clear screenshot of balance required. Must check for Wage Assignment before enrolling.",
+    type: "Online Buy Now / Pay Later",
+    alternateNames: ["Online Buy Now - Pay Later", "BNPL", "Affirm", "Afterpay", "Klarna", "Online Payback Programs"],
+    stipulations:
+      "Clear screenshot of the balance is acceptable. Check for a wage assignment clause before enrolling.",
     checkWageAssignment: true,
     documentRequired: "Clear screenshot of current balance",
     requiresNote: false,
@@ -215,255 +462,295 @@ export const ACCEPTABLE_DEBTS = [
   },
   {
     type: "Payday Loans",
-    stipulations: "Check for Wage Assignment before enrolling.",
+    stipulations: "Check for wage assignment clauses before enrolling.",
     checkWageAssignment: true,
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
     type: "Personal Loans",
-    alternateNames: ["Personal Credit Cards", "Signature Loans"],
-    stipulations: "Not secured to collateral and/or not secured to home.",
+    alternateNames: ["Personal Credit Cards"],
+    stipulations: "Must be unsecured — not tied to collateral and not tied to the home.",
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
-    type: "Summons",
-    stipulations: "$650 legal representation fee applies for enrolling after signing up. Can be spread over 2 months.",
-    legalFee: 650,
-    legalFeeSpreadMonths: 2,
+    type: "Signature Loans",
+    stipulations: "Must be unsecured — not tied to collateral and not tied to the home.",
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
     type: "Timeshares",
-    stipulations: "MUST BE IN 3RD PARTY COLLECTIONS.",
+    alternateNames: ["Timeshare"],
+    stipulations: "MUST BE IN 3RD PARTY COLLECTIONS ONLY.",
     mustBeInCollections: true,
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
     type: "Transform Credit",
-    alternateNames: ["Together Loans"],
-    stipulations: "Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.",
+    alternateNames: ["Together Loans", "Transform Credit / Consolidation"],
+    stipulations:
+      "Not issued by a debt settlement company. No loans under $3,000. No monthly memberships.",
     minimumBalance: 3000,
+    conditional: true,
+    requiresConfirmation: true,
+    confirmationReason: CONSOLIDATION_RULE.warning,
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
     type: "Unsecured Credit Cards",
-    stipulations: "See unacceptable list for excluded lenders.",
+    stipulations: "Refer to the excluded companies list if there is any concern about a specific issuer.",
     requiresNote: false,
     requiresSalesforceAction: false,
   },
   {
-    type: "Unsecured Debts",
-    stipulations: "See unacceptable list. Add Cross Collateral / Repo Note in Salesforce. Client must be notified service may be shut off.",
+    type: "Unsecured Debts (General)",
+    alternateNames: ["Unsecured Debts", "Unsecured Debt"],
+    stipulations:
+      "Client should understand that service may be shut off if the debt is disputed. Must not be part of the original title/lien holder.",
     requiresNote: true,
-    noteText: "Client is aware that service will be shut off.",
-    requiresSalesforceAction: true,
-    salesforceAction: "Add Cross Collateral / Repo Note",
-  },
-  {
-    type: "USAA Federal Savings Bank",
-    stipulations: null,
-    requiresNote: false,
+    noteText: "Client is aware that service may be shut off.",
     requiresSalesforceAction: false,
   },
   {
     type: "Utility Bills",
-    alternateNames: ["Power", "Internet", "Electric", "Cellular", "Cable"],
-    stipulations: "Must be with a PREVIOUS address/provider only. Client must NOT currently be using the service. Note required confirming client is aware service will be shut off.",
+    alternateNames: ["Power", "Internet", "Electric", "Cellular", "Cable", "Utilities"],
+    stipulations:
+      "Power, internet, electric, cellular and cable only. Must be OLD accounts that are not currently active. Client should understand service may be shut off if disputed.",
     mustBePreviousProvider: true,
     requiresNote: true,
     noteText: "Client is aware that service will be shut off.",
     requiresSalesforceAction: false,
   },
+];
+
+// ─────────────────────────────────────────────────────────────
+//  6. UNACCEPTABLE DEBT TYPES
+//     Source: "Debt List" tab — DEBTS WE DO NOT ACCEPT.
+//     Entries marked retained:true were on the 2025-09-22 list and
+//     are not on the new sheet. Per ELP the lender/type lists are
+//     not exhaustive, so they are held rather than deleted.
+// ─────────────────────────────────────────────────────────────
+
+export const UNACCEPTABLE_DEBT_TYPES = [
+  { type: "Agriculture Loans", addedInRevision: "2026-09-01" },
+  { type: "Alimony" },
+  { type: "Child Support" },
+  { type: "Bankruptcy (during active bankruptcy)" },
+  { type: "City Debts" },
+  { type: "County Debts" },
+  { type: "State Debts" },
+  { type: "Federal Debts" },
+  { type: "Debt Settlement Loans" },
+  { type: "Home Equity Line of Credit (HELOC)" },
+  { type: "Home Improvement Loans or Structural Attachments", governingType: "HOME_IMPROVEMENT" },
+  { type: "Judgements (Pre-Enrollment)", note: "Post-enrollment judgments ARE accepted — see LEGAL_FEES." },
+  { type: "Lawsuits (Pre-Enrollment)", note: "Post-enrollment lawsuits ARE accepted — see LEGAL_FEES." },
+  { type: "Summons (Pre-Enrollment)", note: "Post-enrollment summons ARE accepted — see LEGAL_FEES." },
+  { type: "Mortgages" },
+  { type: "Home Loans" },
+  { type: "Pioneer Loans" },
+  { type: "Pools (or anything in ground)", addedInRevision: "2026-09-01" },
+  { type: "Promissory Notes", note: "Falls under city/state debt.", addedInRevision: "2026-09-01" },
   {
-    type: "Velocity",
-    stipulations: "Acceptable as 3rd party collections only.",
-    mustBeInCollections: true,
-    requiresNote: false,
-    requiresSalesforceAction: false,
+    type: "Social Security Income (pre-enrollment)",
+    note:
+      "Social Security income the client receives AFTER the enrollment date is permissible; it is not eligible prior to enrollment.",
+    addedInRevision: "2026-09-01",
+  },
+  {
+    type: "Solar Panels",
+    note:
+      "Excluded even if detached. 3rd party collections may be acceptable for the debt type, BUT named solar lenders on the excluded list (e.g. GoodLeap) are never accepted under any circumstance.",
+    thirdPartyCollectionsException: true,
+  },
+  { type: "Student Loans (Federal or Personal)", governingType: "STUDENT" },
+  { type: "Tax Debts" },
+  { type: "Tribal Loans", governingType: "TRIBAL" },
+  { type: "VA Loans" },
+  { type: "Wage Garnishments (Court Ordered)" },
+
+  // ── Retained from the 2025-09-22 revision, not on the new sheet.
+  { type: "Air Conditioning Units", retained: true },
+  { type: "Business Inventory Outstanding Balances", retained: true },
+  { type: "Citations", retained: true },
+  { type: "Tickets", retained: true },
+  { type: "Credit Builder Monthly Memberships", retained: true },
+  { type: "Debt Negotiation Loans (issued by a debt settlement company)", retained: true },
+  { type: "Mechanic's Liens Filed Against Property", retained: true },
+  { type: "Spot Loans", retained: true },
+];
+
+// ─────────────────────────────────────────────────────────────
+//  7. COMPANIES NOT ACCEPTED (ELP excluded lender list)
+//     Matched ONE-FOR-ONE. Each name is a distinct legal entity.
+//     Source: "Excluded Companies" tab, 2026-09-01.
+// ─────────────────────────────────────────────────────────────
+
+export const COMPANIES_NOT_ACCEPTED = [
+  { company: "AES", reason: "Student Loan Provider", aliases: ["American Education Services"] },
+  { company: "American Recovery System", reason: "Collateral Recovery", aliases: ["American Recovery Systems"] },
+  { company: "Aqua Finance", reason: "Lending / Financing company" },
+  { company: "Arrowhead Advance", reason: "Tribal Lender" },
+  { company: "BHG", reason: "Business loan disguised as personal loan", aliases: ["Bankers Healthcare Group"] },
+  { company: "Big Picture Loans", reason: "Tribal Lender" },
+  { company: "Birch Lending", reason: "Tribal Lender" },
+  { company: "Bison Cash", reason: "Tribal Lender" },
+  { company: "Blue Mountain Loan", reason: "Tribal Lender" },
+  { company: "Bonneville Collection", reason: "Collection Agency" },
+  { company: "Boost Credit", reason: "Tribal Lender" },
+  { company: "Bright Lending", reason: "Tribal Lender" },
+  { company: "BX Omni", reason: "Excluded Military Lender" },
+  { company: "Clear Air Lending", reason: "Tribal Lender" },
+  { company: "Crane Lending", reason: "Tribal Lender" },
+  { company: "Credit 9", reason: "Consumer Credit Lender" },
+  { company: "Credit Cube", reason: "Tribal Lender" },
+  { company: "E Loan Warehouse", reason: "Tribal Lender" },
+  { company: "Eagle Advance", reason: "Tribal Lender" },
+  { company: "Eagle Wing Funds", reason: "Investment / Lending Fund" },
+  { company: "Elective Group USA", reason: "Federal Student Loan Provider", aliases: ["Elective Group"] },
+  { company: "Eloan Warehouse", reason: "Tribal Lender" },
+  { company: "Equity Sales Finance", reason: "Asset / Sales Finance" },
+  { company: "Express Cash Flow", reason: "Business / Commercial Debt" },
+  { company: "FIGURE TECH / FIGURE LENDING", reason: "Fintech Lending", aliases: ["Figure Tech", "Figure Lending", "Figure Technologies"] },
+  { company: "Fineday Funds", reason: "Tribal Lender" },
+  { company: "GoodLeap LLC", reason: "Solar / Clean Energy Finance", aliases: ["GoodLeap", "Good Leap", "GoodLeap Solar", "LoanPal", "Loan Pal"] },
+  { company: "GRANITE", reason: "Student Loan Provider", aliases: ["Granite", "Granite State Management"] },
+  { company: "Green Arrow Loans", reason: "Tribal Lender" },
+  { company: "Greenline", reason: "Tribal Lender" },
+  { company: "Hollis Cobb", reason: "Collection / Finance Company" },
+  { company: "Home Equity Line of Credit", reason: "Home-Secured Debt", aliases: ["HELOC"] },
+  { company: "Kadikorn Bank", reason: "Bank / Financial Institution" },
+  { company: "Lendumo", reason: "Tribal Lender" },
+  { company: "Level Up Funding", reason: "Tribal Lender" },
+  { company: "LightStream", reason: "Excluded Loan Types" },
+  { company: "Little Lake Lending", reason: "Tribal Lender" },
+  { company: "Loan At Last", reason: "Tribal Lender" },
+  { company: "Lookout Credit Union", reason: "Credit Union" },
+  { company: "Makwa Finance", reason: "Tribal Lender" },
+  { company: "Makwa Lending", reason: "Tribal Lender" },
+  { company: "Mariner Finance", reason: "Installment Loans", aliases: ["Personal Finance Company"] },
+  { company: "Maxlend", reason: "Tribal Lender" },
+  { company: "Merit Financial Trust", reason: "Tribal Lender" },
+  { company: "Military Star", reason: "Government-Backed Loans", aliases: ["Exchange Credit Program", "AAFES", "AFES"] },
+  { company: "Minto Money", reason: "Tribal Lender" },
+  { company: "MobiLoans LLC", reason: "Tribal Lender", aliases: ["MobiLoans", "Mobi Loans"] },
+  { company: "MOHELA", reason: "Student Loan Provider", aliases: ["Mohela"] },
+  { company: "Money Messiah", reason: "Tribal Lender" },
+  { company: "My QuickWallet", reason: "Tribal Lender", aliases: ["MyQuickWallet"] },
+  { company: "NAVIENT", reason: "Student Loan Provider", aliases: ["Navient"] },
+  { company: "NCR Finance", reason: "Finance Company / Lender" },
+  { company: "Night Wings Lending", reason: "Tribal Lender" },
+  { company: "Opici Funds LLC", reason: "Tribal Lender", aliases: ["Opici Funds"] },
+  { company: "Post Lake Lending", reason: "Tribal Lender" },
+  { company: "Premier Loan Solutions", reason: "Tribal Lender" },
+  { company: "Reach Financial", reason: "Consumer Finance" },
+  { company: "Rise Up Lending", reason: "Tribal Lender" },
+  { company: "River Valley Loans", reason: "Tribal Lender" },
+  { company: "Sallie Mae Loans", reason: "Student Loan Provider", aliases: ["Sallie Mae"] },
+  { company: "Same Day Credit", reason: "Tribal Lender" },
+  { company: "SBA Loans", reason: "Government-Backed Small Business", aliases: ["SBA Loan", "Small Business Administration"] },
+  { company: "Simple Fast Loans", reason: "Payday / Quick Consumer Lending" },
+  { company: "Snap On Credit", reason: "Secured Loans Only" },
+  { company: "Spotloan", reason: "Tribal Lender" },
+  { company: "Sunbelt Federal Credit Union", reason: "Credit Union", aliases: ["Sunbelt FCU"] },
+  { company: "Three Sticks Lending", reason: "Tribal Lender" },
+  { company: "Tule Lake Lending", reason: "Tribal Lender" },
+  { company: "Uprova", reason: "Tribal Lender" },
+  { company: "Velocity Lending Solution", reason: "Business Loan Lender", aliases: ["Velocity Lending Solutions"] },
+  { company: "White Pine Lending", reason: "Tribal Lender" },
+  { company: "Willow Lake Lending", reason: "Tribal Lender" },
+  { company: "WithU Loans", reason: "Tribal Lender" },
+  { company: "Write St. Education Liens", reason: "Education Finance / Lien Recording", aliases: ["Write St Education Liens", "Wright St. Education Liens"] },
+  { company: "Yendo", reason: "Auto Lender" },
+  { company: "ZipLoan", reason: "Student / Consumer Loan Provider", aliases: ["Zip Loan"] },
+  { company: "Zuntafi", reason: "Student / Consumer Loan Provider" },
+
+  // ── Retained from the 2025-09-22 revision. These lenders are NOT on
+  //    ELP's new list, but their debt TYPE is ineligible, and ELP has
+  //    confirmed the lender list is not exhaustive. Held as excluded.
+  { company: "Climb Loans", reason: "Student loan lender — student loans are an ineligible debt type regardless of lender listing.", governingType: "STUDENT", retainedFromPreviousRevision: true },
+  { company: "GreenSky", reason: "Home improvement financing — home improvement loans are an ineligible debt type regardless of lender listing.", governingType: "HOME_IMPROVEMENT", retainedFromPreviousRevision: true },
+  { company: "Today Cash", reason: "Tribal lender — tribal loans are an ineligible debt type regardless of lender listing.", governingType: "TRIBAL", retainedFromPreviousRevision: true },
+  { company: "Versara Lending", reason: "Consolidation / negotiation lender — see CONSOLIDATION_RULE. Held as excluded pending ELP written confirmation.", governingType: "CONSOLIDATION", retainedFromPreviousRevision: true },
+];
+
+// ─────────────────────────────────────────────────────────────
+//  8. COMPANIES ACCEPTED (named lenders only)
+//     Debt TYPES live in ACCEPTABLE_DEBTS above — this list is
+//     only for specific named entities on ELP's included list.
+//     Matched ONE-FOR-ONE. "Lake Lending" is a distinct company
+//     and is NOT related to Little / Post / Tule / Willow Lake
+//     Lending, all of which are excluded tribal lenders.
+// ─────────────────────────────────────────────────────────────
+
+export const COMPANIES_ACCEPTED = [
+  { company: "ADT Alarm System", aliases: ["ADT"], exceptions: "System may need removal based on age. Note client awareness." },
+  { company: "Lake Lending", exceptions: "Unsecured debt only.", distinctFrom: ["Little Lake Lending", "Post Lake Lending", "Tule Lake Lending", "Willow Lake Lending"] },
+  { company: "Lending Club", aliases: ["LendingClub"], exceptions: "Not secured to collateral and/or not secured to the home." },
+  { company: "Navy Federal Credit Union", aliases: ["Navy Federal", "NFCU"], exceptions: "Verify the client is not currently active military and does not have or need secret / top secret clearance. Cannot be government-endorsed." },
+  { company: "OMNI Financial", aliases: ["Omni Financial"], exceptions: "Military personal loans only. Must not be backed by the government." },
+  { company: "Together Loans", aliases: ["Together Loans (aka Transform Credit)"], exceptions: "Not issued by a debt settlement company. No loans under $3,000. No monthly memberships.", requiresConfirmation: true },
+  { company: "Transform Credit", exceptions: "Not issued by a debt settlement company. No loans under $3,000. No monthly memberships.", requiresConfirmation: true },
+  { company: "Velocity Recoveries", exceptions: "Third party debt collector.", distinctFrom: ["Velocity Lending Solution"] },
+];
+
+// ─────────────────────────────────────────────────────────────
+//  9. PENDING ELP CONFIRMATION
+//     Open items sent back to Affiliate Support. Anything listed
+//     here is held at its SAFER status until ELP answers in writing.
+// ─────────────────────────────────────────────────────────────
+
+export const PENDING_ELP_CONFIRMATION = [
+  {
+    item: "USAA Federal Savings Bank",
+    heldAs: "NOT_LISTED",
+    question:
+      "USAA Federal Savings Bank was accepted in the 2025 revision but does not appear on the 2026 included list. Confirm whether USAA remains acceptable.",
+  },
+  {
+    item: "Consolidation / Negotiation Loans",
+    heldAs: "CONDITIONAL",
+    question:
+      "ELP guidance (Sept 2026) states consolidation loans are not accepted, but the Acceptable Debts 2026 sheet accepts Consolidation/Negotiation Loans and Transform Credit / Together Loans at $3,000+ when not issued by a debt settlement company. Which governs?",
+  },
+  {
+    item: "Legal fee after year one",
+    heldAs: "CONFIRM_BEFORE_QUOTING",
+    question:
+      "The $675 tier is defined for legal actions received within the first year of enrollment. Confirm the fee when an enrolled debt receives a judgment, lawsuit or summons AFTER the first year.",
+  },
+  {
+    item: "Solar in 3rd party collections",
+    heldAs: "CONDITIONAL",
+    question:
+      "Debt List row 63 reads 'Solar Panels (even if detached) / 3rd party acceptable'. Confirm that solar debt in verified 3rd party collections is enrollable when the originating lender is not on the excluded list. GoodLeap is understood to be excluded in all cases.",
   },
 ];
 
 // ─────────────────────────────────────────────────────────────
-//  4. UNACCEPTABLE DEBT TYPES
+//  10. GLOBAL POLICY RULES (apply to every creditor)
 // ─────────────────────────────────────────────────────────────
 
-export const UNACCEPTABLE_DEBT_TYPES = [
-  "Air Conditioning Units",
-  "Alimony",
-  "Child Support",
-  "Bankruptcy",
-  "Business Credit Cards under EIN#",
-  "Business Credit Cards under SS#",
-  "Business Debts",
-  "Business Inventory Outstanding Balances",
-  "Business Loans under EIN#",
-  "Business Loans under SS#",
-  "City Debts",
-  "County Debts",
-  "State Debts",
-  "Federal Debts",
-  "Citations",
-  "Tickets",
-  "Credit Builder Monthly Memberships",
-  "Debt Negotiation Loans",
-  "Debt Consolidation Loans (from debt settlement companies)",
-  "Home Equity Line of Credit (HELOC)",
-  "Home Improvement Loans (Roofs, Kitchens, Windows)",
-  "Mechanic's Liens Filed Against Property",
-  "Mortgages",
-  "Home Loans",
-  "Pioneer Loans",
-  "Solar Panels",
-  "Spot Loans",
-  "Student Loans",
-  "Tax Debts",
-  "Tribal Loans",
-  "VA Loans",
-  "Wage Garnishments (Court Ordered)",
+export const GLOBAL_POLICY_RULES = [
+  "Debt must not be part of the original title or lien holder.",
+  "Debt must not be attached to the home or dwelling unit.",
+  "Authorized-user debts are not enrollable.",
+  "Wage garnishments, lawsuits, judgments and summons received BEFORE enrollment are not enrollable.",
+  "Business debt is enrollable only when it is in verified 3rd party collections.",
+  "If a lender does not appear on either list, the debt TYPE still governs. Escalate to Affiliate Support before enrolling.",
 ];
 
 // ─────────────────────────────────────────────────────────────
-//  5. COMPANIES NOT ACCEPTED
-// ─────────────────────────────────────────────────────────────
-
-export const COMPANIES_NOT_ACCEPTED = [
-  { company: "All Companies (Default)",           debtType: "Wage Garnishments / Lawsuits / Summons (Pre-Enrollment)" },
-  { company: "All Companies (Default)",           debtType: "Business Loans (must be 3rd party collections to accept)" },
-  { company: "All Companies (Default)",           debtType: "Authorized User Debts" },
-  { company: "American Recovery Systems",         debtType: "Collateral Recovery" },
-  { company: "Aqua Finance",                      debtType: "Lending / Financing company" },
-  { company: "Arrowhead Advance",                 debtType: "Tribal" },
-  { company: "Big Picture Loans",                 debtType: "Tribal" },
-  { company: "Birch Lending",                     debtType: "Tribal" },
-  { company: "Bison Cash",                        debtType: "Tribal" },
-  { company: "Blue Mountain Loan",                debtType: "Tribal" },
-  { company: "Bonneville Collection",             debtType: "Standard collection agency / Debt recovery firm" },
-  { company: "Boost Credit",                      debtType: "Tribal" },
-  { company: "Bright Lending",                    debtType: "Tribal" },
-  { company: "BX Omni",                           debtType: "Military-affiliated" },
-  { company: "Clear Air Lending",                 debtType: "Tribal" },
-  { company: "Climb Loans",                       debtType: "Student Loans" },
-  { company: "Crane Lending",                     debtType: "Tribal" },
-  { company: "Credit 9",                          debtType: "Consumer credit / lending" },
-  { company: "Credit Cube",                       debtType: "Tribal" },
-  { company: "E Loan Warehouse",                  debtType: "Tribal" },
-  { company: "Eagle Wing Funds",                  debtType: "Investment / lending fund" },
-  { company: "Elective Group USA",                debtType: "Federal student loan provider" },
-  { company: "Eloan Warehouse",                   debtType: "Tribal" },
-  { company: "Equity Sales Finance",              debtType: "Asset finance / sales financing" },
-  { company: "Express Cash Flow",                 debtType: "Must be 3rd party — not collateral, business, or commercial" },
-  { company: "Figure Tech",                       alternateNames: ["Figure Lending"], debtType: "Home Equity / Secured" },
-  { company: "Fineday Funds",                     debtType: "Tribal" },
-  { company: "GoodLeap LLC",                      alternateNames: ["Goodleap Solar"], debtType: "Fintech / Clean energy / Solar" },
-  { company: "Green Arrow Loans",                 debtType: "Tribal" },
-  { company: "Greenline",                         debtType: "Tribal" },
-  { company: "GreenSky",                          debtType: "Per Legal — not accepted" },
-  { company: "Hollis Cobb",                       debtType: "Collection / finance" },
-  { company: "Home Equity Line of Credit",        debtType: "Secured / Home equity" },
-  { company: "Kadikorn Bank",                     debtType: "Bank / financial institution" },
-  { company: "Lendumo",                           debtType: "Tribal" },
-  { company: "Level Up Funding",                  debtType: "Tribal" },
-  { company: "LightStream",                       debtType: "Home improvement, auto, debt consolidation, recreation, adoption, education" },
-  { company: "Little Lake Lending",               debtType: "Tribal" },
-  { company: "Loan At Last",                      debtType: "Tribal" },
-  { company: "Lookout Credit Union",              debtType: "Credit union" },
-  { company: "Makwa Finance",                     debtType: "Tribal" },
-  { company: "Makwa Lending",                     debtType: "Tribal" },
-  { company: "Mariner Finance",                   alternateNames: ["Personal Finance Company"], debtType: "Installment Loans" },
-  { company: "Maxlend",                           debtType: "Tribal" },
-  { company: "Merit Financial Trust",             debtType: "Tribal" },
-  { company: "Military Star",                     debtType: "Government-backed loans" },
-  { company: "Minto Money",                       debtType: "Tribal" },
-  { company: "MobiLoans LLC",                     debtType: "Tribal" },
-  { company: "My QuickWallet",                    alternateNames: ["MyQuickWallet"], debtType: "Tribal" },
-  { company: "NCR Finance",                       debtType: "Finance company / lender" },
-  { company: "Night Wings Lending",               debtType: "Tribal" },
-  { company: "Opici Funds LLC",                   debtType: "Tribal" },
-  { company: "Post Lake Lending",                 debtType: "Tribal" },
-  { company: "Premier Loan Solutions",            debtType: "Tribal" },
-  { company: "Reach Financial",                   debtType: "Personal / small-dollar / consumer finance" },
-  { company: "Rise Up Lending",                   debtType: "Tribal" },
-  { company: "River Valley Loans",                debtType: "Tribal" },
-  { company: "Sallie Mae Loans",                  debtType: "Education / student lending" },
-  { company: "Same Day Credit",                   debtType: "Tribal" },
-  { company: "SBA Loans",                         debtType: "Government-backed small business loans" },
-  { company: "Simple Fast Loans",                 debtType: "Payday / quick consumer lending" },
-  { company: "Snap On Credit",                    debtType: "Secured loans only" },
-  { company: "Spotloan",                          debtType: "Tribal" },
-  { company: "Sunbelt Federal Credit Union",      alternateNames: ["Sunbelt FCU"], debtType: "Credit union" },
-  { company: "Three Sticks Lending",              debtType: "Tribal" },
-  { company: "Today Cash",                        debtType: "Tribal" },
-  { company: "Tule Lake Lending",                 debtType: "Tribal" },
-  { company: "Uprova",                            debtType: "Tribal" },
-  { company: "Versara Lending",                   debtType: "Consolidation / Negotiation" },
-  { company: "White Pine Lending",                debtType: "Tribal" },
-  { company: "Willow Lake Lending",               debtType: "Tribal" },
-  { company: "WithU Loans",                       debtType: "Tribal" },
-  { company: "Write St. Education Liens",         debtType: "Educational lender / student finance" },
-  { company: "Yendo",                             debtType: "Auto-secured / vehicle title" },
-  { company: "ZipLoan",                           alternateNames: ["Zuntafi"], debtType: "Student / consumer loan origination & servicing" },
-  { company: "Zuntafi",                           alternateNames: ["ZipLoan"], debtType: "Student / consumer loan origination & servicing" },
-];
-
-// ─────────────────────────────────────────────────────────────
-//  6. COMPANIES ACCEPTED
-// ─────────────────────────────────────────────────────────────
-
-export const COMPANIES_ACCEPTED = [
-  { company: "3rd Party Collections",             exceptions: "See unacceptable debt list." },
-  { company: "ADT Alarm System",                  exceptions: "Removal may be required based on age. Note required." },
-  { company: "All Companies (Default)",           exceptions: "Must not be part of original title/lien holder. Must not be attached to home/dwelling unit." },
-  { company: "Auto Loans / RVs / Motos / Repos",  exceptions: "MUST BE IN 3RD PARTY COLLECTIONS. Cannot accept deficiency loans." },
-  { company: "Back Rent",                         exceptions: "Client must no longer be living in the unit." },
-  { company: "Business Debts / Loans",            exceptions: "MUST BE IN 3RD PARTY COLLECTIONS." },
-  { company: "Cash Advance",                      exceptions: null },
-  { company: "Check Cashing",                     exceptions: null },
-  { company: "Consolidation Loans",               exceptions: "Not issued by a debt settlement company. No Transform Credit under $3,000. No monthly memberships." },
-  { company: "Credit Builder Loans",              exceptions: "Add Repo Note in Salesforce." },
-  { company: "Credit Unions / Federal",           exceptions: "Add Repo Note in Salesforce." },
-  { company: "Department Stores",                 exceptions: "Add Repo Note in Salesforce." },
-  { company: "Furniture and/or Jewelry",          exceptions: "Add Repo Note in Salesforce. Unsecured only." },
-  { company: "Gas Cards",                         exceptions: null },
-  { company: "Gyms / Fitness Centers",            exceptions: "Note required — client understands they will lose membership." },
-  { company: "Health Clubs",                      exceptions: "Note required — client understands they will lose membership." },
-  { company: "Installment Loans / Note Loans",    exceptions: "Not issued by debt settlement company. Add Cross Collateral / Repo Note in Salesforce." },
-  { company: "Judgements",                        exceptions: "$650 legal representation fee. Can be spread over 2 months." },
-  { company: "Lake Lending",                      exceptions: "Not tied to collateral." },
-  { company: "Lawsuits",                          exceptions: "$650 legal representation fee. Can be spread over 2 months." },
-  { company: "Lending Club",                      exceptions: "Not secured to collateral and/or not secured to home." },
-  { company: "Lines of Credit",                   exceptions: "Must be used like a credit card. First page of statement required." },
-  { company: "Medical Debt",                      exceptions: "First page of statement required. Must not be currently receiving treatment." },
-  { company: "Merchant Cash Advance Loans",       exceptions: "MUST BE IN 3RD PARTY COLLECTIONS." },
-  { company: "Military Credit Unions",            exceptions: "Excludes: Military Star, Pioneer Loans, BX Omni, VA Loans." },
-  { company: "Military Loans",                    exceptions: "Not endorsed by the government." },
-  { company: "Navy Federal Credit Union",         exceptions: "Verify not active military. No secret/top secret clearance. Not government-endorsed." },
-  { company: "OMNI Financial",                    exceptions: "Military personal loans only. Not backed by the government." },
-  { company: "Online Buy Now - Pay Later",        exceptions: "Clear screenshot required. Check for Wage Assignment. (Affirm, Afterpay, Klarna, etc.)" },
-  { company: "Payday Loans",                      exceptions: "Check for Wage Assignment." },
-  { company: "Personal Loans",                    exceptions: "Not secured to collateral and/or not secured to home." },
-  { company: "Signature Loans",                   exceptions: "Not secured to collateral and/or not secured to home." },
-  { company: "Summons",                           exceptions: "$650 legal representation fee. Can be spread over 2 months." },
-  { company: "Timeshares",                        exceptions: "MUST BE IN 3RD PARTY COLLECTIONS." },
-  { company: "Together Loans",                    alternateNames: ["Transform Credit"], exceptions: "Not issued by debt settlement company. No loans under $3,000. No monthly memberships." },
-  { company: "Transform Credit",                  exceptions: "Not issued by debt settlement company. No loans under $3,000. No monthly memberships." },
-  { company: "Unsecured Credit Cards",            exceptions: null },
-  { company: "Unsecured Debts",                   exceptions: null },
-  { company: "USAA Federal Savings Bank",         exceptions: null },
-  { company: "Utility Bills",                     exceptions: "Previous provider/address only. Note required — client aware service will be shut off." },
-  { company: "Velocity",                          exceptions: "Acceptable as 3rd party collections only." },
-];
-
-// ─────────────────────────────────────────────────────────────
-//  7. SUPPORT CONTACTS
+//  11. SUPPORT CONTACTS
 // ─────────────────────────────────────────────────────────────
 
 export const SUPPORT_CONTACTS = {
   company: "Legacy Capital Services",
+  partner: "Elite Legal Practice (ELP)",
   affiliateSupportTeam: {
     manager: {
       name: "Sara Mitz",
@@ -481,8 +768,9 @@ export const SUPPORT_CONTACTS = {
   officePhone: "(725) 218-2796",
   b2bEmail: "b2b@legacycapitalservices.com",
   clientCallerID: "(800) 718-9606",
+  // Updated 2026-09-01 — previously Mon–Fri 8:00 AM–4:30 PM PST.
   operationHours: {
-    mondayFriday: { open: "8:00 AM", close: "4:30 PM", timezone: "PST" },
+    mondayFriday: { open: "7:00 AM", close: "5:00 PM", timezone: "PST" },
     saturday:     { open: "7:00 AM", close: "5:00 PM", timezone: "PST", note: "On Call Only" },
     sunday:       null,
   },
@@ -501,20 +789,68 @@ export const SUPPORT_CONTACTS = {
 };
 
 // ─────────────────────────────────────────────────────────────
-//  8. HELPER FUNCTIONS
+//  12. MATCHING CORE
+//
+//  normalizeName() is the ONLY normalization used for lender names.
+//  matchCompany() is exact on the normalized string or on an explicit
+//  alias. There is deliberately NO substring fallback: substring
+//  matching is what allowed "Willow Lake Lending" to be cleared by a
+//  "Lake Lending" rule, and "Velocity Lending Solution" to be cleared
+//  by "Velocity Recoveries".
+// ─────────────────────────────────────────────────────────────
+
+export function normalizeName(value) {
+  return String(value || "")
+    .toUpperCase()
+    .replace(/&/g, " AND ")
+    .replace(/\b(LLC|L\.L\.C|INC|INCORPORATED|CORP|CORPORATION|CO|INC\.)\b/g, " ")
+    .replace(/[^A-Z0-9 ]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function namesFor(entry) {
+  return [entry.company, ...(entry.aliases || [])].map(normalizeName).filter(Boolean);
+}
+
+/**
+ * Exact one-for-one company match. Returns null when the name is not
+ * an exact match (or exact alias) of a listed entity.
+ */
+export function matchCompany(companyName, list) {
+  const q = normalizeName(companyName);
+  if (!q) return null;
+  return list.find((entry) => namesFor(entry).includes(q)) || null;
+}
+
+/**
+ * Detect an ineligible debt type from free text (debt type OR creditor name).
+ * These outrank the lender list entirely — an unlisted tribal lender is
+ * still a tribal loan.
+ */
+export function findGoverningIneligibleType(text) {
+  const q = String(text || "").toLowerCase();
+  if (!q.trim()) return null;
+  return (
+    GOVERNING_INELIGIBLE_TYPES.find((t) =>
+      t.aliases.some((a) => new RegExp(`(^|[^a-z])${a.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z]|$)`, "i").test(q))
+    ) || null
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+//  13. HELPER FUNCTIONS
 // ─────────────────────────────────────────────────────────────
 
 /**
  * Check if a state is eligible for enrollment.
- * @param {string} stateCode - Two-letter state code
- * @returns {{ eligible: boolean, reason: string|null }}
  */
 export function checkStateEligibility(stateCode) {
-  const code = stateCode?.toUpperCase();
+  const code = String(stateCode || "").toUpperCase().trim();
   if (RESTRICTED_STATES.includes(code)) {
     return {
       eligible: false,
-      reason: `We cannot accept clients or debts from ${code}. Restricted states: ${RESTRICTED_STATES.join(", ")}.`,
+      reason: `ELP cannot accept clients or debts from ${code}. Restricted states: ${RESTRICTED_STATES.join(", ")}.`,
     };
   }
   return { eligible: true, reason: null };
@@ -522,141 +858,158 @@ export function checkStateEligibility(stateCode) {
 
 /**
  * Check if a client meets program minimums.
- * @param {object} params
- * @param {number} params.totalDebt
- * @param {number} params.monthlyPayment
- * @param {number} params.accountBalance
- * @returns {{ eligible: boolean, failures: string[] }}
  */
 export function checkProgramMinimums({ totalDebt, monthlyPayment, accountBalance }) {
   const failures = [];
-  if (totalDebt < PROGRAM_MINIMUMS.minimumDebtLoad)
+  if (Number(totalDebt) < PROGRAM_MINIMUMS.minimumDebtLoad)
     failures.push(`Total debt $${totalDebt} is below the $${PROGRAM_MINIMUMS.minimumDebtLoad} minimum.`);
-  if (monthlyPayment < PROGRAM_MINIMUMS.minimumClientPayment)
+  if (Number(monthlyPayment) < PROGRAM_MINIMUMS.minimumClientPayment)
     failures.push(`Monthly payment $${monthlyPayment} is below the $${PROGRAM_MINIMUMS.minimumClientPayment} minimum.`);
-  if (accountBalance < PROGRAM_MINIMUMS.minimumAccountBalance)
+  if (Number(accountBalance) < PROGRAM_MINIMUMS.minimumAccountBalance)
     failures.push(`Account balance $${accountBalance} is below the $${PROGRAM_MINIMUMS.minimumAccountBalance} minimum.`);
   return { eligible: failures.length === 0, failures };
 }
 
 /**
- * Look up an acceptable debt type by name or alternate name.
- * @param {string} debtType
- * @returns {object|null}
+ * Look up an acceptable debt type by name or alternate name (exact).
  */
 export function getAcceptableDebt(debtType) {
-  const query = debtType?.toLowerCase().trim();
+  const q = normalizeName(debtType);
+  if (!q) return null;
   return (
     ACCEPTABLE_DEBTS.find(
-      (d) =>
-        d.type.toLowerCase() === query ||
-        (d.alternateNames || []).some((a) => a.toLowerCase() === query)
+      (d) => [d.type, ...(d.alternateNames || [])].map(normalizeName).includes(q)
     ) || null
   );
 }
 
 /**
  * Check if a debt type is on the unacceptable list.
- * @param {string} debtType
- * @returns {boolean}
+ * Exact match on the normalized type — NOT a substring scan. The previous
+ * implementation used `.includes(query)`, which rejected any debt whose name
+ * appeared anywhere in any unacceptable entry (e.g. every "business" debt).
  */
 export function isDebtTypeUnacceptable(debtType) {
-  const query = debtType?.toLowerCase().trim();
-  return UNACCEPTABLE_DEBT_TYPES.some((d) => d.toLowerCase().includes(query));
+  const q = normalizeName(debtType);
+  if (!q) return false;
+  return UNACCEPTABLE_DEBT_TYPES.some((d) => normalizeName(d.type) === q);
+}
+
+export function getUnacceptableDebtEntry(debtType) {
+  const q = normalizeName(debtType);
+  return UNACCEPTABLE_DEBT_TYPES.find((d) => normalizeName(d.type) === q) || null;
 }
 
 /**
  * Full debt eligibility check — returns a routing decision.
- * @param {string} debtType
- * @returns {object}
+ * @returns {{status:"ACCEPT"|"CONDITIONAL"|"REJECT"|"UNKNOWN", ...}}
  */
 export function checkDebtEligibility(debtType) {
-  if (isDebtTypeUnacceptable(debtType)) {
-    return {
-      status: "REJECT",
-      reason: `${debtType} is on the unacceptable debt type list.`,
-      stipulations: null,
-      notes: [],
-      salesforceActions: [],
-      legalFee: null,
-    };
-  }
-  const match = getAcceptableDebt(debtType);
-  if (match) {
-    return {
-      status: "ACCEPT",
-      reason: null,
-      stipulations: match.stipulations || null,
-      notes: match.requiresNote ? [match.noteText] : [],
-      salesforceActions: match.requiresSalesforceAction ? [match.salesforceAction] : [],
-      legalFee: match.legalFee || null,
-      mustBeInCollections: match.mustBeInCollections || false,
-      checkWageAssignment: match.checkWageAssignment || false,
-      documentRequired: match.documentRequired || null,
-    };
-  }
-  return {
+  const base = {
     status: "UNKNOWN",
-    reason: `${debtType} was not found in any list. Escalate to Affiliate Support.`,
+    reason: null,
     stipulations: null,
     notes: [],
     salesforceActions: [],
     legalFee: null,
+    requiresConfirmation: false,
+  };
+
+  // 1. Governing ineligible type wins over everything.
+  const governing = findGoverningIneligibleType(debtType);
+  if (governing) {
+    return { ...base, status: "REJECT", reason: governing.reason, governingType: governing.key };
+  }
+
+  // 2. Explicit unacceptable list.
+  const rejected = getUnacceptableDebtEntry(debtType);
+  if (rejected) {
+    return {
+      ...base,
+      status: "REJECT",
+      reason: `${rejected.type} is on the ELP unacceptable debt type list.${rejected.note ? " " + rejected.note : ""}`,
+    };
+  }
+
+  // 3. Acceptable list.
+  const match = getAcceptableDebt(debtType);
+  if (match) {
+    return {
+      ...base,
+      status: match.conditional ? "CONDITIONAL" : "ACCEPT",
+      stipulations: match.stipulations || null,
+      notes: match.requiresNote ? [match.noteText] : [],
+      salesforceActions: match.requiresSalesforceAction ? [match.salesforceAction] : [],
+      legalFee: match.usesLegalFeeSchedule ? LEGAL_FEES : null,
+      usesLegalFeeSchedule: !!match.usesLegalFeeSchedule,
+      mustBePostEnrollment: !!match.mustBePostEnrollment,
+      mustBeInCollections: !!match.mustBeInCollections,
+      checkWageAssignment: !!match.checkWageAssignment,
+      documentRequired: match.documentRequired || null,
+      minimumBalance: match.minimumBalance || null,
+      requiresConfirmation: !!match.requiresConfirmation,
+      confirmationReason: match.confirmationReason || null,
+    };
+  }
+
+  return {
+    ...base,
+    reason: `"${debtType}" was not found on the ELP debt type lists. The lists are not exhaustive — escalate to Affiliate Support before enrolling.`,
   };
 }
 
 /**
- * Look up a company/lender — checks both accepted and rejected lists.
- * @param {string} companyName
- * @returns {{ status: "ACCEPTED"|"REJECTED"|"UNKNOWN", entry: object|null, message: string }}
+ * Look up a company/lender — exact match against both lists.
  */
-export function lookupCompany(companyName) {
-  const query = companyName?.toLowerCase().trim();
-
-  const rejected = COMPANIES_NOT_ACCEPTED.find(
-    (c) =>
-      c.company.toLowerCase() === query ||
-      (c.alternateNames || []).some((a) => a.toLowerCase() === query)
-  );
+export function lookupCompany(companyName, debtType) {
+  const rejected = matchCompany(companyName, COMPANIES_NOT_ACCEPTED);
   if (rejected) {
     return {
       status: "REJECTED",
       entry: rejected,
-      message: `${rejected.company} is NOT accepted. Reason: ${rejected.debtType}.`,
+      message: `${rejected.company} is NOT accepted by ELP. Reason: ${rejected.reason}`,
     };
   }
 
-  const accepted = COMPANIES_ACCEPTED.find(
-    (c) =>
-      c.company.toLowerCase() === query ||
-      (c.alternateNames || []).some((a) => a.toLowerCase() === query)
-  );
+  const accepted = matchCompany(companyName, COMPANIES_ACCEPTED);
   if (accepted) {
     return {
-      status: "ACCEPTED",
+      status: accepted.requiresConfirmation ? "CONDITIONAL" : "ACCEPTED",
       entry: accepted,
-      message: `${accepted.company} is accepted.${accepted.exceptions ? " Exceptions: " + accepted.exceptions : ""}`,
+      message: `${accepted.company} is accepted by ELP.${accepted.exceptions ? " Exceptions: " + accepted.exceptions : ""}`,
+    };
+  }
+
+  // Not on either list — the debt TYPE still governs.
+  const governing =
+    findGoverningIneligibleType(companyName) || findGoverningIneligibleType(debtType);
+  if (governing) {
+    return {
+      status: "REJECTED",
+      entry: null,
+      message: `${companyName} is not on ELP's lender lists, but ${governing.reason} ELP's lender list is not exhaustive.`,
+      governingType: governing.key,
     };
   }
 
   return {
     status: "UNKNOWN",
     entry: null,
-    message: `${companyName} was not found in the lender lists. Escalate to Affiliate Support for verification.`,
+    message: `${companyName} was not found on the ELP lender lists. The lists are not exhaustive — contact Affiliate Support to confirm before enrolling.`,
   };
 }
 
 /**
  * Full enrollment eligibility router.
  * Combines state, minimums, debt type, and company checks into one call.
- * @param {object} params
- * @param {string} params.stateCode
- * @param {number} params.totalDebt
- * @param {number} params.monthlyPayment
- * @param {number} params.accountBalance
- * @param {string} params.debtType
- * @param {string} [params.companyName]
- * @returns {object}
+ *
+ * Precedence, highest first:
+ *   1. Restricted state
+ *   2. Governing ineligible debt type (tribal / home improvement / student)
+ *   3. Named excluded lender
+ *   4. Explicit unacceptable debt type
+ *   5. Program minimums
+ *   6. Stipulations, notes, Salesforce actions, confirmations
  */
 export function enrollmentEligibilityCheck({
   stateCode,
@@ -665,11 +1018,15 @@ export function enrollmentEligibilityCheck({
   accountBalance,
   debtType,
   companyName,
+  inThirdPartyCollections,
+  legalContext,
 }) {
   const result = {
     eligible: true,
+    status: "ACCEPT",
     blockers: [],
     warnings: [],
+    confirmations: [],
     requiredNotes: [],
     requiredSalesforceActions: [],
     legalFee: null,
@@ -678,21 +1035,21 @@ export function enrollmentEligibilityCheck({
     mustBeInCollections: false,
   };
 
-  // 1. State check
+  // 1. State
   const stateCheck = checkStateEligibility(stateCode);
   if (!stateCheck.eligible) {
     result.eligible = false;
     result.blockers.push(stateCheck.reason);
   }
 
-  // 2. Program minimums check
+  // 2. Program minimums
   const minimumsCheck = checkProgramMinimums({ totalDebt, monthlyPayment, accountBalance });
   if (!minimumsCheck.eligible) {
     result.eligible = false;
     result.blockers.push(...minimumsCheck.failures);
   }
 
-  // 3. Debt type check
+  // 3. Debt type
   const debtCheck = checkDebtEligibility(debtType);
   if (debtCheck.status === "REJECT") {
     result.eligible = false;
@@ -700,50 +1057,96 @@ export function enrollmentEligibilityCheck({
   } else if (debtCheck.status === "UNKNOWN") {
     result.warnings.push(debtCheck.reason);
   } else {
-    if (debtCheck.notes.length)             result.requiredNotes.push(...debtCheck.notes);
+    if (debtCheck.notes.length) result.requiredNotes.push(...debtCheck.notes);
     if (debtCheck.salesforceActions.length) result.requiredSalesforceActions.push(...debtCheck.salesforceActions);
-    if (debtCheck.legalFee)                 result.legalFee = debtCheck.legalFee;
-    if (debtCheck.documentRequired)         result.documentRequired = debtCheck.documentRequired;
-    if (debtCheck.checkWageAssignment)      result.checkWageAssignment = true;
-    if (debtCheck.mustBeInCollections)      result.mustBeInCollections = true;
+    if (debtCheck.documentRequired) result.documentRequired = debtCheck.documentRequired;
+    if (debtCheck.checkWageAssignment) result.checkWageAssignment = true;
+    if (debtCheck.requiresConfirmation) result.confirmations.push(debtCheck.confirmationReason);
+
+    // 3a. 3rd-party-collections gate — business debt, autos, MCAs, timeshares.
+    if (debtCheck.mustBeInCollections) {
+      result.mustBeInCollections = true;
+      if (inThirdPartyCollections === false) {
+        result.eligible = false;
+        result.blockers.push(
+          `${debtType} is only enrollable when it is in verified 3rd party collections.`
+        );
+      } else if (inThirdPartyCollections === undefined) {
+        result.warnings.push(
+          `${debtType} must be in verified 3rd party collections. Confirm with the client before enrolling.`
+        );
+      }
+    }
+
+    // 3b. Legal fee schedule — judgments, lawsuits, summons.
+    if (debtCheck.usesLegalFeeSchedule) {
+      const fee = getLegalFee(legalContext || {});
+      if (fee.status === "REJECT") {
+        result.eligible = false;
+        result.blockers.push(fee.reason);
+      } else {
+        result.legalFee = { amount: fee.fee, spreadMonths: fee.spreadMonths, basis: fee.reason };
+        if (fee.needsConfirmation) result.confirmations.push(fee.reason);
+      }
+    }
   }
 
-  // 4. Company check (optional)
+  // 4. Company
   if (companyName) {
-    const companyCheck = lookupCompany(companyName);
+    const companyCheck = lookupCompany(companyName, debtType);
     if (companyCheck.status === "REJECTED") {
       result.eligible = false;
       result.blockers.push(companyCheck.message);
     } else if (companyCheck.status === "UNKNOWN") {
       result.warnings.push(companyCheck.message);
-    } else if (companyCheck.entry?.exceptions) {
-      result.warnings.push(`Note for ${companyName}: ${companyCheck.entry.exceptions}`);
+    } else {
+      if (companyCheck.status === "CONDITIONAL") result.confirmations.push(companyCheck.message);
+      else if (companyCheck.entry?.exceptions)
+        result.warnings.push(`Note for ${companyCheck.entry.company}: ${companyCheck.entry.exceptions}`);
     }
   }
+
+  result.status = !result.eligible
+    ? "REJECT"
+    : result.confirmations.length || result.warnings.length
+    ? "CONDITIONAL"
+    : "ACCEPT";
 
   return result;
 }
 
 // ─────────────────────────────────────────────────────────────
-//  9. ROUTER-READY DEFAULT EXPORT
+//  14. ROUTER-READY DEFAULT EXPORT
 // ─────────────────────────────────────────────────────────────
 
 export default {
+  // Metadata
+  KB_REVISION,
   // Data
   PROGRAM_MINIMUMS,
   RESTRICTED_STATES,
+  LEGAL_FEES,
+  GOVERNING_INELIGIBLE_TYPES,
+  CONSOLIDATION_RULE,
   ACCEPTABLE_DEBTS,
   UNACCEPTABLE_DEBT_TYPES,
   COMPANIES_NOT_ACCEPTED,
   COMPANIES_ACCEPTED,
+  PENDING_ELP_CONFIRMATION,
+  GLOBAL_POLICY_RULES,
   SUPPORT_CONTACTS,
   // Functions
+  normalizeName,
+  matchCompany,
+  findGoverningIneligibleType,
   checkStateEligibility,
   checkProgramMinimums,
   getAcceptableDebt,
   isDebtTypeUnacceptable,
+  getUnacceptableDebtEntry,
   checkDebtEligibility,
   lookupCompany,
+  getLegalFee,
   enrollmentEligibilityCheck,
 };
 
@@ -753,29 +1156,26 @@ export default {
 //
 //  import kb from "./knowledgebase.js";
 //
-//  // Check if a state is eligible
-//  kb.checkStateEligibility("GA");
-//  // → { eligible: false, reason: "We cannot accept clients or debts from GA..." }
+//  kb.lookupCompany("Willow Lake Lending");
+//  // → REJECTED — Tribal Lender. (Does NOT match the "Lake Lending" accept rule.)
 //
-//  // Check program minimums
-//  kb.checkProgramMinimums({ totalDebt: 8000, monthlyPayment: 300, accountBalance: 150 });
-//  // → { eligible: true, failures: [] }
+//  kb.lookupCompany("Lake Lending");
+//  // → ACCEPTED — Unsecured debt only.
 //
-//  // Look up a debt type
-//  kb.checkDebtEligibility("Medical Debt");
-//  // → { status: "ACCEPT", stipulations: "Must not be currently receiving treatment...", documentRequired: "First page of statement..." }
+//  kb.lookupCompany("GoodLeap");
+//  // → REJECTED — Solar / Clean Energy Finance. No 3rd party exception.
 //
-//  // Look up a lender
-//  kb.lookupCompany("Mariner Finance");
-//  // → { status: "REJECTED", message: "Mariner Finance is NOT accepted. Reason: Installment Loans." }
+//  kb.lookupCompany("Some Unlisted Tribal Lender", "Tribal Loan");
+//  // → REJECTED — debt type governs even though the lender is unlisted.
 //
-//  // Full enrollment eligibility check
+//  kb.getLegalFee({ clientEnrolled: true, debtEnrolled: false });
+//  // → { status: "FEE", fee: 850, spreadMonths: 2 }
+//
+//  kb.getLegalFee({ receivedPreEnrollment: true });
+//  // → { status: "REJECT", ... }
+//
 //  kb.enrollmentEligibilityCheck({
-//    stateCode:      "CA",
-//    totalDebt:      9500,
-//    monthlyPayment: 300,
-//    accountBalance: 200,
-//    debtType:       "Payday Loans",
-//    companyName:    "Speedy Cash",
+//    stateCode: "CA", totalDebt: 9500, monthlyPayment: 300, accountBalance: 200,
+//    debtType: "Business Debts", companyName: null, inThirdPartyCollections: false,
 //  });
-//  // → { eligible: true, blockers: [], warnings: [], checkWageAssignment: true, ... }
+//  // → { eligible: false, blockers: ["Business Debts is only enrollable when..."] }

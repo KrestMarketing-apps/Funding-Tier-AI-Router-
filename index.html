@@ -1664,122 +1664,155 @@ function legacyDefaultMonths(total, feeRate, csMp, ldMp, splitPay = false){
 
   return legacyClampMonths(total, feeRate, ideal, splitPay);
 }
-const LEGACY_REJECT_RULES=[
-  {n:["American Recovery Systems"],s:"rej",r:"Elite Legal Practice (ELP) list: Collateral Recovery."},
-  {n:["Aqua Finance"],s:"rej",r:"Elite Legal Practice (ELP) list: Lending / Financing company."},
-  {n:["Arrowhead Advance"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Big Picture Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Birch Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Bison Cash"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Blue Mountain Loan"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Bonneville Collection"],s:"rej",r:"Elite Legal Practice (ELP) list: Standard collection agency / Debt recovery firm."},
-  {n:["Boost Credit"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Bright Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["BX Omni"],s:"rej",r:"Elite Legal Practice (ELP) list: Unknown / ambiguous."},
-  {n:["Clear Air Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Climb Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Student Loans."},
-  {n:["Crane Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Credit 9"],s:"rej",r:"Elite Legal Practice (ELP) list: Likely consumer credit / lending."},
-  {n:["Credit Cube"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["E Loan Warehouse"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Eagle Wing Funds"],s:"rej",r:"Elite Legal Practice (ELP) list: Possibly investment / lending fund."},
-  {n:["Elective Group USA (this is a federal student loan provider)"],s:"rej",r:"Elite Legal Practice (ELP) list: Student / educational loan / financing."},
-  {n:["Eloan Warehouse"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Equity Sales Finance"],s:"rej",r:"Elite Legal Practice (ELP) list: Asset finance / sales financing."},
-  {n:["Express Cash Flow"],s:"rej",r:"Elite Legal Practice (ELP) list: Must be 3rd party or not part of colleterial, business or commercial debt."},
-  {n:["Figure Tech/Figure Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Not accepted by Elite Legal Practice (ELP).."},
-  {n:["Fineday Funds"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["GoodLeap LLC (Does business as Goodleap Solar)"],s:"rej",r:"Elite Legal Practice (ELP) list: Fintech / clean energy finance / Solar."},
-  {n:["Green Arrow Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Greenline"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Greensky"],s:"rej",r:"Elite Legal Practice (ELP) list: Per Legal."},
-  {n:["Hollis Cobb"],s:"rej",r:"Elite Legal Practice (ELP) list: possibly collection / finance."},
-  {n:["Home Equity Line of Credit"],s:"rej",r:"Elite Legal Practice (ELP) list: Not accepted by Elite Legal Practice (ELP).."},
-  {n:["Kadikorn Bank"],s:"rej",r:"Elite Legal Practice (ELP) list: Bank / financial institution."},
-  {n:["Lendumo"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Level Up Funding"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["LIGHTSTREAM"],s:"rej",r:"Elite Legal Practice (ELP) list: Home Improvement, Auto, Debt Consolidation, Recreation, Adoption, education, etc.)."},
-  {n:["Little Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Loan At Last"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Lookout Credit Union"],s:"rej",r:"Elite Legal Practice (ELP) list: Credit union / cooperative financial institution."},
-  {n:["Makwa Finance"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Makwa Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Mariner Finance"],s:"rej",r:"Elite Legal Practice (ELP) list: Installment Loans."},
-  {n:["Maxlend"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Merit Financial Trust (Tribal Loans)"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Military Star"],s:"rej",r:"Elite Legal Practice (ELP) list: Government-backed loans."},
-  {n:["Minto Money"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["MobiLoans LLC (Tribal Loan Company)"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["My QuickWallet"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["NCR Finance"],s:"rej",r:"Elite Legal Practice (ELP) list: Finance company / lender."},
-  {n:["Night Wings Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Opici Funds LLC"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Post Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Premier Loan Solutions"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Reach Financial"],s:"rej",r:"Elite Legal Practice (ELP) list: Personal / small-dollar / consumer finance."},
-  {n:["Rise Up Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["River Valley Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Sallie Mae Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Education / student lending."},
-  {n:["Same Day Credit"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["SBA Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Government-backed small business loans."},
-  {n:["Simple Fast Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Payday / quick consumer lending."},
-  {n:["Snap On Credit"],s:"rej",r:"Elite Legal Practice (ELP) list: Secured Loans only."},
-  {n:["Spotloan"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Sunbelt Federal Credit Union (Sunbelt FCU)"],s:"rej",r:"Elite Legal Practice (ELP) list: Credit union / cooperative bank."},
-  {n:["Three Sticks Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Today Cash"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Tule Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Uprova"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Versara Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Consolidation/Negotiation."},
-  {n:["White Pine Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Willow Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["WithU Loans"],s:"rej",r:"Elite Legal Practice (ELP) list: Tribal."},
-  {n:["Write St. Education Leins"],s:"rej",r:"Elite Legal Practice (ELP) list: Educational lender / student finance / lien recording in education."},
-  {n:["Yendo"],s:"rej",r:"Elite Legal Practice (ELP) list: Not accepted by Elite Legal Practice (ELP).."},
-  {n:["ZipLoan (AKA Zuntafi)"],s:"rej",r:"Elite Legal Practice (ELP) list: Student / consumer loan origination & servicing."},
-  {n:["Zuntafi (AKA ZipLoan)"],s:"rej",r:"Elite Legal Practice (ELP) list: Student / consumer loan origination & servicing."}
+// ═══════════════════════════════════════════════════════════════════
+//  ELP RULES — TWO SEPARATE LAYERS
+//
+//  Layer 1  LEGACY_CREDITOR_* — specific companies, matched against the
+//           CREDITOR NAME field only. Exact one-for-one, aliases explicit.
+//  Layer 2  LEGACY_DEBT_TYPE_RULES — debt categories, matched against the
+//           DEBT TYPE field only.
+//
+//  Both layers are evaluated on every lookup and a rejection in EITHER one
+//  rejects the account. An accepted company with an ineligible debt type is
+//  still ineligible; an eligible debt type from an excluded lender is still
+//  excluded. Mixing the two into one table hides that second layer.
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Layer 1a: excluded companies ──────────────────────────────────
+const LEGACY_CREDITOR_REJECT=[
+  {n:["AES", "American Education Services"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Student Loan Provider."},
+  {n:["American Recovery System", "American Recovery Systems"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Collateral Recovery."},
+  {n:["Aqua Finance"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Lending / Financing company."},
+  {n:["Arrowhead Advance"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["BHG", "Bankers Healthcare Group"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Business loan disguised as personal loan."},
+  {n:["Big Picture Loans"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Birch Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Bison Cash"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Blue Mountain Loan"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Bonneville Collection"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Collection Agency."},
+  {n:["Boost Credit"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Bright Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["BX Omni"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Excluded Military Lender."},
+  {n:["Clear Air Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Crane Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Credit 9"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Consumer Credit Lender."},
+  {n:["Credit Cube"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["E Loan Warehouse"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Eagle Advance"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Eagle Wing Funds"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Investment / Lending Fund."},
+  {n:["Elective Group USA", "Elective Group"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Federal Student Loan Provider."},
+  {n:["Eloan Warehouse"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Equity Sales Finance"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Asset / Sales Finance."},
+  {n:["Express Cash Flow"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Business / Commercial Debt."},
+  {n:["FIGURE TECH / FIGURE LENDING", "Figure Tech", "Figure Lending", "Figure Technologies"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Fintech Lending."},
+  {n:["Fineday Funds"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["GoodLeap LLC", "GoodLeap", "Good Leap", "GoodLeap Solar", "LoanPal", "Loan Pal"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Solar / Clean Energy Finance."},
+  {n:["GRANITE", "Granite"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Student Loan Provider."},
+  {n:["Green Arrow Loans"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Greenline"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Hollis Cobb"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Collection / Finance Company."},
+  {n:["Home Equity Line of Credit", "HELOC"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Home-Secured Debt."},
+  {n:["Kadikorn Bank"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Bank / Financial Institution."},
+  {n:["Lendumo"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Level Up Funding"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["LightStream"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Excluded Loan Types."},
+  {n:["Little Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Loan At Last"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Lookout Credit Union"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Credit Union."},
+  {n:["Makwa Finance"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Makwa Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Mariner Finance", "Personal Finance Company"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Installment Loans."},
+  {n:["Maxlend"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Merit Financial Trust"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Military Star", "Exchange Credit Program", "AAFES"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Government-Backed Loans."},
+  {n:["Minto Money"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["MobiLoans LLC", "MobiLoans", "Mobi Loans"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["MOHELA"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Student Loan Provider."},
+  {n:["Money Messiah"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["My QuickWallet", "MyQuickWallet"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["NAVIENT"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Student Loan Provider."},
+  {n:["NCR Finance"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Finance Company / Lender."},
+  {n:["Night Wings Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Opici Funds LLC", "Opici Funds"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Post Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Premier Loan Solutions"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Reach Financial"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Consumer Finance."},
+  {n:["Rise Up Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["River Valley Loans"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Sallie Mae Loans", "Sallie Mae"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Student Loan Provider."},
+  {n:["Same Day Credit"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["SBA Loans", "SBA Loan", "Small Business Administration"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Government-Backed Small Business."},
+  {n:["Simple Fast Loans"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Payday / Quick Consumer Lending."},
+  {n:["Snap On Credit"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Secured Loans Only."},
+  {n:["Spotloan"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Sunbelt Federal Credit Union", "Sunbelt FCU"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Credit Union."},
+  {n:["Three Sticks Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Tule Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Uprova"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Velocity Lending Solution", "Velocity Lending Solutions"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Business Loan Lender."},
+  {n:["White Pine Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Willow Lake Lending"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["WithU Loans"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Tribal Lender."},
+  {n:["Write St. Education Liens", "Write St Education Liens"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Education Finance / Lien Recording."},
+  {n:["Yendo"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Auto Lender."},
+  {n:["ZipLoan", "Zip Loan"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Student / Consumer Loan Provider."},
+  {n:["Zuntafi"],s:"rej",r:"Elite Legal Practice (ELP) excluded lender: Student / Consumer Loan Provider."},
+  // Retained from the 2025-09-22 list — absent from ELP's 2026 sheet, but the debt TYPE is ineligible.
+  {n:["Climb Loans"],s:"rej",r:"Elite Legal Practice (ELP) — Student loan lender. Student loans are ineligible regardless of lender listing."},
+  {n:["GreenSky"],s:"rej",r:"Elite Legal Practice (ELP) — Home improvement financing. Home improvement loans are ineligible regardless of lender listing."},
+  {n:["Today Cash"],s:"rej",r:"Elite Legal Practice (ELP) — Tribal lender. Tribal loans are ineligible regardless of lender listing."},
+  {n:["Versara Lending"],s:"rej",r:"Elite Legal Practice (ELP) — Consolidation lender. Held as excluded pending written ELP confirmation."}
 ];
-const LEGACY_ACCEPT_RULES=[
-  {n:["3rd Party Collections"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: See unacceptable debt list below."},
-  {n:["ADT Alarm System"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Removal of the system may be required based on its age. Create a NOTE that client is aware the system may be removed."},
-  {n:["Auto Loans (RVs/Moto/Leases//Repos/Balances)"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS / Cannot accept deficiency loans."},
-  {n:["Back Rent"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Client is no longer living in unit."},
-  {n:["Business Debts/Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
-  {n:["Cash Advance"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
-  {n:["Check Cashing"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
-  {n:["Consolidation Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
-  {n:["Credit Builder Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
-  {n:["Credit Unions / Federal"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
-  {n:["Department Stores"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
-  {n:["Furniture and/or Jewelry"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add Repo Note in Sales Force."},
-  {n:["Gas Cards"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
-  {n:["Gyms / Fitness Centers"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add note, client unerstands will lose membership."},
-  {n:["Health clubs"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add note, client unerstands will lose membership."},
-  {n:["Installment Loans / Note Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Issues from Debt Settlement Company. Add Cross Collateral / Repo Note in Sales Force."},
-  {n:["Judgements"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
-  {n:["Lake Lending"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not tied to Collateral."},
-  {n:["Lawsuits"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
-  {n:["Lending Club"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
-  {n:["Lines of Credit"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Must be used like a credit card and include the first page of the statement with client and billing information."},
-  {n:["Medical Debt"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Needs to provide the first page of the statement showing both client and billing details.."},
-  {n:["Merchant Cash Advance Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
-  {n:["Military Credit Unions"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Excludes: Military, Star, Pioneer Loans, BX Omni, and VA Loans.."},
-  {n:["Military Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not endorsed by the government, noted on bottom of website."},
-  {n:["Navy Federal Credit Union"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Verify they are not currently in the military, and they don't have, or have to get secret or top secret clearance. Cannot be endorsed by the government.."},
-  {n:["OMNI Financial"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Military Personal Loans / Not Backed by the Government."},
-  {n:["Online Buy Now - Pay Later"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Clear screenshot of balance acceptable. Check for Wage Assignment (Affirm, Afterpay, Klarna, Online Payback Programs.)."},
-  {n:["Payday Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Check for Wage Assignment."},
-  {n:["Personal Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
-  {n:["Signature Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
-  {n:["Summons"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
-  {n:["Timeshares"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
-  {n:["Together Loans (aka Transform Credit)"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
-  {n:["Transform Credit"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
-  {n:["Unsecured Credit Cards"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
-  {n:["Unsecured Debts"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
-  {n:["USAA Federal Savings Bank"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Accepted by Elite Legal Practice (ELP).."},
-  {n:["Utility Bills"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Items such as power, internet, electric, cellular, and cable require a NOTE confirming the client is aware service will be shut off.."},
-  {n:["Velocity"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Acceptable 3rd party."}
+
+// ── Layer 1b: accepted companies (named entities only) ────────────
+const LEGACY_CREDITOR_ACCEPT=[
+  {n:["ADT Alarm System", "ADT"],s:"ok",r:"Elite Legal Practice (ELP) accepted lender: System may need removal based on age. Note that the client is aware."},
+  {n:["Lake Lending"],s:"ok",r:"Elite Legal Practice (ELP) accepted lender: Unsecured debt only. DISTINCT company — not Little Lake, Post Lake, Tule Lake or Willow Lake Lending, all of which are excluded tribal lenders."},
+  {n:["Lending Club", "LendingClub"],s:"ok",r:"Elite Legal Practice (ELP) accepted lender: Not secured to collateral and/or not secured to the home."},
+  {n:["Navy Federal Credit Union", "Navy Federal", "NFCU"],s:"ok",r:"Elite Legal Practice (ELP) accepted lender: Verify the client is not currently active military and does not have or need secret / top secret clearance. Cannot be government-endorsed."},
+  {n:["OMNI Financial", "Omni Financial"],s:"ok",r:"Elite Legal Practice (ELP) accepted lender: Military personal loans only. Must not be backed by the government."},
+  {n:["Together Loans", "Together Loans (aka Transform Credit)"],s:"cond",r:"Elite Legal Practice (ELP) conditional lender: Not issued by a debt settlement company. No loans under $3,000. No monthly memberships. Confirm with Affiliate Support before enrolling."},
+  {n:["Transform Credit"],s:"cond",r:"Elite Legal Practice (ELP) conditional lender: Not issued by a debt settlement company. No loans under $3,000. No monthly memberships. Confirm with Affiliate Support before enrolling."},
+  {n:["Velocity Recoveries"],s:"ok",r:"Elite Legal Practice (ELP) accepted lender: Third party debt collector. DISTINCT company — not Velocity Lending Solution, which is excluded."}
+];
+
+// ── Layer 2: debt types ───────────────────────────────────────────
+const LEGACY_DEBT_TYPE_RULES=[
+  {n:["3rd Party Collections", "Third Party Collections"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Excluded Student Loans or 3rd Party Tribal Loans."},
+  {n:["Alarm Systems", "Alarm System"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: System may need to be removed due to age, we'll note this with the client."},
+  {n:["Auto Loans & Repossessions", "Auto Loans", "Auto Loan", "RV Loans", "Motorcycle Loans", "Repossession", "Repossession Deficiency", "Auto Repo Deficiency", "Repos"],s:"cond",c:"collections",r:"Elite Legal Practice (ELP) conditional debt type: Must be in collections only. Cannot accept deficiency loans."},
+  {n:["Back Rent", "Apartment Back Rent (Collections)"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Client must no longer be living in the rental unit."},
+  {n:["Cash Advances", "Cash Advance"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Accepted."},
+  {n:["Certificates of Deposit (CDs)", "Certificate of Deposit", "CDs"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Right to offset note required."},
+  {n:["Check Cashing Debts", "Check Cashing"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Accepted."},
+  {n:["Consolidation/Negotiation Loans", "Consolidation Loans", "Consolidation Loan", "Debt Consolidation", "Negotiation Loans"],s:"cond",c:"confirm",r:"Elite Legal Practice (ELP) conditional debt type: Must NOT be issued by a debt settlement company. No loans under $3,000. No monthly memberships. CONFLICT — ELP Sept 2026 guidance says consolidation loans are not accepted. Confirm with Affiliate Support before enrolling."},
+  {n:["Credit Builder Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: We'll add a cross-collateral/repo note in our system."},
+  {n:["Credit Unions & Federal Banks", "Credit Unions / Federal", "Credit Union Loan"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: We'll add a cross-collateral/repo note in our system."},
+  {n:["Department Store Cards", "Department Stores", "Furniture Store Financing"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: We'll add a repo note in our system."},
+  {n:["Furniture & Jewelry Loans", "Furniture and/or Jewelry", "Furniture Loans", "Jewelry Loans", "Backyard Accessories"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Furniture, backyard accessories, or jewelry (Repo Note Required)."},
+  {n:["Gas Station Cards", "Gas Cards"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Accepted."},
+  {n:["Gym & Fitness Memberships", "Gyms / Fitness Centers", "Gym Membership"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: If disputed, client should understand they may lose membership."},
+  {n:["Health Club Memberships", "Health Clubs"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: If disputed, client should understand they may lose membership."},
+  {n:["Installment & Note Loans", "Installment Loans", "Note Loans", "Installment Sales Contract"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Cannot be from debt settlement companies. We'll add cross-collateral/repo notes."},
+  {n:["Judgments", "Judgment", "Judgement", "Judgements"],s:"cond",c:"confirm",r:"Elite Legal Practice (ELP) conditional debt type: Client must be enrolled PRIOR to receiving it. $675 legal fee if received within the first year of enrollment on an enrolled debt; $850 if the debt itself is not enrolled. Either may be spread over 2 months. Pre-enrollment is NOT accepted."},
+  {n:["Lawsuits", "Lawsuit"],s:"cond",c:"confirm",r:"Elite Legal Practice (ELP) conditional debt type: Client must be enrolled PRIOR to receiving it. $675 legal fee if received within the first year of enrollment on an enrolled debt; $850 if the debt itself is not enrolled. Either may be spread over 2 months. Pre-enrollment is NOT accepted."},
+  {n:["Lending Club Loans", "Lending Club"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Must be unsecured (not tied to collateral or home)."},
+  {n:["Lines of Credit", "Line of Credit", "Unsecured Line of Credit"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Must function like a credit card. Provide first page of statement with client & billing info."},
+  {n:["Medical Debt", "Medical Bill"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: First page of statement required showing client and billing details. Client must not be receiving ongoing treatment."},
+  {n:["Merchant Cash Advances", "Merchant Cash Advance", "Merchant Cash Advance Loans", "MCA"],s:"cond",c:"collections",r:"Elite Legal Practice (ELP) conditional debt type: Must be in 3rd party collections only."},
+  {n:["Military Credit Unions"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Accepted. Excludes: Military Star, Pioneer Loans, BX Omni, VA Loans."},
+  {n:["Military Loans", "Military Account"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Not government-endorsed. Verify client is not active military and doesn't require security clearance."},
+  {n:["Online Buy Now / Pay Later", "Online Buy Now - Pay Later", "BNPL"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Screenshot of balance acceptable. Check for wage assignment (Affirm, Afterpay, Klarna)."},
+  {n:["Payday Loans", "Payday Loan"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Check for wage assignment clauses."},
+  {n:["Personal Loans", "Personal Loan", "Unsecured Personal Loan"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Must be unsecured (not tied to collateral or home)."},
+  {n:["Signature Loans", "Signature Loan"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Must be unsecured (not tied to collateral or home)."},
+  {n:["Summons"],s:"cond",c:"confirm",r:"Elite Legal Practice (ELP) conditional debt type: Client must be enrolled PRIOR to receiving it. $675 legal fee if received within the first year of enrollment on an enrolled debt; $850 if the debt itself is not enrolled. Either may be spread over 2 months. Pre-enrollment is NOT accepted."},
+  {n:["Timeshares", "Timeshare"],s:"cond",c:"collections",r:"Elite Legal Practice (ELP) conditional debt type: Must be in 3rd party collections only."},
+  {n:["Transform Credit / Consolidation"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Not from debt settlement companies. No loans under $3,000. No monthly memberships."},
+  {n:["Unsecured Credit Cards", "Unsecured", "Unsecured Card"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Accepted. Refer to excluded companies list if concerned about specific issuer."},
+  {n:["Unsecured Debts (General)", "Unsecured Debts", "Unsecured Debt"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Accepted. Client should understand service may be shut off if disputed."},
+  {n:["Utility Bills", "Utility Bill", "Cell Phone Bill", "Power", "Internet", "Electric", "Cellular", "Cable"],s:"ok",r:"Elite Legal Practice (ELP) accepted debt type: Power, internet, electric, cellular, cable only. Must be old accounts (not currently active). Client should understand service may shut off if disputed."},
+  {n:["Business Debts", "Business Debt", "Business Loans", "Business Credit Cards", "Business Debts/Loans"],s:"cond",c:"collections",r:"Elite Legal Practice (ELP) conditional debt type: MUST BE IN 3RD PARTY COLLECTIONS ONLY. Business debt not in 3rd party collections is rejected."}
 ];
 // ─── Consumer Shield: Explicit Accepted Named Creditor Rules ───
 // These prevent broad reject aliases from accidentally blocking normal accepted cards.
@@ -1967,10 +2000,41 @@ function getCSNamedRule(name) {
   return _ruleSearch(name, [...CS_NAMED_REJECT_RULES, ...CS_NAMED_COND_RULES]);
 }
 
-// ELP only (LEGACY_REJECT_RULES + LEGACY_ACCEPT_RULES)
-function getLegacyCredRule(name) {
-  return _ruleSearch(name, [...LEGACY_REJECT_RULES, ...LEGACY_ACCEPT_RULES]);
+// ELP only — EXACT one-for-one matching, no substring fallback.
+//
+// Every name on ELP's excluded and included lists is a distinct legal entity.
+// The shared _ruleSearch() helper does substring matching, which silently
+// cleared "Willow Lake Lending" against the "Lake Lending" accept rule and
+// "Velocity Lending Solution" against "Velocity Recoveries". ELP names are
+// therefore matched on an exact normalized string or an explicit alias only.
+//
+// The two layers are queried separately. getLegacyCredRule() only ever sees
+// company names; getLegacyDebtTypeRule() only ever sees debt types. Keeping
+// them apart is what lets the router say "debt type is fine, the lender is
+// not" — and the reverse.
+function _legacyNorm(v){
+  return String(v||'')
+    .toUpperCase()
+    .replace(/&/g,' AND ')
+    .replace(/\b(LLC|INC|INCORPORATED|CORP|CORPORATION)\b/g,' ')
+    .replace(/[^A-Z0-9 ]/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
 }
+function _legacyExact(name, ruleList){
+  const q=_legacyNorm(name);
+  if(!q) return null;
+  return ruleList.find(r=>(r.n||[]).some(n=>_legacyNorm(n)===q))||null;
+}
+// Layer 1 — creditor / company name. Rejects are checked before accepts.
+function getLegacyCredRule(name) {
+  return _legacyExact(name, LEGACY_CREDITOR_REJECT) || _legacyExact(name, LEGACY_CREDITOR_ACCEPT);
+}
+// Layer 2 — debt type.
+function getLegacyDebtTypeRule(debtType) {
+  return _legacyExact(debtType, LEGACY_DEBT_TYPE_RULES);
+}
+
 
 // Legacy (all rules merged — for backward compat where needed)
 function getCredRule(name) {
@@ -1981,7 +2045,7 @@ function getCredRule(name) {
  * Returns the status of a creditor across all three programs.
  * @returns {{ level, cs, legacy }} — each: { status:'ok'|'cond'|'rej', rule:string|null }
  */
-function getCreditorProgramStatus(credName, debtType) {
+function getCreditorProgramStatus(credName, debtType, row) {
   const dt = String(debtType || 'Unsecured');
 
   const levelRule = getLevelCredRule(credName);
@@ -1999,22 +2063,83 @@ function getCreditorProgramStatus(credName, debtType) {
     csStatus = csRule ? { status: csRule.s, rule: csRule.r } : { status: 'ok', rule: null };
   }
 
-  const legacyDebtRej = [
-    'Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt',
-    'Alimony / Child Support','Wage Garnishments','Solar Panels',
-    'Student Loans','Tax Debts','VA Loans','Pioneer Loans',
-    'Business Credit Cards under EIN#','Business Credit Cards under SS#',
-    'Business Loans under EIN#','Business Loans under SS#',
-    'Home Improvement Loans','Mechanic\'s Liens'
+  // ── ELP: two layers, evaluated separately ────────────────────
+  //   Layer 1  creditor / company name  → LEGACY_CREDITOR_REJECT / _ACCEPT
+  //   Layer 2  debt type                → LEGACY_DEBT_TYPE_RULES
+  // A rejection in EITHER layer rejects the account. Conditions from both
+  // layers accumulate, so "accepted lender + conditional debt type" still
+  // surfaces the condition.
+  //
+  // Above both layers sits the governing-type rule. Per ELP (Sept 2026):
+  // "While some lenders may not appear on the Unaccepted Lender List, the
+  // debt type itself is ineligible." So tribal, home improvement and student
+  // loans reject on either field even when the lender is on no list at all.
+  const LEGACY_GOVERNING_INELIGIBLE = [
+    { key:'TRIBAL',           words:['tribal'],
+      why:'Tribal loans are ineligible for ELP regardless of lender.' },
+    { key:'HOME_IMPROVEMENT', words:['home improvement','structural attachment'],
+      why:'Home improvement loans and structural attachments are ineligible for ELP regardless of lender.' },
+    { key:'STUDENT',          words:['student loan'],
+      why:'Student loans (federal or private) are ineligible for ELP regardless of lender.' }
   ];
+
+  // Layer 2 hard rejects — ELP "DEBTS WE DO NOT ACCEPT", 2026-09-01.
+  const LEGACY_DEBT_TYPE_REJECT = [
+    'Agriculture Loans','Alimony','Child Support','Alimony / Child Support',
+    'Bankruptcy','City Debts','County Debts','State Debts','Federal Debts',
+    'Debt Settlement Loans','HELOC','Home Equity Line of Credit',
+    'Mortgage','Mortgages','Home Loans','Pioneer Loans',
+    'Pools','Promissory Notes','Solar Panels','Tax Debts','IRS Tax Debt',
+    'VA Loans','Wage Garnishments','Mechanic\'s Liens','Spot Loans',
+    'Air Conditioning Units','Citations','Tickets','SBA Loan','Casino Debt'
+  ];
+
+  const _dtLower   = dt.toLowerCase();
+  const _credLower = String(credName || '').toLowerCase();
+
+  const governing = LEGACY_GOVERNING_INELIGIBLE.find(g =>
+    g.words.some(w => _dtLower.includes(w) || _credLower.includes(w))
+  );
+  const credRule = getLegacyCredRule(credName);          // layer 1
+  const typeRule = getLegacyDebtTypeRule(dt);            // layer 2
+  const typeHardRej = LEGACY_DEBT_TYPE_REJECT.some(t => _dtLower.includes(t.toLowerCase()));
+
   let legacyStatus;
-  if(legacyDebtRej.some(t => dt.toLowerCase().includes(t.toLowerCase()))) {
-    legacyStatus = { status: 'rej', rule: `${dt} is not accepted by ELP.` };
+  if(governing) {
+    legacyStatus = { status:'rej', rule: governing.why, layer:'debtType' };
+  } else if(credRule && credRule.s === 'rej') {
+    legacyStatus = { status:'rej', rule: credRule.r, layer:'creditor' };
+  } else if(typeHardRej) {
+    legacyStatus = { status:'rej', rule:`${dt} is on the ELP unacceptable debt type list.`, layer:'debtType' };
   } else {
-    const legacyRule = getLegacyCredRule(credName);
-    legacyStatus = legacyRule
-      ? { status: legacyRule.s, rule: legacyRule.r }
-      : { status: 'ok', rule: null };
+    // Neither layer rejects. Collect conditions from both.
+    const conds = [];
+    if(credRule && credRule.s === 'cond')
+      conds.push({ layer:'creditor', kind:'confirm', why:credRule.r });
+    if(typeRule && typeRule.s === 'cond')
+      conds.push({ layer:'debtType', kind:typeRule.c || 'confirm', why:typeRule.r });
+
+    const collectionsCond = conds.find(c => c.kind === 'collections');
+    const notes = [credRule && credRule.s === 'ok' ? credRule.r : null,
+                   typeRule && typeRule.s === 'ok' ? typeRule.r : null]
+                  .filter(Boolean).join(' ');
+
+    if(collectionsCond) {
+      // A checkable condition, not just a warning — the agent ticks it off.
+      const others = conds.filter(c => c !== collectionsCond).map(c => c.why).join(' ');
+      legacyStatus = (row && row.collections)
+        ? { status: conds.length > 1 ? 'cond' : 'ok',
+            rule: `Condition met — verified in 3rd party collections. ${collectionsCond.why} ${others}`.trim(),
+            condition:'collections', conditionMet:true, layer:collectionsCond.layer }
+        : { status:'cond', rule:`${collectionsCond.why} ${others}`.trim(),
+            condition:'collections', conditionMet:false,
+            conditionLabel:'In 3rd party collections', layer:collectionsCond.layer };
+    } else if(conds.length) {
+      legacyStatus = { status:'cond', rule: conds.map(c => c.why).join(' '),
+                       condition:'confirm', layer: conds[0].layer };
+    } else {
+      legacyStatus = { status:'ok', rule: notes || null };
+    }
   }
 
   return { level: levelStatus, cs: csStatus, legacy: legacyStatus };
@@ -2250,7 +2375,7 @@ function collectFlags(rows, total, sc) {
     const a = num(r.amount);
     if(!a) return;
 
-    const ps = getCreditorProgramStatus(r.cred, r.dt);
+    const ps = getCreditorProgramStatus(r.cred, r.dt, r);
     const label = r.cred || r.dt;
 
     // Consumer Shield
@@ -2426,7 +2551,7 @@ function computeScenario(){
 }
 function rowAlerts(row, route) {
   const alerts = [];
-  const ps = getCreditorProgramStatus(row.cred, row.dt);
+  const ps = getCreditorProgramStatus(row.cred, row.dt, row);
 
   // ── Level badges ────────────────────────────────────────
   if(ps.level.status === 'rej') {
@@ -2449,6 +2574,12 @@ function rowAlerts(row, route) {
   // ── ELP badges ─────────────────────────────────
   if(ps.legacy.status === 'rej') {
     alerts.push({ label:'ELP ✕', tone:'p', detail: ps.legacy.rule, program:'LEGACY' });
+  } else if(ps.legacy.status === 'cond') {
+    alerts.push({
+      label: ps.legacy.condition === 'collections' ? 'ELP ⚠ Needs 3rd party collections' : 'ELP ⚠ Verify',
+      tone:'a', detail: ps.legacy.rule, program:'LEGACY' });
+  } else if(ps.legacy.conditionMet) {
+    alerts.push({ label:'ELP ✓ Condition met', tone:'g', detail: ps.legacy.rule, program:'LEGACY' });
   } else if(ps.legacy.status === 'ok' && ps.legacy.rule) {
     alerts.push({ label:'ELP — notes', tone:'a', detail: ps.legacy.rule, program:'LEGACY' });
   }
@@ -3324,15 +3455,47 @@ function refreshRowVisuals() {
           a: 'background:#fffbeb;color:#92400e;border:1px solid rgba(245,158,11,.3);',
           b: 'background:#eff6ff;color:#1d4ed8;border:1px solid rgba(26,110,216,.3);',
           p: 'background:rgba(109,40,217,.1);color:#6d28d9;border:1px solid rgba(109,40,217,.3);',
+          g: 'background:#f0fdf4;color:#15803d;border:1px solid rgba(21,128,61,.3);',
         };
         return `<span class="pill" style="${styleMap[a.tone]||styleMap.a}font-size:10px;cursor:help;" title="${esc(a.detail||a.label)}">${a.label}</span>`;
       }).join('');
     }
+    renderRowConditions(row, i);
+  });
+}
+
+// ── Checkable ELP conditions ──────────────────────────────────────
+// Some ELP rules are not warnings, they are conditions with a yes/no answer
+// the agent can settle on the call: "is this in 3rd party collections?"
+// Ticking the box satisfies the condition and the account clears. Leaving it
+// unticked keeps the account flagged. The state is stored on the row and is
+// already carried through to the generated plan as `inCollections`.
+function renderRowConditions(row, i) {
+  const host = document.querySelector(`[data-cw="${i}"]`);
+  if(!host) return;
+  const ps = getCreditorProgramStatus(row.cred, row.dt, row);
+  const needs = ps.legacy && (ps.legacy.condition === 'collections');
+  if(!needs) { host.innerHTML = ''; return; }
+  const met = !!row.collections;
+  host.innerHTML = `
+    <label style="display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:11px;font-weight:700;
+      padding:5px 9px;border-radius:7px;line-height:1.3;
+      background:${met?'#f0fdf4':'#fffbeb'};
+      border:1.5px solid ${met?'rgba(21,128,61,.35)':'rgba(245,158,11,.4)'};
+      color:${met?'#15803d':'#92400e'};">
+      <input type="checkbox" data-coll="${i}" ${met?'checked':''}
+        style="width:14px;height:14px;accent-color:#15803d;cursor:pointer;margin:0;"/>
+      <span>ELP condition — in 3rd party collections${met?' \u2713':''}</span>
+    </label>`;
+  const box = host.querySelector(`[data-coll="${i}"]`);
+  if(box) box.addEventListener('change', () => {
+    app.rows[i].collections = box.checked;
+    render();
   });
 }
 function renderRows(){
   const total=app.rows.reduce((s,r)=>s+num(r.amount),0);
-  $('rows').innerHTML=app.rows.map((row,i)=>`<div class="row-card" data-row="${i}"><div class="row-inner"><div class="creditor-entry-wrap"><input class="fi ci" data-i="${i}" placeholder="Type creditor name&#8230;" value="${esc(row.cred||'')}" autocomplete="off"/><div class="drop" data-cr="${i}"></div><div class="aw" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div></div><div><input class="fi" data-i="${i}" data-k="amount" placeholder="$0" value="${row.amount||''}"/>${total>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${((num(row.amount)/total)*100).toFixed(1)}%</div>`:''}</div><div><div class="dt-wrap" data-dw="${i}"><svg class="dt-icon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg><input class="dt-inp" data-di="${i}" placeholder="Search debt type&#8230;" autocomplete="off"/><button class="dt-x" data-dx="${i}">&#10005;</button><div class="dt-panel" data-dp="${i}"></div></div><div class="dt-sel" data-ds="${i}"><span></span><button data-dsc="${i}">&#10005;</button></div></div><div>${app.rows.length>1?`<button type="button" data-rem="${i}" style="width:30px;height:30px;border:1.5px solid rgba(239,68,68,.4);border-radius:8px;background:#fef2f2;color:var(--rd);font-weight:900;font-size:16px;cursor:pointer;margin-top:5px;font-family:inherit;">&#8722;</button>`:'<div></div>'}</div></div></div>`).join('');
+  $('rows').innerHTML=app.rows.map((row,i)=>`<div class="row-card" data-row="${i}"><div class="row-inner"><div class="creditor-entry-wrap"><input class="fi ci" data-i="${i}" placeholder="Type creditor name&#8230;" value="${esc(row.cred||'')}" autocomplete="off"/><div class="drop" data-cr="${i}"></div><div class="aw" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div><div class="cw" data-cw="${i}" style="margin-top:6px;"></div></div><div><input class="fi" data-i="${i}" data-k="amount" placeholder="$0" value="${row.amount||''}"/>${total>0&&row.amount?`<div style="font-size:10px;color:#94a3b8;font-weight:600;margin-top:3px;text-align:right;">${((num(row.amount)/total)*100).toFixed(1)}%</div>`:''}</div><div><div class="dt-wrap" data-dw="${i}"><svg class="dt-icon" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-2.8-2.8"/></svg><input class="dt-inp" data-di="${i}" placeholder="Search debt type&#8230;" autocomplete="off"/><button class="dt-x" data-dx="${i}">&#10005;</button><div class="dt-panel" data-dp="${i}"></div></div><div class="dt-sel" data-ds="${i}"><span></span><button data-dsc="${i}">&#10005;</button></div></div><div>${app.rows.length>1?`<button type="button" data-rem="${i}" style="width:30px;height:30px;border:1.5px solid rgba(239,68,68,.4);border-radius:8px;background:#fef2f2;color:var(--rd);font-weight:900;font-size:16px;cursor:pointer;margin-top:5px;font-family:inherit;">&#8722;</button>`:'<div></div>'}</div></div></div>`).join('');
   app.rows.forEach((row,i)=>{if(row.dt){const sel=document.querySelector(`[data-ds="${i}"]`);if(sel){const s=DT_REJ.has(row.dt)?'no':DT_COND.has(row.dt)?'cond':'ok';sel.querySelector('span').textContent=row.dt;sel.className=`dt-sel s-${s}`;}}});
   $('addBtn').style.display=app.rows.length<MAX_ROWS?'flex':'none';
   document.querySelectorAll('[data-k="amount"]').forEach(n=>{n.addEventListener('input',onAmtChange);});
