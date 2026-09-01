@@ -46,12 +46,14 @@ export default async function handler(req, res) {
 
   const key = `auth/links/${token}.json`;
 
+  // get() resolves to { statusCode, stream, blob } — the body comes off the
+  // stream, not from a URL. Reading it any other way silently yields nothing
+  // and every valid link looks expired.
   let record = null;
   try {
-    const blob = await get(key, { access: "private" });
-    if (blob?.url) {
-      const fetched = await fetch(blob.url);
-      if (fetched.ok) record = await fetched.json();
+    const result = await get(key, { access: "private" });
+    if (result?.statusCode === 200 && result.stream) {
+      record = await new Response(result.stream).json();
     }
   } catch (err) {
     console.error("auth/callback: token read failed", err);

@@ -25,11 +25,9 @@ function randomToken() {
 /** Reads a private JSON blob, or null if it is absent or unreadable. */
 async function readJson(key) {
   try {
-    const blob = await get(key, { access: "private" });
-    if (!blob?.url) return null;
-    const res = await fetch(blob.url);
-    if (!res.ok) return null;
-    return await res.json();
+    const result = await get(key, { access: "private" });
+    if (result?.statusCode !== 200 || !result.stream) return null;
+    return await new Response(result.stream).json();
   } catch {
     return null;
   }
@@ -62,15 +60,14 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, message: "Method not allowed." });
   }
 
-  if (
-    !process.env.SESSION_SECRET ||
-    !process.env.RESEND_API_KEY ||
-    !process.env.GHL_PIT ||
-    !process.env.GHL_LOCATION_ID
-  ) {
-    // Loud for the operator, quiet for the visitor.
-    console.error("auth/request: SESSION_SECRET, RESEND_API_KEY, GHL_PIT or GHL_LOCATION_ID missing");
-    return res.status(503).json({ ok: false, message: "Sign-in is not available right now." });
+  // Name the specific missing variable. The previous version answered 503 for
+  // both a missing env var and an unreachable GoHighLevel, which meant every
+  // failure needed a log dive to tell apart.
+  const missing = ["SESSION_SECRET", "RESEND_API_KEY", "GHL_PIT", "GHL_LOCATION_ID"]
+    .filter((k) => !process.env[k]);
+  if (missing.length) {
+    console.error(`auth/request: missing env ${missing.join(", ")}`);
+    return res.status(503).json({ ok: false, message: "Sign-in is not configured yet." });
   }
 
   const email = normaliseEmail(req.body?.email);
@@ -86,7 +83,7 @@ export default async function handler(req, res) {
     role = await lookupRole(email);
   } catch (err) {
     console.error("auth/request: GHL lookup failed", err);
-    return res.status(503).json({ ok: false, message: "Sign-in is not available right now." });
+    return res.status(503).json({ ok: false, message: "Could not reach GoHighLevel. Try again in a moment." });
   }
   if (!role) return res.status(200).json(SAME_ANSWER);
 
