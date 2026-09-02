@@ -17,6 +17,12 @@
 //   The menu is not the gate. It shows what this person may open, but the
 //   middleware is what actually refuses. Hiding a link is courtesy; the
 //   lock is elsewhere.
+//
+//   Two groups, not five. Every tool belongs to exactly one audience:
+//   Agents or Admins. The menu mirrors that — one collapsible group each,
+//   Admins first for admins because that is what they came for. Anything
+//   the API hands back that is neither is treated as an agent tool, so a
+//   mislabelled section degrades into something usable rather than hiding.
 
 (function () {
   "use strict";
@@ -26,25 +32,29 @@
   if (document.getElementById("ft-toolkit")) return; // already mounted
 
   var HEIGHT = 52;
+  var STORE = "ft.toolkit.collapsed"; // remembered per browser, not per session
 
   var CSS = `
     :host { all: initial; }
     * { box-sizing: border-box; }
 
     /* --- Bar -------------------------------------------------------------
-       Glass over the page rather than a solid slab: the tool underneath stays
-       faintly visible, which keeps a fixed header from feeling like a lid.
-       The gradient hairline is the one loud element; everything else is quiet
-       so it stays readable over eleven differently-coloured tools. */
+       Dark glass over the page rather than a solid slab: the tool underneath
+       stays faintly visible, which keeps a fixed header from feeling like a
+       lid. The gradient hairline is the one loud element; everything else is
+       quiet so it stays readable over eleven differently-coloured tools. */
     .bar {
       position: fixed; top: 0; left: 0; right: 0; height: ${HEIGHT}px;
       display: flex; align-items: center; gap: 10px; padding: 0 14px;
-      background: var(--glass);
-      -webkit-backdrop-filter: saturate(180%) blur(16px);
-      backdrop-filter: saturate(180%) blur(16px);
+      background:
+        radial-gradient(120% 240% at 0% 0%, var(--tint-a), transparent 60%),
+        radial-gradient(120% 240% at 100% 0%, var(--tint-b), transparent 60%),
+        var(--glass);
+      -webkit-backdrop-filter: saturate(170%) blur(18px);
+      backdrop-filter: saturate(170%) blur(18px);
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       font-size: 14px; color: var(--text); z-index: 2147483000;
-      box-shadow: 0 1px 0 var(--line), 0 10px 30px -22px rgba(2,24,26,.55);
+      box-shadow: 0 1px 0 var(--line), 0 14px 34px -24px rgba(0,0,0,.9);
     }
     /* Luminous rule: brand gradient, fading out at both ends. */
     .bar::after {
@@ -64,8 +74,8 @@
                    display: block; }
     .brand img { width: 100%; height: 100%; border-radius: 7.5px; display: block;
                  background: var(--surface); }
-    .brand span { font-size: 14.5px;
-                  background: linear-gradient(92deg, var(--text) 30%, var(--g1));
+    .brand span.wordmark { font-size: 14.5px;
+                  background: linear-gradient(92deg, var(--text) 26%, var(--g2));
                   -webkit-background-clip: text; background-clip: text;
                   -webkit-text-fill-color: transparent; }
 
@@ -95,8 +105,8 @@
       box-shadow: 0 0 0 3px var(--ring-soft);
     }
     button.trigger:focus-visible, a.chip:focus-visible, .item:focus-visible,
-    .brand:focus-visible, .signout:focus-visible {
-      outline: 2px solid var(--g1); outline-offset: 2px;
+    .brand:focus-visible, .signout:focus-visible, .ghead:focus-visible {
+      outline: 2px solid var(--g2); outline-offset: 2px;
     }
 
     .caret { width: 8px; height: 8px; border-right: 2px solid currentColor;
@@ -106,23 +116,59 @@
     .avatar { width: 25px; height: 25px; border-radius: 50%; flex: none;
               display: grid; place-items: center; font-size: 10.5px; font-weight: 700;
               background: linear-gradient(135deg, var(--g2), var(--g3));
-              color: #fff; letter-spacing: .02em;
-              box-shadow: 0 1px 6px -1px var(--ring-soft); }
+              color: #04191c; letter-spacing: .02em;
+              box-shadow: 0 1px 8px -1px var(--ring-soft); }
 
     /* --- Popovers -------------------------------------------------------- */
     .pop {
-      position: fixed; top: ${HEIGHT + 8}px; background: var(--pop);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      backdrop-filter: saturate(180%) blur(20px);
-      border: 1px solid var(--line-strong); border-radius: 14px; padding: 8px;
-      box-shadow: 0 2px 4px rgba(2,24,26,.06), 0 18px 44px -12px rgba(2,24,26,.32);
-      z-index: 2147483001; min-width: 280px; max-height: calc(100vh - ${HEIGHT + 26}px);
+      position: fixed; top: ${HEIGHT + 8}px;
+      background:
+        radial-gradient(120% 70% at 0% 0%, var(--tint-a), transparent 62%),
+        radial-gradient(120% 70% at 100% 0%, var(--tint-b), transparent 62%),
+        var(--pop);
+      -webkit-backdrop-filter: saturate(170%) blur(22px);
+      backdrop-filter: saturate(170%) blur(22px);
+      border: 1px solid var(--line-strong); border-radius: 14px; padding: 6px;
+      box-shadow: 0 1px 0 var(--edge-hi) inset, 0 24px 56px -14px rgba(0,0,0,.75);
+      z-index: 2147483001; min-width: 300px; max-height: calc(100vh - ${HEIGHT + 26}px);
       overflow: auto; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--text);
     }
     .pop[hidden] { display: none; }
 
-    .sect { padding: 11px 10px 6px; font-size: 10px; font-weight: 700;
-            letter-spacing: .13em; text-transform: uppercase; color: var(--dim); }
+    /* --- Collapsible groups ---------------------------------------------- */
+    .group + .group { margin-top: 4px; }
+    .group { border-radius: 11px; }
+    .group.admin { background: var(--admin-wash); border: 1px solid var(--admin-line); }
+    .group.admin > .ghead { padding-top: 9px; }
+
+    .ghead {
+      display: flex; align-items: center; gap: 8px; width: 100%;
+      font: inherit; color: var(--dim); background: transparent; border: 0;
+      padding: 10px 10px 7px; border-radius: 10px; cursor: pointer; text-align: left;
+      transition: color .12s ease, background .12s ease;
+    }
+    .ghead:hover { color: var(--text); background: var(--hover); }
+    .gname { font-size: 10px; font-weight: 700; letter-spacing: .13em;
+             text-transform: uppercase; }
+    .group.admin .gname {
+      background: linear-gradient(92deg, var(--g2), var(--g3));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gcount { font-size: 10px; font-weight: 700; line-height: 1;
+              padding: 3px 6px; border-radius: 999px; color: var(--dim);
+              background: var(--chip); border: 1px solid var(--line); }
+    .grule { flex: 1 1 auto; height: 1px;
+             background: linear-gradient(90deg, var(--line-strong), transparent); }
+    .gcaret { width: 7px; height: 7px; flex: none; opacity: .6;
+              border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+              transform: rotate(45deg) translate(-1px,-1px);
+              transition: transform .18s ease; }
+    .ghead[aria-expanded="false"] .gcaret { transform: rotate(-45deg) translate(-1px,1px); }
+
+    .glist { padding: 0 2px 6px; }
+    .glist[hidden] { display: none; }
 
     .item { position: relative; display: block; text-decoration: none; color: var(--text);
             padding: 9px 10px 9px 12px; border-radius: 9px; line-height: 1.35;
@@ -150,7 +196,7 @@
     .who .e { font-size: 12.5px; color: var(--dim); word-break: break-all; margin-top: 1px; }
     .role { display: inline-block; margin-top: 8px; font-size: 9.5px; font-weight: 700;
             letter-spacing: .11em; text-transform: uppercase; padding: 3px 9px;
-            border-radius: 999px; color: #fff;
+            border-radius: 999px; color: #04191c;
             background: linear-gradient(135deg, var(--g2), var(--g3)); }
 
     .signout { display: block; width: 100%; text-align: left; font: inherit;
@@ -159,48 +205,44 @@
     .signout:hover { background: var(--danger-soft); }
 
     @media (max-width: 640px) {
-      .brand span, .here, .sep { display: none; }
+      .brand span.wordmark, .here, .sep { display: none; }
       .label-crm { display: none; }
       .pop { left: 8px !important; right: 8px; min-width: 0; }
     }
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
     /* --- Tokens ----------------------------------------------------------
-       Brand teal through to deep cyan. Defined light-first, redefined whole
-       for dark, so no colour is ever left resolving against the wrong ground. */
+       Brand teal through to deep cyan, on a near-black ground.
+
+       Pinned dark, deliberately. The header is chrome, not page content: it
+       reads as a distinct surface above whichever tool is underneath, the way
+       an app bar does. The tools themselves are light and stay that way, so
+       following the viewer's OS here would only make the chrome flicker
+       between matching and clashing for no gain. */
     :host {
-      --g1:#0F8F86; --g2:#17B8AC; --g3:#0B6B7A;
-      --glass: rgba(255,255,255,.82);
-      --pop: rgba(255,255,255,.92);
-      --surface:#fff; --chip: rgba(255,255,255,.6);
-      --line:#e4e9f0; --line-strong:#d3dbe5; --hover:#eef4f6;
-      --text:#0f1720; --mid:#46535f; --dim:#6b7986;
-      --accent-ink:#0b6b64; --accent-soft:#e4f4f2; --ring-soft: rgba(23,184,172,.18);
-      --warn:#8a5a05; --warn-soft:#fcf3e0; --warn-line:#e6d2a6;
-      --danger:#a8322a; --danger-soft:#fbeae8;
-      --rule-alpha:.75;
+      --g1:#2ED3C4; --g2:#3FE0CF; --g3:#1B8FA8;
+
+      --glass: rgba(7,17,21,.86);
+      --pop:   rgba(9,21,26,.94);
+      --tint-a: rgba(63,224,207,.10);
+      --tint-b: rgba(27,143,168,.14);
+      --edge-hi: rgba(255,255,255,.06);
+
+      --surface:#0b1418; --chip: rgba(255,255,255,.045);
+      --line: rgba(255,255,255,.08); --line-strong: rgba(255,255,255,.14);
+      --hover: rgba(255,255,255,.07);
+
+      --text:#e8f1f2; --mid:#a9bcc0; --dim:#7d9296;
+
+      --accent-ink:#7ef0e1; --accent-soft: rgba(63,224,207,.13);
+      --ring-soft: rgba(63,224,207,.20);
+      --admin-wash: rgba(27,143,168,.10);
+      --admin-line: rgba(63,224,207,.16);
+
+      --warn:#e8bd6f; --warn-soft: rgba(232,189,111,.12); --warn-line: rgba(232,189,111,.28);
+      --danger:#f39387; --danger-soft: rgba(243,147,135,.12);
+      --rule-alpha:1;
     }
-    /* Pinned light, deliberately.
-       This bar sits on top of eleven existing tools, and those tools have
-       their own fixed colours — mostly light. Following the viewer's OS would
-       put a dark glass header over a white page for anyone on a dark machine,
-       which reads as broken rather than as a theme.
-
-       To follow the OS again, wrap the dark values below in
-       @media (prefers-color-scheme: dark) and drop them back in — but only
-       once the tools themselves are theme-aware, or you get the mismatch.
-
-         --g1:#2ED3C4; --g2:#3FE0CF; --g3:#1B8FA8;
-         --glass: rgba(11,17,23,.74);  --pop: rgba(16,23,31,.92);
-         --surface:#0f151c;            --chip: rgba(255,255,255,.03);
-         --line:#1e2731; --line-strong:#2b3742; --hover:#18212a;
-         --text:#e6edf3; --mid:#a3b1bf; --dim:#7a8896;
-         --accent-ink:#6fe3d6; --accent-soft:rgba(46,211,196,.12);
-         --ring-soft: rgba(46,211,196,.16);
-         --warn:#e0b45f; --warn-soft:#2b2416; --warn-line:#584824;
-         --danger:#f08b80; --danger-soft:#331d1b;
-         --rule-alpha:1;
-    */
   `;
 
   function el(tag, attrs, kids) {
@@ -228,23 +270,76 @@
     return a === b;
   }
 
+  function isAdminish(s) { return /admin/i.test(s || ""); }
+
+  /* Collapsed groups persist per browser. Storage is a convenience, not a
+     dependency — a browser that refuses it just opens with the defaults. */
+  function readCollapsed() {
+    try { return JSON.parse(localStorage.getItem(STORE)) || {}; }
+    catch (e) { return {}; }
+  }
+  function writeCollapsed(map) {
+    try { localStorage.setItem(STORE, JSON.stringify(map)); } catch (e) {}
+  }
+
+  /**
+   * Two groups, in the order this person needs them.
+   *
+   * The API may hand back any number of sections; they collapse to Agents
+   * and Admins here so the menu shape does not drift when the registry is
+   * edited. An admin sees Admins first — that is the work they opened the
+   * menu for — with Agents underneath, still reachable.
+   */
+  function toGroups(data) {
+    var viewerIsAdmin = isAdminish(data.user && data.user.role);
+    var agents = [], admins = [];
+
+    (data.sections || []).forEach(function (s) {
+      (s.tools || []).forEach(function (t) {
+        // Prefer the tool's own role; fall back to the section it arrived in.
+        var adminOnly = isAdminish(t.role) || isAdminish(t.section) || isAdminish(s.name);
+        (adminOnly ? admins : agents).push(t);
+      });
+    });
+
+    var groups = [];
+    // Defence in depth: the API should already withhold these, but never
+    // render an admin group to someone who is not one.
+    if (admins.length && viewerIsAdmin) {
+      groups.push({ key: "admins", name: "Admins", admin: true, tools: admins });
+    }
+    if (agents.length) {
+      groups.push({ key: "agents", name: "Agents", admin: false, tools: agents });
+    }
+    return groups;
+  }
+
   function mount(data) {
     var host = el("div", { id: "ft-toolkit" });
     document.body.appendChild(host);
     var root = host.attachShadow({ mode: "open" });
     root.appendChild(el("style", { text: CSS }));
 
+    var groups = toGroups(data);
+
     // --- current tool name, for the bar ---
     var current = null;
-    (data.sections || []).forEach(function (s) {
-      s.tools.forEach(function (t) { if (isHere(t.href)) current = t; });
+    groups.forEach(function (g) {
+      g.tools.forEach(function (t) { if (isHere(t.href)) current = t; });
     });
 
     // --- tools popover ---
+    var collapsed = readCollapsed();
     var pop = el("div", { class: "pop", role: "menu", hidden: "" });
-    (data.sections || []).forEach(function (s) {
-      pop.appendChild(el("div", { class: "sect", text: s.name }));
-      s.tools.forEach(function (t) {
+
+    groups.forEach(function (g) {
+      var holdsCurrent = g.tools.some(function (t) { return isHere(t.href); });
+      // A group is open unless it was closed by hand — and the group holding
+      // the current page is always open, so you can see where you are.
+      var open = holdsCurrent || !collapsed[g.key];
+
+      var list = el("div", { class: "glist", role: "group" });
+      g.tools.forEach(function (t) {
         var title = el("div", { class: "t" }, [el("span", { text: t.label })]);
         if (t.wip) title.appendChild(el("span", { class: "tag", text: "WIP" }));
         var item = el("a", {
@@ -252,8 +347,29 @@
           "aria-current": isHere(t.href) ? "page" : null,
         }, [title]);
         if (t.blurb) item.appendChild(el("div", { class: "b", text: t.blurb }));
-        pop.appendChild(item);
+        list.appendChild(item);
       });
+      if (!open) list.hidden = true;
+
+      var head = el("button", {
+        class: "ghead", type: "button", "aria-expanded": open ? "true" : "false",
+      }, [
+        el("span", { class: "gname", text: g.name }),
+        el("span", { class: "gcount", text: String(g.tools.length) }),
+        el("span", { class: "grule" }),
+        el("span", { class: "gcaret" }),
+      ]);
+
+      head.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var nowOpen = list.hidden;
+        list.hidden = !nowOpen;
+        head.setAttribute("aria-expanded", nowOpen ? "true" : "false");
+        collapsed[g.key] = !nowOpen;
+        writeCollapsed(collapsed);
+      });
+
+      pop.appendChild(el("div", { class: "group" + (g.admin ? " admin" : "") }, [head, list]));
     });
 
     var toolsBtn = el("button", {
@@ -279,11 +395,11 @@
 
     // --- bar ---
     var bar = el("div", { class: "bar" }, [
-      // Brand always returns to "/" — the Deal Router, which is where
-      // signing in lands you too. One home, reachable from every tool.
-      el("a", { class: "brand", href: "/", title: "Funding Tier Tools \u2014 Deal Router" }, [
+      // Brand always returns to "/" — the Router, which is where signing in
+      // lands you too. One home, reachable from every tool.
+      el("a", { class: "brand", href: "/", title: "Funding Tier Tools — Router" }, [
         el("span", { class: "ring" }, [el("img", { src: "/apple-touch-icon.png", alt: "" })]),
-        el("span", { text: "Funding Tier Tools" }),
+        el("span", { class: "wordmark", text: "Funding Tier Tools" }),
       ]),
       el("div", { class: "sep" }),
       el("div", { class: "here", text: current ? current.label : "" }),

@@ -15,12 +15,13 @@
     { "source": "/admins/operating-model", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/operating-model" },
     { "source": "/profit-engine", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine" },
     { "source": "/profit-engine/:path*", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*" },
+    { "source": "/agents/commission-simulator", "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools/commission-simulator" },
     { "source": "/agent-tools", "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools" },
     { "source": "/agent-tools/:path*", "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools/:path*" }
   ],
   "headers": [
     {
-      "source": "/((?!profit-engine|agent-tools).*)",
+      "source": "/((?!profit-engine|agent-tools|agents/commission-simulator).*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
 { "key": "Content-Security-Policy", "value": "frame-ancestors 'self' https://app.gohighlevel.com https://*.gohighlevel.com https://*.leadconnectorhq.com https://*.msgsndr.com https://app.krestmarketing.com https://*.krestmarketing.com;" },        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
