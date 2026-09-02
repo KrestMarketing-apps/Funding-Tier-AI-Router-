@@ -55,6 +55,8 @@
     .htitl  { font-size: 13px; font-weight: 800; color: #fff; letter-spacing: -0.2px; line-height: 1.2; white-space: nowrap; }
     .hsub   { font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 1px; font-weight: 500; white-space: nowrap; }
     .hgrp   { display: flex; flex-direction: column; gap: 4px; min-width: 105px; }
+    .tnote  { font-weight: 600; letter-spacing: 0; text-transform: none; color: rgba(255,255,255,0.38); }
+    .tnote.at { color: #fbbf24; }
     .ilbl   { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.55); display: block; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
     .dual   { display: flex; flex-direction: column; gap: 4px; }
     .drow   { display: flex; align-items: center; gap: 4px; }
@@ -151,12 +153,12 @@
 
     <!-- Term -->
     <div class="hgrp">
-      <label class="ilbl">Term</label>
+      <label class="ilbl">Term <span class="tnote" id="termNote"></span></label>
       <div class="dual">
         <div class="drow"><div class="pwrap">
-          <input type="number" id="termField" class="hfld nopfx" min="1" max="48" step="1" value="22">
+          <input type="number" id="termField" class="hfld nopfx" min="1" max="60" step="1" value="22">
         </div><span class="sfx">mo</span></div>
-        <input type="range" id="termSlider" min="1" max="48" step="1" value="22">
+        <input type="range" id="termSlider" min="1" max="60" step="1" value="22">
       </div>
     </div>
 
@@ -418,6 +420,31 @@
 
   const PROC_FEE = 4; // per draft
 
+  // The client draft can never come in under $250/mo. That floor — not a fixed
+  // number of months — is what caps the term: a bigger service fee stretches
+  // over more months before the draft gets too small, a smaller one over fewer.
+  // 60 is simply the longest term offered; most deals cap out below it.
+  //
+  // Reference implementation: /agents/legacy-capital-program-calculator.
+  const MIN_PMT  = 250;
+  const TERM_MIN = 1, TERM_MAX = 60;
+
+  /**
+   * Longest term this deal can run before the draft falls under $250.
+   *
+   * grossPmt = debt x fee% / term + maint + proc, so the service fee has to
+   * cover whatever $250 is left after maintenance and draft fees. If those
+   * already clear $250 on their own, the floor cannot bind and the term is
+   * free to run the full 60.
+   */
+  function maxTermFor(debt, feeRate, maint, split){
+    const proc     = split ? PROC_FEE * 2 : PROC_FEE;
+    const headroom = MIN_PMT - maint - proc;
+    if(headroom <= 0) return TERM_MAX;
+    if(!debt || !feeRate) return TERM_MAX;
+    return clamp(Math.floor(debt * (feeRate / 100) / headroom), TERM_MIN, TERM_MAX);
+  }
+
   const fmt  = n => new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(n);
   const fmtD = n => new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
   const fmtK = n => n>=1000000?"$"+(n/1000000).toFixed(1)+"M":n>=1000?"$"+(n/1000).toFixed(0)+"K":fmt(n);
@@ -443,7 +470,7 @@
   }
   linkDual("debtField","debtSlider",6000,500000);
   linkDual("feeField","feeSlider",35,49);
-  linkDual("termField","termSlider",1,48);
+  linkDual("termField","termSlider",TERM_MIN,TERM_MAX);
   linkDual("filesField","filesSlider",1,500);
 
   // maintenance fee toggle
@@ -695,9 +722,27 @@
   function update(){
     const debt  = +document.getElementById("debtField").value  || 0;
     const fee   = +document.getElementById("feeField").value   || 0;
-    const term  = +document.getElementById("termField").value  || 0;
+    let   term  = +document.getElementById("termField").value  || 0;
     const files = +document.getElementById("filesField").value || 0;
     if(!debt||!fee||!term) return;
+
+    // Term ceiling for THIS deal. The slider's own max moves with it, so the
+    // control cannot express a term that breaks the $250 floor — and a term
+    // already typed in that breaks it is pulled back rather than left to
+    // produce a payout schedule for a program that could not be sold.
+    const mxTerm     = maxTermFor(debt, fee, maintFee, isSplit);
+    const termSlider = document.getElementById("termSlider");
+    const termField  = document.getElementById("termField");
+    termSlider.max = mxTerm;
+    if(term > mxTerm){ term = mxTerm; termField.value = mxTerm; termSlider.value = mxTerm; }
+    const termNote = document.getElementById("termNote");
+    if(termNote){
+      const atCap = term >= mxTerm;
+      termNote.className = "tnote" + (atCap ? " at" : "");
+      termNote.textContent = mxTerm >= TERM_MAX
+        ? `\u00b7 max ${TERM_MAX} mo`
+        : `\u00b7 max ${mxTerm} mo at $${MIN_PMT}/mo floor`;
+    }
 
     const payRate = files >= 100 ? 0.65 : 0.60;
 
@@ -751,7 +796,7 @@
     drawCompareChart("chart2", c1pts, R.upfront, R.beMonth, term);
 
     // ── Chart 3 ───────────────────────────────────────────
-    const projMonths = Math.min(term*2, 60);
+    const projMonths = Math.min(term * 2, Math.max(60, term + 12));
     const c3pts = [];
     let cumInflow = 0;
     for(let m=1;m<=projMonths;m++){
