@@ -9,6 +9,7 @@
     { "source": "/plan/:token", "destination": "/api/plan?token=:token" },
     { "source": "/agents/call-scripts", "destination": "/agents/call-scripts/index.html" },
     { "source": "/agents/debt-settlement/level-debt/forth/enrollment-process", "destination": "/agents/debt-settlement/level-debt/forth/enrollment-process/index.html" },
+    { "source": "/agents/commission-bonuses-spiffs", "destination": "/agents/commission-bonuses-spiffs.html" },
     { "source": "/credit-card-calculator", "destination": "/credit-card-calculator.html" },
     { "source": "/agents/legacy-capital-program-calculator", "destination": "/agents/legacy-capital-program-calculator.html" },
     { "source": "/admins/legacy-capital-billable-payout-simulator", "destination": "/admins/legacy-capital-billable-payout-simulator.html" },
@@ -16,13 +17,16 @@
     { "source": "/admins/operating-model", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/operating-model" },
     { "source": "/profit-engine", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine" },
     { "source": "/profit-engine/:path*", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*" },
-    { "source": "/agents/commission-simulator", "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools/commission-simulator" },
     { "source": "/agent-tools", "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools" },
     { "source": "/agent-tools/:path*", "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools/:path*" }
   ],
+  "redirects": [
+    { "source": "/agents/commission-simulator", "destination": "/agents/commission-bonuses-spiffs", "permanent": false },
+    { "source": "/agents/bonuses", "destination": "/agents/commission-bonuses-spiffs", "permanent": false }
+  ],
   "headers": [
     {
-      "source": "/((?!profit-engine|agent-tools|agents/commission-simulator).*)",
+      "source": "/((?!profit-engine|agent-tools).*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
 { "key": "Content-Security-Policy", "value": "frame-ancestors 'self' https://app.gohighlevel.com https://*.gohighlevel.com https://*.leadconnectorhq.com https://*.msgsndr.com https://app.krestmarketing.com https://*.krestmarketing.com;" },        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },

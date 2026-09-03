@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0f9d8a" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Funding Tier — Commission, Bonuses &amp; SPIFFs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ── Design tokens — matched to the Operating Model page (components/operatingModel/ui.tsx) ── */
+:root{
+  --brand:#0f9d8a; --brand-dark:#0b7d6e; --brand-deep:#0f766e;
+  --brand-soft:#e6f7f4; --brand-line:#99e5da;
+  --navy:#0f172a; --navy-mid:#0b3b50;
+  --ink:#0f172a; --body:#334155; --muted:#64748b; --faint:#94a3b8;
+  --line:#e2e8f0; --line-soft:#f1f5f9; --bg:#ffffff; --panel:#f8fafc; --shell:#f1f5f9;
+  --warn:#b45309; --warn-bg:#fffbeb; --warn-line:#fde68a;
+  --bad:#b91c1c; --bad-bg:#fef2f2; --good:#15803d; --good-bg:#f0fdf4;
+  /* categorical, colour-vision-checked (same set as Operating Model) */
+  --blue:#1a6ed8; --amber:#d97706; --purple:#7c3aed;
+
+  --radius:12px;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+
+  --g-header: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 45%, var(--brand-deep) 100%);
+  --g-brand: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+  --g-tile: linear-gradient(180deg, #ffffff 0%, #fbfdfd 100%);
+  --g-panel: linear-gradient(180deg, #ffffff 0%, #fcfdfd 100%);
+  --g-shell: linear-gradient(180deg, #f1f5f9 0%, #eef4f5 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--g-shell);color:var(--body);min-height:100vh;margin-top:52px;}
+
+/* ── Sticky product-tab header — top:52px clears the site-wide toolkit.js bar ── */
+.header-outer{position:sticky;top:52px;z-index:900;padding:10px 16px 0;}
+.header-inner-wrap{max-width:1180px;margin:0 auto;}
+.header{
+  background:var(--g-header);border-radius:14px 14px 0 0;padding:13px 18px 0;
+  box-shadow:0 10px 30px -12px rgba(15,23,42,.55);
+  border:1px solid rgba(255,255,255,.07);border-bottom:none;
+}
+.header-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
+.header img.logo{height:26px;width:auto;flex:0 0 auto;}
+.header-titles{display:flex;flex-direction:column;line-height:1.2;flex:1;min-width:150px;}
+.header-titles .title{font-weight:800;font-size:18px;color:#fff;letter-spacing:-.4px;}
+.header-titles .subtitle{font-size:10.5px;color:rgba(255,255,255,.55);font-weight:600;margin-top:2px;}
+.header-total{text-align:right;}
+.header-total .k{font-size:8.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.header-total .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);margin-top:1px;}
+
+.tabgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
+.tabbtn{
+  padding:11px 6px;border:none;cursor:pointer;font-weight:800;font-size:12.5px;
+  letter-spacing:-.1px;border-radius:9px 9px 0 0;font-family:var(--sans);
+  background:transparent;color:rgba(255,255,255,.65);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;position:relative;
+}
+.tabbtn.active{background:var(--bg);color:var(--ink);}
+.tabbtn .bar{position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px 3px 0 0;}
+.tabbtn[data-tab="ld"] .bar{background:var(--brand);}
+.tabbtn[data-tab="cs"] .bar{background:var(--blue);}
+.tabbtn[data-tab="lc"] .bar{background:var(--purple);}
+.tabbtn[data-tab="bonus"] .bar{background:var(--amber);}
+
+.shell{max-width:1180px;margin:0 auto;padding:0 16px 60px;}
+.tabpanel{display:none;padding-top:16px;}
+.tabpanel.active{display:block;}
+.tabpanel-inner{display:grid;gap:14px;}
+
+/* ── Panel — matches Operating Model's Panel component exactly ── */
+.panel{
+  border:1px solid var(--line);border-radius:var(--radius);background:var(--g-panel);
+  overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,.04), 0 8px 24px -18px rgba(15,23,42,.28);
+}
+.panel-accent{height:3px;background:linear-gradient(90deg, var(--accent,var(--brand)) 0%, rgba(15,157,138,0) 78%);}
+.panel-hd{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line-soft);}
+.panel-hd .titles{flex:1;min-width:0;}
+.panel-title{display:flex;align-items:center;gap:9px;font-size:14.5px;font-weight:800;color:var(--ink);}
+.panel-title img{height:19px;width:auto;object-fit:contain;}
+.panel-subtitle{font-size:11.5px;color:var(--muted);margin-top:2px;font-weight:500;}
+.panel-badge{
+  display:inline-flex;align-items:center;border-radius:999px;padding:5px 10px;font-size:11px;
+  font-weight:800;white-space:nowrap;
+}
+.panel-body{padding:16px;}
+
+.callout{border-radius:10px;padding:11px 14px;font-size:12.5px;line-height:1.65;font-weight:500;}
+.callout.route{background:var(--line-soft);border:1px solid var(--line);color:var(--body);}
+.callout.warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn);}
+.callout.bad{background:var(--bad-bg);border:1px solid rgba(185,28,28,.25);color:var(--bad);}
+.callout.good{background:var(--good-bg);border:1px solid rgba(21,128,61,.25);color:var(--good);}
+.callout strong{font-weight:800;}
+
+label.field-label{
+  display:block;font-size:9.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--muted);margin-bottom:6px;
+}
+.field-sub{font-size:11px;color:var(--faint);margin-top:4px;font-weight:500;}
+input[type=number], select{
+  width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+  font-size:15px;font-weight:700;font-family:var(--mono);font-variant-numeric:tabular-nums;
+  color:var(--ink);outline:none;background:var(--bg);
+}
+input[type=number]:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(15,157,138,.12);}
+input[type=range]{width:100%;accent-color:var(--accent,var(--brand));}
+.range-val{text-align:center;font-weight:800;font-size:15px;color:var(--accent,var(--brand));margin-top:4px;font-family:var(--mono);}
+
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:640px){.input-grid{grid-template-columns:1fr;}}
+
+.tier-picker{display:flex;gap:4px;margin-top:6px;}
+.tier-picker button{
+  flex:1;padding:8px 4px;border-radius:8px;border:1px solid var(--line);background:var(--bg);
+  cursor:pointer;font-weight:800;font-size:12px;color:var(--faint);font-family:var(--sans);
+}
+.tier-picker button.active{border:2px solid var(--brand);background:rgba(15,157,138,.1);color:var(--brand-dark);}
+
+/* ── Stat tiles — matches Operating Model's Stat component ── */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;}
+@media(max-width:640px){.metrics{grid-template-columns:1fr;}}
+.stat{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:var(--g-tile);}
+.stat.big{grid-column:span 1;}
+.stat-lbl{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+.stat-val{font-size:22px;font-weight:800;font-family:var(--mono);letter-spacing:-.5px;color:var(--ink);margin-top:5px;}
+.stat-val.accent{color:var(--accent,var(--brand));}
+.stat-sub{font-size:10.5px;color:var(--faint);margin-top:3px;font-weight:500;}
+
+.big-result{
+  background:var(--g-header);color:#fff;border-radius:var(--radius);padding:18px 20px;
+  display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.big-result .k{font-size:9px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.55);}
+.big-result .v{font-size:clamp(26px,4vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1;font-family:var(--mono);margin-top:4px;}
+.big-result .sub{font-size:12.5px;color:rgba(255,255,255,.75);margin-top:6px;font-weight:500;max-width:520px;}
+
+.progress-track{height:11px;background:var(--line);border-radius:99px;overflow:hidden;position:relative;margin:8px 0;}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent,var(--brand)),var(--brand-dark));transition:width .3s;}
+.progress-labels{display:flex;justify-content:space-between;font-size:10.5px;font-weight:700;color:var(--faint);}
+.progress-labels .hit{color:var(--accent,var(--brand));}
+
+/* ── Table — matches Operating Model's th/td tokens exactly ── */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+th{
+  text-align:left;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;
+  background:linear-gradient(180deg,#f8fafc 0%,#f1f5f9 100%);
+}
+td{padding:9px 12px;color:var(--body);border-bottom:1px solid var(--line-soft);white-space:nowrap;}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;}
+tr.active-row td{background:rgba(15,157,138,.07);}
+tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand));}
+.row-tag{display:inline-block;font-size:9.5px;font-weight:800;background:var(--brand);color:#fff;padding:2px 7px;border-radius:99px;margin-left:6px;}
+.dim{color:var(--faint);}
+.good-txt{color:var(--good);font-weight:800;}
+.bad-txt{color:var(--bad);font-weight:800;}
+
+/* ── Policy accordion ── */
+.accordion{border-top:1px solid var(--line-soft);}
+.accordion-hd{
+  display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;
+  font-weight:700;font-size:13px;color:var(--ink);
+}
+.accordion-hd .chev{transition:transform .2s;color:var(--muted);font-size:12px;}
+.accordion.open .accordion-hd .chev{transform:rotate(180deg);}
+.accordion-body{display:none;padding:0 16px 16px;}
+.accordion.open .accordion-body{display:block;}
+.policy-h{font-size:12.5px;font-weight:800;color:var(--ink);margin:14px 0 6px;}
+.policy-h:first-child{margin-top:0;}
+.policy-p{font-size:13px;color:var(--body);line-height:1.65;margin-bottom:4px;}
+
+.footer-note{font-size:11px;color:var(--muted);line-height:1.6;font-weight:500;text-align:center;padding:20px 0 4px;}
+
+.tip{position:relative;display:inline-flex;margin-left:5px;}
+.tip>a{
+  width:14px;height:14px;min-width:14px;border-radius:50%;
+  background:var(--brand-soft);border:1px solid var(--brand-line);color:var(--brand-dark);
+  font-size:9.5px;line-height:12px;text-align:center;cursor:help;
+  display:inline-flex;align-items:center;justify-content:center;font-weight:800;
+  text-decoration:none;font-family:var(--sans);
+}
+.tip>a::before{content:"?";}
+.tip .tip-box{
+  visibility:hidden;opacity:0;position:absolute;bottom:calc(100% + 9px);left:0;
+  background:var(--navy);color:#fff;border-radius:10px;padding:10px 12px;width:280px;
+  white-space:normal;line-height:1.6;font-size:12px;font-weight:400;font-family:var(--sans);
+  z-index:50;box-shadow:0 14px 38px rgba(15,23,42,.32);border:1px solid rgba(255,255,255,.08);
+  transition:opacity .15s;
+}
+.tip:hover .tip-box{visibility:visible;opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="header-outer">
+  <div class="header-inner-wrap">
+    <div class="header">
+      <div class="header-top">
+        <img class="logo" src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" alt="Funding Tier" onerror="this.style.display='none'"/>
+        <div class="header-titles">
+          <span class="title">Commission, Bonuses &amp; SPIFFs</span>
+          <span class="subtitle">Every product's payout math, plus everything that stacks on top</span>
+        </div>
+        <div class="header-total">
+          <div class="k">This Tab's Estimate</div>
+          <div class="v" id="headerEstimate">$0</div>
+        </div>
+      </div>
+      <div class="tabgrid">
+        <button class="tabbtn active" data-tab="ld" onclick="showTab('ld')">Level Debt<span class="bar"></span></button>
+        <button class="tabbtn" data-tab="cs" onclick="showTab('cs')">Debt Validation<span class="bar"></span></button>
+        <button class="tabbtn" data-tab="lc" onclick="showTab('lc')">Debt Resolution<span class="bar"></span></button>
+        <button class="tabbtn" data-tab="bonus" onclick="showTab('bonus')">Bonuses &amp; SPIFFs<span class="bar"></span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="shell">
+
+  <!-- ============ LEVEL DEBT TAB ============ -->
+  <div class="tabpanel active" id="tab-ld">
+    <div class="tabpanel-inner">
+    <div class="panel" style="--accent:var(--brand)">
+      <div class="panel-accent"></div>
+      <div class="panel-hd">
+        <div class="titles">
+          <div class="panel-title">Level Debt — Monthly Commission</div>
+          <div class="panel-subtitle">Debt settlement · paid as a % of enrolled debt, tiered by your monthly volume</div>
+        </div>
+        <span class="panel-badge" style="background:rgba(15,157,138,.1);color:var(--brand-dark);border:1px solid rgba(15,157,138,.25);">$7,000 min per deal</span>
+      </div>
+      <div class="panel-body">
+        <div class="callout route" style="margin-bottom:16px;">
+          <strong>Deal routing:</strong> Level Debt requires <strong>$7,000+</strong> enrolled debt. Deals <strong>$6,000–$6,999</strong> → evaluate for Debt Resolution or Debt Validation. Deals <strong>$4,000–$5,999</strong> → Debt Validation only.
+        </div>
+
+        <div class="input-grid">
+          <div>
+            <label class="field-label">Enrolled Debt Already This Month</label>
+            <input id="ldMonthVol" type="number" min="0" step="5000" value="850000">
+            <div class="field-sub">Total Level Debt volume already enrolled this month, before this new deal</div>
+          </div>
+          <div>
+            <label class="field-label">New Deal — Enrolled Debt</label>
+            <input id="ldNewDeal" type="number" min="0" step="500" value="20000">
+            <div class="field-sub">The enrolled debt on the deal you're about to close</div>
+          </div>
+        </div>
+        <div id="ldWarning"></div>
+
+        <label class="field-label">Your Commission Tier</label>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-bottom:16px;">
+          <div id="ldTierBefore" style="border-radius:12px;padding:13px 14px;text-align:center;background:var(--panel);border:1px solid var(--line);">
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">Before This Deal</div>
+            <div class="ld-rate" style="font-size:26px;font-weight:800;font-family:var(--mono);">—</div>
+            <div class="ld-label" style="font-size:12px;font-weight:700;color:var(--muted);margin-top:3px;">—</div>
+          </div>
+          <div id="ldArrow" style="font-size:22px;color:var(--faint);">→</div>
+          <div id="ldTierAfter" style="border-radius:12px;padding:13px 14px;text-align:center;background:var(--brand-soft);border:2px solid var(--brand);">
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">After This Deal</div>
+            <div class="ld-rate" style="font-size:26px;font-weight:800;font-family:var(--mono);color:var(--brand-dark);">—</div>
+            <div class="ld-label" style="font-size:12px;font-weight:700;color:var(--muted);margin-top:3px;">—</div>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <div class="stat" style="--accent:var(--blue)"><div class="stat-lbl">Commission — This Deal</div><div class="stat-val accent" id="ldDealComm">—</div><div class="stat-sub" id="ldDealSub">—</div></div>
+          <div class="stat" id="ldTierBonusCard"><div class="stat-lbl">Monthly Commission Total</div><div class="stat-val" id="ldMonthTotal">—</div><div class="stat-sub" id="ldMonthSub">—</div></div>
+          <div class="stat" style="--accent:var(--brand-dark)"><div class="stat-lbl">Net Gain From This Deal</div><div class="stat-val accent" id="ldNetGain">—</div><div class="stat-sub">deal commission + any tier upgrade</div></div>
+        </div>
+
+        <div id="ldTierUpBanner"></div>
+        <div id="ldProgressBanner"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hd"><div class="titles"><div class="panel-title">All Tier Scenarios — Based on Your Monthly Total</div></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Tier</th><th>Monthly Volume Needed</th><th>Rate</th><th>Commission on This Deal</th><th>Total Monthly Commission</th></tr></thead>
+        <tbody id="ldTierTable"></tbody>
+      </table></div>
+    </div>
+
+    <div class="panel">
+      <div class="accordion" id="ldAccordion">
+        <div class="accordion-hd" onclick="toggleAccordion('ldAccordion')">
+          <span>Level Debt — Full Commission Policy</span><span class="chev">▾</span>
+        </div>
+        <div class="accordion-body">
+          <div class="policy-h">What is debt settlement?</div>
+          <p class="policy-p">Level Debt is Funding Tier's debt settlement partner. The client makes monthly payments into a dedicated account while Level Debt negotiates and settles their unsecured debts with creditors over time.</p>
+          <div class="policy-h">Commission rate</div>
+          <p class="policy-p">Paid as a percentage of the client's <strong>total cleared enrolled debt</strong>, at the tier your <strong>monthly enrolled volume</strong> reaches. Example on a $25,000 deal: Tier 1 = $250, Tier 2 = $287.50, Tier 3 = $325.</p>
+          <div class="policy-h">When you get paid</div>
+          <p class="policy-p">After the client completes <strong>2 monthly program payments</strong>, commission is paid on the <strong>20th of the following month</strong>.</p>
+          <div class="policy-h">Chargebacks and clawbacks</div>
+          <p class="policy-p">A client must complete <strong>3 program payments</strong> to be fully outside the chargeback window. Cancel after 2 payments → possible clawback. NSF on any payment → possible clawback. 3+ payments or full program completion → no clawback.</p>
+          <div class="policy-h">Commission modifications</div>
+          <p class="policy-p">Funding Tier reserves the right to modify commission structures at its sole discretion at any time. Material changes will be communicated.</p>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- ============ DEBT VALIDATION (Consumer Shield) TAB ============ -->
+  <div class="tabpanel" id="tab-cs">
+    <div class="tabpanel-inner">
+    <div class="panel" style="--accent:var(--blue)">
+      <div class="panel-accent"></div>
+      <div class="panel-hd">
+        <div class="titles">
+          <div class="panel-title">Debt Validation — Consumer Shield</div>
+          <div class="panel-subtitle">Flat commission by program, split across Payment 2 and Payment 4</div>
+        </div>
+        <span class="panel-badge" style="background:rgba(26,110,216,.1);color:var(--blue);border:1px solid rgba(26,110,216,.25);">$4,000 min</span>
+      </div>
+      <div class="panel-body">
+        <div class="callout route" style="margin-bottom:16px;">
+          <strong>Deal routing:</strong> Consumer Shield accepts <strong>$4,000+</strong>. Deals <strong>$4,000–$5,999</strong> → Consumer Shield only. Deals <strong>$6,000–$6,999</strong> → Consumer Shield or Debt Resolution (both pay the same $150). Deals <strong>$7,000+</strong> → any product.
+        </div>
+
+        <label class="field-label">Total Enrolled Debt ($)</label>
+        <input id="csDebt" type="number" min="0" step="500" value="20000" style="margin-bottom:16px;">
+        <div id="csWarning"></div>
+        <div id="csResult"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hd"><div class="titles"><div class="panel-title">Full Commission Schedule — Debt Validation</div></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Program</th><th>Debt Range</th><th>At Payment 2</th><th>At Payment 4</th><th>Total Commission</th></tr></thead>
+        <tbody id="csTable"></tbody>
+      </table></div>
+      <div class="footer-note" style="text-align:left;padding:10px 16px;">* Programs A, B, C: $150 guaranteed minimum paid in full at Payment 2. No split, no clawback.</div>
+    </div>
+
+    <div class="panel">
+      <div class="accordion" id="csAccordion">
+        <div class="accordion-hd" onclick="toggleAccordion('csAccordion')">
+          <span>Debt Validation — Full Commission Policy</span><span class="chev">▾</span>
+        </div>
+        <div class="accordion-body">
+          <div class="policy-h">What is debt validation?</div>
+          <p class="policy-p">Consumer Shield is Funding Tier's debt validation partner. Debt validation is a legal process where a client's debts are formally challenged and creditors must prove the debt is valid — distinct from debt settlement, which focuses on negotiating a payoff.</p>
+          <div class="policy-h">When you get paid</div>
+          <p class="policy-p"><strong>Payment 2 payout:</strong> the 20th of Month 3. <strong>Payment 4 payout</strong> (Programs D–I only): the 20th of Month 5.</p>
+          <div class="policy-h">Chargebacks and clawbacks</div>
+          <p class="policy-p"><strong>Programs D–I:</strong> if the client cancels before Payment 4 clears, the Payment 2 commission is subject to clawback within 60 days of cancellation. <strong>Programs A, B, C:</strong> not subject to clawback — single $150 payment triggers at Payment 2 only.</p>
+          <div class="policy-h">Bonuses that apply</div>
+          <p class="policy-p">Debt Validation deals pool together with Debt Resolution deals toward the Daily Hustle and Monthly Volume bonuses, and count toward the Balanced Book Bonus mix. See the Bonuses &amp; SPIFFs tab.</p>
+          <div class="policy-h">Commission modifications</div>
+          <p class="policy-p">Funding Tier reserves the right to modify commission rates at its sole discretion at any time. Material changes will be communicated.</p>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- ============ DEBT RESOLUTION (Legacy Capital) TAB ============ -->
+  <div class="tabpanel" id="tab-lc">
+    <div class="tabpanel-inner">
+    <div class="panel" style="--accent:var(--purple)">
+      <div class="panel-accent"></div>
+      <div class="panel-hd">
+        <div class="titles">
+          <div class="panel-title">Debt Resolution — Legacy Capital / Elite Legal</div>
+          <div class="panel-subtitle">Flat commission by band, split across Payment 2 and Payment 4</div>
+        </div>
+        <span class="panel-badge" style="background:rgba(124,58,237,.1);color:var(--purple);border:1px solid rgba(124,58,237,.25);">$6,000 min</span>
+      </div>
+      <div class="panel-body">
+        <div class="callout route" style="margin-bottom:16px;">
+          <strong>Deal routing:</strong> Debt Resolution accepts <strong>$6,000+</strong>. Deals <strong>$6,000–$9,999</strong> → Debt Resolution or Debt Validation (both pay $150). Deals <strong>$7,000+</strong> → any product.
+          <strong>Blocked in ID, ND, GA</strong> — route those states to Debt Validation instead.
+        </div>
+
+        <label class="field-label">Total Enrolled Debt ($)</label>
+        <input id="lcDebt" type="number" min="0" step="500" value="20000" style="margin-bottom:8px;">
+        <div style="margin-bottom:16px;">
+          <label class="field-label" style="margin-top:10px;">Client State</label>
+          <select id="lcState" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;font-weight:600;color:var(--ink);background:var(--bg);font-family:var(--sans);">
+            <option value="">— Select if checking blocked-state eligibility —</option>
+            <option>ID — Idaho (blocked)</option>
+            <option>ND — North Dakota (blocked)</option>
+            <option>GA — Georgia (blocked)</option>
+            <option value="other">Any other state</option>
+          </select>
+        </div>
+        <div id="lcWarning"></div>
+        <div id="lcResult"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hd"><div class="titles"><div class="panel-title">Full Commission Schedule — Debt Resolution</div></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Band</th><th>Debt Range</th><th>At Payment 2</th><th>At Payment 4</th><th>Total Commission</th></tr></thead>
+        <tbody id="lcTable"></tbody>
+      </table></div>
+      <div class="footer-note" style="text-align:left;padding:10px 16px;">* Band L1: $150 guaranteed minimum paid in full at Payment 2. No split, no clawback.</div>
+    </div>
+
+    <div class="panel">
+      <div class="accordion" id="lcAccordion">
+        <div class="accordion-hd" onclick="toggleAccordion('lcAccordion')">
+          <span>Debt Resolution — Full Commission Policy</span><span class="chev">▾</span>
+        </div>
+        <div class="accordion-body">
+          <div class="policy-h">What is debt resolution?</div>
+          <p class="policy-p">Legacy Capital Services / Elite Legal Practice is Funding Tier's attorney-model debt resolution partner — an alternative path for clients whose debt is too small for Level Debt but who still need professional negotiation.</p>
+          <div class="policy-h">When you get paid</div>
+          <p class="policy-p"><strong>Payment 2 payout:</strong> the 20th of Month 3. <strong>Payment 4 payout</strong> (Bands L2–L7 only): the 20th of Month 5.</p>
+          <div class="policy-h">Chargebacks and clawbacks</div>
+          <p class="policy-p"><strong>Bands L2–L7:</strong> Payment 2 commission may be clawed back if the client cancels before Payment 4 clears. <strong>Band L1:</strong> single payout after Payment 2 clears — no clawback.</p>
+          <div class="policy-h">State eligibility</div>
+          <p class="policy-p">Legacy Capital Services is currently <strong>blocked in Idaho, North Dakota, and Georgia</strong>. Route clients in those states to Debt Validation instead.</p>
+          <div class="policy-h">Bonuses that apply</div>
+          <p class="policy-p">Debt Resolution deals pool together with Debt Validation deals toward the Daily Hustle and Monthly Volume bonuses, and count toward the Balanced Book Bonus mix. See the Bonuses &amp; SPIFFs tab.</p>
+          <div class="policy-h">Commission modifications</div>
+          <p class="policy-p">Funding Tier reserves the right to modify commission rates at its sole discretion at any time. Material changes will be communicated.</p>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- ============ BONUSES & SPIFFS TAB ============ -->
+  <div class="tabpanel" id="tab-bonus">
+    <div class="tabpanel-inner">
+
+    <div class="callout warn">
+      Shield Services (Debt Validation) and Elite Legal Practice (Debt Resolution) deals <strong>pool together</strong> for every bonus below — Level Debt is tracked separately. All bonus payouts are provisional until the related files clear the clawback and chargeback windows.
+    </div>
+
+    <div class="panel" style="--accent:var(--amber)">
+      <div class="panel-accent"></div>
+      <div class="panel-hd">
+        <div class="titles">
+          <div class="panel-title">Daily Hustle Bonus</div>
+          <div class="panel-subtitle">Combined Debt Validation + Debt Resolution deals, per calendar day</div>
+        </div>
+        <span class="panel-badge" style="background:rgba(217,119,6,.1);color:var(--amber);border:1px solid rgba(217,119,6,.25);">Daily · resets at midnight</span>
+      </div>
+      <div class="panel-body">
+        <p class="policy-p" style="margin-bottom:14px;">Close any combination that totals 3 or more in one day, and <strong>every</strong> deal closed that day — Validation and Resolution alike — earns the per-deal bonus on top of base commission.</p>
+        <div class="input-grid">
+          <div style="background:rgba(26,110,216,.05);border:1px solid rgba(26,110,216,.15);border-radius:10px;padding:12px;">
+            <label class="field-label">Debt Validation Deals Today</label>
+            <input type="range" id="dhCs" min="0" max="10" step="1" value="3" style="--accent:var(--blue)" oninput="calcDailyHustle()">
+            <div class="range-val" style="--accent:var(--blue)" id="dhCsVal">3</div>
+          </div>
+          <div style="background:rgba(124,58,237,.05);border:1px solid rgba(124,58,237,.15);border-radius:10px;padding:12px;">
+            <label class="field-label">Debt Resolution Deals Today</label>
+            <input type="range" id="dhLc" min="0" max="10" step="1" value="2" style="--accent:var(--purple)" oninput="calcDailyHustle()">
+            <div class="range-val" style="--accent:var(--purple)" id="dhLcVal">2</div>
+          </div>
+        </div>
+        <div id="dhResult"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="--accent:var(--brand)">
+      <div class="panel-accent"></div>
+      <div class="panel-hd">
+        <div class="titles">
+          <div class="panel-title">Monthly Volume Bonus</div>
+          <div class="panel-subtitle">Combined Debt Validation + Debt Resolution deals with Payment 2 cleared, per calendar month</div>
+        </div>
+        <span class="panel-badge" style="background:rgba(15,157,138,.1);color:var(--brand-dark);border:1px solid rgba(15,157,138,.25);">Monthly</span>
+      </div>
+      <div class="panel-body">
+        <div class="input-grid">
+          <div style="background:rgba(26,110,216,.05);border:1px solid rgba(26,110,216,.15);border-radius:10px;padding:12px;">
+            <label class="field-label">Debt Validation (P2 cleared)</label>
+            <input type="range" id="mvCs" min="0" max="40" step="1" value="12" style="--accent:var(--blue)" oninput="calcMonthlyVolume()">
+            <div class="range-val" style="--accent:var(--blue)" id="mvCsVal">12 deals</div>
+          </div>
+          <div style="background:rgba(124,58,237,.05);border:1px solid rgba(124,58,237,.15);border-radius:10px;padding:12px;">
+            <label class="field-label">Debt Resolution (P2 cleared)</label>
+            <input type="range" id="mvLc" min="0" max="40" step="1" value="8" style="--accent:var(--purple)" oninput="calcMonthlyVolume()">
+            <div class="range-val" style="--accent:var(--purple)" id="mvLcVal">8 deals</div>
+          </div>
+        </div>
+        <div id="mvResult"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="--accent:var(--purple)">
+      <div class="panel-accent"></div>
+      <div class="panel-hd">
+        <div class="titles">
+          <div class="panel-title">Balanced Book Bonus</div>
+          <div class="panel-subtitle">Rewards keeping a healthy Level Debt floor alongside your Validation/Resolution volume</div>
+        </div>
+        <span class="panel-badge" style="background:rgba(124,58,237,.1);color:var(--purple);border:1px solid rgba(124,58,237,.25);">Monthly · min 5 deals</span>
+      </div>
+      <div class="panel-body">
+        <div class="input-grid">
+          <div>
+            <label class="field-label">Total Deals This Month (all products)</label>
+            <input type="number" id="bbTotal" min="0" step="1" value="20" oninput="calcBalancedBook()">
+          </div>
+          <div>
+            <label class="field-label">Validation + Resolution Mix (%)</label>
+            <input type="range" id="bbPct" min="0" max="100" step="5" value="45" style="--accent:var(--purple)" oninput="calcBalancedBook()">
+            <div class="range-val" style="--accent:var(--purple)" id="bbPctVal">45%</div>
+          </div>
+        </div>
+        <div id="bbResult"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="--accent:var(--brand)">
+      <div class="panel-accent"></div>
+      <div class="panel-hd">
+        <div class="titles">
+          <div class="panel-title">Level Debt Enrollment Bonus</div>
+          <div class="panel-subtitle">Level Debt's own daily enrolled-volume bonus — separate from the pooled bonuses above</div>
+        </div>
+        <span class="panel-badge" style="background:rgba(15,157,138,.1);color:var(--brand-dark);border:1px solid rgba(15,157,138,.25);">Daily</span>
+      </div>
+      <div class="panel-body">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Daily Enrolled Volume</th><th>Applies To</th><th>Bonus</th></tr></thead>
+          <tbody>
+            <tr><td>$75,000+ enrolled in one day</td><td>Level Debt</td><td class="num good-txt">+$75</td></tr>
+            <tr><td>$100,000+ enrolled in one day</td><td>Level Debt</td><td class="num good-txt">+$125</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="accordion open" id="bonusAccordion">
+        <div class="accordion-hd" onclick="toggleAccordion('bonusAccordion')">
+          <span>Bonus Policy &amp; Accounting Controls</span><span class="chev">▾</span>
+        </div>
+        <div class="accordion-body">
+          <p class="policy-p"><strong>All bonus payouts are subject to Funding Tier clawback and chargeback policy.</strong></p>
+          <p class="policy-p">• Daily, monthly, balanced-book, and Level Debt enrollment bonuses are all subject to review before payout.</p>
+          <p class="policy-p">• Chargeback liability is enforced daily — any open risk period can delay or reverse a bonus payout.</p>
+          <p class="policy-p">• Accounting treats bonus amounts as provisional until the related files fully clear the applicable clawback and chargeback windows.</p>
+          <p class="policy-p">• This policy applies uniformly to avoid reconciliation issues, overpayment errors, and incorrect bonus accruals.</p>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <p class="footer-note">Internal agent reference. Commission rates, bonus thresholds, and payout timing are subject to change at Funding Tier's discretion. Confirm current figures with your team lead before quoting earnings to a client.</p>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// Funding Tier — Commission, Bonuses & SPIFFs
+// All figures below are copied verbatim from the backend source of truth:
+//   src/config/backends/levelDebt/agentcommission.js
+//   src/config/backends/legacy/agentcommission.js          (Debt Resolution)
+//   src/config/backends/consumerShield/agentcommission.js  (Debt Validation)
+// and cross-checked against the existing commission simulator component.
+// ═══════════════════════════════════════════════════════════════════════
+
+function fmt(n){ return (n<0?'-':'') + '$' + Math.abs(Math.round(n)).toLocaleString('en-US'); }
+function fmt2(n){ return (n<0?'-':'') + '$' + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+// ── Level Debt: tiered % of monthly enrolled volume ──
+const LD_TIERS = [
+  {id:1, min:0,        max:999999,   rate:0.0100, label:'Tier 1', rateLabel:'1.00%', range:'$0 – $999,999'},
+  {id:2, min:1000000,  max:1999999,  rate:0.0115, label:'Tier 2', rateLabel:'1.15%', range:'$1,000,000 – $1,999,999'},
+  {id:3, min:2000000,  max:Infinity, rate:0.0130, label:'Tier 3', rateLabel:'1.30%', range:'$2,000,000+'},
+];
+function ldTierFor(vol){ return LD_TIERS.find(t=>vol>=t.min && vol<=t.max) || LD_TIERS[0]; }
+
+// ── Debt Validation (Consumer Shield): flat $ by program ──
+const CS_PROGS = [
+  {code:'A', range:'$4,000 – $4,999',   min:4000,  max:4999,     total:150, p2:150, p4:0},
+  {code:'B', range:'$5,000 – $8,799',   min:5000,  max:8799,     total:150, p2:150, p4:0},
+  {code:'C', range:'$8,800 – $9,999',   min:8800,  max:9999,     total:150, p2:150, p4:0},
+  {code:'D', range:'$10,000 – $14,999', min:10000, max:14999,    total:225, p2:175, p4:50},
+  {code:'E', range:'$15,000 – $19,999', min:15000, max:19999,    total:275, p2:200, p4:75},
+  {code:'F', range:'$20,000 – $24,999', min:20000, max:24999,    total:350, p2:250, p4:100},
+  {code:'G', range:'$25,000 – $29,999', min:25000, max:29999,    total:400, p2:300, p4:100},
+  {code:'H', range:'$30,000 – $49,999', min:30000, max:49999,    total:500, p2:375, p4:125},
+  {code:'I', range:'$50,000+',          min:50000, max:Infinity, total:600, p2:450, p4:150},
+];
+function csProgFor(debt){ return CS_PROGS.find(p=>debt>=p.min && debt<=p.max) || null; }
+
+// ── Debt Resolution (Legacy Capital / Elite Legal): flat $ by band ──
+const LC_BANDS = [
+  {code:'L1', range:'$6,000 – $9,999',   min:6000,  max:9999,     total:150, p2:150, p4:0},
+  {code:'L2', range:'$10,000 – $14,999', min:10000, max:14999,    total:225, p2:175, p4:50},
+  {code:'L3', range:'$15,000 – $19,999', min:15000, max:19999,    total:275, p2:200, p4:75},
+  {code:'L4', range:'$20,000 – $24,999', min:20000, max:24999,    total:350, p2:250, p4:100},
+  {code:'L5', range:'$25,000 – $29,999', min:25000, max:29999,    total:400, p2:300, p4:100},
+  {code:'L6', range:'$30,000 – $49,999', min:30000, max:49999,    total:500, p2:375, p4:125},
+  {code:'L7', range:'$50,000+',          min:50000, max:Infinity, total:600, p2:450, p4:150},
+];
+const LC_BLOCKED = ['ID — Idaho (blocked)','ND — North Dakota (blocked)','GA — Georgia (blocked)'];
+function lcBandFor(debt){ return LC_BANDS.find(b=>debt>=b.min && debt<=b.max) || null; }
+
+// ── Combined pooled bonuses (Debt Validation + Debt Resolution) ──
+function dailySpiffPerDeal(combined){ if(combined>=5) return 75; if(combined>=3) return 50; return 0; }
+const MONTHLY_TIERS = [
+  {min:8,  max:11, label:'8–11',  bonus:300},
+  {min:12, max:16, label:'12–16', bonus:600},
+  {min:17, max:22, label:'17–22', bonus:1000},
+  {min:23, max:29, label:'23–29', bonus:1500},
+  {min:30, max:Infinity, label:'30+', bonus:2250},
+];
+function monthlyBonusFor(deals){
+  for(let i=MONTHLY_TIERS.length-1;i>=0;i--){ if(deals>=MONTHLY_TIERS[i].min) return MONTHLY_TIERS[i]; }
+  return null;
+}
+function nextMonthlyTier(deals){
+  return MONTHLY_TIERS.find(t=>deals<t.min) || null;
+}
+const BALANCED_TIERS = [
+  {pct:0.70, bonus:500},
+  {pct:0.50, bonus:250},
+  {pct:0.30, bonus:100},
+];
+
+// ═══════════════════════ TAB / ACCORDION CHROME ═══════════════════════
+function showTab(id){
+  document.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  document.querySelectorAll('.tabpanel').forEach(p=>p.classList.toggle('active', p.id==='tab-'+id));
+  updateHeaderEstimate(id);
+}
+function toggleAccordion(id){
+  document.getElementById(id).classList.toggle('open');
+}
+function updateHeaderEstimate(tab){
+  const el = document.getElementById('headerEstimate');
+  if(tab==='ld') el.textContent = document.getElementById('ldMonthTotal').textContent || '$0';
+  else if(tab==='cs') el.textContent = window.__csTotal ? fmt(window.__csTotal) : '$0';
+  else if(tab==='lc') el.textContent = window.__lcTotal ? fmt(window.__lcTotal) : '$0';
+  else el.textContent = window.__bonusTotal ? fmt(window.__bonusTotal) : '$0';
+}
+
+// ═══════════════════════ LEVEL DEBT CALCULATOR ═══════════════════════
+function renderLdTierTable(activeId, newDeal, totalVol){
+  const body = document.getElementById('ldTierTable');
+  body.innerHTML = LD_TIERS.map(t=>{
+    const dealC = newDeal>=7000 ? fmt(Math.round(newDeal*t.rate)) : '—';
+    const totalC = fmt(Math.round(totalVol*t.rate));
+    const isActive = t.id===activeId;
+    return `<tr class="${isActive?'active-row':''}">
+      <td style="font-weight:800;">${t.label}${isActive?'<span class="row-tag">ACTIVE</span>':''}</td>
+      <td>${t.range}</td>
+      <td class="num" style="font-size:15px;">${t.rateLabel}</td>
+      <td class="num">${dealC}</td>
+      <td class="num" style="font-weight:800;">${totalC}</td>
+    </tr>`;
+  }).join('');
+}
+function calcLevelDebt(){
+  const monthVol = Number(document.getElementById('ldMonthVol').value||0);
+  const newDeal  = Number(document.getElementById('ldNewDeal').value||0);
+  const totalVol = monthVol + newDeal;
+  const before = ldTierFor(monthVol);
+  const after  = ldTierFor(totalVol);
+  const crossed = after.id > before.id;
+  const validDeal = newDeal >= 7000;
+
+  const commTotal = Math.round(totalVol*after.rate);
+  const commBefore = Math.round(monthVol*before.rate);
+  const dealComm = Math.round(newDeal*after.rate);
+  const netGain = commTotal - commBefore;
+  const tierBonus = crossed ? Math.round(monthVol*(after.rate-before.rate)) : 0;
+
+  document.getElementById('ldWarning').innerHTML = (newDeal>0 && !validDeal)
+    ? `<div class="callout bad" style="margin-bottom:16px;">Level Debt requires a minimum of $7,000 enrolled debt per deal.${newDeal>=6000?' Consider Debt Resolution (min $6,000) or Debt Validation (min $4,000).':''}</div>`
+    : '';
+
+  const beforeBox = document.getElementById('ldTierBefore');
+  beforeBox.querySelector('.ld-rate').textContent = before.rateLabel;
+  beforeBox.querySelector('.ld-rate').style.color = 'var(--ink)';
+  beforeBox.querySelector('.ld-label').textContent = before.label + ' · ' + fmt(monthVol) + ' enrolled';
+
+  const afterBox = document.getElementById('ldTierAfter');
+  afterBox.querySelector('.ld-rate').textContent = after.rateLabel;
+  afterBox.querySelector('.ld-label').textContent = after.label + ' · ' + fmt(totalVol) + ' total';
+  document.getElementById('ldArrow').textContent = crossed ? '🎉' : '→';
+
+  document.getElementById('ldDealComm').textContent = validDeal ? fmt(dealComm) : '—';
+  document.getElementById('ldDealSub').textContent = validDeal ? `${fmt(newDeal)} × ${after.rateLabel}` : 'Deal below $7k minimum';
+
+  const bonusCard = document.getElementById('ldTierBonusCard');
+  if(crossed){
+    bonusCard.querySelector('.stat-lbl').textContent = 'Tier Upgrade Bonus';
+    bonusCard.querySelector('#ldMonthTotal').textContent = '+'+fmt(tierBonus);
+    bonusCard.querySelector('#ldMonthTotal').style.color = 'var(--amber)';
+    document.getElementById('ldMonthSub').textContent = `Extra on ${fmt(monthVol)} already enrolled — you hit ${after.label}!`;
+  } else {
+    bonusCard.querySelector('.stat-lbl').textContent = 'Monthly Commission Total';
+    bonusCard.querySelector('#ldMonthTotal').textContent = fmt(commTotal);
+    bonusCard.querySelector('#ldMonthTotal').style.color = 'var(--ink)';
+    document.getElementById('ldMonthSub').textContent = `${fmt(totalVol)} total enrolled × ${after.rateLabel}`;
+  }
+  document.getElementById('ldNetGain').textContent = fmt(netGain);
+
+  document.getElementById('ldTierUpBanner').innerHTML = crossed
+    ? `<div class="callout good" style="margin-bottom:12px;">🎉 This deal pushed you into <strong>${after.label} (${after.rateLabel})</strong>. Your entire month's volume is now paid at ${after.rateLabel} instead of ${before.rateLabel} — an extra <strong>${fmt(tierBonus)}</strong> on your existing ${fmt(monthVol)}, plus <strong>${fmt(dealComm)}</strong> on this new deal. Total gain: <strong>${fmt(netGain)}</strong>.</div>`
+    : '';
+
+  const nextTier = after.id<3 ? LD_TIERS[after.id] : null;
+  if(nextTier){
+    const gap = nextTier.min - totalVol;
+    const progress = Math.min(100, (totalVol/nextTier.min)*100);
+    const extraOnDeal = Math.round(newDeal*(nextTier.rate-after.rate));
+    document.getElementById('ldProgressBanner').innerHTML = `
+      <div class="callout route">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-weight:700;">
+          <span>Progress to ${nextTier.label} — ${nextTier.rateLabel}</span><span>${fmt(gap)} more to go</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:${progress}%"></div></div>
+        <div style="font-size:12px;">Enroll <strong>${fmt(gap)}</strong> more this month to unlock ${nextTier.rateLabel}. On a ${fmt(newDeal)} deal that's worth an extra <strong>${fmt(extraOnDeal)}</strong>.</div>
+      </div>`;
+  } else {
+    document.getElementById('ldProgressBanner').innerHTML = '';
+  }
+
+  renderLdTierTable(after.id, newDeal, totalVol);
+  if(document.querySelector('.tabbtn[data-tab="ld"]').classList.contains('active')){
+    document.getElementById('headerEstimate').textContent = crossed ? '+'+fmt(tierBonus) : fmt(commTotal);
+  }
+}
+document.getElementById('ldMonthVol').addEventListener('input', calcLevelDebt);
+document.getElementById('ldNewDeal').addEventListener('input', calcLevelDebt);
+
+// ═══════════════════════ DEBT VALIDATION (CS) CALCULATOR ═══════════════════════
+function renderProgTable(bodyId, progs, activeCode, min, tableName){
+  document.getElementById(bodyId).innerHTML = progs.map(p=>{
+    const isActive = p.code===activeCode;
+    return `<tr class="${isActive?'active-row':''}">
+      <td style="font-weight:800;">${p.code}${isActive?'<span class="row-tag">CURRENT</span>':''}</td>
+      <td>${p.range}</td>
+      <td class="num">${fmt(p.p2)}</td>
+      <td class="num ${p.p4===0?'dim':''}">${p.p4>0?fmt(p.p4):'—'}</td>
+      <td class="num" style="font-size:15px;color:var(--brand-dark);">${fmt(p.total)}</td>
+    </tr>`;
+  }).join('');
+}
+function calcCS(){
+  const debt = Number(document.getElementById('csDebt').value||0);
+  const prog = csProgFor(debt);
+  const warnEl = document.getElementById('csWarning');
+  const resEl = document.getElementById('csResult');
+
+  if(debt>0 && debt<4000){
+    warnEl.innerHTML = `<div class="callout bad" style="margin-bottom:16px;">Below the $4,000 minimum — not eligible for Debt Validation enrollment.</div>`;
+  } else { warnEl.innerHTML=''; }
+
+  if(!prog){
+    resEl.innerHTML = '';
+    window.__csTotal = 0;
+  } else {
+    resEl.innerHTML = `
+      <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(26,110,216,.1);border:1px solid rgba(26,110,216,.25);border-radius:10px;padding:9px 16px;margin-bottom:16px;">
+        <span style="font-weight:900;font-size:15px;color:var(--blue);">Program ${prog.code}</span>
+        <span style="font-size:13px;color:var(--muted);font-weight:600;">${prog.range}</span>
+        ${prog.p4===0?'<span style="font-size:11px;font-weight:800;background:rgba(21,128,61,.12);color:var(--good);padding:2px 8px;border-radius:99px;">Full payout at P2</span>':''}
+      </div>
+      <div class="metrics" style="margin-top:0;">
+        <div class="stat" style="--accent:var(--blue)"><div class="stat-lbl">Total Commission</div><div class="stat-val accent">${fmt(prog.total)}</div><div class="stat-sub">Full amount for this deal</div></div>
+        <div class="stat" style="--accent:var(--blue)"><div class="stat-lbl">Paid at Payment 2</div><div class="stat-val accent">${fmt(prog.p2)}</div><div class="stat-sub">20th of Month 3</div></div>
+        <div class="stat"><div class="stat-lbl">${prog.p4>0?'Paid at Payment 4':'Second Payout'}</div><div class="stat-val">${prog.p4>0?fmt(prog.p4):'—'}</div><div class="stat-sub">${prog.p4>0?'20th of Month 5':'Single payout — no split on this tier'}</div></div>
+      </div>`;
+    window.__csTotal = prog.total;
+  }
+  renderProgTable('csTable', CS_PROGS, prog?prog.code:null, 4000, 'Debt Validation');
+  if(document.querySelector('.tabbtn[data-tab="cs"]').classList.contains('active')) updateHeaderEstimate('cs');
+}
+document.getElementById('csDebt').addEventListener('input', calcCS);
+
+// ═══════════════════════ DEBT RESOLUTION (LC) CALCULATOR ═══════════════════════
+function calcLC(){
+  const debt = Number(document.getElementById('lcDebt').value||0);
+  const state = document.getElementById('lcState').value;
+  const band = lcBandFor(debt);
+  const warnEl = document.getElementById('lcWarning');
+  const resEl = document.getElementById('lcResult');
+  let warnings = [];
+
+  if(debt>0 && debt<6000) warnings.push('Below the $6,000 minimum — not eligible for Debt Resolution enrollment.');
+  if(LC_BLOCKED.includes(state)) warnings.push(`Debt Resolution is blocked in this state. Route to Debt Validation instead.`);
+  warnEl.innerHTML = warnings.map(w=>`<div class="callout bad" style="margin-bottom:10px;">${w}</div>`).join('');
+
+  if(!band || LC_BLOCKED.includes(state)){
+    resEl.innerHTML='';
+    window.__lcTotal = 0;
+  } else {
+    resEl.innerHTML = `
+      <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);border-radius:10px;padding:9px 16px;margin-bottom:16px;">
+        <span style="font-weight:900;font-size:15px;color:var(--purple);">Band ${band.code}</span>
+        <span style="font-size:13px;color:var(--muted);font-weight:600;">${band.range}</span>
+        ${band.p4===0?'<span style="font-size:11px;font-weight:800;background:rgba(21,128,61,.12);color:var(--good);padding:2px 8px;border-radius:99px;">Full payout at P2</span>':''}
+      </div>
+      <div class="metrics" style="margin-top:0;">
+        <div class="stat" style="--accent:var(--purple)"><div class="stat-lbl">Total Commission</div><div class="stat-val accent">${fmt(band.total)}</div><div class="stat-sub">Full amount for this deal</div></div>
+        <div class="stat" style="--accent:var(--purple)"><div class="stat-lbl">Paid at Payment 2</div><div class="stat-val accent">${fmt(band.p2)}</div><div class="stat-sub">20th of Month 3</div></div>
+        <div class="stat"><div class="stat-lbl">${band.p4>0?'Paid at Payment 4':'Second Payout'}</div><div class="stat-val">${band.p4>0?fmt(band.p4):'—'}</div><div class="stat-sub">${band.p4>0?'20th of Month 5':'Single payout — no split on this tier'}</div></div>
+      </div>`;
+    window.__lcTotal = band.total;
+  }
+  renderProgTable('lcTable', LC_BANDS, band?band.code:null, 6000, 'Debt Resolution');
+  if(document.querySelector('.tabbtn[data-tab="lc"]').classList.contains('active')) updateHeaderEstimate('lc');
+}
+document.getElementById('lcDebt').addEventListener('input', calcLC);
+document.getElementById('lcState').addEventListener('change', calcLC);
+
+// ═══════════════════════ BONUSES & SPIFFS CALCULATORS ═══════════════════════
+function calcDailyHustle(){
+  const cs = Number(document.getElementById('dhCs').value);
+  const lc = Number(document.getElementById('dhLc').value);
+  document.getElementById('dhCsVal').textContent = cs;
+  document.getElementById('dhLcVal').textContent = lc;
+  const combined = cs+lc;
+  const perDeal = dailySpiffPerDeal(combined);
+  const total = perDeal*combined;
+  const toNext = combined<3 ? 3-combined : combined<5 ? 5-combined : 0;
+
+  document.getElementById('dhResult').innerHTML = `
+    <div class="callout ${perDeal>0?'good':'route'}" style="padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div class="stat-lbl">Combined Deals Today</div>
+          <div style="font-size:32px;font-weight:800;font-family:var(--mono);color:${perDeal>0?'var(--amber)':'var(--ink)'};line-height:1;">${combined}<span style="font-size:14px;font-weight:600;color:var(--muted);margin-left:8px;">${cs} Validation + ${lc} Resolution</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div class="stat-lbl">Bonus Per Deal</div>
+          <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:${perDeal>0?'var(--amber)':'var(--faint)'};">${perDeal>0?'+'+fmt(perDeal):'—'}</div>
+        </div>
+      </div>
+      <div class="progress-track" style="margin-top:12px;"><div class="progress-fill" style="width:${Math.min(100,(combined/5)*100)}%;background:linear-gradient(90deg,var(--amber),#b45309);"></div></div>
+      <div style="font-size:12.5px;font-weight:600;margin-top:6px;">${perDeal>0 ? (combined>=5?'🔥 Maximum daily tier — +$75 on every deal today.':`✓ Threshold hit — +$50 on every deal. ${toNext} more to reach +$75.`) : `${toNext} more deal${toNext!==1?'s':''} (Validation or Resolution) to unlock +$50 per deal.`}</div>
+      ${total>0?`<div style="margin-top:10px;font-size:14px;font-weight:800;">Total Daily SPIFF: <span style="color:var(--amber);">${fmt(total)}</span></div>`:''}
+    </div>`;
+  window.__bonusTotal = total;
+  if(document.querySelector('.tabbtn[data-tab="bonus"]').classList.contains('active')) updateHeaderEstimate('bonus');
+}
+
+function calcMonthlyVolume(){
+  const cs = Number(document.getElementById('mvCs').value);
+  const lc = Number(document.getElementById('mvLc').value);
+  document.getElementById('mvCsVal').textContent = cs+' deals';
+  document.getElementById('mvLcVal').textContent = lc+' deals';
+  const combined = cs+lc;
+  const tier = monthlyBonusFor(combined);
+  const next = nextMonthlyTier(combined);
+
+  let rows = MONTHLY_TIERS.map(t=>{
+    const active = tier && tier.min===t.min;
+    const achieved = combined>=t.min;
+    return `<div style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:${active?800:600};color:${active?'var(--brand-dark)':achieved?'var(--body)':'var(--faint)'};margin-bottom:3px;">
+        <span>${t.label} deals ${active?'<span class="row-tag">ACTIVE</span>':''}</span><span>${fmt(t.bonus)}</span>
+      </div>
+      <div class="progress-track" style="height:8px;"><div class="progress-fill" style="width:${Math.min(100,(combined/(t.min+4))*100)}%;background:${active?'linear-gradient(90deg,var(--brand),var(--brand-dark))':achieved?'var(--brand-line)':'var(--line)'};"></div></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('mvResult').innerHTML = `
+    <div class="callout ${tier?'good':'route'}" style="padding:16px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div class="stat-lbl">Combined Deals This Month</div>
+          <div style="font-size:32px;font-weight:800;font-family:var(--mono);color:${tier?'var(--brand-dark)':'var(--ink)'};line-height:1;">${combined}<span style="font-size:14px;font-weight:600;color:var(--muted);margin-left:8px;">${cs} Validation + ${lc} Resolution</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div class="stat-lbl">Monthly Bonus</div>
+          <div style="font-size:32px;font-weight:800;font-family:var(--mono);color:${tier?'var(--brand)':'var(--faint)'};">${tier?fmt(tier.bonus):'—'}</div>
+          ${next?`<div style="font-size:11.5px;color:var(--muted);font-weight:600;">${next.min-combined} more → ${fmt(next.bonus)}</div>`:''}
+        </div>
+      </div>
+    </div>
+    ${rows}`;
+  window.__bonusTotal = tier ? tier.bonus : 0;
+  if(document.querySelector('.tabbtn[data-tab="bonus"]').classList.contains('active')) updateHeaderEstimate('bonus');
+}
+
+function calcBalancedBook(){
+  const total = Number(document.getElementById('bbTotal').value||0);
+  const pct = Number(document.getElementById('bbPct').value);
+  document.getElementById('bbPctVal').textContent = pct+'%';
+  const p = pct/100;
+
+  let bonus = 0;
+  if(total>=5){
+    for(const t of BALANCED_TIERS){ if(p>=t.pct){ bonus=t.bonus; break; } }
+  }
+
+  document.getElementById('bbResult').innerHTML = `
+    <div class="callout ${bonus>0?'good':'route'}" style="padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:13px;font-weight:600;">
+          ${total<5 ? `Needs 5+ total deals — currently ${total}.` : `At ${pct}% Validation + Resolution mix on ${total} deals:`}
+        </div>
+        <div style="text-align:right;">
+          <div class="stat-lbl">Balanced Book Bonus</div>
+          <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:${bonus>0?'var(--purple)':'var(--faint)'};">${bonus>0?fmt(bonus):'—'}</div>
+        </div>
+      </div>
+    </div>`;
+  window.__bonusTotal = bonus;
+  if(document.querySelector('.tabbtn[data-tab="bonus"]').classList.contains('active')) updateHeaderEstimate('bonus');
+}
+document.getElementById('bbTotal').addEventListener('input', calcBalancedBook);
+
+// ═══════════════════════ INIT ═══════════════════════
+calcLevelDebt();
+calcCS();
+calcLC();
+calcDailyHustle();
+calcMonthlyVolume();
+calcBalancedBook();
+updateHeaderEstimate('ld');
+</script>
+<script src="https://ai.fundingtier.com/toolkit.js" defer></script>
+
+</body>
+</html>
