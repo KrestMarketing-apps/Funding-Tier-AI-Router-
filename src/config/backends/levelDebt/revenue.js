@@ -14,7 +14,9 @@ export const revenue = {
   legalFeeMonthly: 19.99,
   // Global Holdings escrow / bank account.
   gatewayFeeMonthly: 10.95,
-  // Charged once, at enrollment — so month 1 carries the gateway fee twice.
+  // Charged once, at enrollment. It does NOT make month 1 a bigger draft — the
+  // client pays the same every month. It comes out of that payment, so month 1
+  // simply puts less into the savings / escrow account.
   gatewaySetupFee: 10.95,
   // Semi-monthly (split) schedules draft twice; each draft carries this.
   splitSurchargePerPayment: 0.515,
@@ -38,15 +40,44 @@ export const revenue = {
     return 60;
   },
 
-  /** Ancillary fees for a given month. Month 1 carries the gateway setup fee. */
-  getAncillaryFees(month, split) {
-    const isFirst = Number(month || 1) === 1;
+  /**
+   * Recurring fees taken out of every draft. Constant across the term — the
+   * one-time setup fee changes what lands in savings, not what is charged.
+   */
+  getAncillaryFees(split) {
     return (
       this.legalFeeMonthly +
       this.gatewayFeeMonthly +
-      (isFirst ? this.gatewaySetupFee : 0) +
       (split ? this.splitSurchargePerPayment * 2 : 0)
     );
+  },
+
+  /** Usually the earliest point a first settlement can be attempted. */
+  firstSettlementMilestoneMonth: 6,
+
+  /**
+   * Funds accumulating in the client's savings / escrow account, month by
+   * month. Deposits net of the legal and gateway fees only — settlement
+   * payouts and the program fee draw this down as accounts settle, so it is
+   * the ceiling on funds available to settle with, not a balance forecast.
+   */
+  getEscrowProjection(totalDebt, state, routing, opts) {
+    var o = opts || {};
+    var split = !!o.split;
+    var term = this.getMaxTerm(Number(totalDebt || 0));
+    var months = Math.min(o.months || term, term);
+    var payment = this.getMonthlyPayment(totalDebt, state, routing, { split: split });
+    var recurring = this.getAncillaryFees(split);
+
+    var rows = [];
+    var cumulative = 0;
+    for (var month = 1; month <= months; month++) {
+      var feesTaken = recurring + (month === 1 ? this.gatewaySetupFee : 0);
+      var toEscrow = payment - feesTaken;
+      cumulative += toEscrow;
+      rows.push({ month: month, payment: payment, feesTaken: feesTaken, toEscrow: toEscrow, cumulative: cumulative });
+    }
+    return rows;
   },
 
   /** The settlement deposit alone — this is what the $250 minimum applies to. */
@@ -68,10 +99,7 @@ export const revenue = {
    */
   getMonthlyPayment(totalDebt, state, routing, opts) {
     var o = opts || {};
-    return (
-      this.getMonthlyDeposit(totalDebt, state, routing) +
-      this.getAncillaryFees(o.month || 2, o.split)
-    );
+    return this.getMonthlyDeposit(totalDebt, state, routing) + this.getAncillaryFees(o.split);
   },
 
   calculate({ totalDebt, state, routing }) {
@@ -87,9 +115,9 @@ export const revenue = {
 
     const split = !!(routing && routing.splitPayments);
     const monthlyDeposit = totalProgramCost / termMonths;
-    // Month 1 carries the gateway setup fee on top; every later month does not.
-    const firstMonthPayment = monthlyDeposit + this.getAncillaryFees(1, split);
-    const monthlyPayment = monthlyDeposit + this.getAncillaryFees(2, split);
+    // Same draft every month. The one-time setup fee reduces what reaches the
+    // savings account in month 1; it does not raise the payment.
+    const monthlyPayment = monthlyDeposit + this.getAncillaryFees(split);
 
     // 🔥 YOUR ACTUAL REVENUE
     const companyRevenue = debt * this.companyPayoutRate;
@@ -106,8 +134,7 @@ export const revenue = {
       totalProgramCost,
       monthlyDeposit,
       monthlyPayment,
-      firstMonthPayment,
-      ancillaryMonthly: this.getAncillaryFees(2, split),
+      ancillaryMonthly: this.getAncillaryFees(split),
       splitPayments: split,
 
       // Internal values (DO NOT expose to agents)
