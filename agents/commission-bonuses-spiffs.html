@@ -37,35 +37,26 @@
 body{font-family:var(--sans);background:var(--g-shell);color:var(--body);min-height:100vh;margin-top:52px;}
 
 /* ── Sticky product-tab header — top:52px clears the site-wide toolkit.js bar ── */
-.header-outer{position:sticky;top:52px;z-index:900;padding:10px 16px 0;}
-.header-inner-wrap{max-width:1180px;margin:0 auto;}
+.header-outer{position:sticky;top:52px;z-index:900;}
 .header{
-  background:var(--g-header);border-radius:14px 14px 0 0;padding:13px 18px 0;
-  box-shadow:0 10px 30px -12px rgba(15,23,42,.55);
-  border:1px solid rgba(255,255,255,.07);border-bottom:none;
+  background:var(--g-header);padding:0;width:100%;
+  box-shadow:0 4px 24px -8px rgba(15,23,42,.5);
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
-.header-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
-.header img.logo{height:26px;width:auto;flex:0 0 auto;}
-.header-titles{display:flex;flex-direction:column;line-height:1.2;flex:1;min-width:150px;}
-.header-titles .title{font-weight:800;font-size:18px;color:#fff;letter-spacing:-.4px;}
-.header-titles .subtitle{font-size:10.5px;color:rgba(255,255,255,.55);font-weight:600;margin-top:2px;}
-.header-total{text-align:right;}
-.header-total .k{font-size:8.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.5);}
-.header-total .v{font-size:20px;font-weight:800;color:#fff;font-family:var(--mono);margin-top:1px;}
-
-.tabgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
+.tabgrid{display:grid;grid-template-columns:repeat(4,1fr);max-width:1180px;margin:0 auto;}
 .tabbtn{
-  padding:11px 6px;border:none;cursor:pointer;font-weight:800;font-size:12.5px;
-  letter-spacing:-.1px;border-radius:9px 9px 0 0;font-family:var(--sans);
+  padding:15px 6px;border:none;cursor:pointer;font-weight:800;font-size:13px;
+  letter-spacing:-.1px;font-family:var(--sans);
   background:transparent;color:rgba(255,255,255,.65);white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;position:relative;
 }
-.tabbtn.active{background:var(--bg);color:var(--ink);}
-.tabbtn .bar{position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px 3px 0 0;}
+.tabbtn.active{color:#fff;}
+.tabbtn .bar{position:absolute;left:0;right:0;bottom:0;height:3px;}
 .tabbtn[data-tab="ld"] .bar{background:var(--brand);}
 .tabbtn[data-tab="cs"] .bar{background:var(--blue);}
 .tabbtn[data-tab="lc"] .bar{background:var(--purple);}
 .tabbtn[data-tab="bonus"] .bar{background:var(--amber);}
+.tabbtn:not(.active) .bar{background:transparent;}
 
 .shell{max-width:1180px;margin:0 auto;padding:0 16px 60px;}
 .tabpanel{display:none;padding-top:16px;}
@@ -198,25 +189,12 @@ tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand))
 <body>
 
 <div class="header-outer">
-  <div class="header-inner-wrap">
-    <div class="header">
-      <div class="header-top">
-        <img class="logo" src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" alt="Funding Tier" onerror="this.style.display='none'"/>
-        <div class="header-titles">
-          <span class="title">Commission, Bonuses &amp; SPIFFs</span>
-          <span class="subtitle">Every product's payout math, plus everything that stacks on top</span>
-        </div>
-        <div class="header-total">
-          <div class="k">This Tab's Estimate</div>
-          <div class="v" id="headerEstimate">$0</div>
-        </div>
-      </div>
-      <div class="tabgrid">
-        <button class="tabbtn active" data-tab="ld" onclick="showTab('ld')">Level Debt<span class="bar"></span></button>
-        <button class="tabbtn" data-tab="cs" onclick="showTab('cs')">Debt Validation<span class="bar"></span></button>
-        <button class="tabbtn" data-tab="lc" onclick="showTab('lc')">Debt Resolution<span class="bar"></span></button>
-        <button class="tabbtn" data-tab="bonus" onclick="showTab('bonus')">Bonuses &amp; SPIFFs<span class="bar"></span></button>
-      </div>
+  <div class="header">
+    <div class="tabgrid">
+      <button class="tabbtn active" data-tab="ld" onclick="showTab('ld')">Level Debt<span class="bar"></span></button>
+      <button class="tabbtn" data-tab="cs" onclick="showTab('cs')">Debt Validation<span class="bar"></span></button>
+      <button class="tabbtn" data-tab="lc" onclick="showTab('lc')">Debt Resolution<span class="bar"></span></button>
+      <button class="tabbtn" data-tab="bonus" onclick="showTab('bonus')">Bonuses &amp; SPIFFs<span class="bar"></span></button>
     </div>
   </div>
 </div>
@@ -640,11 +618,9 @@ function toggleAccordion(id){
   document.getElementById(id).classList.toggle('open');
 }
 function updateHeaderEstimate(tab){
-  const el = document.getElementById('headerEstimate');
-  if(tab==='ld') el.textContent = document.getElementById('ldMonthTotal').textContent || '$0';
-  else if(tab==='cs') el.textContent = window.__csTotal ? fmt(window.__csTotal) : '$0';
-  else if(tab==='lc') el.textContent = window.__lcTotal ? fmt(window.__lcTotal) : '$0';
-  else el.textContent = window.__bonusTotal ? fmt(window.__bonusTotal) : '$0';
+  // no-op: the header no longer shows a live estimate (removed as redundant
+  // with the toolkit nav bar's page title). Calls left in place elsewhere
+  // in this file are harmless now.
 }
 
 // ═══════════════════════ LEVEL DEBT CALCULATOR ═══════════════════════
@@ -731,9 +707,6 @@ function calcLevelDebt(){
   }
 
   renderLdTierTable(after.id, newDeal, totalVol);
-  if(document.querySelector('.tabbtn[data-tab="ld"]').classList.contains('active')){
-    document.getElementById('headerEstimate').textContent = crossed ? '+'+fmt(tierBonus) : fmt(commTotal);
-  }
 }
 document.getElementById('ldMonthVol').addEventListener('input', calcLevelDebt);
 document.getElementById('ldNewDeal').addEventListener('input', calcLevelDebt);
