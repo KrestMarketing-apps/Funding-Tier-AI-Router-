@@ -1,36 +1,83 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": true,
   "functions": {
-    "api/generate-plan.js": { "maxDuration": 45 }
+    "api/generate-plan.js": {
+      "maxDuration": 45
+    }
   },
   "rewrites": [
-    { "source": "/plan/:name/:token", "destination": "/api/plan?token=:token" },
-    { "source": "/plan/:token", "destination": "/api/plan?token=:token" },
-    { "source": "/agents/call-scripts", "destination": "/agents/call-scripts/index.html" },
-    { "source": "/agents/debt-settlement/level-debt/forth/enrollment-process", "destination": "/agents/debt-settlement/level-debt/forth/enrollment-process/index.html" },
-    { "source": "/credit-card-calculator", "destination": "/credit-card-calculator.html" },
-    { "source": "/agents/legacy-capital-program-calculator", "destination": "/agents/legacy-capital-program-calculator.html" },
-    { "source": "/admins/legacy-capital-billable-payout-simulator", "destination": "/admins/legacy-capital-billable-payout-simulator.html" },
-    { "source": "/admins/Backend-Payout-Process", "destination": "/admins/backend-payout-timing.html" },
-    { "source": "/admins/operating-model", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/operating-model" },
-    { "source": "/profit-engine", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine" },
-    { "source": "/profit-engine/:path*", "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*" },
-    { "source": "/agents/commission-simulator", "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools/commission-simulator" },
-    { "source": "/agent-tools", "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools" },
-    { "source": "/agent-tools/:path*", "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools/:path*" }
+    {
+      "source": "/plan/:name/:token",
+      "destination": "/api/plan?token=:token"
+    },
+    {
+      "source": "/plan/:token",
+      "destination": "/api/plan?token=:token"
+    },
+    {
+      "source": "/agents/call-scripts",
+      "destination": "/agents/call-scripts/index.html"
+    },
+    {
+      "source": "/credit-card-calculator",
+      "destination": "/credit-card-calculator.html"
+    },
+    {
+      "source": "/agents/legacy-capital-program-calculator",
+      "destination": "/agents/legacy-capital-program-calculator.html"
+    },
+    {
+      "source": "/admins/legacy-capital-billable-payout-simulator",
+      "destination": "/admins/legacy-capital-billable-payout-simulator.html"
+    },
+    {
+      "source": "/admins/Backend-Payout-Process",
+      "destination": "/admins/backend-payout-timing.html"
+    },
+    {
+      "source": "/profit-engine",
+      "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine"
+    },
+    {
+      "source": "/profit-engine/:path*",
+      "destination": "https://funding-tier-profit-engine.vercel.app/profit-engine/:path*"
+    },
+    {
+      "source": "/agent-tools",
+      "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools"
+    },
+    {
+      "source": "/agent-tools/:path*",
+      "destination": "https://funding-tier-agent-tools.vercel.app/agent-tools/:path*"
+    }
   ],
   "headers": [
     {
-      "source": "/((?!profit-engine|agent-tools|agents/commission-simulator).*)",
+      "source": "/((?!profit-engine|agent-tools).*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-{ "key": "Content-Security-Policy", "value": "frame-ancestors 'self' https://app.gohighlevel.com https://*.gohighlevel.com https://*.leadconnectorhq.com https://*.msgsndr.com https://app.krestmarketing.com https://*.krestmarketing.com;" },        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
       ]
     }
   ],
   "crons": [
-    { "path": "/api/cleanup-plans", "schedule": "0 9 * * 1" }
+    {
+      "path": "/api/cleanup-plans",
+      "schedule": "0 9 * * 1"
+    }
   ]
 }
