@@ -537,6 +537,9 @@
 
     return {
       sfeeMonthly, grossPmt, procMonthly,
+      // The months 3+ tier rate. The deduction callout reads R.payRate; it was
+      // only ever set per row, so that callout rendered "NaN% = $NaN/mo".
+      payRate,
       earlyDeduct, lateDeduct,
       m12payout : rows[0]?.mpay   || 0,
       m3payout  : rows[2]?.mpay   || 0,
