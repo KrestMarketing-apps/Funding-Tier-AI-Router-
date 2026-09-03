@@ -47,7 +47,7 @@
     .header {
       background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 45%, var(--dark3) 100%);
       padding: 13px 20px 14px;
-      position: sticky; top: 0; z-index: 50;
+      position: sticky; top: var(--ft-toolkit-height, 0px); z-index: 50;
       box-shadow: 0 4px 24px rgba(15,23,42,0.22);
     }
     .hstrip { display: flex; align-items: center; gap: 14px; flex-wrap: nowrap; }
@@ -115,18 +115,26 @@
     @media(max-width:900px){.g4{grid-template-columns:1fr 1fr;}.g3{grid-template-columns:1fr 1fr;}.g2{grid-template-columns:1fr;}}
     @media(max-width:600px){.g4,.g3,.g2{grid-template-columns:1fr;}}
   </style>
+<script>
+  /* Rendered by toolkit.js — the same band the React tools get from ToolShell.
+     `mode` is not declared here: it comes from the /api/me role the toolkit
+     already reads, so the chrome cannot disagree with the tool menu. */
+  window.FT_TOOL = {
+    eyebrow: "ADMIN \u00B7 PAYOUT TIMING",
+    title: "Billable Payout Simulator",
+    subtitle: "What Funding Tier earns on an Elite Legal Practice enrollment, month by month, against the Level Debt 8% benchmark.",
+    badge: { text: "ADMIN ONLY" }
+  };
+</script>
 </head>
 <body>
 
 <div class="header">
+  <!-- Title, subtitle and badge now come from the shared hero band (see
+       window.FT_TOOL above). What stays here are the live controls. -->
   <div class="hstrip">
     <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69f13f2e011ebfb8f93239b4.png"
-      alt="Legacy Capital Services" style="height:30px;width:auto;object-fit:contain;flex-shrink:0;display:block">
-    <div class="hdiv"></div>
-    <div style="flex-shrink:0">
-      <div class="htitl">Billable Payout Simulator</div>
-      <div class="hsub">Admin &amp; Affiliate &middot; Legacy Capital Services</div>
-    </div>
+      alt="Legacy Capital Services" style="height:26px;width:auto;object-fit:contain;flex-shrink:0;display:block">
     <div class="hdiv"></div>
 
     <!-- Enrolled debt -->

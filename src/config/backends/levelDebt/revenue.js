@@ -8,6 +8,17 @@ export const revenue = {
   standardProgramFee: 0.25,
   attorneyProgramFee: 0.27,
 
+  // ── Ancillary client fees ────────────────────────────────────────────────
+  // These ride on top of the settlement deposit every month. They are what the
+  // client actually pays, and none of them touch Funding Tier's 8%.
+  legalFeeMonthly: 19.99,
+  // Global Holdings escrow / bank account.
+  gatewayFeeMonthly: 10.95,
+  // Charged once, at enrollment — so month 1 carries the gateway fee twice.
+  gatewaySetupFee: 10.95,
+  // Semi-monthly (split) schedules draft twice; each draft carries this.
+  splitSurchargePerPayment: 0.515,
+
   getProgramFee(state, routing) {
     if (routing?.isAttorneyModelState?.(state)) {
       return this.attorneyProgramFee;
@@ -27,16 +38,40 @@ export const revenue = {
     return 60;
   },
 
-  getMonthlyPayment(totalDebt, state, routing) {
+  /** Ancillary fees for a given month. Month 1 carries the gateway setup fee. */
+  getAncillaryFees(month, split) {
+    const isFirst = Number(month || 1) === 1;
+    return (
+      this.legalFeeMonthly +
+      this.gatewayFeeMonthly +
+      (isFirst ? this.gatewaySetupFee : 0) +
+      (split ? this.splitSurchargePerPayment * 2 : 0)
+    );
+  },
+
+  /** The settlement deposit alone — this is what the $250 minimum applies to. */
+  getMonthlyDeposit(totalDebt, state, routing) {
     const debt = Number(totalDebt || 0);
     const termMonths = this.getMaxTerm(debt);
     const programFee = this.getProgramFee(state, routing);
 
     const estimatedSettlement = debt * 0.5;
     const programFees = debt * programFee;
-    const totalProgramCost = estimatedSettlement + programFees;
 
-    return totalProgramCost / termMonths;
+    return (estimatedSettlement + programFees) / termMonths;
+  },
+
+  /**
+   * What actually leaves the client's account. Deposit plus the legal, gateway
+   * and (on a split schedule) per-draft fees. Pass month 1 to include the
+   * one-time gateway setup fee.
+   */
+  getMonthlyPayment(totalDebt, state, routing, opts) {
+    var o = opts || {};
+    return (
+      this.getMonthlyDeposit(totalDebt, state, routing) +
+      this.getAncillaryFees(o.month || 2, o.split)
+    );
   },
 
   calculate({ totalDebt, state, routing }) {
@@ -49,7 +84,12 @@ export const revenue = {
     const estimatedSettlement = debt * 0.5;
     const programFees = debt * programFee;
     const totalProgramCost = estimatedSettlement + programFees;
-    const monthlyPayment = totalProgramCost / termMonths;
+
+    const split = !!(routing && routing.splitPayments);
+    const monthlyDeposit = totalProgramCost / termMonths;
+    // Month 1 carries the gateway setup fee on top; every later month does not.
+    const firstMonthPayment = monthlyDeposit + this.getAncillaryFees(1, split);
+    const monthlyPayment = monthlyDeposit + this.getAncillaryFees(2, split);
 
     // 🔥 YOUR ACTUAL REVENUE
     const companyRevenue = debt * this.companyPayoutRate;
@@ -64,7 +104,11 @@ export const revenue = {
       estimatedSettlement,
       programFees,
       totalProgramCost,
+      monthlyDeposit,
       monthlyPayment,
+      firstMonthPayment,
+      ancillaryMonthly: this.getAncillaryFees(2, split),
+      splitPayments: split,
 
       // Internal values (DO NOT expose to agents)
       totalRevenue: companyRevenue,
