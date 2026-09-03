@@ -8,6 +8,7 @@
     { "source": "/plan/:name/:token", "destination": "/api/plan?token=:token" },
     { "source": "/plan/:token", "destination": "/api/plan?token=:token" },
     { "source": "/agents/call-scripts", "destination": "/agents/call-scripts/index.html" },
+    { "source": "/agents/debt-settlement/level-debt/forth/enrollment-process", "destination": "/agents/debt-settlement/level-debt/forth/enrollment-process/index.html" },
     { "source": "/credit-card-calculator", "destination": "/credit-card-calculator.html" },
     { "source": "/agents/legacy-capital-program-calculator", "destination": "/agents/legacy-capital-program-calculator.html" },
     { "source": "/admins/legacy-capital-billable-payout-simulator", "destination": "/admins/legacy-capital-billable-payout-simulator.html" },
