@@ -25,10 +25,14 @@ export const revenue = {
   gatewaySetupFee: 10.95,
   splitSurchargePerPayment: 0.515,
 
-  // NOT on the standard Forth debt settlement plan — the live schedule's total
-  // fees reconcile exactly without it. Zero until it is confirmed which plans
-  // carry a monthly legal fee.
-  legalFeeMonthly: 0,
+  // New addition. Forth's current schedule does not show it yet, so a plan
+  // priced here reads $19.99/mo higher than the same plan in Forth until Forth
+  // catches up — expected, not a discrepancy. Pass legalFeeMonthly: 0 in opts
+  // to reconcile against Forth's current output.
+  //
+  // It raises the draft but not the settlement fund: the client pays it, the
+  // amount reaching savings each month is unchanged.
+  legalFeeMonthly: 19.99,
 
   firstSettlementMilestoneMonth: 6,
 
@@ -66,7 +70,8 @@ export const revenue = {
     const settlementTarget = debt * settlementPct;
     const successFeeTotal = debt * successFeeRate;
     const gatewayTotal = this.gatewayFeeMonthly * term + this.gatewaySetupFee;
-    const legalTotal = (this.legalFeeMonthly + splitSurcharge) * term;
+    const legalFeeMonthly = o.legalFeeMonthly != null ? o.legalFeeMonthly : this.legalFeeMonthly;
+    const legalTotal = (legalFeeMonthly + splitSurcharge) * term;
 
     // Forth rounds the draft and the success-fee line to cents, then derives
     // savings from the rounded figures. Rounding at the end instead leaves
@@ -83,7 +88,7 @@ export const revenue = {
       successFeeMonthly: r2(successFeeTotal / term),
       gatewayMonthly: this.gatewayFeeMonthly,
       gatewaySetup: this.gatewaySetupFee,
-      legalFeeMonthly: this.legalFeeMonthly,
+      legalFeeMonthly,
       splitSurcharge,
       totalFees, totalProgramCost,
       estClientSavings: r2(debt - totalProgramCost),
