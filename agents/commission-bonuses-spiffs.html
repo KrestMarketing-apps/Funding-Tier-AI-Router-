@@ -34,10 +34,12 @@
   --g-shell: linear-gradient(180deg, #f1f5f9 0%, #eef4f5 100%);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--sans);background:var(--g-shell);color:var(--body);min-height:100vh;padding-top:52px;}
+body{font-family:var(--sans);background:var(--g-shell);color:var(--body);min-height:100vh;}
 
-/* ── Sticky product-tab header — top:52px clears the site-wide toolkit.js bar ── */
-.header-outer{position:sticky;top:52px;z-index:900;}
+/* ── Sticky product-tab header. toolkit.js already reserves its own height on
+      the body and publishes it as --ft-toolkit-height; hardcoding 52px here
+      double-counted it and left a white gap under the bar. ── */
+.header-outer{position:sticky;top:var(--ft-toolkit-height,0px);z-index:900;}
 .header{
   background:var(--g-header);padding:0;width:100%;
   box-shadow:0 4px 24px -8px rgba(15,23,42,.5);
@@ -477,23 +479,41 @@ tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand))
       <div class="panel-hd">
         <div class="titles">
           <div class="panel-title">Balanced Book Bonus</div>
-          <div class="panel-subtitle">Rewards keeping a healthy Level Debt floor alongside your Validation/Resolution volume</div>
+          <div class="panel-subtitle">Paid for the mix of your book, not the size of it</div>
         </div>
         <span class="panel-badge" style="background:rgba(124,58,237,.1);color:var(--purple);border:1px solid rgba(124,58,237,.25);">Monthly · min 5 deals</span>
       </div>
       <div class="panel-body">
+        <div class="callout" style="margin-bottom:16px;">
+          <div style="font-weight:800;margin-bottom:5px;">Why this bonus exists</div>
+          <div style="line-height:1.65;">
+            Settlement (Level Debt) and the other two products get paid on different clocks.
+            A book that leans too far one way leaves your month lopsided, so this bonus pays you
+            for carrying enough of both — settlement deals to pad the shorter-term revenue,
+            Validation and Resolution to build the tail.
+          </div>
+        </div>
         <div class="input-grid">
           <div>
             <label class="field-label">Total Deals This Month (all products)</label>
             <input type="number" id="bbTotal" min="0" step="1" value="20" oninput="calcBalancedBook()">
+            <div class="field-sub">Level Debt + Debt Validation + Debt Resolution, all together.</div>
           </div>
           <div>
             <label class="field-label">Validation + Resolution Mix (%)</label>
             <input type="range" id="bbPct" min="0" max="100" step="5" value="45" style="--accent:var(--purple)" oninput="calcBalancedBook()">
             <div class="range-val" style="--accent:var(--purple)" id="bbPctVal">45%</div>
+            <div class="field-sub" id="bbSplitSub">The rest of the book is settlement.</div>
           </div>
         </div>
         <div id="bbResult"></div>
+        <div class="table-wrap" style="margin-top:14px;"><table>
+          <thead><tr><th>Validation + Resolution share of the book</th><th>Rest of the book (settlement)</th><th>Bonus</th></tr></thead>
+          <tbody id="bbTierRows"></tbody>
+        </table></div>
+        <div class="field-sub" style="margin-top:8px;">
+          Thresholds are on the month's whole book, and nothing pays under 5 total deals.
+        </div>
       </div>
     </div>
 
@@ -868,22 +888,62 @@ function calcBalancedBook(){
   document.getElementById('bbPctVal').textContent = pct+'%';
   const p = pct/100;
 
+  // Spell the mix out as actual deals. "45%" on its own tells a rep nothing;
+  // "9 validation + resolution, 11 settlement" is the thing they can act on.
+  const vr  = Math.round(total * p);
+  const stl = Math.max(0, total - vr);
+  document.getElementById('bbSplitSub').textContent =
+    total > 0
+      ? `${vr} Validation + Resolution · ${stl} settlement, out of ${total}.`
+      : 'The rest of the book is settlement.';
+
   let bonus = 0;
   if(total>=5){
     for(const t of BALANCED_TIERS){ if(p>=t.pct){ bonus=t.bonus; break; } }
+  }
+
+  // The tier ladder, with the one you are standing on marked. It used to be
+  // invisible — the panel paid out a number with no way to see what came next.
+  document.getElementById('bbTierRows').innerHTML = BALANCED_TIERS
+    .slice().sort((a,b)=>a.pct-b.pct)
+    .map(t=>{
+      const hit = total>=5 && p>=t.pct;
+      return `<tr${hit?' style="background:rgba(124,58,237,.07);"':''}>
+        <td>${Math.round(t.pct*100)}% or more${hit?' <strong style="color:var(--purple);">← you are here</strong>':''}</td>
+        <td>up to ${100-Math.round(t.pct*100)}%</td>
+        <td class="num${hit?' good-txt':''}">${fmt(t.bonus)}</td>
+      </tr>`;
+    }).join('');
+
+  // What it takes to reach the next tier, in deals rather than percentages.
+  const nextTier = BALANCED_TIERS.slice().sort((a,b)=>a.pct-b.pct).find(t=>!(total>=5 && p>=t.pct));
+  let nextLine = '';
+  if(total < 5){
+    nextLine = `${5-total} more deal${5-total!==1?'s':''} to qualify at all.`;
+  } else if(nextTier){
+    const needVr = Math.ceil(nextTier.pct * total);
+    const add = Math.max(0, needVr - vr);
+    nextLine = add > 0
+      ? `${add} more Validation or Resolution deal${add!==1?'s':''} this month reaches ${Math.round(nextTier.pct*100)}% — worth ${fmt(nextTier.bonus - bonus)} more.`
+      : `You are one rounding step from ${Math.round(nextTier.pct*100)}%.`;
+  } else {
+    nextLine = 'Top tier — this is the largest Balanced Book Bonus available.';
   }
 
   document.getElementById('bbResult').innerHTML = `
     <div class="callout ${bonus>0?'good':'route'}" style="padding:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
         <div style="font-size:13px;font-weight:600;">
-          ${total<5 ? `Needs 5+ total deals — currently ${total}.` : `At ${pct}% Validation + Resolution mix on ${total} deals:`}
+          ${total<5
+            ? `Needs 5+ total deals — currently ${total}.`
+            : `${vr} Validation + Resolution and ${stl} settlement out of ${total} deals is a ${pct}% mix.`}
         </div>
         <div style="text-align:right;">
           <div class="stat-lbl">Balanced Book Bonus</div>
           <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:${bonus>0?'var(--purple)':'var(--faint)'};">${bonus>0?fmt(bonus):'—'}</div>
         </div>
       </div>
+      <div style="font-size:12.5px;font-weight:600;margin-top:10px;">${nextLine}</div>
     </div>`;
   window.__bonusTotal = bonus;
   if(document.querySelector('.tabbtn[data-tab="bonus"]').classList.contains('active')) updateHeaderEstimate('bonus');

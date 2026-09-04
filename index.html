@@ -19,7 +19,7 @@
 :root{--g:#0f9d8a;--gd:#0b7d6e;--dk:#0f172a;--bl:#1a6ed8;--am:#f59e0b;--rd:#ef4444;--br:#e2e8f0;--bg:#f8fafc;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--dk);min-height:100vh;}
-.topbar{position:sticky;top:0;z-index:80;background:linear-gradient(135deg,var(--dk) 0%,#0b3b50 42%,#0f9d8a 100%);box-shadow:0 4px 24px rgba(15,23,42,.22);}
+.topbar{position:sticky;top:var(--ft-toolkit-height,0px);z-index:80;background:linear-gradient(135deg,var(--dk) 0%,#0b3b50 42%,#0f9d8a 100%);box-shadow:0 4px 24px rgba(15,23,42,.22);}
 .workspace{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,400px);gap:20px;align-items:start;}
 .workspace-full{grid-column:1/-1;}
 @media(max-width:1100px){.workspace{grid-template-columns:1fr;}.workspace-full{grid-column:1;}}
@@ -448,15 +448,11 @@ body{top:0!important;}
 <body>
 
 <header class="topbar">
-<div style="max-width:1420px;margin:0 auto;padding:10px 20px 14px;">
-  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;">
-    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
-      <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" style="height:32px;width:auto;" alt="Funding Tier"/>
-      <div>
-        <div style="font-size:17px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.1;">AI Deal Router</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;font-weight:600;letter-spacing:.2px;">Debt Resolution Estimator</div>
-      </div>
-    </div>
+<div style="max-width:1420px;margin:0 auto;padding:8px 20px;">
+  <!-- The logo and "AI Deal Router / Debt Resolution Estimator" lockup used to
+       live here. toolkit.js's bar already names the tool, so it was the same
+       title twice; the bar now carries only the live controls. -->
+  <div style="display:flex;align-items:center;justify-content:flex-end;gap:24px;flex-wrap:wrap;">
     <div id="headerMetaControls" style="margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;">
       <button id="stateCoverageBtn" class="state-coverage-btn" type="button" onclick="toggleStateCoverageMenu()">🗺️ State Coverage</button>
       <select id="tzSel" class="meta-sel" onchange="setDispTZ(this.value)">
@@ -1566,17 +1562,86 @@ const SUPP_HOURS=[
 const MAX_ROWS=10;
 const legacyState={feeRate:0.49,months:null,splitPay:false};
 const levelDebtState={term:null,total:null};
-function getLDProgramCost(total, feeRate){
-  return (total || 0) * 0.5 + (total || 0) * (feeRate || 0);
+
+/* ═══════════════════════════════════════════════════════════════
+   LEVEL DEBT CLIENT PROGRAM MATH
+
+   Mirrors src/config/backends/levelDebt/revenue.js and the Profit
+   Engine's levelDebtEngine.ts, which were both verified line for line
+   against a live Forth schedule. Before this, the page priced a plan as
+   settlement reserve + success fee and nothing else — no gateway fee, no
+   setup fee, no legal fee — so every payment it quoted was low.
+
+     settlement target = enrolled debt x 50%
+     success fee       = enrolled debt x 25% (27% attorney-model states)
+     gateway           = $10.95/mo x term + $10.95 one-time setup
+     legal             = $19.99/mo x term
+     split schedules   = + $0.515 on each of the two drafts
+     program cost      = settlement + success fee + gateway + legal
+     monthly payment   = program cost / term      <- same every month
+
+   The setup fee sits inside the program cost, so it is already spread
+   across the term. It does not make month 1 a bigger draft; it just
+   leaves $10.95 less in month 1's savings.
+   ═══════════════════════════════════════════════════════════════ */
+const LD_SETTLEMENT_PCT           = 0.50;
+const LD_GATEWAY_FEE_MONTHLY      = 10.95;
+const LD_GATEWAY_SETUP_FEE        = 10.95;
+const LD_LEGAL_FEE_MONTHLY        = 19.99;
+const LD_SPLIT_SURCHARGE_PER_PAYMENT = 0.515;
+
+/** Success fee rate for a scenario. RED / attorney-model states pay 27%. */
+function getLDSuccessFeeRate(c){
+  return (c && c.lds && c.lds.status === 'RED') ? 0.27 : 0.25;
 }
+
+/** Fees that recur every month, and so scale with the term. */
+function getLDMonthlyFees(splitPay){
+  return LD_GATEWAY_FEE_MONTHLY + LD_LEGAL_FEE_MONTHLY
+    + (splitPay ? LD_SPLIT_SURCHARGE_PER_PAYMENT * 2 : 0);
+}
+
+/** Costs that do not scale with the term: the settlement fund, the success
+ *  fee and the one-time gateway setup. */
+function getLDFixedCost(total, feeRate){
+  return (total || 0) * LD_SETTLEMENT_PCT
+    + (total || 0) * (feeRate || 0)
+    + LD_GATEWAY_SETUP_FEE;
+}
+
+/** Full program cost for a given term. */
+function getLDProgramCost(total, feeRate, term, splitPay){
+  if(!total) return 0;
+  const t = Math.max(1, parseInt(term, 10) || getLDMaxTerm(total) || 12);
+  return getLDFixedCost(total, feeRate) + getLDMonthlyFees(splitPay) * t;
+}
+
+/** The draft. Constant across the whole program. */
+function getLDMonthlyPayment(total, feeRate, term, splitPay){
+  const t = Math.max(1, parseInt(term, 10) || 1);
+  return getLDProgramCost(total, feeRate, t, splitPay) / t;
+}
+
 function getLDMinTerm(total){
   return total >= LEVEL_DEBT_KNOWLEDGEBASE.minimums.totalDebt ? 12 : 0;
 }
-function getLDEffectiveMaxTerm(total, feeRate){
+
+/** Longest term that still clears the minimum monthly deposit.
+ *
+ *  payment(t) = fixed/t + monthlyFees, which falls as the term grows, so the
+ *  binding condition is fixed/t + monthlyFees >= minDraft, i.e.
+ *  t <= fixed / (minDraft - monthlyFees). Solving it directly avoids the old
+ *  circular "cost depends on term depends on cost" approximation. */
+function getLDEffectiveMaxTerm(total, feeRate, splitPay){
   const maxByDebt = getLDMaxTerm(total);
-  const minDraft = getLDMinDraft(total);
-  const tc = getLDProgramCost(total, feeRate);
-  const maxByMinPayment = minDraft > 0 ? Math.floor(tc / minDraft) : maxByDebt;
+  const minDraft  = getLDMinDraft(total);
+  let maxByMinPayment = maxByDebt;
+  if(minDraft > 0){
+    const headroom = minDraft - getLDMonthlyFees(splitPay);
+    maxByMinPayment = headroom > 0
+      ? Math.floor(getLDFixedCost(total, feeRate) / headroom)
+      : maxByDebt;   // fees alone clear the minimum; only the debt band caps it
+  }
   const effectiveMax = Math.min(maxByDebt, maxByMinPayment > 0 ? maxByMinPayment : maxByDebt);
   return Math.max(getLDMinTerm(total), effectiveMax || 0);
 }
@@ -1594,7 +1659,7 @@ function getLDSelectedTerm(total, feeRate){
 function updateLDTerm(value){
   if(!lastScenario) return;
   const minTerm = getLDMinTerm(lastScenario.total);
-  const maxTerm = getLDEffectiveMaxTerm(lastScenario.total, lastScenario.feeRate);
+  const maxTerm = getLDEffectiveMaxTerm(lastScenario.total, getLDSuccessFeeRate(lastScenario));
   levelDebtState.total = lastScenario.total;
   levelDebtState.term = Math.max(minTerm, Math.min(maxTerm, parseInt(value,10) || maxTerm));
   render();
@@ -2354,13 +2419,15 @@ function computeScenario(){
   let shortest = null, recommended = null;
 
   if(route.route === 'LEVEL'){
-    const tc = total * .5 + total * feeRate;
     const minDraft = getLDMinDraft(total);
-    const mt = getLDMaxTerm(total);
-    const maxTermForMin = minDraft > 0 ? Math.floor(tc / minDraft) : mt;
-    const effTerm = Math.min(mt, maxTermForMin > 0 ? maxTermForMin : mt);
+    const effTerm = getLDEffectiveMaxTerm(total, feeRate);
+    const tc = getLDProgramCost(total, feeRate, effTerm);
     const forthPlanRule = getLDForthPlanRule(total);
-    shortest = {term:12, tc, mp:tc / 12};
+    shortest = {
+      term: 12,
+      tc: getLDProgramCost(total, feeRate, 12),
+      mp: getLDMonthlyPayment(total, feeRate, 12),
+    };
     recommended = {
       term: effTerm,
       tc,
@@ -2382,7 +2449,7 @@ function computeScenario(){
       total,
       legacyState.feeRate,
       csProg ? csProg.pay : 0,
-      ldAvail ? Math.round((total * .5 + total * (lds.status === 'RED' ? .27 : .25)) / getLDMaxTerm(total)) : 0,
+      ldAvail ? Math.round(getLDMonthlyPayment(total, lds.status === 'RED' ? .27 : .25, getLDMaxTerm(total))) : 0,
       legacyState.splitPay
     );
 
@@ -2705,19 +2772,24 @@ function renderPlanCards(c){
     const minTerm = getLDMinTerm(c.total);
     const minDraft = getLDMinDraft(c.total);
     const forthPlanRule = getLDForthPlanRule(c.total);
-    const _ldTc = getLDProgramCost(c.total, c.feeRate);
-    const _ldReserve = c.total * 0.50;
-    const _ldFee = c.total * c.feeRate;
-    const _ldFeePct = Math.round(c.feeRate * 100);
+    // c.feeRate is 0 whenever the recommended route is not LEVEL, which used to
+    // price this card off a $0 program fee. Derive the rate from the state.
+    const _ldRate = getLDSuccessFeeRate(c);
+    const _ldMaxT = getLDEffectiveMaxTerm(c.total, _ldRate);
+    const selectedTerm = getLDSelectedTerm(c.total, _ldRate);
+    const _ldTc = getLDProgramCost(c.total, _ldRate, selectedTerm);
+    const _ldReserve = c.total * LD_SETTLEMENT_PCT;
+    const _ldFee = c.total * _ldRate;
+    const _ldGateway = LD_GATEWAY_FEE_MONTHLY * selectedTerm + LD_GATEWAY_SETUP_FEE;
+    const _ldLegal = LD_LEGAL_FEE_MONTHLY * selectedTerm;
+    const _ldFeePct = Math.round(_ldRate * 100);
     const _ldModelLabel = c.lds.status === 'RED' ? 'RED / ATTORNEY MODEL STATE' : 'GREEN STATE';
     const _ldModelClass = c.lds.status === 'RED' ? 'red' : 'green';
-    const _ldMaxT = getLDEffectiveMaxTerm(c.total, c.feeRate);
-    const selectedTerm = getLDSelectedTerm(c.total, c.feeRate);
     const mp = Math.round(_ldTc / Math.max(1, selectedTerm));
     const isRec = c.route.route === 'LEVEL';
     const comm=getCommForCard(c,'LEVEL');
     const forthTooltip = `<strong>FORTH CRM Plan: ${esc(forthPlanRule.planType)}</strong><br>${esc(forthPlanRule.instruction)}`;
-    const ldPricingTooltip = `<div class="ld-price-pop"><div class="ld-price-pop-hd"><div class="ld-price-pop-title">Pricing Breakdown</div><span class="ld-model-pill ${_ldModelClass}">${_ldModelLabel}</span></div><div class="ld-price-pop-row"><span>Estimated settlement reserve</span><strong>${fmt(_ldReserve)} <span style="color:#64748b;font-weight:850;">50%</span></strong></div><div class="ld-price-pop-row"><span>${c.lds.status==='RED'?'Attorney-model program fee':'Program fee'}</span><strong>${fmt(_ldFee)} <span style="color:#64748b;font-weight:850;">${_ldFeePct}%</span></strong></div><div class="ld-price-pop-row ld-price-pop-total"><span>Total estimated program cost</span><strong>${fmt(_ldTc)}</strong></div><div class="ld-price-pop-note">Estimate only. Results, fees, timelines, settlement amounts, and creditor participation can vary by individual situation.</div></div>`;
+    const ldPricingTooltip = `<div class="ld-price-pop"><div class="ld-price-pop-hd"><div class="ld-price-pop-title">Pricing Breakdown</div><span class="ld-model-pill ${_ldModelClass}">${_ldModelLabel}</span></div><div class="ld-price-pop-row"><span>Estimated settlement reserve</span><strong>${fmt(_ldReserve)} <span style="color:#64748b;font-weight:850;">50%</span></strong></div><div class="ld-price-pop-row"><span>${c.lds.status==='RED'?'Attorney-model success fee':'Success fee'}</span><strong>${fmt(_ldFee)} <span style="color:#64748b;font-weight:850;">${_ldFeePct}%</span></strong></div><div class="ld-price-pop-row"><span>Gateway &mdash; $${LD_GATEWAY_FEE_MONTHLY}/mo &times; ${selectedTerm} + $${LD_GATEWAY_SETUP_FEE} setup</span><strong>${fmt(_ldGateway)}</strong></div><div class="ld-price-pop-row"><span>Legal plan &mdash; $${LD_LEGAL_FEE_MONTHLY}/mo &times; ${selectedTerm}</span><strong>${fmt(_ldLegal)}</strong></div><div class="ld-price-pop-row ld-price-pop-total"><span>Total estimated program cost</span><strong>${fmt(_ldTc)}</strong></div><div class="ld-price-pop-note">Estimate only. Results, fees, timelines, settlement amounts, and creditor participation can vary by individual situation.</div></div>`;
     cards.push(`<div class="plan-card-v pc-ld${isRec?' rec':''}">
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
@@ -2766,7 +2838,7 @@ function renderPlanCards(c){
     const total=c.total,feeRate=legacyState.feeRate;
     const maxMo=legacyMaxMonths(total,feeRate,legacyState.splitPay),minMo=legacyMinMonths();
     const csMp=c.csProg?c.csProg.pay:0;
-    const ldMp=c.ldAvail?Math.round((total*.5+total*c.feeRate)/getLDMaxTerm(total)):0;
+    const ldMp=c.ldAvail?Math.round(getLDMonthlyPayment(total,getLDSuccessFeeRate(c),getLDMaxTerm(total))):0;
     if(total>0 && (!legacyState._init||legacyState._initTotal!==total)){
       legacyState.months=legacyMaxMonths(total,feeRate,legacyState.splitPay);
       legacyState._init=true;legacyState._initTotal=total;
@@ -2840,8 +2912,9 @@ function renderLDCard(c){
   const term = getLDMaxTerm(c.total);
   const minDraftLD = getLDMinDraft(c.total);
   const forthPlanRule = getLDForthPlanRule(c.total);
-  const _ldTcDet = getLDProgramCost(c.total, c.feeRate);
-  const _ldTermDet = getLDSelectedTerm(c.total, c.feeRate);
+  const _ldRateDet = getLDSuccessFeeRate(c);
+  const _ldTermDet = getLDSelectedTerm(c.total, _ldRateDet);
+  const _ldTcDet = getLDProgramCost(c.total, _ldRateDet, _ldTermDet);
   const mp = Math.round(_ldTcDet / Math.max(1, _ldTermDet));
   $('ldActiveDetail').innerHTML=`<div style="background:rgba(15,157,138,.06);border:2px solid var(--g);border-radius:12px;padding:16px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:#0b7d6e;">Level Debt Program Explanation</span><span style="font-size:12px;color:#64748b;margin-left:10px;">Client-facing quick pitch</span></div><span class="pill p-g">Settlement</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px;text-align:center;">${[['Monthly Payment',fmt(mp),'est. monthly'],['Program Length',`${_ldTermDet} mo`,'estimated'],['Estimated Total',fmt(_ldTcDet),'program total'],['Minimum Deposit',fmt(minDraftLD),'current minimum']].map(([l,v,s])=>`<div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">${l}</div><div style="font-size:22px;font-weight:900;color:#0b7d6e;margin-top:4px;">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${s}</div></div>`).join('')}</div><div style="background:#f0fdf4;border:1.5px solid rgba(15,157,138,.28);border-radius:10px;padding:11px 13px;margin-bottom:14px;"><div style="font-size:10px;font-weight:900;color:#0b7d6e;text-transform:uppercase;letter-spacing:.45px;margin-bottom:5px;">FORTH CRM Setup Instruction</div><div style="font-size:13px;font-weight:900;color:#0f172a;margin-bottom:4px;">${forthPlanRule.planType}</div><div style="font-size:12px;color:#334155;font-weight:650;line-height:1.55;">${forthPlanRule.instruction}</div></div><div style="font-size:12px;color:#334155;line-height:1.8;"><div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Program Explanation</div><ul style="padding-left:18px;display:grid;gap:6px;"><li>One structured monthly deposit replaces the chaos of multiple unsecured debt payments.</li><li>The program works to negotiate enrolled creditors and may reduce what the client ultimately pays, depending on creditor participation.</li><li>Clients gain a defined timeline instead of revolving minimum payments that can drag on for years.</li><li>There are no guarantees on settlement timing or savings, but the goal is to improve cash flow and create a realistic path out of debt.</li><li>Credit impact can occur while accounts are being resolved, so expectations should stay clear and transparent.</li></ul></div></div>`;
 }
@@ -2851,7 +2924,7 @@ function renderLegacyCard(c){
   card.style.display='block';
   const total=c.total;
   const feeRate=legacyState.feeRate;
-  const mo=legacyClampMonths(total,feeRate,legacyState.months||legacyDefaultMonths(total,feeRate,c.csProg?c.csProg.pay:0,c.ldAvail?Math.round((total*.5+total*c.feeRate)/getLDMaxTerm(total)):0,legacyState.splitPay),legacyState.splitPay);
+  const mo=legacyClampMonths(total,feeRate,legacyState.months||legacyDefaultMonths(total,feeRate,c.csProg?c.csProg.pay:0,c.ldAvail?Math.round(getLDMonthlyPayment(total,getLDSuccessFeeRate(c),getLDMaxTerm(total))):0,legacyState.splitPay),legacyState.splitPay);
   legacyState.months=mo;
   const tc=legacyTotalCost(total,feeRate,mo,legacyState.splitPay);
   const mp=legacyMP(total,feeRate,mo,legacyState.splitPay);
@@ -3014,11 +3087,11 @@ function renderLDCard(c){
   if(!c.total){card.style.display='none';return;}
   card.style.display='block';
   const unavailable=!c.ldAvail;
-  const feeRate=(c.lds&&c.lds.status==='RED')?.27:.25;
-  const tc=getLDProgramCost(c.total, feeRate);
+  const feeRate=getLDSuccessFeeRate(c);
   const minDraftLD=getLDMinDraft(c.total);
   const termMax=getLDMaxTerm(c.total)||0;
   const effectiveTerm=c.ldAvail?getLDSelectedTerm(c.total, feeRate):(termMax||0);
+  const tc=getLDProgramCost(c.total, feeRate, effectiveTerm||termMax||12);
   const mp=effectiveTerm?Math.round(tc/Math.max(1,effectiveTerm)):0;
   const forthPlanRule=getLDForthPlanRule(c.total);
   const reason=(c.flags&&c.flags.ld&&c.flags.ld[0]) || (c.lds&&c.lds.status==='BLACKOUT'?'Level Debt does not service this state.':'Level Debt is not available for the current debt amount or creditor mix.');
@@ -3041,7 +3114,7 @@ function renderLegacyCard(c){
   const unavailable=!c.legacyAvail;
   const total=c.total;
   const feeRate=legacyState.feeRate;
-  const fallbackMo=legacyDefaultMonths(total,feeRate,c.csProg?c.csProg.pay:0,c.ldAvail?Math.round((total*.5+total*c.feeRate)/Math.max(1,getLDMaxTerm(total))):0,legacyState.splitPay);
+  const fallbackMo=legacyDefaultMonths(total,feeRate,c.csProg?c.csProg.pay:0,c.ldAvail?Math.round(getLDMonthlyPayment(total,getLDSuccessFeeRate(c),Math.max(1,getLDMaxTerm(total)))):0,legacyState.splitPay);
   const mo=legacyClampMonths(total,feeRate,legacyState.months||fallbackMo,legacyState.splitPay);
   legacyState.months=mo;
   const tc=legacyTotalCost(total,feeRate,mo,legacyState.splitPay);
