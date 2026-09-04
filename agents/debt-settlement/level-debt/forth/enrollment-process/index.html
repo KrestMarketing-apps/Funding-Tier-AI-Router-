@@ -35,7 +35,8 @@
     color:var(--ink);
     font-family:'Inter',sans-serif;
     -webkit-font-smoothing:antialiased;
-    margin-top:52px; /* clearance for the site-wide toolkit.js fixed nav bar */
+    /* No manual offset for the toolkit.js bar — it reserves its own height on
+       the body, and adding 52px here double-counted it into a white gap. */
   }
   h1,h2,h3,h4{
     font-family:'Poppins',sans-serif;
@@ -89,6 +90,9 @@
     overflow-x:auto;
     padding:0 24px;
     border-bottom:1px solid rgba(0,0,0,.2);
+    position:sticky;
+    top:var(--ft-toolkit-height,0px);
+    z-index:900;
   }
   .tabbtn{
     background:none;border:none;
@@ -321,6 +325,7 @@
   <button class="tabbtn active" data-tab="overview">Overview</button>
   <button class="tabbtn" data-tab="enrollment">Enrollment Process</button>
   <button class="tabbtn" data-tab="callflow">Call / Process Flow</button>
+  <button class="tabbtn" data-tab="aiqc">AI Compliance Call</button>
   <button class="tabbtn" data-tab="budget">Budget Analysis</button>
   <button class="tabbtn" data-tab="credit">Credit Report Basics</button>
   <button class="tabbtn" data-tab="reference">Quick Reference</button>
@@ -681,6 +686,165 @@
     <div class="callout needinput">
       <strong>Needs input from your team</strong>
       This SOP doesn't yet include your compliance-approved talking points for the discovery, objection-handling, or close portions of the call, or the specific structure of the <strong>Welcome Call</strong> (what it covers, when it happens relative to enrollment, and who runs it). Send over your current call script or Welcome Call checklist and I'll build those out as a proper walkthrough in this tab &mdash; I didn't want to invent debt-settlement sales language that hasn't been compliance-reviewed.
+    </div>
+  </div>
+
+  <!-- =================== AI COMPLIANCE / QC CALL =================== -->
+  <div class="panel" id="aiqc">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span>After the sale, before the file closes</div>
+      <h2>AI compliance (QC) call</h2>
+      <p>Level Debt runs the compliance call with an AI voicebot instead of a live agent queue. You submit the file, wait a minute, then transfer the client to the compliance number that matches the deal type. The bot verifies identity, reads the compliance script, and time-stamps the result in the system. It is available 24/7 and takes unlimited calls at once, so there is no hold queue.</p>
+    </div>
+
+    <div class="mini-stat-row" style="margin-bottom:22px;">
+      <div class="mini-stat"><strong>~45&ndash;60 sec</strong>wait after submitting the file</div>
+      <div class="mini-stat"><strong>4 ID checks</strong>phone, address, DOB, last 4 of SSN</div>
+      <div class="mini-stat"><strong>24/7</strong>no compliance queue to wait in</div>
+      <div class="mini-stat"><strong>Spanish</strong>on request, mid-call</div>
+    </div>
+
+    <div class="callout warn">
+      <strong>Two things that fail the call every time</strong>
+      The address in Forth must be correct &mdash; the bot reads it back and the client has to confirm it, so a stale address ends the call. And you must still email the compliance script on every single file, with no exceptions; that is the backup if the bot fails.
+    </div>
+
+    <h3 style="font-size:17px;margin:26px 0 12px;">The process, start to finish</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <div class="step-kicker">Step 1</div>
+          <h4>Submit the client file</h4>
+          <p>Submit the deal through Level Debt or Pinnacle. Before you do, check the client's data in the CRM &mdash; especially the mailing address, date of birth and last four of the SSN. Everything the bot verifies is pulled from Forth, so whatever is wrong there is what fails on the call.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <div class="step-kicker">Step 2</div>
+          <h4>Wait about 45&ndash;60 seconds</h4>
+          <p>The AI system needs that minute to receive the file and prepare it. Transferring early means the bot has no record to pull up. Keep the client on the line and use the time to set expectations: a quick recorded verification call, four questions, a few minutes.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <div class="step-kicker">Step 3</div>
+          <h4>Transfer to the compliance line for the deal type</h4>
+          <p>Each deal type has its own number. Using the wrong one puts the client in front of a bot that has no file for them.</p>
+          <div class="card" style="padding:0;overflow:hidden;margin-top:12px;">
+            <table>
+              <thead><tr><th>Deal type</th><th>Compliance line</th><th>Saved in the dialer as</th></tr></thead>
+              <tbody>
+                <tr><td>Level Debt <strong>with</strong> Level Coaching</td><td>916-954-9713</td><td>AI Compliance &mdash; Level Debt + Coaching</td></tr>
+                <tr><td>Level Debt <strong>no</strong> Level Coaching</td><td>916-249-6493</td><td>AI Compliance &mdash; Level Debt</td></tr>
+                <tr><td>Pinnacle <strong>with</strong> Level Coaching</td><td>916-252-4551</td><td>AI Compliance &mdash; Pinnacle + Coaching</td></tr>
+                <tr><td>Pinnacle <strong>no</strong> Level Coaching</td><td>916-302-9310</td><td>AI Compliance &mdash; Pinnacle</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:12px;">All four are saved as contacts in <strong>app.krestmarketing.com</strong>, so you transfer by name rather than typing digits &mdash; see the transfer walkthrough below.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <div class="step-kicker">Step 4</div>
+          <h4>The bot verifies identity</h4>
+          <p>Four questions, all answered by the client, all matched against Forth:</p>
+          <ul>
+            <li><strong>Phone number</strong> &mdash; the client gives it, the bot pulls the file.</li>
+            <li><strong>Address</strong> &mdash; the bot reads the address on file and the client confirms yes or no.</li>
+            <li><strong>Date of birth</strong> &mdash; must match the system.</li>
+            <li><strong>Last four of SSN</strong> &mdash; must match the system.</li>
+          </ul>
+          <p style="margin-top:9px;">All four match and the bot moves into the compliance script. A mismatch can trigger failure handling.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <div class="step-kicker">Step 5</div>
+          <h4>Compliance script runs</h4>
+          <p>The bot reads the standard compliance script. Nothing changes on your side and the client's experience mirrors the current compliance call. If the client asks for Spanish at any point &mdash; &ldquo;Do you speak Spanish?&rdquo; or &ldquo;&iquest;Habla Espa&ntilde;ol?&rdquo; &mdash; the bot switches immediately and continues in Spanish.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <div class="step-kicker">Step 6</div>
+          <h4>Outcome</h4>
+          <p><strong>If it succeeds:</strong> the call ends on its own and compliance is time-stamped in the system. No welcome call is scheduled during this step &mdash; the internal team schedules it afterward and the bot also texts the client to book, which is what keeps show rates up.</p>
+          <p style="margin-top:9px;"><strong>If the bot fails:</strong> the call is transferred automatically to a live compliance agent and routed into a dedicated &ldquo;bot failure&rdquo; queue, where the agent completes compliance manually. This is the reason the emailed compliance script is not optional.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:17px;margin:30px 0 12px;">Transferring the call in app.krestmarketing.com</h3>
+    <p style="color:var(--ink-soft);font-size:14.5px;line-height:1.65;max-width:70ch;margin-bottom:14px;">
+      Every compliance line is already saved as a contact in our system, so you never dial the number by hand &mdash;
+      you search the contact by name and transfer. That is what stops the most common mistake, which is sending a
+      Pinnacle file to a Level Debt bot.
+    </p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <div class="step-kicker">Transfer</div>
+          <h4>Open the transfer control on the live call</h4>
+          <p>With the client still on the line in the dialer, open the call controls and choose <strong>Transfer</strong>. Our outbound line shows as <strong>310-xxx-xxxx</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <div class="step-kicker">Transfer</div>
+          <h4>Pick the compliance contact by name</h4>
+          <p>Start typing &ldquo;AI Compliance&rdquo; in the transfer field and pick the entry that matches the deal type from the table above. Read the contact name back to yourself before you commit &mdash; Level Debt and Pinnacle sit next to each other in the list, and with or without coaching is a second fork on top of that.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <div class="step-kicker">Transfer</div>
+          <h4>Choose blind transfer, then stay reachable</h4>
+          <p>Select <strong>blind transfer</strong> to hand the client straight to the bot without an introduction step. Confirm, and the client is connected.</p>
+          <div class="callout warn" style="margin-top:12px;">
+            <strong>Check this against Level Debt's own SOP first</strong>
+            Level Debt's Compliance AI Voice Bot SOP (v1.1) says to always warm transfer the client to the bot and
+            explicitly not to cold transfer or have the client dial the bot directly, and to stay on the line during the
+            process in case the client needs support. A blind transfer is a cold transfer. Confirm with Level Debt that
+            blind transfer is approved for our files before running it this way &mdash; if it is not, use the dialer's
+            warm transfer option instead and stay on until the bot picks up.
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <div class="step-kicker">Transfer</div>
+          <h4>Email the compliance script</h4>
+          <p>Every file, every time, regardless of how the call went. If the bot fails and the file lands in the manual queue, this is what the live agent works from.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:26px;">
+      <h3 style="font-size:16px;margin-bottom:10px;">Quick checklist</h3>
+      <ul class="checklist">
+        <li><span class="ck"></span>Client data double-checked in Forth &mdash; address above all.</li>
+        <li><span class="ck"></span>File submitted, then a full 45&ndash;60 seconds before transferring.</li>
+        <li><span class="ck"></span>Compliance contact selected by name, matching the deal type.</li>
+        <li><span class="ck"></span>Transfer method confirmed against Level Debt's SOP.</li>
+        <li><span class="ck"></span>Compliance script emailed &mdash; no exceptions.</li>
+        <li><span class="ck"></span>Client told a welcome call will be scheduled separately, plus a text from the system.</li>
+      </ul>
+    </div>
+
+    <div class="callout" style="margin-top:18px;">
+      <strong>Source</strong>
+      Level Debt &mdash; Compliance AI Voice Bot SOP for Affiliate Partners, v1.1 (May 15, 2026). Document owner: Nichole Miller.
     </div>
   </div>
 
