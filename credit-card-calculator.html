@@ -40,13 +40,13 @@
   --g-shell: linear-gradient(180deg, #f1f5f9 0%, #eef4f5 100%);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--sans);background:var(--g-shell);color:var(--body);min-height:100vh;margin-top:52px;}
+/* No margin-top here: toolkit.js already offsets the page by the height of
+   its fixed bar. Setting it again double-counted, leaving a 52px white band
+   between the bar and the content. */
+body{font-family:var(--sans);background:var(--g-shell);color:var(--body);min-height:100vh;}
 
-/* ── Sticky brand header — same compact pill pattern as Operating Model.
-   top:52px (not 0) so it sticks just below the site-wide toolkit.js nav bar
-   instead of underneath it. ── */
-.header-outer{position:sticky;top:52px;z-index:900;padding:10px 16px 0;}
-.header-inner-wrap{max-width:1280px;margin:0 auto;}
+/* The brand header moved into the shared hero band, so its sticky wrapper is
+   gone with it. The stat row it used to hold is projected into the hero. */
 .header{
   background:var(--g-header);border-radius:14px;padding:11px 18px;
   display:flex;align-items:center;gap:16px;flex-wrap:wrap;
@@ -179,29 +179,34 @@ tr:nth-child(even) td{background:#f8fafc;}
 }
 .tip:hover .tip-box{visibility:visible;opacity:1;}
 </style>
+<script>
+  /* The live stats and Copy Summary button are projected into the hero through
+     slotSelector, so their own scripts keep working against the same nodes. */
+  window.FT_TOOL = {
+    eyebrow: "ADMIN \u00B7 PROSPECT ILLUSTRATION",
+    title: "Credit Card Payment Impact",
+    subtitle: "Show prospects how minimum payments, APR and interest stretch a payoff timeline.",
+    badge: { text: "WIP", style: "wip" },
+    slotSelector: ".header-stats"
+  };
+</script>
 </head>
 <body>
-<div class="header-outer">
-  <div class="header-inner-wrap">
-    <div class="header">
-      <img class="logo" src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" alt="Funding Tier" onerror="this.style.display='none'"/>
-      <div class="header-titles">
-        <span class="title">Credit Card Payment Impact</span>
-        <span class="subtitle">Show prospects how minimum payments, APR, and interest stretch payoff timelines</span>
-      </div>
-      <div class="header-stats">
-        <div class="header-stat">
-          <div class="k">Router Default</div>
-          <div class="v">3.0%</div>
-        </div>
-        <div class="header-stat">
-          <div class="k">Unknown-APR Default</div>
-          <div class="v">27.99%</div>
-        </div>
-        <button class="header-cta" onclick="copySummary()">Copy Summary</button>
-      </div>
-    </div>
+<!-- Logo, title and subtitle come from the shared hero band (FT_TOOL above).
+     This block is projected into it by slotSelector, so copySummary() keeps
+     working against the same button. The old header-outer / header-inner-wrap
+     chrome is gone with it — left in place it rendered as an empty white band
+     above the hero. -->
+<div class="header-stats">
+  <div class="header-stat">
+    <div class="k">Router Default</div>
+    <div class="v">3.0%</div>
   </div>
+  <div class="header-stat">
+    <div class="k">Unknown-APR Default</div>
+    <div class="v">27.99%</div>
+  </div>
+  <button class="header-cta" onclick="copySummary()">Copy Summary</button>
 </div>
 
 <main class="shell">

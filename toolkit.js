@@ -467,6 +467,141 @@
     document.body.style.paddingTop = pad + HEIGHT + "px";
   }
 
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     HERO BAND
+     The same band ToolShell renders in the two Next apps, for the pages that
+     are plain HTML. Shadow DOM again, so a page's own CSS cannot reach in and
+     the band's cannot leak out — but the host sits in normal flow rather than
+     fixed, so it pushes content rather than covering it.
+
+     A page opts in by declaring, before this script loads:
+
+       window.FT_TOOL = {
+         eyebrow: "ADMIN · PAYOUT TIMING",
+         title:   "Billable Payout Simulator",
+         subtitle:"…",
+         badge:   { text: "ADMIN ONLY" },        // optional; style defaults to mode
+         metrics: [{ label, value, accent }],    // optional
+         slotSelector: "#hero-controls"          // optional: an existing element
+       };                                        // is projected into the band
+
+     `mode` is never declared by the page — it comes from the same /api/me role
+     this script already reads for the tool menu, so the chrome cannot disagree
+     with itself about who is looking.
+     ───────────────────────────────────────────────────────────────────────── */
+
+  var HERO_CSS = `
+    /* flow-root, not block: a slotted element's own margin would otherwise
+       collapse out through the host and push the whole band down the page. */
+    :host { display: flow-root; }
+    .hero {
+      position: relative; overflow: hidden;
+      font-family: -apple-system, "Inter", Segoe UI, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(120% 140% at 88% -20%, #17435a 0%, transparent 58%),
+        radial-gradient(90% 110% at -10% 115%, rgba(20,184,166,0.22) 0%, transparent 62%),
+        linear-gradient(150deg, #0b1622 0%, #0e1e2b 60%, #0e1e2b 100%);
+      padding: 30px 28px 26px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+    }
+    .hero::before {
+      content: ""; position: absolute; pointer-events: none;
+      top: -45%; right: -20%; width: 65%; height: 170%;
+      background: radial-gradient(closest-side, #3d7f9c, transparent);
+      opacity: 0.16; filter: blur(60px);
+    }
+    .top { position: relative; display: flex; align-items: center; justify-content: space-between;
+           gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .eyebrow { display: flex; align-items: center; gap: 8px; }
+    .eyebrowIcon { width: 20px; height: 20px; border-radius: 6px; background: rgba(255,255,255,0.08);
+                   display: flex; align-items: center; justify-content: center; font-size: 11px; }
+    .eyebrowText { font-size: 11.5px; font-weight: 700; letter-spacing: 0.02em;
+                   color: rgba(245,248,247,0.86); text-shadow: 0 1px 2px rgba(0,0,0,0.35); }
+    .badge { font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; letter-spacing: 0.02em; }
+    .badge.admin { background: rgba(61,220,111,0.16); color: #3ddc6f; border: 1px solid rgba(61,220,111,0.4); }
+    .badge.agent { background: rgba(61,157,255,0.16); color: #3d9dff; border: 1px solid rgba(61,157,255,0.4); }
+    .badge.wip   { background: rgba(245,165,36,0.15); color: #f5a524; border: 1px solid rgba(245,165,36,0.3); }
+    h1 { position: relative; font-size: 25px; font-weight: 700; color: #f5f8f7; margin: 0 0 6px; letter-spacing: -0.01em; }
+    p  { position: relative; font-size: 13.5px; color: rgba(245,248,247,0.86); max-width: 600px;
+         line-height: 1.5; margin: 0 0 18px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+    .slot { position: relative; margin-top: 4px; }
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+    .metric { background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.1);
+              border-radius: 8px; padding: 12px 14px; border-left: 2px solid #3d7f9c; }
+    .mlabel { font-size: 10px; font-weight: 800; letter-spacing: 0.04em; color: rgba(245,248,247,0.68);
+              margin-bottom: 6px; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+    .mvalue { font-size: 19px; font-weight: 700; color: #f5f8f7; }
+    .hero[data-mode="admin"] .eyebrowIcon, .hero[data-mode="admin"] .accent { color: #3ddc6f; }
+    .hero[data-mode="agent"] .eyebrowIcon, .hero[data-mode="agent"] .accent { color: #3d9dff; }
+    .hero[data-mode="admin"] .metric { border-left-color: #3ddc6f; }
+    .hero[data-mode="agent"] .metric { border-left-color: #3d9dff; }
+    @media (max-width: 640px) { .hero { padding: 22px 16px 20px; } }
+  `;
+
+  function mountHero(data) {
+    var cfg = window.FT_TOOL;
+    if (!cfg || !cfg.title) return;   // pages opt in; silence otherwise
+
+    var mode = isAdminish(data.user && data.user.role) ? "admin" : "agent";
+
+    var host = el("div", { id: "ft-hero" });
+    // First child of body, so it lands directly under the fixed bar. The
+    // inline style is belt and braces for the same margin-collapse problem:
+    // the shadow root's :host rule cannot contain a margin that escapes
+    // before the shadow tree is attached.
+    host.style.display = "flow-root";
+    document.body.insertBefore(host, document.body.firstChild);
+    var root = host.attachShadow({ mode: "open" });
+    root.appendChild(el("style", { text: HERO_CSS }));
+
+    var hero = el("div", { class: "hero" });
+    hero.setAttribute("data-mode", mode);
+
+    var top = el("div", { class: "top" });
+    var eye = el("div", { class: "eyebrow" });
+    eye.appendChild(el("div", { class: "eyebrowIcon", text: "\u25C6" }));
+    eye.appendChild(el("span", { class: "eyebrowText", text: cfg.eyebrow || "" }));
+    top.appendChild(eye);
+    if (cfg.badge && cfg.badge.text) {
+      top.appendChild(el("span", {
+        class: "badge " + (cfg.badge.style || mode),
+        text: cfg.badge.text,
+      }));
+    }
+    hero.appendChild(top);
+
+    hero.appendChild(el("h1", { text: cfg.title }));
+    if (cfg.subtitle) hero.appendChild(el("p", { text: cfg.subtitle }));
+
+    if (cfg.metrics && cfg.metrics.length) {
+      var grid = el("div", { class: "metrics" });
+      cfg.metrics.forEach(function (m) {
+        var c = el("div", { class: "metric" });
+        c.appendChild(el("div", { class: "mlabel", text: m.label }));
+        c.appendChild(el("div", { class: "mvalue" + (m.accent ? " accent" : ""), text: m.value }));
+        grid.appendChild(c);
+      });
+      hero.appendChild(el("div", { class: "slot" })).appendChild(grid);
+    }
+
+    /* A page with live controls keeps them: the existing element is projected
+       into the band through a slot, so its own scripts and event listeners
+       carry on working against the same nodes. Nothing is cloned or rebuilt. */
+    if (cfg.slotSelector) {
+      var live = document.querySelector(cfg.slotSelector);
+      if (live) {
+        live.setAttribute("slot", "live");
+        var wrap = el("div", { class: "slot" });
+        wrap.appendChild(el("slot", { name: "live" }));
+        hero.appendChild(wrap);
+        host.appendChild(live);
+      }
+    }
+
+    root.appendChild(hero);
+  }
+
   function start() {
     fetch("/api/me", { headers: { accept: "application/json" } })
       .then(function (r) { return r.ok ? r.json() : null; })
@@ -474,9 +609,19 @@
         // Not signed in, or the endpoint is unavailable — show nothing rather
         // than an empty shell. Middleware will have redirected anyone who
         // needed a session to reach this page in the first place.
-        if (data && data.ok && data.user) mount(data);
+        if (data && data.ok && data.user) {
+          mount(data);
+          // The band is decoration; a page that misconfigures it should still
+          // render. The outer catch would swallow this silently otherwise.
+          try { mountHero(data); }
+          catch (e) { if (window.console) console.warn("[ft-toolkit] hero:", e); }
+        }
       })
-      .catch(function () {});
+      .catch(function (e) {
+        // Was silent. A header that fails to render is worth a console line —
+        // it is the difference between "the API is down" and "we shipped a bug".
+        if (window.console) console.warn("[ft-toolkit]", e);
+      });
   }
 
   if (document.readyState === "loading") {

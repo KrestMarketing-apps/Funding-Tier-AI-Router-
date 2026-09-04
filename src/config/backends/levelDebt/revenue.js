@@ -4,20 +4,50 @@ export const revenue = {
   // 🔥 What Funding Tier earns
   companyPayoutRate: 0.08, // 8%
 
-  // Program fee (client-facing, NOT your revenue)
-  standardProgramFee: 0.25,
-  attorneyProgramFee: 0.27,
+  // ── Client-facing program math ───────────────────────────────────────────
+  // Reproduces the Forth enrollment schedule exactly. Verified against a live
+  // plan ($10,000 enrolled, California, 30 months, 25% success fee, 50% est
+  // settlement): total fees $2,839.45, program cost $7,839.45, client savings
+  // $2,160.55, payment $261.32, month 1 savings $156.09, $167.04 thereafter.
+  //
+  //   program cost = (debt x settlement%) + (debt x success fee%)
+  //                  + (gateway monthly x term) + gateway setup
+  //   payment      = program cost / term      <- the SAME every month
+  //
+  // The setup fee is inside the program cost, already spread across the term.
+  // It does not raise month 1; it takes $10.95 out of month 1's savings.
 
+  standardSuccessFee: 0.25,
+  attorneySuccessFee: 0.27,
+  defaultSettlementPct: 0.5,
+
+  gatewayFeeMonthly: 10.95,
+  gatewaySetupFee: 10.95,
+  splitSurchargePerPayment: 0.515,
+
+  // New addition. Forth's current schedule does not show it yet, so a plan
+  // priced here reads $19.99/mo higher than the same plan in Forth until Forth
+  // catches up — expected, not a discrepancy. Pass legalFeeMonthly: 0 in opts
+  // to reconcile against Forth's current output.
+  //
+  // It raises the draft but not the settlement fund: the client pays it, the
+  // amount reaching savings each month is unchanged.
+  legalFeeMonthly: 19.99,
+
+  firstSettlementMilestoneMonth: 6,
+
+  getSuccessFeeRate(state, routing) {
+    if (routing?.isAttorneyModelState?.(state)) return this.attorneySuccessFee;
+    return this.standardSuccessFee;
+  },
+
+  /** Kept for callers that still ask for a "program fee". */
   getProgramFee(state, routing) {
-    if (routing?.isAttorneyModelState?.(state)) {
-      return this.attorneyProgramFee;
-    }
-    return this.standardProgramFee;
+    return this.getSuccessFeeRate(state, routing);
   },
 
   getMaxTerm(totalDebt) {
     const debt = Number(totalDebt || 0);
-
     if (debt < 10000) return 24;
     if (debt < 12500) return 30;
     if (debt < 15000) return 36;
@@ -27,47 +57,97 @@ export const revenue = {
     return 60;
   },
 
-  getMonthlyPayment(totalDebt, state, routing) {
+  /** Full plan breakdown, column for column as Forth renders it. */
+  getPlan(totalDebt, state, routing, opts) {
+    const o = opts || {};
     const debt = Number(totalDebt || 0);
-    const termMonths = this.getMaxTerm(debt);
-    const programFee = this.getProgramFee(state, routing);
+    const term = Math.max(1, Number(o.term || this.getMaxTerm(debt)));
+    const successFeeRate = this.getSuccessFeeRate(state, routing);
+    const settlementPct = o.settlementPct != null ? o.settlementPct : this.defaultSettlementPct;
+    const split = !!o.split;
+    const splitSurcharge = split ? this.splitSurchargePerPayment * 2 : 0;
 
-    const estimatedSettlement = debt * 0.5;
-    const programFees = debt * programFee;
-    const totalProgramCost = estimatedSettlement + programFees;
+    const settlementTarget = debt * settlementPct;
+    const successFeeTotal = debt * successFeeRate;
+    const gatewayTotal = this.gatewayFeeMonthly * term + this.gatewaySetupFee;
+    const legalFeeMonthly = o.legalFeeMonthly != null ? o.legalFeeMonthly : this.legalFeeMonthly;
+    const legalTotal = (legalFeeMonthly + splitSurcharge) * term;
 
-    return totalProgramCost / termMonths;
+    // Forth rounds the draft and the success-fee line to cents, then derives
+    // savings from the rounded figures. Rounding at the end instead leaves
+    // every savings row a cent light.
+    const r2 = (n) => Math.round(n * 100) / 100;
+
+    const totalFees = r2(successFeeTotal + gatewayTotal + legalTotal);
+    const totalProgramCost = r2(settlementTarget + totalFees);
+    const monthlyPayment = r2(totalProgramCost / term);
+
+    return {
+      term, successFeeRate, settlementPct,
+      settlementTarget: r2(settlementTarget), successFeeTotal: r2(successFeeTotal),
+      successFeeMonthly: r2(successFeeTotal / term),
+      gatewayMonthly: this.gatewayFeeMonthly,
+      gatewaySetup: this.gatewaySetupFee,
+      legalFeeMonthly,
+      splitSurcharge,
+      totalFees, totalProgramCost,
+      estClientSavings: r2(debt - totalProgramCost),
+      monthlyPayment,
+      perDraft: split ? r2(monthlyPayment / 2) : null,
+      splitPayments: split,
+    };
   },
 
-  calculate({ totalDebt, state, routing }) {
+  /** What actually leaves the client's account — the same every month. */
+  getMonthlyPayment(totalDebt, state, routing, opts) {
+    return this.getPlan(totalDebt, state, routing, opts).monthlyPayment;
+  },
+
+  /**
+   * The payment schedule. Savings is the remainder after each month's fees,
+   * which is why month 1 is lighter by the setup fee while the draft is not.
+   */
+  getSchedule(totalDebt, state, routing, opts) {
+    const plan = this.getPlan(totalDebt, state, routing, opts);
+    const months = Math.min((opts && opts.months) || plan.term, plan.term);
+    const rows = [];
+    let cumulativeSavings = 0;
+    for (let month = 1; month <= months; month++) {
+      const gatewaySetup = month === 1 ? plan.gatewaySetup : 0;
+      const legalFee = plan.legalFeeMonthly + plan.splitSurcharge;
+      const savings = Math.round((plan.monthlyPayment - plan.successFeeMonthly
+        - plan.gatewayMonthly - gatewaySetup - legalFee) * 100) / 100;
+      cumulativeSavings = Math.round((cumulativeSavings + savings) * 100) / 100;
+      rows.push({
+        month, successFee: plan.successFeeMonthly, gatewaySetup,
+        gatewayMonthly: plan.gatewayMonthly, legalFee,
+        savings, cumulativeSavings, totalPayment: plan.monthlyPayment,
+      });
+    }
+    return rows;
+  },
+
+  calculate({ totalDebt, state, routing, term, settlementPct, split }) {
     const debt = Number(totalDebt || 0);
-
-    const programFee = this.getProgramFee(state, routing);
-    const termMonths = this.getMaxTerm(debt);
-
-    // 🔹 Client-facing math
-    const estimatedSettlement = debt * 0.5;
-    const programFees = debt * programFee;
-    const totalProgramCost = estimatedSettlement + programFees;
-    const monthlyPayment = totalProgramCost / termMonths;
-
-    // 🔥 YOUR ACTUAL REVENUE
-    const companyRevenue = debt * this.companyPayoutRate;
+    const plan = this.getPlan(debt, state, routing, { term, settlementPct, split });
 
     return {
       eligible: debt >= 7000,
-
       totalDebt: debt,
-      termMonths,
+      termMonths: plan.term,
 
       // Client-facing values
-      estimatedSettlement,
-      programFees,
-      totalProgramCost,
-      monthlyPayment,
+      estimatedSettlement: plan.settlementTarget,
+      successFeeTotal: plan.successFeeTotal,
+      totalFees: plan.totalFees,
+      totalProgramCost: plan.totalProgramCost,
+      estClientSavings: plan.estClientSavings,
+      monthlyPayment: plan.monthlyPayment,
+      perDraft: plan.perDraft,
+      splitPayments: plan.splitPayments,
 
       // Internal values (DO NOT expose to agents)
-      totalRevenue: companyRevenue,
+      totalRevenue: debt * this.companyPayoutRate,
       revenueRate: this.companyPayoutRate,
 
       backend: "LEVEL_DEBT"
