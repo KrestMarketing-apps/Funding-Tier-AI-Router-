@@ -487,10 +487,9 @@ tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand))
         <div class="callout" style="margin-bottom:16px;">
           <div style="font-weight:800;margin-bottom:5px;">Why this bonus exists</div>
           <div style="line-height:1.65;">
-            Settlement (Level Debt) and the other two products get paid on different clocks.
-            A book that leans too far one way leaves your month lopsided, so this bonus pays you
-            for carrying enough of both — settlement deals to pad the shorter-term revenue,
-            Validation and Resolution to build the tail.
+            Settlement pays sooner than Validation and Resolution do. A book that drifts too far
+            into the slower-paying products leaves the month thin up front, so this bonus rewards
+            keeping settlement volume high — the more of your book is settlement, the more it pays.
           </div>
         </div>
         <div class="input-grid">
@@ -500,15 +499,15 @@ tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand))
             <div class="field-sub">Level Debt + Debt Validation + Debt Resolution, all together.</div>
           </div>
           <div>
-            <label class="field-label">Validation + Resolution Mix (%)</label>
-            <input type="range" id="bbPct" min="0" max="100" step="5" value="45" style="--accent:var(--purple)" oninput="calcBalancedBook()">
-            <div class="range-val" style="--accent:var(--purple)" id="bbPctVal">45%</div>
-            <div class="field-sub" id="bbSplitSub">The rest of the book is settlement.</div>
+            <label class="field-label">Settlement Share of the Book (%)</label>
+            <input type="range" id="bbPct" min="0" max="100" step="5" value="55" style="--accent:var(--purple)" oninput="calcBalancedBook()">
+            <div class="range-val" style="--accent:var(--purple)" id="bbPctVal">55%</div>
+            <div class="field-sub" id="bbSplitSub">The rest of the book is Validation + Resolution.</div>
           </div>
         </div>
         <div id="bbResult"></div>
         <div class="table-wrap" style="margin-top:14px;"><table>
-          <thead><tr><th>Validation + Resolution share of the book</th><th>Rest of the book (settlement)</th><th>Bonus</th></tr></thead>
+          <thead><tr><th>Settlement share of the book</th><th>Rest (Validation + Resolution)</th><th>Bonus</th></tr></thead>
           <tbody id="bbTierRows"></tbody>
         </table></div>
         <div class="field-sub" style="margin-top:8px;">
@@ -622,6 +621,9 @@ function monthlyBonusFor(deals){
 function nextMonthlyTier(deals){
   return MONTHLY_TIERS.find(t=>deals<t.min) || null;
 }
+/* Thresholds are on the SETTLEMENT share of the month's book. The bonus exists
+   to pull settlement volume up, so the more of the book is settlement, the
+   larger it pays. These read the settlement side; the payouts are unchanged. */
 const BALANCED_TIERS = [
   {pct:0.70, bonus:500},
   {pct:0.50, bonus:250},
@@ -888,14 +890,14 @@ function calcBalancedBook(){
   document.getElementById('bbPctVal').textContent = pct+'%';
   const p = pct/100;
 
-  // Spell the mix out as actual deals. "45%" on its own tells a rep nothing;
-  // "9 validation + resolution, 11 settlement" is the thing they can act on.
-  const vr  = Math.round(total * p);
-  const stl = Math.max(0, total - vr);
+  // Spell the mix out as actual deals. "55%" on its own tells a rep nothing;
+  // "11 settlement, 9 validation + resolution" is the thing they can act on.
+  const stl = Math.round(total * p);
+  const vr  = Math.max(0, total - stl);
   document.getElementById('bbSplitSub').textContent =
     total > 0
-      ? `${vr} Validation + Resolution · ${stl} settlement, out of ${total}.`
-      : 'The rest of the book is settlement.';
+      ? `${stl} settlement · ${vr} Validation + Resolution, out of ${total}.`
+      : 'The rest of the book is Validation + Resolution.';
 
   let bonus = 0;
   if(total>=5){
@@ -904,12 +906,16 @@ function calcBalancedBook(){
 
   // The tier ladder, with the one you are standing on marked. It used to be
   // invisible — the panel paid out a number with no way to see what came next.
+  // Mark only the tier being paid — the highest one cleared, not every one below it.
+  const payingPct = bonus > 0
+    ? Math.max(...BALANCED_TIERS.filter(t=>p>=t.pct).map(t=>t.pct))
+    : null;
   document.getElementById('bbTierRows').innerHTML = BALANCED_TIERS
     .slice().sort((a,b)=>a.pct-b.pct)
     .map(t=>{
-      const hit = total>=5 && p>=t.pct;
+      const hit = payingPct !== null && t.pct === payingPct;
       return `<tr${hit?' style="background:rgba(124,58,237,.07);"':''}>
-        <td>${Math.round(t.pct*100)}% or more${hit?' <strong style="color:var(--purple);">← you are here</strong>':''}</td>
+        <td>${Math.round(t.pct*100)}% or more settlement${hit?' <strong style="color:var(--purple);">← you are here</strong>':''}</td>
         <td>up to ${100-Math.round(t.pct*100)}%</td>
         <td class="num${hit?' good-txt':''}">${fmt(t.bonus)}</td>
       </tr>`;
@@ -921,10 +927,11 @@ function calcBalancedBook(){
   if(total < 5){
     nextLine = `${5-total} more deal${5-total!==1?'s':''} to qualify at all.`;
   } else if(nextTier){
-    const needVr = Math.ceil(nextTier.pct * total);
-    const add = Math.max(0, needVr - vr);
+    // Settlement deals are additive — one more settlement deal raises both the
+    // numerator and the total, so solve for it rather than assuming a fixed total.
+    const add = Math.max(0, Math.ceil((nextTier.pct*total - stl) / (1 - nextTier.pct)));
     nextLine = add > 0
-      ? `${add} more Validation or Resolution deal${add!==1?'s':''} this month reaches ${Math.round(nextTier.pct*100)}% — worth ${fmt(nextTier.bonus - bonus)} more.`
+      ? `${add} more settlement deal${add!==1?'s':''} this month reaches ${Math.round(nextTier.pct*100)}% — worth ${fmt(nextTier.bonus - bonus)} more.`
       : `You are one rounding step from ${Math.round(nextTier.pct*100)}%.`;
   } else {
     nextLine = 'Top tier — this is the largest Balanced Book Bonus available.';
@@ -936,7 +943,7 @@ function calcBalancedBook(){
         <div style="font-size:13px;font-weight:600;">
           ${total<5
             ? `Needs 5+ total deals — currently ${total}.`
-            : `${vr} Validation + Resolution and ${stl} settlement out of ${total} deals is a ${pct}% mix.`}
+            : `${stl} settlement and ${vr} Validation + Resolution out of ${total} deals is a ${pct}% settlement book.`}
         </div>
         <div style="text-align:right;">
           <div class="stat-lbl">Balanced Book Bonus</div>

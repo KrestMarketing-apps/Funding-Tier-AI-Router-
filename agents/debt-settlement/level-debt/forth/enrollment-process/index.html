@@ -325,7 +325,7 @@
   <button class="tabbtn active" data-tab="overview">Overview</button>
   <button class="tabbtn" data-tab="enrollment">Enrollment Process</button>
   <button class="tabbtn" data-tab="callflow">Call / Process Flow</button>
-  <button class="tabbtn" data-tab="aiqc">AI Compliance Call</button>
+  <button class="tabbtn" data-tab="aiqc">AI Compliance Call <span style="opacity:.62;font-weight:500;">&middot; final step</span></button>
   <button class="tabbtn" data-tab="budget">Budget Analysis</button>
   <button class="tabbtn" data-tab="credit">Credit Report Basics</button>
   <button class="tabbtn" data-tab="reference">Quick Reference</button>
@@ -633,6 +633,12 @@
       <strong>Confirmed from the live system</strong>
       There isn't yet a separate "LP"-specific compliance template &mdash; the standard Level/Pinnacle Compliance Script templates (NO Benefits / and Benefits) are what's currently used regardless of the legal fee. Flag with your team lead if that should change once the LP rollout is complete everywhere.
     </div>
+
+    <div class="callout" style="border-color:var(--green);background:#F2FAF6;">
+      <strong>Last step of enrollment &rarr; the AI compliance call</strong>
+      Submitting the file is not the end of the enrollment. The compliance call runs immediately after, on an AI voicebot, and the file is not done until it is time-stamped.
+      <a href="#" onclick="goTab('aiqc');return false;" style="display:inline-block;margin-top:9px;font-weight:800;">Open the AI Compliance Call steps &rarr;</a>
+    </div>
   </div>
 
   <!-- =================== CALL / PROCESS FLOW =================== -->
@@ -692,7 +698,8 @@
   <!-- =================== AI COMPLIANCE / QC CALL =================== -->
   <div class="panel" id="aiqc">
     <div class="section-head">
-      <div class="eyebrow"><span class="dot"></span>After the sale, before the file closes</div>
+      <div class="eyebrow"><span class="dot"></span>Final step of
+        <a href="#" onclick="goTab('enrollment');return false;" style="font-weight:700;">the enrollment process</a></div>
       <h2>AI compliance (QC) call</h2>
       <p>Level Debt runs the compliance call with an AI voicebot instead of a live agent queue. You submit the file, wait a minute, then transfer the client to the compliance number that matches the deal type. The bot verifies identity, reads the compliance script, and time-stamps the result in the system. It is available 24/7 and takes unlimited calls at once, so there is no hold queue.</p>
     </div>
@@ -732,19 +739,27 @@
         <div class="step-body">
           <div class="step-kicker">Step 3</div>
           <h4>Transfer to the compliance line for the deal type</h4>
-          <p>Each deal type has its own number. Using the wrong one puts the client in front of a bot that has no file for them.</p>
+          <p>Which bot you send the client to depends on <strong>two</strong> things: whether the deal carries Level Coaching / benefits, and whether the client's state of residence is a <strong>green or red state</strong>. Red states run the Pinnacle Legal entity. Using the wrong one puts the client in front of a bot that has no file for them.</p>
           <div class="card" style="padding:0;overflow:hidden;margin-top:12px;">
             <table>
-              <thead><tr><th>Deal type</th><th>Compliance line</th><th>Saved in the dialer as</th></tr></thead>
+              <thead><tr><th>Contact name in app.krestmarketing.com</th><th>Coaching / benefits</th><th>State</th><th>Number</th></tr></thead>
               <tbody>
-                <tr><td>Level Debt <strong>with</strong> Level Coaching</td><td>916-954-9713</td><td>AI Compliance &mdash; Level Debt + Coaching</td></tr>
-                <tr><td>Level Debt <strong>no</strong> Level Coaching</td><td>916-249-6493</td><td>AI Compliance &mdash; Level Debt</td></tr>
-                <tr><td>Pinnacle <strong>with</strong> Level Coaching</td><td>916-252-4551</td><td>AI Compliance &mdash; Pinnacle + Coaching</td></tr>
-                <tr><td>Pinnacle <strong>no</strong> Level Coaching</td><td>916-302-9310</td><td>AI Compliance &mdash; Pinnacle</td></tr>
+                <tr><td>LEVEL DEBT AI-QC | W/ Benefits/Coaching GREEN STATES</td><td>With</td><td>Green</td><td>916-954-9713</td></tr>
+                <tr><td>LEVEL DEBT AI-QC | NO BENEFITS_NO COACHING GREEN STATES</td><td>Without</td><td>Green</td><td>916-249-6493</td></tr>
+                <tr><td>LEVEL _PINNACLE LEGAL AI-QC | W/ Benefits/Coaching_RED STATES</td><td>With</td><td>Red</td><td>916-252-4551</td></tr>
+                <tr><td>LEVEL_PINNACLE LEGAL AI-QC | NO BENEFITS_NO COACHING GREEN STATES</td><td>Without</td><td>Green</td><td>916-302-9310</td></tr>
               </tbody>
             </table>
           </div>
-          <p style="margin-top:12px;">All four are saved as contacts in <strong>app.krestmarketing.com</strong>, so you transfer by name rather than typing digits &mdash; see the transfer walkthrough below.</p>
+          <div class="callout warn" style="margin-top:12px;">
+            <strong>One row to confirm</strong>
+            The names above are exactly as they read in the CRM. The last one is a Pinnacle Legal bot labelled GREEN STATES, while the other Pinnacle line is labelled RED &mdash; so there is no red-state number for a deal without coaching. Check with the team which bot a red-state, no-coaching file goes to before you transfer one.
+          </div>
+          <p style="margin-top:14px;">All four are saved as contacts, so you search the name rather than typing digits:</p>
+          <figure style="margin:12px 0 0;">
+            <img src="img/qc-contacts-list.png" alt="The four Level Debt AI-QC bots saved as contacts in app.krestmarketing.com, with their 916 numbers" style="width:100%;height:auto;border-radius:10px;border:1px solid var(--line);display:block;">
+            <figcaption style="font-size:12.5px;color:var(--ink-soft);margin-top:7px;">The AI-QC bots as they appear under Contacts. Search &ldquo;AI-QC&rdquo; to pull all four up.</figcaption>
+          </figure>
         </div>
       </div>
       <div class="step">
@@ -801,7 +816,11 @@
         <div class="step-body">
           <div class="step-kicker">Transfer</div>
           <h4>Pick the compliance contact by name</h4>
-          <p>Start typing &ldquo;AI Compliance&rdquo; in the transfer field and pick the entry that matches the deal type from the table above. Read the contact name back to yourself before you commit &mdash; Level Debt and Pinnacle sit next to each other in the list, and with or without coaching is a second fork on top of that.</p>
+          <p>Start typing &ldquo;AI-QC&rdquo; in the transfer field and pick the entry that matches the deal from the table above. Read the contact name back to yourself before you commit &mdash; Level Debt and Pinnacle sit next to each other in the list, coaching or no coaching is a second fork, and green or red state is a third.</p>
+          <figure style="margin:12px 0 0;">
+            <img src="img/qc-dialer.png" alt="The dialer in app.krestmarketing.com showing the compliance number ready to connect" style="width:100%;max-width:520px;height:auto;border-radius:10px;border:1px solid var(--line);display:block;">
+            <figcaption style="font-size:12.5px;color:var(--ink-soft);margin-top:7px;">The dialer with the compliance line selected. The client's own number stays on the contact record behind it.</figcaption>
+          </figure>
         </div>
       </div>
       <div class="step">
@@ -809,7 +828,11 @@
         <div class="step-body">
           <div class="step-kicker">Transfer</div>
           <h4>Choose blind transfer, then stay reachable</h4>
-          <p>Select <strong>blind transfer</strong> to hand the client straight to the bot without an introduction step. Confirm, and the client is connected.</p>
+          <p>The live-call controls carry both options side by side. Select <strong>Blind Transfer</strong> to hand the client straight to the bot without an introduction step. Confirm, and the client is connected.</p>
+          <figure style="margin:12px 0;">
+            <img src="img/qc-blind-transfer.png" alt="Live call controls in app.krestmarketing.com showing Blind Transfer and Warm Transfer" style="width:100%;max-width:560px;height:auto;border-radius:10px;border:1px solid var(--line);display:block;">
+            <figcaption style="font-size:12.5px;color:var(--ink-soft);margin-top:7px;">Blind Transfer and Warm Transfer sit next to each other in the in-call panel &mdash; make sure you pick the one below.</figcaption>
+          </figure>
           <div class="callout warn" style="margin-top:12px;">
             <strong>Check this against Level Debt's own SOP first</strong>
             Level Debt's Compliance AI Voice Bot SOP (v1.1) says to always warm transfer the client to the bot and
@@ -995,6 +1018,16 @@
 <script>
   const tabButtons = document.querySelectorAll('.tabbtn');
   const panels = document.querySelectorAll('.panel');
+
+  // Cross-links between tabs — the enrollment steps and the compliance call are
+  // one process, so each end points at the other rather than making the rep
+  // hunt for the tab.
+  function goTab(id){
+    tabButtons.forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+    panels.forEach(p=>p.classList.toggle('active', p.id===id));
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  window.goTab = goTab;
   tabButtons.forEach(btn=>{
     btn.addEventListener('click', ()=>{
       tabButtons.forEach(b=>b.classList.remove('active'));
