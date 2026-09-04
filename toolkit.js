@@ -492,7 +492,9 @@
      ───────────────────────────────────────────────────────────────────────── */
 
   var HERO_CSS = `
-    :host { display: block; }
+    /* flow-root, not block: a slotted element's own margin would otherwise
+       collapse out through the host and push the whole band down the page. */
+    :host { display: flow-root; }
     .hero {
       position: relative; overflow: hidden;
       font-family: -apple-system, "Inter", Segoe UI, Helvetica, Arial, sans-serif;
@@ -544,7 +546,11 @@
     var mode = isAdminish(data.user && data.user.role) ? "admin" : "agent";
 
     var host = el("div", { id: "ft-hero" });
-    // First child of body, so it lands directly under the fixed bar.
+    // First child of body, so it lands directly under the fixed bar. The
+    // inline style is belt and braces for the same margin-collapse problem:
+    // the shadow root's :host rule cannot contain a margin that escapes
+    // before the shadow tree is attached.
+    host.style.display = "flow-root";
     document.body.insertBefore(host, document.body.firstChild);
     var root = host.attachShadow({ mode: "open" });
     root.appendChild(el("style", { text: HERO_CSS }));

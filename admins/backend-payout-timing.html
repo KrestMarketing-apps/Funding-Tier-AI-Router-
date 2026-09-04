@@ -109,28 +109,21 @@ table.disb .double td{background:rgba(20,184,166,.06)!important;}
 .example-scenario-label{font-size:10px;font-weight:800;color:var(--g);text-transform:uppercase;letter-spacing:.4px;margin:14px 0 8px;}
 .example-scenario-label:first-child{margin-top:0;}
 </style>
+<script>
+  /* Hero band rendered by toolkit.js — mode comes from the /api/me role. */
+  window.FT_TOOL = {
+    eyebrow: "ADMIN \u00B7 CASH-FLOW REFERENCE",
+    title: "Backend Payout Timing",
+    subtitle: "Real disbursement timing per backend, cross-referenced against agent payout dates. Agent-facing tools show only the resulting payout date \u2014 this is the internal record of the cash-flow buffer behind it.",
+    badge: { text: "ADMIN ONLY" }
+  };
+</script>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">
-      <img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png" alt="Funding Tier"/>
-      <div>
-        <div class="brand-title">Backend Payout Timing</div>
-        <div class="brand-sub">Internal Cash-Flow Reference</div>
-      </div>
-    </div>
-    <span class="admin-badge">🔒 Admin Only — Not Agent-Facing</span>
-  </div>
-</header>
+<!-- Masthead and admin badge now come from the shared hero band (FT_TOOL above). -->
 
 <main>
-  <div class="page-head">
-    <h1 class="page-title">Who Pays Us, When, and Our Float Risk</h1>
-    <p class="page-lede">Real disbursement timing per backend, cross-referenced against agent payout dates. Agent-facing tools intentionally show only the resulting payout date — this page is the internal record of the cash-flow buffer behind it.</p>
-  </div>
-
   <div class="card">
     <div class="card-hd hd-ld">
       <div class="card-hd-l">
