@@ -28,7 +28,7 @@
     --brand-gradient-accent: linear-gradient(135deg,#0F9D8A 0%,#0B7D6E 100%);
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;}
   body{
     background:var(--brand-gradient-soft);
     background-attachment:fixed;
@@ -349,6 +349,51 @@
     background-repeat:no-repeat;background-position:center;background-size:contain;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M4 15V9M9 15V4M14 15v-6' fill='none' stroke='%230B7D6E' stroke-width='2' stroke-linecap='round'/></svg>");
   }
+  /* ---------- ZOOM ---------- */
+  .shot img, figure img{cursor:zoom-in;}
+  #lightbox-overlay{
+    position:fixed;inset:0;background:rgba(10,15,20,.88);
+    display:none;align-items:center;justify-content:center;
+    z-index:99999;padding:24px;cursor:zoom-out;
+  }
+  #lightbox-overlay.active{display:flex;}
+  #lightbox-overlay img{max-width:96vw;max-height:92vh;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5);}
+  #lightbox-hint{
+    position:fixed;top:18px;left:50%;transform:translateX(-50%);
+    background:rgba(255,255,255,.92);color:var(--forest,#0F172A);
+    font-size:12.5px;font-weight:600;padding:6px 14px;border-radius:999px;
+    z-index:100000;
+  }
+
+  /* ---------- MOBILE ---------- */
+  @media (max-width:640px){
+    .topbar{padding:16px 18px;}
+    .page-title{text-align:left;width:100%;}
+    .wrap{padding:20px 14px 60px;}
+    .tabbtn{padding:12px 14px;font-size:13px;white-space:nowrap;}
+    h2{font-size:21px !important;}
+    .section-head p{font-size:14px;}
+    .card{padding:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    table{min-width:520px;}
+    .step{gap:12px;padding:18px 0;}
+    .step-num{width:34px;height:34px;font-size:14px;border-radius:9px;}
+    .mini-flow-step{gap:10px;padding:14px 0;}
+    .mini-flow-num{width:32px;height:32px;font-size:14px;border-radius:9px;}
+    .flow{gap:8px;}
+    .flow-node{flex:1 1 130px;padding:11px;}
+    .flow-arrow{display:none;}
+    .mini-stat-row{gap:8px;}
+    .mini-stat{font-size:12px;padding:7px 10px;}
+    .callout{padding:14px 14px 14px 42px;font-size:13.5px;}
+    .callout::before{left:12px;top:14px;width:17px;height:17px;}
+    .video-caption{flex-direction:column;gap:2px;align-items:flex-start;}
+    #lightbox-overlay{padding:10px;}
+  }
+  @media (max-width:400px){
+    .flow-node{flex:1 1 100%;}
+    .mini-stat{flex:1 1 100%;}
+  }
+
 </style>
 </head>
 <body>
@@ -1057,6 +1102,32 @@
 </script>
 
 <script src="https://ai.fundingtier.com/toolkit.js" defer></script>
+
+<div id="lightbox-hint" style="display:none;">Tap anywhere to close</div>
+<div id="lightbox-overlay"><img id="lightbox-img" src="" alt=""></div>
+<script>
+  (function(){
+    var overlay = document.getElementById('lightbox-overlay');
+    var lbImg = document.getElementById('lightbox-img');
+    var hint = document.getElementById('lightbox-hint');
+    function openLightbox(src){
+      lbImg.src = src;
+      overlay.classList.add('active');
+      hint.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox(){
+      overlay.classList.remove('active');
+      hint.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.shot img, figure img').forEach(function(img){
+      img.addEventListener('click', function(){ openLightbox(img.src); });
+    });
+    overlay.addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLightbox(); });
+  })();
+</script>
 
 </body>
 </html>
