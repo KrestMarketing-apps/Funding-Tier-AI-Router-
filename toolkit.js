@@ -141,6 +141,8 @@
     .group { border-radius: 11px; }
     .group.admin { background: var(--admin-wash); border: 1px solid var(--admin-line); }
     .group.admin > .ghead { padding-top: 9px; }
+    .group.agent { background: var(--agent-wash); border: 1px solid var(--agent-line); }
+    .group.agent > .ghead { padding-top: 9px; }
 
     .ghead {
       display: flex; align-items: center; gap: 8px; width: 100%;
@@ -153,6 +155,11 @@
              text-transform: uppercase; }
     .group.admin .gname {
       background: linear-gradient(92deg, var(--g2), var(--g3));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .group.agent .gname {
+      background: linear-gradient(92deg, var(--ga2), var(--ga3));
       -webkit-background-clip: text; background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -238,6 +245,9 @@
       --ring-soft: rgba(63,224,207,.20);
       --admin-wash: rgba(27,143,168,.10);
       --admin-line: rgba(63,224,207,.16);
+      --ga1:#6FB6FF; --ga2:#3D9DFF; --ga3:#1C5FD6;
+      --agent-wash: rgba(61,157,255,.10);
+      --agent-line: rgba(61,157,255,.22);
 
       --warn:#e8bd6f; --warn-soft: rgba(232,189,111,.12); --warn-line: rgba(232,189,111,.28);
       --danger:#f39387; --danger-soft: rgba(243,147,135,.12);
@@ -369,7 +379,7 @@
         writeCollapsed(collapsed);
       });
 
-      pop.appendChild(el("div", { class: "group" + (g.admin ? " admin" : "") }, [head, list]));
+      pop.appendChild(el("div", { class: "group" + (g.admin ? " admin" : " agent") }, [head, list]));
     });
 
     var toolsBtn = el("button", {
