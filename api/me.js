@@ -5,7 +5,7 @@
 // machine never receives the admin entries at all.
 
 import { COOKIE, readSession, readCookie } from "../lib/auth.js";
-import { sectionsFor, CRM } from "../lib/tools.js";
+import { sectionsFor, SUPPORT, CRM } from "../lib/tools.js";
 
 export default async function handler(req, res) {
   res.setHeader("cache-control", "no-store");
@@ -28,6 +28,9 @@ export default async function handler(req, res) {
       role: session.role,
     },
     sections: sectionsFor(session.role),
+    // Admin-only, same server-side filtering principle as sections above —
+    // an agent's browser never receives these links at all.
+    support: session.role === "admin" ? SUPPORT : [],
     crm: CRM,
   });
 }

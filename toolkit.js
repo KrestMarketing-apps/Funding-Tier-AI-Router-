@@ -175,6 +175,28 @@
     .ghead[aria-expanded="false"] .gcaret { transform: rotate(-45deg) translate(-1px,1px); }
 
     .glist { padding: 0 2px 6px; }
+
+    /* --- Nested sub-group (Backend Support, under Admins) ----------------- */
+    .subgroup { margin: 6px 6px 2px; border-top: 1px solid var(--line); padding-top: 6px; }
+    .shead {
+      display: flex; align-items: center; gap: 8px; width: 100%;
+      font: inherit; color: var(--dim); background: transparent; border: 0;
+      padding: 6px 4px; border-radius: 8px; cursor: pointer; text-align: left;
+      transition: color .12s ease, background .12s ease;
+    }
+    .shead:hover { color: var(--text); background: var(--hover); }
+    .sname { font-size: 9.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .scaret { width: 6px; height: 6px; flex: none; opacity: .6;
+              border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+              transform: rotate(45deg) translate(-1px,-1px);
+              transition: transform .18s ease; margin-left: auto; }
+    .shead[aria-expanded="false"] .scaret { transform: rotate(-45deg) translate(-1px,1px); }
+    .slist[hidden] { display: none; }
+    .sitem { display: flex; align-items: center; gap: 9px; text-decoration: none;
+             color: var(--text); padding: 7px 8px; border-radius: 8px;
+             transition: background .12s ease; }
+    .sitem:hover { background: var(--hover); }
+    .sitem .sb { font-size: 11.5px; color: var(--dim); margin-left: auto; }
     .glist[hidden] { display: none; }
 
     .item { position: relative; display: block; text-decoration: none; color: var(--text);
@@ -183,6 +205,21 @@
     .item:hover { background: var(--hover); }
     .item .t { font-weight: 600; display: flex; align-items: center; gap: 7px; }
     .item .b { font-size: 12.5px; color: var(--dim); margin-top: 1px; }
+
+    /* Flagship items (the enrollment SOPs) get a logo badge and a touch more
+       room so they read as a distinct set rather than blending into the rest
+       of the Agents list. */
+    .item.flagship { padding: 11px 12px 11px 12px; }
+    .item.flagship .t { gap: 9px; }
+    .logo-badge {
+      flex: none; width: 22px; height: 22px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9.5px; font-weight: 800; color: #fff; letter-spacing: -.02em;
+    }
+    .item.flagship::before {
+      content: ""; position: absolute; left: 3px; top: 8px; bottom: 8px; width: 3px;
+      border-radius: 2px; background: var(--flagship-color, transparent); opacity: .55;
+    }
 
     /* Current page: tinted, with a gradient rail rather than a flat bar. */
     .item[aria-current="page"] { background: var(--accent-soft); }
@@ -350,16 +387,68 @@
 
       var list = el("div", { class: "glist", role: "group" });
       g.tools.forEach(function (t) {
-        var title = el("div", { class: "t" }, [el("span", { text: t.label })]);
+        var titleKids = [];
+        if (t.logo) {
+          titleKids.push(el("span", {
+            class: "logo-badge",
+            style: "background:" + t.logo.color + ";",
+            text: t.logo.initials,
+          }));
+        }
+        titleKids.push(el("span", { text: t.label }));
+        var title = el("div", { class: "t" }, titleKids);
         if (t.wip) title.appendChild(el("span", { class: "tag", text: "WIP" }));
+        var itemClass = "item" + (t.flagship ? " flagship" : "");
+        var itemStyle = t.flagship && t.logo ? "--flagship-color:" + t.logo.color + ";" : null;
         var item = el("a", {
-          class: "item", href: t.href, role: "menuitem",
+          class: itemClass, href: t.href, role: "menuitem", style: itemStyle,
           "aria-current": isHere(t.href) ? "page" : null,
         }, [title]);
         if (t.blurb) item.appendChild(el("div", { class: "b", text: t.blurb }));
         list.appendChild(item);
       });
       if (!open) list.hidden = true;
+
+      // Backend Support — a nested, collapsible sub-group inside Admins only.
+      // Same collapsed/expanded persistence pattern as the top-level groups,
+      // under its own storage key so opening one never touches the other.
+      if (g.admin && data.support && data.support.length) {
+        var subOpen = !collapsed["backend-support"];
+        var slist = el("div", { class: "slist", role: "group" });
+        data.support.forEach(function (s) {
+          var kids = [];
+          if (s.logo) {
+            kids.push(el("span", {
+              class: "logo-badge",
+              style: "background:" + s.logo.color + ";",
+              text: s.logo.initials,
+            }));
+          }
+          kids.push(el("span", { text: s.label }));
+          if (s.blurb) kids.push(el("span", { class: "sb", text: s.blurb }));
+          slist.appendChild(el("a", {
+            class: "sitem", href: s.href, role: "menuitem", target: "_blank", rel: "noopener",
+          }, kids));
+        });
+        if (!subOpen) slist.hidden = true;
+
+        var shead = el("button", {
+          class: "shead", type: "button", "aria-expanded": subOpen ? "true" : "false",
+        }, [
+          el("span", { class: "sname", text: "Backend Support" }),
+          el("span", { class: "scaret" }),
+        ]);
+        shead.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var nowOpen = slist.hidden;
+          slist.hidden = !nowOpen;
+          shead.setAttribute("aria-expanded", nowOpen ? "true" : "false");
+          collapsed["backend-support"] = !nowOpen;
+          writeCollapsed(collapsed);
+        });
+
+        list.appendChild(el("div", { class: "subgroup" }, [shead, slist]));
+      }
 
       var head = el("button", {
         class: "ghead", type: "button", "aria-expanded": open ? "true" : "false",
