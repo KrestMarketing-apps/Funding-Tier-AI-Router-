@@ -164,9 +164,9 @@
       <label class="ilbl">Term <span class="tnote" id="termNote"></span></label>
       <div class="dual">
         <div class="drow"><div class="pwrap">
-          <input type="number" id="termField" class="hfld nopfx" min="1" max="60" step="1" value="22">
+          <input type="number" id="termField" class="hfld nopfx" min="1" max="60" step="1" value="60">
         </div><span class="sfx">mo</span></div>
-        <input type="range" id="termSlider" min="1" max="60" step="1" value="22">
+        <input type="range" id="termSlider" min="1" max="60" step="1" value="60">
       </div>
     </div>
 
@@ -462,6 +462,12 @@
   let maintFee = 80;
   let isSplit  = false;
 
+  // The term defaults to the longest one this deal can run. It stays pinned to
+  // that ceiling until the user moves the term control themselves, and re-pins
+  // whenever a term-defining input (debt, service fee, maintenance fee,
+  // payment schedule) changes — the ceiling is a function of those.
+  let termUserSet = false;
+
   // ── SVG helper ────────────────────────────────────────────
   function el(tag,attrs){
     const e=document.createElementNS("http://www.w3.org/2000/svg",tag);
@@ -476,6 +482,19 @@
     f.addEventListener("blur",()=>{const v=clamp(+f.value||lo,lo,hi);f.value=v;s.value=v;update();});
     s.addEventListener("input",()=>{f.value=s.value;update();});
   }
+  // Term-default tracking. Registered before linkDual so the flag is correct by
+  // the time linkDual's own handler calls update().
+  ["termField","termSlider"].forEach(id=>{
+    const e=document.getElementById(id);
+    e.addEventListener("input",()=>{termUserSet=true;});
+    e.addEventListener("change",()=>{termUserSet=true;});
+  });
+  ["debtField","debtSlider","feeField","feeSlider"].forEach(id=>{
+    const e=document.getElementById(id);
+    e.addEventListener("input",()=>{termUserSet=false;});
+    e.addEventListener("blur", ()=>{termUserSet=false;});
+  });
+
   linkDual("debtField","debtSlider",6000,500000);
   linkDual("feeField","feeSlider",35,49);
   linkDual("termField","termSlider",TERM_MIN,TERM_MAX);
@@ -485,7 +504,7 @@
   document.getElementById("maintBtns").addEventListener("click",e=>{
     const b=e.target.closest(".mbtn");if(!b)return;
     document.querySelectorAll("#maintBtns .mbtn").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active");maintFee=+b.dataset.val;update();
+    b.classList.add("active");maintFee=+b.dataset.val;termUserSet=false;update();
   });
 
   // payment schedule toggle
@@ -494,6 +513,7 @@
     document.querySelectorAll("#splitBtns .mbtn").forEach(x=>x.classList.remove("active","active-amber"));
     if(b.dataset.val==="split"){b.classList.add("active-amber");}else{b.classList.add("active");}
     isSplit = b.dataset.val === "split";
+    termUserSet = false;
     update();
   });
 
@@ -745,7 +765,11 @@
     const termSlider = document.getElementById("termSlider");
     const termField  = document.getElementById("termField");
     termSlider.max = mxTerm;
-    if(term > mxTerm){ term = mxTerm; termField.value = mxTerm; termSlider.value = mxTerm; }
+    termField.max  = mxTerm;
+    // Default to the ceiling: until the term control is touched, the term IS
+    // the longest term this debt/fee pair supports, and it follows that ceiling
+    // as the inputs move. A term that breaks the floor is pulled back either way.
+    if(!termUserSet || term > mxTerm){ term = mxTerm; termField.value = mxTerm; termSlider.value = mxTerm; }
     const termNote = document.getElementById("termNote");
     if(termNote){
       const atCap = term >= mxTerm;
