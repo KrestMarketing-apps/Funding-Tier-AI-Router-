@@ -1,6 +1,3 @@
-
-
-Vercel · JSON
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
