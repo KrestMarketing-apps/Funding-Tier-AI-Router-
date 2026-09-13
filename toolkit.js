@@ -197,6 +197,22 @@
              transition: background .12s ease; }
     .sitem:hover { background: var(--hover); }
     .sitem .sb { font-size: 11.5px; color: var(--dim); margin-left: auto; }
+    /* A backend that also has a reference page on this site carries it on the
+       same row: chat link left, page chip right. One row, two doors, no
+       duplicate entry up in the Admins list. */
+    .srow { display: flex; align-items: center; gap: 4px; }
+    .srow .sitem { flex: 1 1 auto; min-width: 0; }
+    .srow .sitem .sb { margin-left: auto; padding-left: 8px; }
+    .spage { flex: none; text-decoration: none; white-space: nowrap;
+             font-size: 10px; font-weight: 700; letter-spacing: .07em;
+             text-transform: uppercase; color: var(--dim);
+             background: var(--chip); border: 1px solid var(--line);
+             padding: 5px 9px; border-radius: 999px; margin-right: 4px;
+             transition: color .12s ease, background .12s ease, border-color .12s ease; }
+    .spage:hover { color: var(--text); background: var(--hover); border-color: var(--line-strong); }
+    .spage[aria-current="page"] { color: var(--accent-ink);
+                                  background: var(--accent-soft);
+                                  border-color: var(--ring-soft); }
     .glist[hidden] { display: none; }
 
     .item { position: relative; display: block; text-decoration: none; color: var(--text);
@@ -374,6 +390,14 @@
     groups.forEach(function (g) {
       g.tools.forEach(function (t) { if (isHere(t.href)) current = t; });
     });
+    // Reference pages hang off a Backend Support row rather than sitting in
+    // the tool list, so name them here too — otherwise the bar goes blank on
+    // a page the menu can plainly reach.
+    (data.support || []).forEach(function (s) {
+      if (s.page && isHere(s.page.href)) {
+        current = { label: s.page.title || s.page.label };
+      }
+    });
 
     // --- tools popover ---
     var collapsed = readCollapsed();
@@ -426,9 +450,20 @@
           }
           kids.push(el("span", { text: s.label }));
           if (s.blurb) kids.push(el("span", { class: "sb", text: s.blurb }));
-          slist.appendChild(el("a", {
+          var chat = el("a", {
             class: "sitem", href: s.href, role: "menuitem", target: "_blank", rel: "noopener",
-          }, kids));
+          }, kids);
+          if (!s.page) { slist.appendChild(chat); return; }
+          // Internal page, so it opens in place — nesting it inside the chat
+          // anchor would be invalid markup, hence the wrapping row.
+          var page = el("a", {
+            class: "spage", href: s.page.href, role: "menuitem",
+            title: s.page.title || s.page.label,
+            "aria-label": s.label + " — " + (s.page.title || s.page.label),
+            "aria-current": isHere(s.page.href) ? "page" : null,
+            text: s.page.label,
+          });
+          slist.appendChild(el("div", { class: "srow" }, [chat, page]));
         });
         if (!subOpen) slist.hidden = true;
 
