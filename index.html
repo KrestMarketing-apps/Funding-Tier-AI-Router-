@@ -2620,6 +2620,9 @@ function renderClocks(){
 }
 
 const UNIVERSAL_CLAWBACK = 'No clawback for ordinary cancellation — if a client simply stops paying, remaining commission just stops. If a client formally disputes or charges back any payment, at any point in the program, all commission and any bonus already paid on that file will be clawed back. This is rare, applied uniformly across all programs as a matter of business integrity.';
+// Level Debt claws its 8% upfront payout back if the client's 2nd program
+// payment does not clear, so Level commission is only final after payment 2.
+const LEVEL_CLAWBACK = 'Level Debt takes back its payout if the client\u2019s 2nd program payment does not clear, so this commission is final once payment 2 clears; a cancellation or failed payment 2 before then is deducted from your next payment. If a client formally disputes or charges back any payment, at any point in the program, all commission and any bonus already paid on that file will be clawed back.';
 
 function getCommForCard(c,key){
   const total=c.total;
@@ -2638,7 +2641,7 @@ function getCommForCard(c,key){
     return{
       base, baseWhen:'1st of the following month (Payment 1 clears 1st\u201315th) or 15th of the following month (clears 16th\u2013end of month)',
       grandTotal:base,
-      clawback:UNIVERSAL_CLAWBACK,
+      clawback:LEVEL_CLAWBACK,
       note:`T1 ${fmt(base)} · T2 ${fmt(t2)} · T3 ${fmt(t3)}`,
       isLD:true, t2, t3
     };
@@ -2948,7 +2951,7 @@ function renderLegacyCard(c){
         &#9432; Commission scales with the service fee. Base commission at 40%: ${fmt(activeBand.total)}. 
         At ${feeLabel}%: ${fmt(legacyCommAtFee(activeBand.total,feeRate))}. 
         If a prospect needs a lower payment, reduce the fee — the monthly drops while you retain eligibility.
-        ${activeBand.p4>0?` P2 (${fmt(activeBand.p2)}) paid after Payment 2 clears · P4 (${fmt(activeBand.p4)}) paid after Payment 4 clears.`:`Full ${fmt(activeBand.total)} paid after Payment 2 clears.`}
+        Paid in one payment, the 20th of the month after Payment 1 clears.
       </div>
       <div style="font-size:12px;color:#334155;line-height:1.8;margin-top:14px;">
         <div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Program Explanation</div>
