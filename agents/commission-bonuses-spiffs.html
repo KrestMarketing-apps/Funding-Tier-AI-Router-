@@ -279,9 +279,11 @@ tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand))
           <div class="policy-h">Commission rate</div>
           <p class="policy-p">Paid as a percentage of the client's <strong>total cleared enrolled debt</strong>, at the tier your <strong>monthly enrolled volume</strong> reaches. Example on a $25,000 deal: Tier 1 = $250, Tier 2 = $287.50, Tier 3 = $325.</p>
           <div class="policy-h">When you get paid</div>
-          <p class="policy-p">After the client completes <strong>2 monthly program payments</strong>, commission is paid on the <strong>20th of the following month</strong>.</p>
+          <p class="policy-p">You are paid once the client's <strong>first program payment clears</strong> and Level Debt has paid Funding Tier on the file. First payment clears <strong>1st–15th</strong> of the month → paid on the <strong>1st of the next month</strong>. Clears <strong>16th–end of month</strong> → paid on the <strong>15th of the next month</strong>. If Level pays Funding Tier late, your pay date moves to the next pay day after the money arrives. Track every deal on <a href="/agent-tools/my-pay">My Deals &amp; Pay</a>.</p>
+          <div class="policy-h">Split, bi-weekly and semi-monthly plans</div>
+          <p class="policy-p">A program payment is <strong>one month</strong> of the client's plan. If the client pays twice a month, <strong>both</strong> drafts for that month must clear before it counts — two drafts are never two program payments.</p>
           <div class="policy-h">Chargebacks and clawbacks</div>
-          <p class="policy-p">A client must complete <strong>3 program payments</strong> to be fully outside the chargeback window. Cancel after 2 payments → possible clawback. NSF on any payment → possible clawback. 3+ payments or full program completion → no clawback.</p>
+          <p class="policy-p">Level Debt takes back its payout if the client's <strong>2nd program payment</strong> does not clear, so your commission is final once the 2nd program payment clears. If the client cancels or the 2nd payment fails before then, the commission is deducted from your next payment.</p>
           <div class="policy-h">Commission modifications</div>
           <p class="policy-p">Funding Tier reserves the right to modify commission structures at its sole discretion at any time. Material changes will be communicated.</p>
         </div>
@@ -298,7 +300,7 @@ tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand))
       <div class="panel-hd">
         <div class="titles">
           <div class="panel-title">Debt Validation — Consumer Shield</div>
-          <div class="panel-subtitle">Flat commission by program, split across Payment 2 and Payment 4</div>
+          <div class="panel-subtitle">Flat commission by program, paid in full after the first program payment</div>
         </div>
         <span class="panel-badge" style="background:rgba(26,110,216,.1);color:var(--blue);border:1px solid rgba(26,110,216,.25);">$4,000 min</span>
       </div>
@@ -317,10 +319,10 @@ tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand))
     <div class="panel">
       <div class="panel-hd"><div class="titles"><div class="panel-title">Full Commission Schedule — Debt Validation</div></div></div>
       <div class="table-wrap"><table>
-        <thead><tr><th>Program</th><th>Debt Range</th><th>At Payment 2</th><th>At Payment 4</th><th>Total Commission</th></tr></thead>
+        <thead><tr><th>Program</th><th>Debt Range</th><th>Commission</th><th>When it's paid</th></tr></thead>
         <tbody id="csTable"></tbody>
       </table></div>
-      <div class="footer-note" style="text-align:left;padding:10px 16px;">* Programs A, B, C: $150 guaranteed minimum paid in full at Payment 2. No split, no clawback.</div>
+      <div class="footer-note" style="text-align:left;padding:10px 16px;">* Every program pays in one payment, the 20th of the month after the client's first program payment clears.</div>
     </div>
 
     <div class="panel">
@@ -332,9 +334,9 @@ tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand))
           <div class="policy-h">What is debt validation?</div>
           <p class="policy-p">Consumer Shield is Funding Tier's debt validation partner. Debt validation is a legal process where a client's debts are formally challenged and creditors must prove the debt is valid — distinct from debt settlement, which focuses on negotiating a payoff.</p>
           <div class="policy-h">When you get paid</div>
-          <p class="policy-p"><strong>Payment 2 payout:</strong> the 20th of Month 3. <strong>Payment 4 payout</strong> (Programs D–I only): the 20th of Month 5.</p>
+          <p class="policy-p">The full commission is paid on the <strong>20th of the month after the client's first program payment clears</strong>, once Consumer Shield has paid Funding Tier (by the 15th). On a twice-a-month plan, both drafts for the first month must clear. Track every deal on <a href="/agent-tools/my-pay">My Deals &amp; Pay</a>.</p>
           <div class="policy-h">Chargebacks and clawbacks</div>
-          <p class="policy-p"><strong>Programs D–I:</strong> if the client cancels before Payment 4 clears, the Payment 2 commission is subject to clawback within 60 days of cancellation. <strong>Programs A, B, C:</strong> not subject to clawback — single $150 payment triggers at Payment 2 only.</p>
+          <p class="policy-p">Once the first program payment has cleared and you have been paid, an ordinary cancellation does not take the commission back.</p>
           <div class="policy-h">Bonuses that apply</div>
           <p class="policy-p">Debt Validation deals pool together with Debt Resolution deals toward the Daily Hustle and Monthly Volume bonuses, and count toward the Balanced Book Bonus mix. See the Bonuses &amp; SPIFFs tab.</p>
           <div class="policy-h">Commission modifications</div>
@@ -353,7 +355,7 @@ tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand))
       <div class="panel-hd">
         <div class="titles">
           <div class="panel-title">Debt Resolution — Legacy Capital / Elite Legal</div>
-          <div class="panel-subtitle">Flat commission by band, split across Payment 2 and Payment 4</div>
+          <div class="panel-subtitle">Flat commission by band, paid in full after the first program payment</div>
         </div>
         <span class="panel-badge" style="background:rgba(124,58,237,.1);color:var(--purple);border:1px solid rgba(124,58,237,.25);">$6,000 min</span>
       </div>
@@ -383,10 +385,10 @@ tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand))
     <div class="panel">
       <div class="panel-hd"><div class="titles"><div class="panel-title">Full Commission Schedule — Debt Resolution</div></div></div>
       <div class="table-wrap"><table>
-        <thead><tr><th>Band</th><th>Debt Range</th><th>At Payment 2</th><th>At Payment 4</th><th>Total Commission</th></tr></thead>
+        <thead><tr><th>Band</th><th>Debt Range</th><th>Commission</th><th>When it's paid</th></tr></thead>
         <tbody id="lcTable"></tbody>
       </table></div>
-      <div class="footer-note" style="text-align:left;padding:10px 16px;">* Band L1: $150 guaranteed minimum paid in full at Payment 2. No split, no clawback.</div>
+      <div class="footer-note" style="text-align:left;padding:10px 16px;">* Every band pays in one payment, the 20th of the month after the client's first program payment clears.</div>
     </div>
 
     <div class="panel">
@@ -398,9 +400,9 @@ tr.active-row td:first-child{box-shadow:inset 3px 0 0 var(--accent,var(--brand))
           <div class="policy-h">What is debt resolution?</div>
           <p class="policy-p">Legacy Capital Services / Elite Legal Practice is Funding Tier's attorney-model debt resolution partner — an alternative path for clients whose debt is too small for Level Debt but who still need professional negotiation.</p>
           <div class="policy-h">When you get paid</div>
-          <p class="policy-p"><strong>Payment 2 payout:</strong> the 20th of Month 3. <strong>Payment 4 payout</strong> (Bands L2–L7 only): the 20th of Month 5.</p>
+          <p class="policy-p">The full commission is paid on the <strong>20th of the month after the client's first program payment clears</strong>, once Legacy Capital Services has paid Funding Tier on that week's cleared cohort. On a twice-a-month plan, both drafts for the first month must clear. Track every deal on <a href="/agent-tools/my-pay">My Deals &amp; Pay</a>.</p>
           <div class="policy-h">Chargebacks and clawbacks</div>
-          <p class="policy-p"><strong>Bands L2–L7:</strong> Payment 2 commission may be clawed back if the client cancels before Payment 4 clears. <strong>Band L1:</strong> single payout after Payment 2 clears — no clawback.</p>
+          <p class="policy-p">Once the first program payment has cleared and you have been paid, an ordinary cancellation does not take the commission back.</p>
           <div class="policy-h">State eligibility</div>
           <p class="policy-p">Legacy Capital Services is currently <strong>blocked in Idaho, North Dakota, and Georgia</strong>. Route clients in those states to Debt Validation instead.</p>
           <div class="policy-h">Bonuses that apply</div>
@@ -740,9 +742,8 @@ function renderProgTable(bodyId, progs, activeCode, min, tableName){
     return `<tr class="${isActive?'active-row':''}">
       <td style="font-weight:800;">${p.code}${isActive?'<span class="row-tag">CURRENT</span>':''}</td>
       <td>${p.range}</td>
-      <td class="num">${fmt(p.p2)}</td>
-      <td class="num ${p.p4===0?'dim':''}">${p.p4>0?fmt(p.p4):'—'}</td>
       <td class="num" style="font-size:15px;color:var(--brand-dark);">${fmt(p.total)}</td>
+      <td>20th of the month after payment 1 clears</td>
     </tr>`;
   }).join('');
 }
@@ -764,12 +765,12 @@ function calcCS(){
       <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(26,110,216,.1);border:1px solid rgba(26,110,216,.25);border-radius:10px;padding:9px 16px;margin-bottom:16px;">
         <span style="font-weight:900;font-size:15px;color:var(--blue);">Program ${prog.code}</span>
         <span style="font-size:13px;color:var(--muted);font-weight:600;">${prog.range}</span>
-        ${prog.p4===0?'<span style="font-size:11px;font-weight:800;background:rgba(21,128,61,.12);color:var(--good);padding:2px 8px;border-radius:99px;">Full payout at P2</span>':''}
+        <span style="font-size:11px;font-weight:800;background:rgba(21,128,61,.12);color:var(--good);padding:2px 8px;border-radius:99px;">Single payout</span>
       </div>
       <div class="metrics" style="margin-top:0;">
         <div class="stat" style="--accent:var(--blue)"><div class="stat-lbl">Total Commission</div><div class="stat-val accent">${fmt(prog.total)}</div><div class="stat-sub">Full amount for this deal</div></div>
-        <div class="stat" style="--accent:var(--blue)"><div class="stat-lbl">Paid at Payment 2</div><div class="stat-val accent">${fmt(prog.p2)}</div><div class="stat-sub">20th of Month 3</div></div>
-        <div class="stat"><div class="stat-lbl">${prog.p4>0?'Paid at Payment 4':'Second Payout'}</div><div class="stat-val">${prog.p4>0?fmt(prog.p4):'—'}</div><div class="stat-sub">${prog.p4>0?'20th of Month 5':'Single payout — no split on this tier'}</div></div>
+        <div class="stat" style="--accent:var(--blue)"><div class="stat-lbl">When you're paid</div><div class="stat-val accent" style="font-size:16px;">20th of the next month</div><div class="stat-sub">after payment 1 clears &amp; the backend pays Funding Tier</div></div>
+        <div class="stat"><div class="stat-lbl">Final</div><div class="stat-val" style="font-size:16px;">Once paid</div><div class="stat-sub">no clawback on ordinary cancellation</div></div>
       </div>`;
     window.__csTotal = prog.total;
   }
@@ -799,12 +800,12 @@ function calcLC(){
       <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);border-radius:10px;padding:9px 16px;margin-bottom:16px;">
         <span style="font-weight:900;font-size:15px;color:var(--purple);">Band ${band.code}</span>
         <span style="font-size:13px;color:var(--muted);font-weight:600;">${band.range}</span>
-        ${band.p4===0?'<span style="font-size:11px;font-weight:800;background:rgba(21,128,61,.12);color:var(--good);padding:2px 8px;border-radius:99px;">Full payout at P2</span>':''}
+        <span style="font-size:11px;font-weight:800;background:rgba(21,128,61,.12);color:var(--good);padding:2px 8px;border-radius:99px;">Single payout</span>
       </div>
       <div class="metrics" style="margin-top:0;">
         <div class="stat" style="--accent:var(--purple)"><div class="stat-lbl">Total Commission</div><div class="stat-val accent">${fmt(band.total)}</div><div class="stat-sub">Full amount for this deal</div></div>
-        <div class="stat" style="--accent:var(--purple)"><div class="stat-lbl">Paid at Payment 2</div><div class="stat-val accent">${fmt(band.p2)}</div><div class="stat-sub">20th of Month 3</div></div>
-        <div class="stat"><div class="stat-lbl">${band.p4>0?'Paid at Payment 4':'Second Payout'}</div><div class="stat-val">${band.p4>0?fmt(band.p4):'—'}</div><div class="stat-sub">${band.p4>0?'20th of Month 5':'Single payout — no split on this tier'}</div></div>
+        <div class="stat" style="--accent:var(--purple)"><div class="stat-lbl">When you're paid</div><div class="stat-val accent" style="font-size:16px;">20th of the next month</div><div class="stat-sub">after payment 1 clears &amp; the backend pays Funding Tier</div></div>
+        <div class="stat"><div class="stat-lbl">Final</div><div class="stat-val" style="font-size:16px;">Once paid</div><div class="stat-sub">no clawback on ordinary cancellation</div></div>
       </div>`;
     window.__lcTotal = band.total;
   }
