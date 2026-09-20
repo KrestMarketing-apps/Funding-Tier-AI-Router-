@@ -404,13 +404,12 @@
       <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border)">
         <table class="sched-table">
           <thead><tr>
-            <th>Band</th><th>Debt range</th><th>At payment 2</th>
-            <th>At payment 4</th><th>Total commission</th><th></th>
+            <th>Band</th><th>Debt range</th><th>Commission</th><th>When it's paid</th>
           </tr></thead>
           <tbody id="schedBody"></tbody>
         </table>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:8px">* Band L1 ($6K&ndash;$9.9K): $150 flat, paid in full at payment 2. No second payout.</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">* Every band pays in one payment, the 20th of the month after the client's first program payment clears and Legacy Capital has paid Funding Tier.</div>
     </div>
 
     <!-- QC + Checklist -->
@@ -479,6 +478,8 @@
     const fmt    =n=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(n);
     const addMo  =(d,n)=>{const r=new Date(d);r.setMonth(r.getMonth()+n);return r;};
     const set20  =d=>{const r=new Date(d);r.setDate(20);return r;};
+    // Latest allowed first draft: 5 business days after the client signs.
+    const addBiz =(d,n)=>{const r=new Date(d);while(n>0){r.setDate(r.getDate()+1);const w=r.getDay();if(w!==0&&w!==6)n--;}return r;};
     const fmtDate=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
     const getBand=debt=>BANDS.find(b=>debt>=b.min&&debt<=b.max)||null;
     const clamp  =(v,lo,hi)=>Math.min(hi,Math.max(lo,v));
@@ -521,10 +522,8 @@
       `<tr class="band-row" id="row-${b.code}">
         <td style="font-family:'Inconsolata',monospace;font-weight:700;font-size:13px;color:var(--cyan)">${b.label}<span id="pill-${b.code}"></span></td>
         <td style="color:var(--text2);font-size:12px">${b.range}</td>
-        <td style="font-family:'Inconsolata',monospace;font-weight:600;color:var(--cyan)">${fmt(b.p2)}</td>
-        <td style="font-family:'Inconsolata',monospace;font-weight:600;color:${b.p4>0?"var(--cyan)":"var(--text3)"}">${b.p4>0?fmt(b.p4):"\u2014"}</td>
         <td style="font-family:'Inconsolata',monospace;font-weight:700;font-size:14px;color:var(--green)">${fmt(b.total)}</td>
-        <td style="font-size:11px;color:var(--text3)">${b.p4===0?"Full at P2":"Split P2 + P4"}</td>
+        <td style="font-size:11px;color:var(--text3)">20th of the month after payment 1</td>
       </tr>`).join("");
 
     const CKS=[
@@ -678,41 +677,25 @@
       document.getElementById("feesBarPct").textContent=`${100-dPct}% fees (${fmt(feesComp)}/mo)`;
 
       const enrollDate=enrollVal?new Date(enrollVal+"T12:00:00"):new Date();
-      const agentP2=set20(addMo(enrollDate,3));
-      const agentP4=set20(addMo(enrollDate,5));
+      // Funding Tier rule: first draft no later than business day 5 after signing.
+      const firstDraft=addBiz(enrollDate,5);
+      const agentPaid=set20(addMo(new Date(firstDraft.getFullYear(),firstDraft.getMonth(),1,12),1));
       document.getElementById("payoutSplit").innerHTML=`
         <div class="pbox" style="background:rgba(8,145,178,0.07);border:1px solid rgba(8,145,178,0.25)">
-          <div class="pbox-label" style="color:var(--cyan)">At payment 2</div>
-          <div class="pbox-value" style="color:var(--cyan)">${fmt(band.p2)}</div>
-          <div class="pbox-sub">Paid 20th of month 3</div>
-          <div class="pbox-date" style="color:var(--cyan)">${fmtDate(agentP2)}</div>
+          <div class="pbox-label" style="color:var(--cyan)">First payment by</div>
+          <div class="pbox-value" style="color:var(--cyan)">${fmtDate(firstDraft)}</div>
+          <div class="pbox-sub">Business day 5 after signing, at the latest</div>
         </div>
-        ${band.p4>0?`
-        <div class="pbox" style="background:rgba(15,157,138,0.07);border:1px solid rgba(15,157,138,0.25)">
-          <div class="pbox-label" style="color:var(--green)">At payment 4</div>
-          <div class="pbox-value" style="color:var(--green)">${fmt(band.p4)}</div>
-          <div class="pbox-sub">Paid 20th of month 5</div>
-          <div class="pbox-date" style="color:var(--green)">${fmtDate(agentP4)}</div>
-        </div>`:`
         <div class="pbox" style="background:#f0fdf4;border:1px solid #86efac">
-          <div class="pbox-label" style="color:#15803d">Single payout</div>
-          <div style="font-size:15px;font-weight:700;color:#15803d">${fmt(band.total)} at P2</div>
-          <div class="pbox-sub" style="margin-top:6px">No second milestone &mdash; faster cash</div>
-        </div>`}`;
+          <div class="pbox-label" style="color:#15803d">You're paid ${fmt(band.total)}</div>
+          <div class="pbox-value" style="color:#15803d">${fmtDate(agentPaid)}</div>
+          <div class="pbox-sub">20th of the next month, once payment 1 clears &amp; Legacy pays Funding Tier</div>
+        </div>`;
 
-      const p1=addMo(enrollDate,1),p2=addMo(enrollDate,2),p4=addMo(enrollDate,4);
-      const steps=band.p4>0?[
-        {label:"Enrolled",                  sub:"Month 0",        date:fmtDate(enrollDate),type:"enroll" },
-        {label:"Payment 1",                 sub:"Month 1",        date:fmtDate(p1),        type:"client" },
-        {label:"Payment 2 clears",          sub:"Month 2",        date:fmtDate(p2),        type:"trigger"},
-        {label:`Agent paid ${fmt(band.p2)}`,sub:"20th of month 3",date:fmtDate(agentP2),   type:"payout" },
-        {label:"Payment 4 clears",          sub:"Month 4",        date:fmtDate(p4),        type:"trigger"},
-        {label:`Agent paid ${fmt(band.p4)}`,sub:"20th of month 5",date:fmtDate(agentP4),   type:"payout" },
-      ]:[
-        {label:"Enrolled",                  sub:"Month 0",        date:fmtDate(enrollDate),type:"enroll" },
-        {label:"Payment 1",                 sub:"Month 1",        date:fmtDate(p1),        type:"client" },
-        {label:"Payment 2 clears",          sub:"Month 2",        date:fmtDate(p2),        type:"trigger"},
-        {label:`Agent paid ${fmt(band.p2)}`,sub:"20th of month 3",date:fmtDate(agentP2),   type:"payout" },
+      const steps=[
+        {label:"Enrolled",                   sub:"Day 0",                    date:fmtDate(enrollDate),type:"enroll" },
+        {label:"First payment clears",       sub:"By business day 5",        date:fmtDate(firstDraft),type:"trigger"},
+        {label:`Agent paid ${fmt(band.total)}`,sub:"20th of the next month", date:fmtDate(agentPaid), type:"payout" },
       ];
       const dB={enroll:"#cbd5e1",client:"rgba(8,145,178,0.4)",trigger:"#0891b2",payout:"#0f9d8a"};
       const dF={enroll:"#cbd5e1",client:"rgba(8,145,178,0.3)",trigger:"#0891b2",payout:"#0f9d8a"};
