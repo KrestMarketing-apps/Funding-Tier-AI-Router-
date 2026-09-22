@@ -478,7 +478,7 @@
     const fmt    =n=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(n);
     const addMo  =(d,n)=>{const r=new Date(d);r.setMonth(r.getMonth()+n);return r;};
     const set20  =d=>{const r=new Date(d);r.setDate(20);return r;};
-    // Latest allowed first draft: 5 business days after the client signs.
+    // Target first draft: as early as possible (shown as business day 5); latest allowed is 21 days out.
     const addBiz =(d,n)=>{const r=new Date(d);while(n>0){r.setDate(r.getDate()+1);const w=r.getDay();if(w!==0&&w!==6)n--;}return r;};
     const fmtDate=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
     const getBand=debt=>BANDS.find(b=>debt>=b.min&&debt<=b.max)||null;
@@ -677,14 +677,15 @@
       document.getElementById("feesBarPct").textContent=`${100-dPct}% fees (${fmt(feesComp)}/mo)`;
 
       const enrollDate=enrollVal?new Date(enrollVal+"T12:00:00"):new Date();
-      // Funding Tier rule: first draft no later than business day 5 after signing.
+      // Funding Tier rule: first draft as early as possible, no more than 21 days after signing.
       const firstDraft=addBiz(enrollDate,5);
+      const latestDraft=new Date(enrollDate);latestDraft.setDate(latestDraft.getDate()+21);
       const agentPaid=set20(addMo(new Date(firstDraft.getFullYear(),firstDraft.getMonth(),1,12),1));
       document.getElementById("payoutSplit").innerHTML=`
         <div class="pbox" style="background:rgba(8,145,178,0.07);border:1px solid rgba(8,145,178,0.25)">
-          <div class="pbox-label" style="color:var(--cyan)">First payment by</div>
+          <div class="pbox-label" style="color:var(--cyan)">Target first payment</div>
           <div class="pbox-value" style="color:var(--cyan)">${fmtDate(firstDraft)}</div>
-          <div class="pbox-sub">Business day 5 after signing, at the latest</div>
+          <div class="pbox-sub">As early as possible &mdash; latest allowed ${fmtDate(latestDraft)} (21 days). Later first payment = later payout.</div>
         </div>
         <div class="pbox" style="background:#f0fdf4;border:1px solid #86efac">
           <div class="pbox-label" style="color:#15803d">You're paid ${fmt(band.total)}</div>
@@ -694,7 +695,7 @@
 
       const steps=[
         {label:"Enrolled",                   sub:"Day 0",                    date:fmtDate(enrollDate),type:"enroll" },
-        {label:"First payment clears",       sub:"By business day 5",        date:fmtDate(firstDraft),type:"trigger"},
+        {label:"First payment clears",       sub:"As early as possible (max 21 days)",        date:fmtDate(firstDraft),type:"trigger"},
         {label:`Agent paid ${fmt(band.total)}`,sub:"20th of the next month", date:fmtDate(agentPaid), type:"payout" },
       ];
       const dB={enroll:"#cbd5e1",client:"rgba(8,145,178,0.4)",trigger:"#0891b2",payout:"#0f9d8a"};

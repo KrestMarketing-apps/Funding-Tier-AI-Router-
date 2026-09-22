@@ -276,6 +276,64 @@
     .callout{padding-left:42px;font-size:13.5px;}
     .callout::before{left:12px;top:14px;width:17px;height:17px;}
   }
+
+  /* ---------- 5-STEP ENROLLMENT (video series) ---------- */
+  .stepnav{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 26px;}
+  .stepnav a{flex:1 1 128px;text-decoration:none;background:#fff;border:1.5px solid var(--line);border-radius:11px;padding:11px 13px;color:var(--forest);font-size:13px;line-height:1.4;transition:border-color .15s ease;}
+  .stepnav a:hover{border-color:var(--green);}
+  .stepnav a b{display:block;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--green);margin-bottom:2px;}
+  .stepnav a.skip{background:#F3F5F8;border-style:dashed;color:var(--ink-soft);}
+  .stepnav a.skip b{color:var(--ink-soft);}
+  .es{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 26px 22px;margin:0 0 26px;scroll-margin-top:90px;}
+  .es-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px;}
+  .es-num{flex-shrink:0;width:46px;height:46px;border-radius:12px;background:var(--brand-gradient-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:700;font-size:19px;box-shadow:0 3px 10px rgba(15,157,138,.35);}
+  .es.skipped .es-num{background:#AEB8C6;box-shadow:none;}
+  .es-head h3{font-size:21px;line-height:1.25;margin:3px 0 4px;}
+  .es-head p{margin:0;color:var(--ink-soft);font-size:14px;}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:5px;margin-bottom:6px;}
+  .pill.skip{background:#EEF1F6;color:#4A5A6E;}
+  .pill.req{background:var(--accent-soft);color:var(--green-dk);}
+  .es > p, .es-body > p{color:var(--ink-soft);font-size:14.5px;line-height:1.65;margin:0 0 12px;}
+  .es h4{font-family:'Montserrat',sans-serif;font-size:15px;margin:22px 0 10px;color:var(--forest);}
+  .talk{border-left:4px solid var(--forest-2);background:#F2F5FA;border-radius:0 10px 10px 0;padding:14px 18px;margin:14px 0;font-size:14.5px;line-height:1.65;color:#1D2F47;}
+  .talk .who{display:block;font-family:'Montserrat',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--forest-2);margin-bottom:5px;}
+  ol.subs{list-style:none;counter-reset:sub;margin:10px 0 6px;padding:0;}
+  ol.subs > li{counter-increment:sub;position:relative;padding:0 0 12px 38px;font-size:14.5px;line-height:1.6;color:var(--ink);}
+  ol.subs > li::before{content:counter(sub);position:absolute;left:0;top:0;width:25px;height:25px;border-radius:50%;background:var(--green);color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12.5px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 0 0 1.5px var(--green);}
+  ol.subs > li span.note{display:block;color:var(--ink-soft);font-size:13.5px;}
+  .ui{font-weight:600;color:var(--forest);background:#EEF1F6;border-radius:5px;padding:1px 6px;font-size:.93em;white-space:nowrap;}
+  figure.shot{margin:14px 0 20px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0A182E;}
+  figure.shot img{display:block;width:100%;height:auto;cursor:zoom-in;background:#fff;}
+  figure.shot figcaption{background:var(--forest);color:#CFE3EC;font-size:12.5px;line-height:1.5;padding:10px 14px;}
+  figure.shot figcaption b{color:#fff;}
+  .shot-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .shot-pair figure.shot{margin:14px 0 8px;}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--ink-soft);margin:0 0 20px;}
+  .legend span{display:inline-flex;align-items:center;gap:7px;}
+  .legend i{display:inline-block;width:18px;height:18px;border-radius:50%;}
+  .legend i.n{background:var(--green);border:2px solid #fff;box-shadow:0 0 0 1.5px var(--green);}
+  .legend i.c{border:3px solid #F57C00;}
+  details.clip{margin:18px 0 4px;border:1px solid var(--line);border-radius:12px;background:#F7F9FC;}
+  details.clip summary{cursor:pointer;list-style:none;padding:12px 16px;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13.5px;color:var(--forest);display:flex;align-items:center;gap:9px;}
+  details.clip summary::-webkit-details-marker{display:none;}
+  details.clip summary::before{content:"";width:0;height:0;border-left:9px solid var(--green);border-top:6px solid transparent;border-bottom:6px solid transparent;transition:transform .15s ease;}
+  details.clip[open] summary::before{transform:rotate(90deg);}
+  details.clip summary em{font-style:normal;font-weight:500;color:var(--ink-soft);font-family:'Inter',sans-serif;font-size:12.5px;margin-left:auto;}
+  details.clip video{display:block;width:100%;height:auto;background:#000;border-radius:0 0 12px 12px;}
+  table.tiers td,table.tiers th{padding:8px 12px;}
+  table.tiers td{font-size:13.5px;color:var(--ink);}
+  .lightbox{position:fixed;inset:0;background:rgba(6,14,28,.92);z-index:5000;display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;}
+  .lightbox.open{display:flex;}
+  .lightbox img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,.5);}
+  @media (max-width:640px){
+    .es{padding:18px 16px 14px;}
+    .es-head{gap:12px;}
+    .es-num{width:38px;height:38px;font-size:16px;}
+    .es-head h3{font-size:18px;}
+    .shot-pair{grid-template-columns:1fr;}
+    ol.subs > li{padding-left:34px;font-size:14px;}
+    .ui{white-space:normal;}
+  }
 </style>
 </head>
 <body>
@@ -327,7 +385,7 @@
     <div class="card" style="margin-top:26px;">
       <h3>How to use the other tabs</h3>
       <ul style="color:var(--ink-soft);font-size:14.5px;line-height:1.8;padding-left:18px;margin:0;">
-        <li><strong>Enrollment Process</strong> &mdash; the CRM walkthrough video, plus the data-entry steps once they're documented.</li>
+        <li><strong>Enrollment Process</strong> &mdash; the 5-step Shield Services CRM walkthrough (create customer, pull credit, budget, quote &amp; ACH, documents) with talk tracks, annotated screenshots and a training clip for each step. Step 1 is usually skipped because the <code>push to consumer shield</code> tag creates the customer for you.</li>
         <li><strong>Compliance &amp; Objections</strong> &mdash; required disclosure language and how to answer common pushback.</li>
       </ul>
     </div>
@@ -338,32 +396,391 @@
     <div class="section-head">
       <div class="eyebrow"><span class="dot"></span>Step-by-step</div>
       <h2>Enrolling a client in Consumer Shield</h2>
-      <p>Full screen recording of the enrollment flow. A written, numbered walkthrough (matching the Level Debt and ELP SOPs) will replace the "needs input" note below once the steps are confirmed.</p>
+      <p>Five steps inside the Shield Services CRM (app.consumershield.me), built from the Consumer Shield CRM training series. Every step has the talk track, the exact fields to fill, annotated screenshots of where to click, and the original training clip.</p>
     </div>
 
-    <div class="callout" style="margin-bottom:22px;">
-      <strong>Check before you re-type</strong>
-      This lead's contact info &mdash; name, phone, email, address, DOB, SSN &mdash; was already captured in app.krestmarketing.com during the inbound call and pushed to Consumer Shield's system via webhook. Check that these fields came through correctly before typing anything new; only fill in what's actually missing or wrong.
+    <div class="stepnav">
+      <a href="#es-1" class="skip"><b>Step 1 &middot; usually skipped</b>Create customer</a>
+      <a href="#es-2"><b>Step 2</b>Pull credit &amp; creditors</a>
+      <a href="#es-3"><b>Step 3</b>Budget</a>
+      <a href="#es-4"><b>Step 4</b>Quote, payment dates &amp; ACH</a>
+      <a href="#es-5"><b>Step 5</b>Send &amp; sign documents</a>
     </div>
 
-    <div class="callout" style="margin-bottom:22px;border-color:#16a34a;background:#F2FAF6;">
-      <strong>First payment within 5 business days &mdash; set it on the call</strong>
-      Ask when the client is paid and how often, then set the first payment for the business day after their next paycheck &mdash; as early as the same day they sign, and no later than business day 5. A later date (up to 14 days) needs a manager's approval before you submit. Tell the client the exact date: &ldquo;Your program starts with your first payment on Friday the 26th.&rdquo; On a twice-a-month plan the first draft lands in that window, and the two drafts in a month count as one program payment. You are paid the 20th of the month after that first payment clears.
+    <div class="legend">
+      <span><i class="n"></i>Numbered box = field or button, matches the numbered list for that step</span>
+      <span><i class="c"></i>Orange ring = where the mouse lands in the training video</span>
+      <span>Tap any screenshot to enlarge it</span>
     </div>
 
-    <div class="video-wrap">
-      <div class="video-stage">
-        <video controls preload="metadata">
-          <source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6a9df3eb4ea183e8729f65ba.mp4" type="video/mp4">
-        </video>
+    <div class="callout" style="border-color:#16a34a;background:#F2FAF6;">
+      <strong>First payment as early as possible &mdash; set it on the call</strong>
+      Ask when the client is paid and how often, then set the first payment for the business day after their next paycheck &mdash; as early as the same day they sign. It can be up to 21 days out, but always push for the earliest date the client can make. The sooner that first payment clears, the sooner the backend pays Funding Tier &mdash; and the sooner you get paid. Tell the client the exact date: &ldquo;Your program starts with your first payment on Friday the 26th.&rdquo; On a twice-a-month plan the first draft lands in that window, and the two drafts in a month count as one program payment. You are paid the 20th of the month after that first payment clears.
+    </div>
+
+    <!-- ===== STEP 1 ===== -->
+    <section class="es skipped" id="es-1">
+      <div class="es-head">
+        <div class="es-num">1</div>
+        <div>
+          <span class="pill skip">Usually skipped &middot; handled by the push tag</span>
+          <h3>Create the customer in the CRM</h3>
+          <p>Training clip: &ldquo;1. Create Customer In CRM&rdquo; &middot; 1:08</p>
+        </div>
       </div>
-      <div class="video-caption"><span>Consumer Shield Enrollment Walkthrough</span><span>Screen recording</span></div>
-    </div>
 
-    <div class="callout needinput">
-      <strong>Needs input from your team</strong>
-      I can't watch or process video content in this environment, so I couldn't turn this recording into the numbered, screenshotted steps the way the Level Debt SOP was built. To finish this tab the same way: either walk through the enrollment with me screen-by-screen (I'll capture and annotate as we go, like the Level Debt build), or send timestamped notes on what each step in the video does and I'll structure it from there.
-    </div>
+      <div class="callout">
+        <strong>You will normally skip this step</strong>
+        Funding Tier already creates the customer for you. When you apply the <code>push to consumer shield</code> tag to the contact in app.krestmarketing.com, the name, phone, email, address, DOB and SSN you captured on the inbound call are pushed into Shield Services by webhook. Open the file in Shield Services, check that each field came through correctly, fix anything missing or wrong, and go straight to Step 2.
+        <br><br>How the tagging works: <a href="https://www.loom.com/share/83246b6cd5b7464fbc5c43bc4212241b" target="_blank" rel="noopener">How to Enter Contact Information in Our CRM + Push to Back Ends (Loom)</a> &middot; <a href="/agents/answering-inbound-calls">Inbound Call Handling SOP &rarr; push tags</a>
+      </div>
+
+      <p><strong>When to create the customer by hand:</strong> only if the push didn't come through (you can't find the client in Shield Services after tagging) or you were told to enter the file manually. We can always create the customer directly in Consumer Shield &mdash; the CRM only needs a few fields (first name, last name, phone, email and address):</p>
+
+      <ol class="subs">
+        <li>From the Shield Services <span class="ui">Home</span> page, under <b>Search Contacts</b>, click <span class="ui">New Contact</span>.<span class="note">Search for the client first &mdash; if the push worked, they're already there.</span></li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s1-new-contact.jpg" width="1400" height="273" alt="Shield Services home page with the New Contact button highlighted">
+        <figcaption><b>Home &rarr; Search Contacts.</b> (1) New Contact opens the Add New Contact form.</figcaption>
+      </figure>
+
+      <ol class="subs">
+        <li>Enter <b>First Name</b> and <b>Last Name</b> (both required).</li>
+        <li>Enter the <b>Mobile Tel</b>.<span class="note">If the number is already on another file, the system shows a pop-up warning &mdash; stop and search for the existing file instead of creating a duplicate.</span></li>
+        <li>Enter the client's <b>Email Address</b>.<span class="note">It isn't typed in the training clip, but it's part of the required contact info &mdash; and you can't send documents in Step 5 without it.</span></li>
+        <li>Enter the complete address: <b>Address</b>, <b>City</b>, <b>State</b> and <b>Zip</b>.</li>
+        <li>Click <span class="ui">Save</span>. No other fields need to be filled out. Saving automatically takes you to the client's main contact page &mdash; continue with Step 2.</li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s1-form.jpg" width="1400" height="708" alt="Add New Contact form with name, mobile, address fields and Save highlighted">
+        <figcaption><b>Add New Contact.</b> The only fields needed: (1) first and last name, (2) mobile, (3) email, (4) address, city, state, zip, then (5) Save.</figcaption>
+      </figure>
+
+      <details class="clip">
+        <summary>Watch the training clip <em>1. Create Customer In CRM &middot; 1:08</em></summary>
+        <video controls preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step1.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690ff484614db8c59bb.mp4" type="video/mp4"></video>
+      </details>
+    </section>
+
+    <!-- ===== STEP 2 ===== -->
+    <section class="es" id="es-2">
+      <div class="es-head">
+        <div class="es-num">2</div>
+        <div>
+          <span class="pill req">Required</span>
+          <h3>Pull credit and review the creditors</h3>
+          <p>Training clip: &ldquo;2. How to pull credit&rdquo; &middot; 3:17</p>
+        </div>
+      </div>
+
+      <p>You need two things to pull credit: the client's <b>date of birth</b> and <b>Social Security number</b>. On a pushed file these should already be filled in &mdash; confirm them before you pull.</p>
+
+      <h4>A. Confirm DOB and SSN on the Contact Info tab</h4>
+      <ol class="subs">
+        <li>Enter or confirm the <b>DOB</b>.</li>
+        <li>Enter the <b>SSN</b> as nine digits only &mdash; <b>no dashes, no spaces</b>. When you click out of the field the system adds the dashes for you.</li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s2-dob-ssn.jpg" width="1400" height="360" alt="Contact Info with DOB and SSN fields highlighted">
+        <figcaption><b>Contact Info.</b> (1) DOB and (2) SSN, typed as nine straight digits.</figcaption>
+      </figure>
+
+      <div class="callout warn">
+        <strong>The SSN masks as soon as you save</strong>
+        After Save, the first five digits show as <code>xxx-xx-</code> and can't be read back. Read the full SSN back to the client <em>before</em> you save. If you see &ldquo;this social already exists,&rdquo; the SSN is already on another file &mdash; stop and find that file rather than working around it.
+      </div>
+
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s2-tabs-ssn.jpg" width="1400" height="595" alt="Contact record tab bar and masked SSN highlighted">
+        <figcaption><b>After saving.</b> (1) The tabs you'll use for the rest of the enrollment: Contact Info, Adtl. Info, Creditors, Budget, Documents. (2) SSN now masked.</figcaption>
+      </figure>
+
+      <h4>B. Pull the report and import the creditors</h4>
+      <p>Scroll to the button row at the bottom of Contact Info.</p>
+      <ol class="subs">
+        <li>Click <span class="ui">Save</span> to save the DOB and SSN.</li>
+        <li>Click <span class="ui">Get Credit Report</span>. Wait for the &ldquo;Report has been saved successfully&rdquo; message at the top of the screen.</li>
+        <li>Click <span class="ui">Import Trades/Creditors</span>. A good pull shows &ldquo;Credit report imported successfully.&rdquo;</li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s2-credit-buttons.jpg" width="1400" height="378" alt="Bottom button row with Save, Get Credit Report and Import Trades/Creditors highlighted">
+        <figcaption><b>Bottom of Contact Info.</b> Click in order: (1) Save, (2) Get Credit Report, (3) Import Trades/Creditors.</figcaption>
+      </figure>
+
+      <div class="shot-pair">
+        <figure class="shot">
+          <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s2-no-results.jpg" width="1064" height="323" alt="Import pop-up showing only a dash and a Close button">
+          <figcaption><b>A dash (&ndash;) instead of &ldquo;imported successfully&rdquo;</b> means the info is wrong or nothing is on the report. Re-check name, DOB, SSN and address, then pull again &mdash; or add the accounts by hand (below).</figcaption>
+        </figure>
+        <figure class="shot">
+          <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s2-creditors-tab.jpg" width="1400" height="679" alt="Creditors tab with totals and Add New button highlighted">
+          <figcaption><b>Creditors tab.</b> (1) Open Creditors to review what imported, (2) running totals, (3) Add New for a manual account.</figcaption>
+        </figure>
+      </div>
+
+      <h4>C. Review creditors &mdash; add any missing accounts by hand</h4>
+      <p>Open the <span class="ui">Creditors</span> tab. Each imported account appears as a line item with the creditor name, balance and account number. The Creditors tab is also where you add accounts by hand &mdash; if the pull shows a dash, or an account the client wants to enroll didn't come through on the report, click <span class="ui">Add New</span> and fill in:</p>
+      <ol class="subs">
+        <li><b>Current Creditor/Collector</b> &mdash; the creditor's name (e.g. Chase).</li>
+        <li><b>Current Creditor/Collector Account Number</b>.</li>
+        <li><b>Original Account Number</b> &mdash; the <b>same account number again</b>. The account number goes in twice; the creditor name does not.</li>
+        <li><b>Balance</b>.</li>
+        <li><b>Payment</b> &mdash; what the client pays on it each month, if anything.</li>
+        <li><b>Current Account</b> &mdash; Yes or No, whether they're current.</li>
+        <li>Click <span class="ui">Add</span>.</li>
+      </ol>
+      <div class="shot-pair">
+        <figure class="shot">
+          <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s2-add-creditor.jpg" width="760" height="1117" alt="Add creditor form with the seven fields highlighted">
+          <figcaption><b>Add New creditor.</b> Fields 1&ndash;6, then (7) Add. Note the account number in both (2) and (3).</figcaption>
+        </figure>
+        <figure class="shot">
+          <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s2-totals.jpg" width="1400" height="608" alt="Creditors tab showing total debts, total payments and a Bank of America line item">
+          <figcaption><b>Result.</b> (1) Total Debts and Total Payments add up across all accounts &mdash; in the video, Chase $7,500 + Bank of America $2,500 = <b>$10,000</b> total debt and <b>$250</b> in payments. (2) Each account shows as its own line item.</figcaption>
+        </figure>
+      </div>
+      <p>The <b>Total Debts</b> figure is what sets the program payment in Step 3, so make sure every account the client is enrolling is on this tab.</p>
+
+      <details class="clip">
+        <summary>Watch the training clip <em>2. How to pull credit &middot; 3:17</em></summary>
+        <video controls preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step2.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690825a8484f2e53e8e.mp4" type="video/mp4"></video>
+      </details>
+    </section>
+
+    <!-- ===== STEP 3 ===== -->
+    <section class="es" id="es-3">
+      <div class="es-head">
+        <div class="es-num">3</div>
+        <div>
+          <span class="pill req">Required</span>
+          <h3>Build the budget</h3>
+          <p>Training clip: &ldquo;3. Budget&rdquo; &middot; 1:33</p>
+        </div>
+      </div>
+
+      <div class="talk">
+        <span class="who">Talk track &mdash; right after the credit pull</span>
+        &ldquo;Okay, I'm going to submit these accounts to underwriting and see what we can get you approved for and how low we can get your payment. In the meantime, let's go over a quick budget.&rdquo;
+      </div>
+
+      <p>Open the <span class="ui">Budget</span> tab and have a conversation &mdash; ask what they bring in and what they pay for each item.</p>
+      <ol class="subs">
+        <li><b>Income</b> &mdash; enter the amount in Income 1 and pick the <b>Income Type</b>. Most of our clients are on Social Security or disability; add Income 2&ndash;4 for any other sources.</li>
+        <li><b>Housing</b> &mdash; Rent/Mortgage (and Home Taxes/Home Insurance if they pay it separately).</li>
+        <li><b>Monthly expenses</b> &mdash; go down the list: electric, cable/internet, telephone, groceries, card payments, auto insurance, health insurance, credit card payments. Net Income drops as you add each one.</li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s3-income.jpg" width="1400" height="774" alt="Budget tab with income, rent and expense list highlighted">
+        <figcaption><b>Budget tab.</b> (1) Income and type, (2) rent/mortgage, (3) household expenses &mdash; each Amount box also offers quick-pick values.</figcaption>
+      </figure>
+
+      <div class="callout warn">
+        <strong>The one thing you can't skip: the program payment line</strong>
+        In an empty Expense box, type <code>program payment</code> and enter the client's actual Consumer Shield payment as the Amount. Then check <b>Net Income</b> &mdash; it must be <b>positive by at least $1</b> after the program payment is in.
+      </div>
+
+      <ol class="subs">
+        <li>Add the <b>program payment</b> expense line. If you don't know the payment off the top of your head, use the payment cheat sheet below &mdash; it lists the tiers by total debt.</li>
+        <li>Confirm <b>Net Income</b> is at least $1 positive.</li>
+        <li>Click <span class="ui">Save</span>.</li>
+        <li>Note the bill-reduction reminder at the bottom of the tab &mdash; utilities, auto insurance, subscriptions, phone and internet are the bills to bring up when you pitch the bill reduction service.</li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s3-program-payment.jpg" width="1400" height="914" alt="Budget with program payment line of 270 dollars, net income 180 dollars and Save highlighted">
+        <figcaption><b>Finished budget.</b> (1) &ldquo;program payment&rdquo; at $270 for $10,000 of debt, (2) Net Income still positive ($180), (3) Save, (4) bill-reduction reminder.</figcaption>
+      </figure>
+
+      <h4>Payment cheat sheet &mdash; program payment by total enrolled debt</h4>
+      <div class="card" style="padding:0;overflow-x:auto;">
+        <table class="tiers">
+          <tr><th>Total enrolled debt</th><th>Monthly payment</th><th>Term</th></tr>
+          <tr><td>$4,000 &ndash; $4,999</td><td>$220</td><td>18 months</td></tr>
+          <tr><td>$5,000 &ndash; $8,799</td><td>$220</td><td>24 months</td></tr>
+          <tr><td>$8,800 &ndash; $9,999</td><td>$220</td><td>36 months</td></tr>
+          <tr><td>$10,000 &ndash; $14,999</td><td>$270</td><td>36 months</td></tr>
+          <tr><td>$15,000 &ndash; $19,999</td><td>$320</td><td>36 months</td></tr>
+          <tr><td>$20,000 &ndash; $24,999</td><td>$370</td><td>36 months</td></tr>
+          <tr><td>$25,000 &ndash; $29,999</td><td>$420</td><td>36 months</td></tr>
+          <tr><td>$30,000 &ndash; $49,999</td><td>$520</td><td>36 months</td></tr>
+          <tr><td>$50,000+</td><td>$620</td><td>36 months</td></tr>
+        </table>
+      </div>
+      <p style="font-size:13px;color:var(--ink-soft);">Same tiers the AI Deal Router uses. Always confirm eligibility and the tier in the Router before quoting.</p>
+
+      <details class="clip">
+        <summary>Watch the training clip <em>3. Budget &middot; 1:33</em></summary>
+        <video controls preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step3.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690bdaa5e26a980016d.mp4" type="video/mp4"></video>
+      </details>
+    </section>
+
+    <!-- ===== STEP 4 ===== -->
+    <section class="es" id="es-4">
+      <div class="es-head">
+        <div class="es-num">4</div>
+        <div>
+          <span class="pill req">Required</span>
+          <h3>Quote the payment, set the dates, gather ACH</h3>
+          <p>Training clip: &ldquo;4. Quote payment / ACH Gather&rdquo; &middot; 2:08</p>
+        </div>
+      </div>
+
+      <div class="talk">
+        <span class="who">Talk track &mdash; the quote (back on Contact Info)</span>
+        &ldquo;Mr. Customer, congratulations &mdash; underwriting came back and I was able to get you approved for the most affordable payment option we have available, with the fastest timeframe to work toward getting you debt-free. You'd be looking at a payment of <b>$270 a month</b> for <b>36 months</b> to take care of that <b>$10,000</b>. Here's what that covers: we work to validate and resolve that debt toward a zero balance; our bill reduction service works to lower some of your most common household bills; the credit builder reports each monthly program payment as a positive payment on your credit report; and you get a membership to the National Litigation Law Group. Now, to get your documents out to you, I just need to pick the date you'd like to start the program.&rdquo;
+      </div>
+      <p style="font-size:13px;color:var(--ink-soft);">Swap in the client's own payment, term and total from Steps 2&ndash;3. Keep to &ldquo;work toward&rdquo; wording &mdash; never promise the debt will be wiped out (see Compliance &amp; Objections).</p>
+
+      <h4>A. Payment dates &mdash; Adtl. Info tab</h4>
+      <ol class="subs">
+        <li>Open the <span class="ui">Adtl. Info</span> tab (Custom Fields).</li>
+        <li><b>1st Payment Date</b> &mdash; aim for the <b>first or second Friday</b> coming up &mdash; the earliest date that fits their pay schedule. It can be up to 21 days out, but the sooner the first payment, the more likely the client actually makes it.</li>
+        <li><b>Recurring Monthly Payment Date</b> &mdash; set it to the <b>same date</b> as the 1st Payment Date. These two must always match.</li>
+        <li><b>3 Day Cancellation Date</b> &mdash; this autofills. Confirm it's <b>at least 10 business days</b> after the enrollment date.</li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s4-dates.jpg" width="1400" height="949" alt="Adtl. Info tab with payment date fields highlighted">
+        <figcaption><b>Adtl. Info.</b> (1) The tab, (2) 1st Payment Date and (3) Recurring Monthly Payment Date both 09/25/2026, (4) 3 Day Cancellation Date autofilled to 10/06/2026 for a 9/21 enrollment.</figcaption>
+      </figure>
+
+      <h4>B. Banking (ACH)</h4>
+      <div class="talk">
+        <span class="who">Talk track</span>
+        &ldquo;What's the best routing and account number you'd like the payments to come from?&rdquo;
+      </div>
+      <p>Enter it as the client gives it to you. These are the only fields you need on this tab:</p>
+      <ol class="subs">
+        <li><b>Bank Routing Number</b>.</li>
+        <li><b>Bank Account Number</b> &mdash; and click <b>CHK</b> (checking) or <b>SVG</b> (savings). <b>This part is important</b> &mdash; don't leave the account type blank.</li>
+        <li><b>Bank Name</b>.</li>
+        <li><b>Last 4 of Social</b>.</li>
+        <li>Read the routing and account numbers back to the client, then click <span class="ui">Save</span>. You'll see &ldquo;Record saved successfully.&rdquo;<span class="note">Before you save, check every required field on this tab is filled: 1st payment and recurring dates, routing number, bank name, account number, checking/savings, and last 4 of SSN.</span></li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s4-banking.jpg" width="1400" height="949" alt="Adtl. Info banking fields highlighted, account and routing numbers blurred">
+        <figcaption><b>Banking fields.</b> (1) Routing, (2) account number + CHK/SVG, (3) bank name, (4) last 4 SSN, (5) Save. Account and routing numbers are blurred in this screenshot.</figcaption>
+      </figure>
+
+      <details class="clip">
+        <summary>Watch the training clip <em>4. Quote payment / ACH Gather &middot; 2:08</em></summary>
+        <video controls preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step4.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d69030b0f957cccf78cf.mp4" type="video/mp4"></video>
+      </details>
+    </section>
+
+    <!-- ===== STEP 5 ===== -->
+    <section class="es" id="es-5">
+      <div class="es-head">
+        <div class="es-num">5</div>
+        <div>
+          <span class="pill req">Required</span>
+          <h3>Send the documents and walk the client through signing</h3>
+          <p>Training clip: &ldquo;5. Sending Docs&rdquo; &middot; 3:41</p>
+        </div>
+      </div>
+
+      <p>This is the last step before the disclosure recording. Documents go out in <b>two separate sends</b>: first the National Lit + RAM ACH pair, then the Consumer Shield ATC on its own.</p>
+
+      <h4>A. Make sure the send button is live</h4>
+      <ol class="subs">
+        <li>An <b>email address</b> must be on file. Enter it on Contact Info.</li>
+        <li>Until the email is saved (or if anything else required is missing), the <b>Send document for signature via</b> area stays grayed out &mdash; you can't click it no matter how many times you try. Click <span class="ui">Save</span> and it turns on.</li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s5-email-gray.jpg" width="1400" height="278" alt="Email field and grayed-out document send controls highlighted">
+        <figcaption><b>Before saving.</b> (1) Email address (blurred here), (2) document send controls still grayed out.</figcaption>
+      </figure>
+
+      <h4>B. Send #1 &mdash; National Lit + RAM ACH together</h4>
+      <ol class="subs">
+        <li>Open the document dropdown and check <b>National Lit Consumer Shield Encore Rev0226</b> (under Document Groups).</li>
+        <li>Scroll to Individual Documents and check <b>RAM_Client ACH Agreement_Consumer Shield_10.9.25.pdf</b>.</li>
+      </ol>
+      <div class="shot-pair">
+        <figure class="shot">
+          <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s5-nationallit.jpg" width="1216" height="465" alt="Document dropdown with National Lit Consumer Shield Encore Rev0226 checked">
+          <figcaption>(1) National Lit Consumer Shield Encore Rev0226.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s5-ram-ach.jpg" width="1216" height="465" alt="Document dropdown with RAM Client ACH Agreement checked">
+          <figcaption>(2) RAM_Client ACH Agreement_Consumer Shield_10.9.25.pdf.</figcaption>
+        </figure>
+      </div>
+      <ol class="subs" style="counter-reset:sub 2;">
+        <li>Choose <b>Text</b>, <b>Email</b> or <b>Both</b>.</li>
+        <li>Confirm the dropdown reads <b>2 selected</b>.</li>
+        <li>Click <span class="ui">Send</span>. You'll see &ldquo;Document sent for signature,&rdquo; and the CRM moves you to the Documents tab.</li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s5-send.jpg" width="1400" height="278" alt="Send via Text Email Both, 2 selected, and Send button highlighted">
+        <figcaption>(1) Text / Email / Both, (2) &ldquo;2 selected&rdquo;, (3) Send.</figcaption>
+      </figure>
+
+      <div class="callout">
+        <strong>You sent two &mdash; you'll see three</strong>
+        The pair goes out as one group, so the <b>Documents</b> tab lists three items under <b>Unsigned Docs</b>: the RAM Client ACH Agreement, the NLLG CC Combo and the Consumer Shield Member Agreement. That's expected. Once the client finishes, they move down to <b>Signed Docs</b> (refresh the page to see it).
+      </div>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s5-documents-tab.jpg" width="1400" height="919" alt="Documents tab with three unsigned documents and the Signed Docs section highlighted">
+        <figcaption><b>Documents tab.</b> (1) The tab, (2) three unsigned docs from the one send, (3) where they land once signed.</figcaption>
+      </figure>
+
+      <h4>C. What the client sees &mdash; walk them through it</h4>
+      <p>Stay on the line while the client opens the text or email link. Each document is a single click to sign &mdash; no drawing, no typing.</p>
+      <ol class="subs">
+        <li>Check the <b>Consumer Disclosure</b> box to agree to electronic records and signatures.</li>
+        <li>Click <b>Click here to sign your document</b>. It signs automatically.</li>
+      </ol>
+      <div class="shot-pair">
+        <figure class="shot">
+          <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s5-client-disclosure.jpg" width="1273" height="646" alt="Client view: Consumer Disclosure pop-up with the agree checkbox highlighted">
+          <figcaption><b>Client view.</b> (1) The Consumer Disclosure agree box.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s5-client-sign.jpg" width="1400" height="804" alt="Client view: Click here to sign your document button and monthly cost highlighted">
+          <figcaption><b>Client view.</b> (1) Click here to sign your document &mdash; one click. (2) Their monthly cost shows on the enrollment acknowledgment.</figcaption>
+        </figure>
+      </div>
+      <p>The same pop-up and sign button come up <b>three times</b>, one per document:</p>
+      <ul style="color:var(--ink-soft);font-size:14.5px;line-height:1.75;margin:0 0 12px;padding-left:20px;">
+        <li><b>Consumer Shield payment agreement</b> &mdash; the program and the services they're getting.</li>
+        <li><b>Law firm membership</b> &mdash; enrolls them in the National Litigation Law Group membership.</li>
+        <li><b>Reliance Account Management (RAM)</b> &mdash; authorizes the monthly program debits from their bank account.</li>
+      </ul>
+      <p>Confirm the client sees the <b>&ldquo;Thank you for signing&rdquo;</b> message, then refresh the Documents tab and check that all three are under Signed Docs.</p>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s5-signed.jpg" width="1400" height="423" alt="Signed Docs section listing three signed documents">
+        <figcaption>(1) All three documents under Signed Docs with a date and time.</figcaption>
+      </figure>
+
+      <h4>D. Send #2 &mdash; the Consumer Shield ATC, by itself</h4>
+      <ol class="subs">
+        <li>Back on Contact Info, open the document dropdown and check only <b>CONSUMER SHIELD ATC Template Rev 925-2.pdf</b>.</li>
+        <li>Choose Text/Email/Both and click <span class="ui">Send</span>. The client signs it exactly the same way: Consumer Disclosure box, then the sign button.</li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s5-atc.jpg" width="1216" height="465" alt="Document dropdown with Consumer Shield ATC Template checked and Send highlighted">
+        <figcaption>(1) CONSUMER SHIELD ATC Template Rev 925-2.pdf on its own, (2) Send.</figcaption>
+      </figure>
+      <div class="callout warn">
+        <strong>Always send the ATC separately</strong>
+        A personal answering service (PAS) number is assigned to the client automatically when the ATC goes out. Because of a glitch in the system, it is <b>not</b> assigned if the ATC is sent together with the other documents. Send it on its own every time.
+      </div>
+
+      <div class="callout">
+        <strong>Next: the disclosure recording</strong>
+        With all documents signed, move on to the disclosure recording (the AI Genie QC call) with the client still on the line.
+      </div>
+
+      <details class="clip">
+        <summary>Watch the training clip <em>5. Sending Docs &middot; 3:41</em></summary>
+        <video controls preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step5.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690bdaa5e26a9800178.mp4" type="video/mp4"></video>
+      </details>
+    </section>
+
+    <details class="clip" style="margin-top:6px;">
+      <summary>Original full enrollment walkthrough <em>Screen recording</em></summary>
+      <video controls preload="none" playsinline><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6a9df3eb4ea183e8729f65ba.mp4" type="video/mp4"></video>
+    </details>
   </div>
 
   <!-- =================== COMPLIANCE & OBJECTIONS =================== -->
@@ -439,6 +856,17 @@
   tabButtons.forEach(btn=>{
     btn.addEventListener('click', ()=>goTab(btn.dataset.tab));
   });
+
+  // screenshot lightbox
+  (function(){
+    var lb=document.createElement('div'); lb.className='lightbox'; lb.setAttribute('role','dialog');
+    var im=document.createElement('img'); lb.appendChild(im); document.body.appendChild(lb);
+    document.querySelectorAll('figure.shot img').forEach(function(i){
+      i.addEventListener('click',function(){ im.src=i.src; im.alt=i.alt; lb.classList.add('open'); });
+    });
+    lb.addEventListener('click',function(){ lb.classList.remove('open'); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') lb.classList.remove('open'); });
+  })();
 </script>
 
 <script src="https://ai.fundingtier.com/toolkit.js" defer></script>
