@@ -712,7 +712,7 @@
         <div class="gf-row">
           <div class="gf-node"><span class="gf-k">4 &middot; Add it</span><span class="ui">Creditors</span> &rarr; <span class="ui">Add New</span> with the details from the statement</div>
           <div class="gf-arrow" aria-hidden="true">&rarr;</div>
-          <div class="gf-node"><span class="gf-k">5 &middot; Upload it</span>Attach the statement or report to the client's file</div>
+          <div class="gf-node"><span class="gf-k">5 &middot; Upload it</span>On that creditor: <span class="ui">Select File</span> &rarr; <span class="ui">Select Files</span> &rarr; appears under Creditor Correspondence</div>
           <div class="gf-arrow" aria-hidden="true">&rarr;</div>
           <div class="gf-node gf-end"><span class="gf-k">6 &middot; Re-check</span>New <b>Total Debts</b>, then use the new tier in Step 3</div>
         </div>
@@ -750,11 +750,56 @@
       </div>
 
       <h4>Add it and upload it</h4>
+      <p>First save the statement to your computer. If the client sent a photo or screenshot, save it as a PDF, because PDF is the format the upload is built for. Then add the creditor and attach the statement to that creditor.</p>
+
+      <h4 style="margin-top:18px;">1 &middot; Add the creditor</h4>
       <ol class="subs">
-        <li>On the <span class="ui">Creditors</span> tab, click <span class="ui">Add New</span> and fill in the account from the statement, exactly as in section C above (the account number goes in twice).</li>
-        <li>Upload the statement or report to the client's file in Shield Services so underwriting can see where the account came from.<span class="note">If you can't find an upload option on the file, email the document to your team lead with the client's name and file so it gets attached.</span></li>
-        <li>Check that the new <b>Total Debts</b> is right. It may move the client into a higher payment tier in Step 3.</li>
+        <li>On the <span class="ui">Creditors</span> tab, click <span class="ui">Add New</span>, under Total Debts on the right.</li>
+        <li><b>Creditor Type</b>: leave it on <b>ATC</b>.</li>
+        <li><b>Current Creditor/Collector</b>: who the client owes <i>now</i>, as named on the latest statement or letter. If the account is in collections, that's the collection agency.</li>
+        <li><b>Current Creditor/Collector Account Number</b>: the account number on that statement or letter.</li>
+        <li><b>Original Creditor</b>: who the debt started with, e.g. the hospital or the lender. If it has never been sold or sent to collections, it's the same as #3.</li>
+        <li><b>Original Account Number</b>: the original account number. If it's the same account, <b>enter the same number again</b>, just as in section C.</li>
+        <li><b>Creditor Statement Address</b>: the payment or mailing address printed on the statement.</li>
+        <li><b>City, State, Zip</b> of that address.</li>
+        <li><b>Collector</b>: the collection agency, if the account is in collections. Leave it blank if it isn't.</li>
+        <li><b>Balance</b>: the current balance on the statement. Never estimate it.</li>
+        <li><b>Payment</b>: what the client pays on it each month, if anything.</li>
+        <li><b>Current Account</b>: Yes or No, whether the client is current on it.</li>
+        <li>Click <span class="ui">Add</span>. The creditor now appears on the Creditors tab, and <b>Total Debts</b> goes up.</li>
       </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s2d-add-new.jpg" width="1155" height="855" alt="Shield Services Add New creditor form with the Add New button and each field numbered 1 to 13">
+        <figcaption><b>Creditors &rarr; Add New.</b> (1) Add New, (2) Creditor Type, (3)&ndash;(4) current creditor and account number, (5)&ndash;(6) original creditor and account number, (7)&ndash;(8) statement address, (9) collector, (10) balance, (11) payment, (12) current account, (13) Add.</figcaption>
+      </figure>
+
+      <h4>2 &middot; Attach the statement to that creditor</h4>
+      <ol class="subs">
+        <li>Scroll down to the creditor you just added. Set its <b>Creditor Status</b>. On a medical bill, fill in <b>Date of Service</b> if it's on the statement, or tick <b>Client did Not Provide</b>.</li>
+        <li>In <b>Creditor Notes</b>, write where the proof came from, e.g. &ldquo;Statement from client's online account, 9/24/26&rdquo; or &ldquo;Statement emailed by creditor on 3-way call, 9/24/26.&rdquo;</li>
+        <li>Click <span class="ui">Select File</span>, at the bottom right of that creditor's section.<span class="note">Use the Select File for <i>this</i> creditor, so the statement is filed against the right account.</span></li>
+      </ol>
+      <figure class="shot">
+        <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s2d-creditor-correspondence.jpg" width="1167" height="521" alt="Creditor section with Creditor Status, Creditor Notes, Select File and the Creditor Correspondence list numbered">
+        <figcaption><b>The new creditor's section.</b> (1) Creditor Status, (2) Creditor Notes, (3) Select File, (4) the uploaded file listed under Creditor Correspondence. Account details are blurred.</figcaption>
+      </figure>
+      <ol class="subs" start="4" style="counter-reset:sub 3;">
+        <li>In the <b>Upload document</b> window, type a tag such as <i>statement</i> in <b>Tags</b>.</li>
+        <li>Click <span class="ui">Select Files</span> and choose the statement PDF.</li>
+        <li>Wait for <b>&ldquo;Document upload processing&hellip;&rdquo;</b> to finish. Don't close the page or click away while it spins.</li>
+        <li>Confirm the file now shows under <b>Creditor Correspondence</b> with the date and time. Click <span class="ui">Edit File Name</span> to give it a clear name, e.g. <i>Statement &ndash; New Hope Medical &ndash; Sept 2026</i>.</li>
+        <li>Check that <b>Total Debts</b> is right. It may move the client into a higher payment tier in Step 3.</li>
+      </ol>
+      <div class="shot-pair">
+        <figure class="shot">
+          <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s2d-upload-modal.jpg" width="864" height="731" alt="Upload document window with Tags field and Select Files button, and the Select File button behind it">
+          <figcaption><b>Upload document.</b> (1) Select File on the creditor opens it, (2) Tags, (3) Select Files to pick the PDF.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img loading="lazy" src="/agents/debt-validation/consumer-shield/enrollment-process/img/s2d-upload-processing.jpg" width="382" height="195" alt="Document upload processing spinner">
+          <figcaption><b>&ldquo;Document upload processing&hellip;&rdquo;</b> Wait for it to clear. The file then appears under Creditor Correspondence.</figcaption>
+        </figure>
+      </div>
 
       <div class="callout warn">
         <strong>If you can't get the statement on this call</strong>
