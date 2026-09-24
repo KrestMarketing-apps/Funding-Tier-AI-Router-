@@ -151,7 +151,7 @@
       transition: color .12s ease, background .12s ease;
     }
     .ghead:hover { color: var(--text); background: var(--hover); }
-    .gname { font-size: 10px; font-weight: 700; letter-spacing: .13em;
+    .gname { font-size: 13.5px; font-weight: 750; letter-spacing: .11em;
              text-transform: uppercase; }
     .group.admin .gname {
       background: linear-gradient(92deg, var(--g2), var(--g3));
@@ -163,7 +163,7 @@
       -webkit-background-clip: text; background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .gcount { font-size: 10px; font-weight: 700; line-height: 1;
+    .gcount { font-size: 11.5px; font-weight: 700; line-height: 1;
               padding: 3px 6px; border-radius: 999px; color: var(--dim);
               background: var(--chip); border: 1px solid var(--line); }
     .grule { flex: 1 1 auto; height: 1px;
@@ -176,6 +176,19 @@
 
     .glist { padding: 0 2px 6px; }
 
+    /* Group icons: a small tinted tile beside each label so Admins, Backend
+       Support and Agents read at a glance, not just by their caps text. */
+    .gicon { flex: none; width: 24px; height: 24px; border-radius: 7px;
+             display: grid; place-items: center; }
+    .gicon svg { width: 15px; height: 15px; display: block; }
+    .group.admin .gicon { color: var(--g2); background: var(--admin-wash);
+                          border: 1px solid var(--admin-line); }
+    .group.agent .gicon { color: var(--ga2); background: var(--agent-wash);
+                          border: 1px solid var(--agent-line); }
+    .shead .gicon { width: 22px; height: 22px; color: var(--text); opacity: .85;
+                    background: var(--chip); border: 1px solid var(--line); }
+    .shead .gicon svg { width: 13px; height: 13px; }
+
     /* --- Nested sub-group (Backend Support, under Admins) ----------------- */
     .subgroup { margin: 6px 6px 2px; border-top: 1px solid var(--line); padding-top: 6px; }
     .shead {
@@ -185,7 +198,7 @@
       transition: color .12s ease, background .12s ease;
     }
     .shead:hover { color: var(--text); background: var(--hover); }
-    .sname { font-size: 9.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .sname { font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
     .scaret { width: 6px; height: 6px; flex: none; opacity: .6;
               border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
               transform: rotate(45deg) translate(-1px,-1px);
@@ -196,7 +209,7 @@
              color: var(--text); padding: 7px 8px; border-radius: 8px;
              transition: background .12s ease; }
     .sitem:hover { background: var(--hover); }
-    .sitem .sb { font-size: 11.5px; color: var(--dim); margin-left: auto; }
+    .sitem .sb { font-size: 12.5px; color: var(--dim); margin-left: auto; }
     /* A backend that also has a reference page on this site carries it on the
        same row: chat link left, page chip right. One row, two doors, no
        duplicate entry up in the Admins list. */
@@ -219,8 +232,8 @@
             padding: 9px 10px 9px 12px; border-radius: 9px; line-height: 1.35;
             transition: background .12s ease; }
     .item:hover { background: var(--hover); }
-    .item .t { font-weight: 600; display: flex; align-items: center; gap: 7px; }
-    .item .b { font-size: 12.5px; color: var(--dim); margin-top: 1px; }
+    .item .t { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 7px; }
+    .item .b { font-size: 13px; color: var(--dim); margin-top: 1px; }
 
     /* Flagship items (the enrollment SOPs) get a logo badge and a touch more
        room so they read as a distinct set rather than blending into the rest
@@ -315,6 +328,18 @@
       else if (attrs[k] != null) n.setAttribute(k, attrs[k]);
     }
     (kids || []).forEach(function (c) { n.appendChild(c); });
+    return n;
+  }
+
+  /* Static, trusted SVG markup only — never pass data from the API here. */
+  var ICONS = {
+    admins: '<path d="M12 3l7 3v5c0 4.5-3 8.3-7 9.5C8 19.3 5 15.5 5 11V6l7-3z"/><path d="M9.5 12l1.8 1.8L15 10"/>',
+    support: '<path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/><path d="M19 19c0 1.5-2 2.5-5 2.5"/>',
+    agents: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.6-.4 4.6 1.2 5 4.8"/>',
+  };
+  function icon(name) {
+    var n = el("span", { class: "gicon", "aria-hidden": "true" });
+    n.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + ICONS[name] + '</svg>';
     return n;
   }
 
@@ -437,7 +462,9 @@
       // Same collapsed/expanded persistence pattern as the top-level groups,
       // under its own storage key so opening one never touches the other.
       if (g.admin && data.support && data.support.length) {
-        var subOpen = !collapsed["backend-support"];
+        // Collapsed by default; opens only once someone has opened it by
+        // hand, and then stays however they last left it.
+        var subOpen = collapsed["backend-support"] === false;
         var slist = el("div", { class: "slist", role: "group" });
         data.support.forEach(function (s) {
           var kids = [];
@@ -470,6 +497,7 @@
         var shead = el("button", {
           class: "shead", type: "button", "aria-expanded": subOpen ? "true" : "false",
         }, [
+          icon("support"),
           el("span", { class: "sname", text: "Backend Support" }),
           el("span", { class: "scaret" }),
         ]);
@@ -488,6 +516,7 @@
       var head = el("button", {
         class: "ghead", type: "button", "aria-expanded": open ? "true" : "false",
       }, [
+        icon(g.admin ? "admins" : "agents"),
         el("span", { class: "gname", text: g.name }),
         el("span", { class: "gcount", text: String(g.tools.length) }),
         el("span", { class: "grule" }),
