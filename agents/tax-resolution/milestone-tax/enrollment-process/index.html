@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tax Resolution | Milestone Tax Enrollment Process (SOP)</title>
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F7F9FC;
+    --cream-panel:#FFFFFF;
+    --forest:#0A182E;
+    --forest-2:#022A51;
+    --green:#0F9D8A;
+    --green-dk:#0B7D6E;
+    --accent:#0F9D8A;
+    --accent-soft:#ECFDF5;
+    --ink:#0A182E;
+    --ink-soft:#4A5A6E;
+    --line:#E1E6EE;
+    --warn-bg:#FFF8EC;
+    --warn-line:#B7791F;
+    --danger:#B3261E;
+    --brand-gradient: linear-gradient(150deg,#0A182E 0%,#022A51 55%,#0F9D8A 100%);
+    --brand-gradient-soft: #F7F9FC;
+    --brand-gradient-accent: linear-gradient(150deg,#0F9D8A 0%,#0B7D6E 100%);
+    --rail-w:272px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--brand-gradient-soft);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:'Montserrat',sans-serif;
+    font-weight:700;
+    margin:0;
+    color:var(--forest);
+    letter-spacing:-0.01em;
+  }
+  a{color:var(--accent);}
+
+  /* ---------- LEFT RAIL NAV ---------- */
+  .tabbar{
+    background:linear-gradient(165deg,#0A182E 0%,#0B2F50 42%,#0E6E62 76%,#0F9D8A 100%);
+    display:flex;
+    flex-direction:column;
+    overflow-y:auto;
+    padding:26px 0 28px;
+    border-right:1px solid rgba(255,255,255,.08);
+    position:fixed;
+    top:var(--ft-toolkit-height,0px);
+    bottom:0;
+    left:0;
+    width:var(--rail-w);
+    z-index:900;
+  }
+  .tabbar::before{
+    content:"Tax Resolution SOP";
+    display:block;
+    font-family:'Montserrat',sans-serif;
+    font-weight:700;
+    font-size:12.5px;
+    letter-spacing:.08em;
+    color:rgba(255,255,255,.55);
+    padding:0 24px 20px;
+  }
+  .tabbtn{
+    background:none;border:none;
+    border-left:4px solid transparent;
+    color:rgba(255,255,255,.78);
+    font-family:'Montserrat',sans-serif;
+    text-align:left;
+    font-weight:600;
+    font-size:16.5px;
+    padding:17px 22px 17px 20px;
+    cursor:pointer;
+    white-space:normal;
+    line-height:1.35;
+    letter-spacing:-0.005em;
+    transition:color .15s ease, border-color .15s ease, background-color .15s ease;
+  }
+  .tabbtn:hover{color:#fff;background:rgba(255,255,255,.06);}
+  .tabbtn.active{
+    color:#fff;
+    border-left-color:#4FE0C8;
+    background:rgba(255,255,255,.10);
+  }
+  .tabicon{width:18px;height:18px;display:inline-block;vertical-align:-3.5px;margin-right:9px;stroke:currentColor;fill:none;stroke-width:1.7;}
+
+  /* ---------- LAYOUT ---------- */
+  .wrap{
+    max-width:760px;
+    margin:0;
+    margin-left:calc(var(--rail-w) + 64px);
+    padding:64px 24px 96px;
+    overflow-x:hidden;
+    scroll-margin-top:24px;
+  }
+  .panel{display:none;}
+  .panel.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:13px;font-weight:600;color:var(--green);
+    margin-bottom:10px;
+  }
+  .eyebrow .dot{width:7px;height:7px;background:var(--accent);border-radius:50%;}
+
+  .section-head{margin-bottom:28px;}
+  .section-head h2{font-size:28px;line-height:1.2;}
+  .section-head p{color:var(--ink-soft);font-size:15.5px;line-height:1.6;max-width:70ch;margin-top:10px;}
+
+  .card{
+    background:var(--cream-panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:24px;
+    margin-bottom:20px;
+  }
+  .card h3{font-size:17px;margin-bottom:10px;}
+  .card p{color:var(--ink-soft);font-size:14.5px;line-height:1.65;margin:0 0 8px;}
+
+  .callout{
+    position:relative;padding-left:46px;
+    border-left:4px solid var(--green);
+    background:var(--accent-soft);
+    border-radius:0 10px 10px 0;
+    padding-top:16px;padding-bottom:16px;padding-right:18px;
+    font-size:14.5px;
+    color:#0F3325;
+    margin:18px 0;
+  }
+  .callout::before{
+    content:"";position:absolute;left:16px;top:16px;width:19px;height:19px;
+    background-repeat:no-repeat;background-position:center;background-size:contain;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='7.6' fill='none' stroke='%230F9D8A' stroke-width='1.7'/><path d='M10 9v5M10 6.4v.01' stroke='%230F9D8A' stroke-width='1.9' stroke-linecap='round'/></svg>");
+  }
+  .callout.warn{
+    border-left-color:var(--warn-line);
+    background:var(--warn-bg);
+    color:#5A3E00;
+  }
+  .callout.warn::before{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M10 2.6l8.4 14.6H1.6L10 2.6z' fill='none' stroke='%23B7791F' stroke-width='1.7' stroke-linejoin='round'/><path d='M10 8v4.2M10 15v.01' stroke='%23B7791F' stroke-width='1.9' stroke-linecap='round'/></svg>");
+  }
+  .callout.needinput{
+    border-left-color:var(--danger);
+    background:#FBECEA;
+    color:#6E1B14;
+  }
+  .callout.needinput::before{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='7.6' fill='none' stroke='%23B3261E' stroke-width='1.7'/><path d='M6.8 6.8l6.4 6.4M13.2 6.8l-6.4 6.4' stroke='%23B3261E' stroke-width='1.8' stroke-linecap='round'/></svg>");
+  }
+  .callout strong{display:block;margin-bottom:4px;font-family:'Montserrat',sans-serif;font-size:13px;letter-spacing:.01em;}
+  .callout code{background:rgba(0,0,0,.06);padding:1px 6px;border-radius:5px;font-size:.92em;}
+
+  /* ---------- STEP LIST ---------- */
+  .steps{counter-reset:stepnum;}
+  .step{
+    display:flex;gap:18px;
+    padding:24px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .step:last-child{border-bottom:none;}
+  .step-num{
+    counter-increment:stepnum;
+    flex-shrink:0;
+    width:42px;height:42px;
+    border-radius:11px;
+    background:var(--brand-gradient-accent);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Montserrat',sans-serif;font-weight:700;font-size:17px;
+    box-shadow:0 3px 10px rgba(15,157,138,.35);
+  }
+  .step-num::before{content:counter(stepnum);}
+  .step-kicker{
+    display:inline-block;
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:10.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--green-dk);
+    background:var(--accent-soft);
+    padding:3px 9px;
+    border-radius:5px;
+    margin-bottom:7px;
+  }
+  .step-body h4{font-family:'Montserrat',sans-serif;font-size:19px;margin-bottom:7px;color:var(--forest);}
+  .step-body p{color:var(--ink-soft);font-size:14.5px;line-height:1.65;margin:0;}
+  .step-body ul{margin:9px 0 0;padding-left:19px;color:var(--ink-soft);font-size:14.5px;line-height:1.75;}
+  .mini-stat-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+  .mini-stat{
+    display:flex;align-items:flex-start;gap:9px;
+    background:#fff;border:1.5px solid var(--line);border-radius:9px;
+    padding:8px 12px;font-size:12.5px;color:var(--ink-soft);
+  }
+  .mini-stat strong{display:block;font-family:'Montserrat',sans-serif;font-size:14px;color:var(--forest);}
+
+  /* ---------- VIDEO ---------- */
+  .video-wrap{
+    background:#0A1B2E;
+    border-radius:14px;
+    overflow:hidden;
+    margin:16px 0 20px;
+    border:1px solid var(--line);
+  }
+  .video-stage{position:relative;line-height:0;}
+  .video-wrap video{display:block;width:100%;height:auto;background:#000;}
+  .video-caption{
+    padding:12px 16px;
+    font-size:13px;
+    color:#BFDCE8;
+    background:var(--forest);
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;
+  }
+
+  /* ---------- FLOW DIAGRAM ---------- */
+  .flow{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 26px;}
+  .flow-node{
+    flex:1 1 150px;
+    background:#fff;
+    border:1.5px solid var(--line);
+    border-radius:12px;
+    padding:14px;
+    position:relative;
+  }
+  .flow-node .fn-label{font-family:'Montserrat',sans-serif;font-weight:700;font-size:12.5px;color:var(--green);margin-bottom:4px;}
+  .flow-node p{font-size:13px;color:var(--ink-soft);margin:0;line-height:1.5;}
+  .flow-arrow{align-self:center;color:var(--green);font-size:18px;font-weight:700;flex:0 0 auto;}
+
+  /* ---------- TABLE ---------- */
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{font-family:'Montserrat',sans-serif;font-weight:600;font-size:12px;color:var(--forest);background:#EEF1F6;}
+  tr:last-child td{border-bottom:none;}
+  td p{margin:0;color:var(--ink-soft);font-size:13.5px;line-height:1.55;}
+
+  footer{text-align:center;font-size:12.5px;color:var(--ink-soft);padding:26px 24px 40px;}
+
+  .tab-select-mobile{display:none;}
+  @media (max-width:900px){
+    .tabbar{display:none;}
+    .wrap{margin-left:0;max-width:none;padding-top:76px;}
+    .tab-select-mobile{
+      display:block;width:100%;box-sizing:border-box;
+      color:#fff;border:none;padding:16px 20px;font-size:16px;font-weight:700;
+      font-family:'Montserrat',sans-serif;
+      position:fixed;top:var(--ft-toolkit-height,0px);left:0;right:0;z-index:900;
+      -webkit-appearance:none;appearance:none;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5 8l5 5 5-5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>"), var(--brand-gradient);
+      background-repeat:no-repeat,no-repeat;
+      background-position:right 16px center, 0 0;
+      background-size:16px, 100% 100%;
+    }
+    .tab-select-mobile option{background:#0A182E;color:#fff;}
+  }
+  @media (max-width:640px){
+    h2{font-size:21px !important;}
+    .section-head p{font-size:14px;}
+    .card{padding:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    table{min-width:480px;}
+    .step{gap:12px;padding:18px 0;}
+    .step-num{width:34px;height:34px;font-size:14px;border-radius:9px;}
+    .flow{gap:8px;}
+    .flow-node{flex:1 1 130px;padding:11px;}
+    .flow-arrow{display:none;}
+    .callout{padding-left:42px;font-size:13.5px;}
+    .callout::before{left:12px;top:14px;width:17px;height:17px;}
+  }
+
+  /* ---------- 5-STEP ENROLLMENT (video series) ---------- */
+  .stepnav{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 26px;}
+  .stepnav a{flex:1 1 128px;text-decoration:none;background:#fff;border:1.5px solid var(--line);border-radius:11px;padding:11px 13px;color:var(--forest);font-size:13px;line-height:1.4;transition:border-color .15s ease;}
+  .stepnav a:hover{border-color:var(--green);}
+  .stepnav a b{display:block;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--green);margin-bottom:2px;}
+  .stepnav a.skip{background:#F3F5F8;border-style:dashed;color:var(--ink-soft);}
+  .stepnav a.skip b{color:var(--ink-soft);}
+  .es{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 26px 22px;margin:0 0 26px;scroll-margin-top:90px;}
+  .es-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px;}
+  .es-num{flex-shrink:0;width:46px;height:46px;border-radius:12px;background:var(--brand-gradient-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:700;font-size:19px;box-shadow:0 3px 10px rgba(15,157,138,.35);}
+  .es.skipped .es-num{background:#AEB8C6;box-shadow:none;}
+  .es-head h3{font-size:21px;line-height:1.25;margin:3px 0 4px;}
+  .es-head p{margin:0;color:var(--ink-soft);font-size:14px;}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:5px;margin-bottom:6px;}
+  .pill.skip{background:#EEF1F6;color:#4A5A6E;}
+  .pill.req{background:var(--accent-soft);color:var(--green-dk);}
+  .es > p, .es-body > p{color:var(--ink-soft);font-size:14.5px;line-height:1.65;margin:0 0 12px;}
+  .es h4{font-family:'Montserrat',sans-serif;font-size:15px;margin:22px 0 10px;color:var(--forest);}
+  .talk{border-left:4px solid var(--forest-2);background:#F2F5FA;border-radius:0 10px 10px 0;padding:14px 18px;margin:14px 0;font-size:14.5px;line-height:1.65;color:#1D2F47;}
+  .talk .who{display:block;font-family:'Montserrat',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--forest-2);margin-bottom:5px;}
+  ol.subs{list-style:none;counter-reset:sub;margin:10px 0 6px;padding:0;}
+  ol.subs > li{counter-increment:sub;position:relative;padding:0 0 12px 38px;font-size:14.5px;line-height:1.6;color:var(--ink);}
+  ol.subs > li::before{content:counter(sub);position:absolute;left:0;top:0;width:25px;height:25px;border-radius:50%;background:var(--green);color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12.5px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 0 0 1.5px var(--green);}
+  ol.subs > li span.note{display:block;color:var(--ink-soft);font-size:13.5px;}
+  .ui{font-weight:600;color:var(--forest);background:#EEF1F6;border-radius:5px;padding:1px 6px;font-size:.93em;white-space:nowrap;}
+  figure.shot{margin:14px 0 20px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0A182E;}
+  figure.shot img{display:block;width:100%;height:auto;cursor:zoom-in;background:#fff;}
+  figure.shot figcaption{background:var(--forest);color:#CFE3EC;font-size:12.5px;line-height:1.5;padding:10px 14px;}
+  figure.shot figcaption b{color:#fff;}
+  .shot-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .shot-pair figure.shot{margin:14px 0 8px;}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--ink-soft);margin:0 0 20px;}
+  .legend span{display:inline-flex;align-items:center;gap:7px;}
+  .legend i{display:inline-block;width:18px;height:18px;border-radius:50%;}
+  .legend i.n{background:var(--green);border:2px solid #fff;box-shadow:0 0 0 1.5px var(--green);}
+  .legend i.c{border:3px solid #F57C00;}
+  details.clip{margin:18px 0 4px;border:1px solid var(--line);border-radius:12px;background:#F7F9FC;}
+  details.clip summary{cursor:pointer;list-style:none;padding:12px 16px;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13.5px;color:var(--forest);display:flex;align-items:center;gap:9px;}
+  details.clip summary::-webkit-details-marker{display:none;}
+  details.clip summary::before{content:"";width:0;height:0;border-left:9px solid var(--green);border-top:6px solid transparent;border-bottom:6px solid transparent;transition:transform .15s ease;}
+  details.clip[open] summary::before{transform:rotate(90deg);}
+  details.clip summary em{font-style:normal;font-weight:500;color:var(--ink-soft);font-family:'Inter',sans-serif;font-size:12.5px;margin-left:auto;}
+  details.clip video{display:block;width:100%;height:auto;background:#000;border-radius:0 0 12px 12px;}
+  table.tiers td,table.tiers th{padding:8px 12px;}
+  table.tiers td{font-size:13.5px;color:var(--ink);}
+  .lightbox{position:fixed;inset:0;background:rgba(6,14,28,.92);z-index:5000;display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;}
+  .lightbox.open{display:flex;}
+  .lightbox img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,.5);}
+  @media (max-width:640px){
+    .es{padding:18px 16px 14px;}
+    .es-head{gap:12px;}
+    .es-num{width:38px;height:38px;font-size:16px;}
+    .es-head h3{font-size:18px;}
+    .shot-pair{grid-template-columns:1fr;}
+    ol.subs > li{padding-left:34px;font-size:14px;}
+    .ui{white-space:normal;}
+  }
+
+  /* ---------- VIDEO FEATURE ---------- */
+  .vid-feature{margin:4px 0 26px;border:2px solid var(--green);border-radius:16px;background:linear-gradient(180deg,#ECFDF5 0%,#FFFFFF 70%);padding:18px 18px 16px;box-shadow:0 6px 22px rgba(15,157,138,.14);}
+  .vid-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+  .vid-badge{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;padding:7px 12px 7px 10px;border-radius:8px;}
+  .vid-badge svg{width:15px;height:15px;}
+  .vid-len{margin-left:auto;font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;color:var(--forest);background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 10px;}
+  .vid-title{font-family:'Montserrat',sans-serif;font-size:20px !important;margin:10px 0 12px !important;color:var(--forest);}
+  .vid-feature video{display:block;width:100%;height:auto;background:#000;border-radius:12px;}
+  .vid-note{margin:12px 2px 0 !important;font-size:15px !important;color:var(--ink-soft) !important;}
+  .vid-full{margin-top:10px;}
+  .vids-callout{border-color:var(--green);}
+
+  /* ---------- MISSING-DEBT FLOW (Step 2.D) ---------- */
+  .gap-types{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0 6px;}
+  .gap-type{border:1px solid var(--line);border-top:4px solid var(--forest-2);border-radius:12px;padding:14px 16px;background:#fff;}
+  .gap-type > b{display:block;font-family:'Montserrat',sans-serif;font-size:16px;color:var(--forest);margin-bottom:4px;}
+  .gap-type > span{display:block;font-size:15px;line-height:1.55;color:var(--ink-soft);}
+  figure.gapflow{margin:22px 0;padding:20px;border:1px solid var(--line);border-radius:16px;background:#F7F9FC;}
+  .gf-row{display:flex;align-items:stretch;gap:10px;}
+  .gf-node{flex:1 1 0;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:15px;line-height:1.5;color:var(--ink);}
+  .gf-node.gf-start{border-color:var(--forest-2);}
+  .gf-node.gf-end{border-color:var(--green);background:var(--accent-soft);}
+  .gf-k{display:block;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase;color:var(--green);margin-bottom:4px;}
+  .gf-arrow{align-self:center;color:var(--green);font-size:22px;font-weight:700;flex:0 0 auto;}
+  .gf-branches{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;padding:12px;border:2px dashed #9FD8CF;border-radius:14px;background:#fff;}
+  .gf-branch{padding:6px 8px;font-size:15px;line-height:1.5;color:var(--ink-soft);}
+  .gf-branch b{display:block;font-family:'Montserrat',sans-serif;font-size:16px;color:var(--forest);margin:4px 0 2px;}
+  .gf-tag{display:inline-block;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;background:var(--forest-2);color:#fff;border-radius:6px;padding:3px 8px;}
+  @media (max-width:900px){
+    .gf-row{flex-direction:column;}
+    .gf-arrow{transform:rotate(90deg);align-self:center;}
+    .gf-branches,.gap-types{grid-template-columns:1fr;}
+  }
+
+  /* ---------- READABILITY: larger type, wider page ---------- */
+  .shot-pair{align-items:start;}
+  .shot-pair figure.shot img{max-height:640px;object-fit:contain;}
+  .section-head h2{font-size:34px;}
+  .section-head p{font-size:18px;max-width:80ch;}
+  .eyebrow{font-size:14.5px;}
+  .card p,.es > p,.es-body > p{font-size:17px;line-height:1.7;}
+  .card h3{font-size:20px;}
+  .callout{font-size:17px;line-height:1.65;}
+  .callout strong{font-size:15px;}
+  .talk{font-size:17px;line-height:1.7;}
+  .talk .who{font-size:13px;}
+  ol.subs > li{font-size:17px;line-height:1.65;padding-left:42px;}
+  ol.subs > li::before{width:28px;height:28px;font-size:14px;}
+  ol.subs > li span.note{font-size:15.5px;}
+  .es{padding:32px 34px 28px;}
+  .es-head h3{font-size:26px;}
+  .es-head p{font-size:15.5px;}
+  .es-num{width:52px;height:52px;font-size:22px;}
+  .es h4{font-size:19px;margin:30px 0 12px;}
+  .pill{font-size:12px;}
+  .stepnav a{font-size:15.5px;padding:13px 15px;}
+  .stepnav a b{font-size:13.5px;}
+  .legend{font-size:14.5px;}
+  figure.shot figcaption{font-size:14.5px;}
+  .mini-stat{font-size:15px;}
+  .mini-stat strong{font-size:16px;}
+  .flow-node p{font-size:15px;}
+  .flow-node .fn-label{font-size:14px;}
+  table{font-size:16px;}
+  th{font-size:13.5px;}
+  table.tiers td{font-size:15.5px;}
+  @media (max-width:900px){
+    .wrap{margin-left:0;max-width:none;padding:76px 16px 80px;}
+  }
+  @media (max-width:640px){
+    .section-head h2{font-size:26px;}
+    .section-head p{font-size:16px;}
+    .card p,.es > p,.es-body > p,.callout,.talk,ol.subs > li{font-size:16px;}
+    .es{padding:20px 16px 16px;}
+    .es-head h3{font-size:20px;}
+    .vid-feature{padding:14px 12px 12px;}
+    .vid-len{margin-left:0;}
+  }
+
+  /* ===== WIDE LAYOUT — use the full screen (Funding Tier SOP system) ===== */
+  .wrap{max-width:1600px !important;width:auto !important;padding:48px 0 110px !important;overflow-x:clip !important;}
+  .section-head h2{font-size:34px;}
+  .section-head p{font-size:18px;line-height:1.65;max-width:100ch;}
+  .eyebrow{font-size:14.5px;}
+  .card p{font-size:17px;line-height:1.7;}
+  .card h3{font-size:20px;}
+  .callout{font-size:17px;line-height:1.65;}
+  .callout strong{font-size:15px;}
+  .step-body h4{font-size:22px;}
+  .step-body p,.step-body ul{font-size:17px;line-height:1.7;max-width:100ch;}
+  .mini-stat{font-size:15px;}
+  .mini-stat strong{font-size:16px;}
+  .flow-node p{font-size:15px;}
+  .flow-node .fn-label{font-size:14px;}
+  table{font-size:16px;}
+  th{font-size:13.5px;}
+  .shot img,figure.shot img{max-height:80vh;object-fit:contain;}
+  .shot-cap,figcaption{font-size:14.5px;}
+  video{max-height:80vh;}
+  @media (max-width:640px){
+    .section-head h2{font-size:26px;}
+    .section-head p,.card p,.callout,.step-body p,.step-body ul{font-size:16px;}
+  }
+  .wrap{margin-left:calc(var(--rail-w) + clamp(24px,3vw,56px)) !important;margin-right:clamp(24px,3vw,56px) !important;}
+  @media (max-width:900px){ .wrap{margin-left:0 !important;margin-right:0 !important;padding:76px 16px 80px !important;} }
+
+  /* Wide screens: instructions on the left, the step's training video pinned on the right */
+  @media (min-width:1400px){
+    .es{display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,40%);column-gap:36px;align-items:start;}
+    .es > *{grid-column:1;min-width:0;}
+    .es > .es-head{grid-column:1 / -1;}
+    .es > .vid-feature{grid-column:2;grid-row:2 / span 400;position:sticky;top:calc(var(--ft-toolkit-height,0px) + 20px);margin:0;}
+  }
+  /* ---------- TAX RESOLUTION ADDITIONS ---------- */
+  .phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:10px 0 24px;}
+  .phase{background:#fff;border:1px solid var(--line);border-top:5px solid var(--green);border-radius:14px;padding:22px 24px;}
+  .phase.p2{border-top-color:var(--forest-2);}
+  .phase .pk{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--green);}
+  .phase.p2 .pk{color:var(--forest-2);}
+  .phase h3{font-size:22px;margin:4px 0 8px;}
+  .phase p,.phase li{color:var(--ink-soft);font-size:16px;line-height:1.65;}
+  .phase ul{padding-left:19px;margin:8px 0 0;}
+  .qlist{counter-reset:q;list-style:none;padding:0;margin:8px 0 4px;}
+  .qlist li{counter-increment:q;position:relative;padding:10px 0 10px 44px;border-bottom:1px solid var(--line);font-size:17px;line-height:1.55;color:var(--ink);}
+  .qlist li:last-child{border-bottom:none;}
+  .qlist li::before{content:counter(q);position:absolute;left:0;top:9px;width:28px;height:28px;border-radius:8px;background:#EEF1F6;color:var(--forest);font-family:'Montserrat',sans-serif;font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center;}
+  .qlist li span.why{display:block;color:var(--ink-soft);font-size:15px;margin-top:3px;}
+  .qlist li ul{margin:6px 0 0;padding-left:18px;color:var(--ink-soft);font-size:15.5px;}
+  .fork{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+  .fork > div{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:#fff;}
+  .fork > div > b{display:block;font-family:'Montserrat',sans-serif;font-size:15px;color:var(--forest);margin-bottom:6px;}
+  .fork .talk{margin:8px 0 0;}
+  .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:12px 0 4px;}
+  .kv > div{background:#fff;border:1.5px solid var(--line);border-radius:11px;padding:13px 15px;}
+  .kv b{display:block;font-family:'Montserrat',sans-serif;font-size:20px;color:var(--forest);}
+  .kv span{font-size:14.5px;color:var(--ink-soft);line-height:1.45;display:block;margin-top:2px;}
+  .open-list li{margin-bottom:8px;}
+  .tag-urgent{display:inline-block;background:#FBECEA;color:#8A1C14;border:1px solid #F1C5BF;border-radius:6px;font-size:12px;font-weight:700;padding:2px 8px;letter-spacing:.03em;}
+  .grid-mock{width:100%;border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+  @media (max-width:900px){.phase-grid,.fork{grid-template-columns:1fr;}}
+  /* No training clips on this SOP yet, so no right-hand video column. */
+  @media (min-width:1400px){.es{display:block;}}
+  .es .talk,.es .qlist,.es ol.subs{max-width:110ch;}
+</style>
+</head>
+<body>
+
+<div class="tabbar" id="tabbar">
+  <button class="tabbtn active" data-tab="overview"><svg class="tabicon" viewBox="0 0 20 20"><path d="M2.5 10L10 3l7.5 7M4.5 8.5V17h11V8.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Overview</button>
+  <button class="tabbtn" data-tab="p1call"><svg class="tabicon" viewBox="0 0 20 20"><path d="M5 3h3l1.5 4-2 1.2a9 9 0 004.3 4.3L13 10.5l4 1.5v3a2 2 0 01-2 2A12 12 0 013 5a2 2 0 012-2z" stroke-linejoin="round"/></svg>Phase 1 &middot; The Call</button>
+  <button class="tabbtn" data-tab="p1crm"><svg class="tabicon" viewBox="0 0 20 20"><rect x="3" y="2.5" width="14" height="15" rx="1.5"/><path d="M6.5 7h7M6.5 10.5h7M6.5 14h4" stroke-linecap="round"/></svg>Phase 1 &middot; CRM Enrollment</button>
+  <button class="tabbtn" data-tab="p2"><svg class="tabicon" viewBox="0 0 20 20"><path d="M3 16.5h14M5 13.5V9M9 13.5V6M13 13.5V8M17 13.5V4" stroke-linecap="round"/></svg>Phase 2 &middot; Resolution Sale</button>
+  <button class="tabbtn" data-tab="irs"><svg class="tabicon" viewBox="0 0 20 20"><path d="M3 7.5L10 3l7 4.5M4.5 8.5v6M8 8.5v6M12 8.5v6M15.5 8.5v6M3 17h14" stroke-linecap="round" stroke-linejoin="round"/></svg>IRS Knowledge</button>
+  <button class="tabbtn" data-tab="compliance"><svg class="tabicon" viewBox="0 0 20 20"><rect x="2.5" y="3" width="15" height="14" rx="1.5"/><path d="M6 9l2.5 2.5L14 6.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Compliance &amp; Objections</button>
+</div>
+<select class="tab-select-mobile" id="tab-select-mobile" aria-label="Choose a section">
+  <option value="overview">Overview</option>
+  <option value="p1call">Phase 1 &middot; The Call</option>
+  <option value="p1crm">Phase 1 &middot; CRM Enrollment</option>
+  <option value="p2">Phase 2 &middot; Resolution Sale</option>
+  <option value="irs">IRS Knowledge</option>
+  <option value="compliance">Compliance &amp; Objections</option>
+</select>
+
+<div class="wrap">
+
+  <!-- =================== OVERVIEW =================== -->
+  <div class="panel active" id="overview">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span>Start here</div>
+      <h2>Tax resolution with Milestone Tax Solutions</h2>
+      <p>Funding Tier now sells tax resolution for clients who owe the IRS or a state tax agency. The backend is Milestone Tax Solutions, LLC: they represent the client, pull transcripts, negotiate with the IRS and service the file. Funding Tier runs the sales call, enrolls the client in Milestone's CRM and hands them to Milestone's welcome call team. It is sold in two separate sales on the same client.</p>
+    </div>
+
+    <div class="phase-grid">
+      <div class="phase">
+        <div class="pk">Phase 1 &middot; first call</div>
+        <h3>Investigation &amp; representation</h3>
+        <p>A consultative intake call. You uncover the tax problem, run the financial interview, then enroll the client for a flat investigation fee.</p>
+        <ul>
+          <li>Fee: <strong>$500</strong> standard (federal). <strong>$995</strong> when the case is urgent or covers federal <em>and</em> state.</li>
+          <li>Eligible: owes at least <strong>$10,000</strong> federal, or <strong>$20,000</strong> on a state-only case. No excluded states.</li>
+          <li>Documents: Client Service Agreement + Payment Authorization (sent by you). IRS authorization forms and the tax-information consent come from Milestone's welcome call team.</li>
+          <li>Milestone then spends about 2.5 weeks from the payment clearing (4&ndash;5 for a state case) pulling transcripts and building the financial profile.</li>
+        </ul>
+      </div>
+      <div class="phase p2">
+        <div class="pk">Phase 2 &middot; second call</div>
+        <h3>Resolution</h3>
+        <p>Once the investigation is done, a Phase 2 opportunity appears in the CRM with Milestone's findings, the price and the script to use. You pitch the resolution plan and collect payment.</p>
+        <ul>
+          <li>Fee: flat, priced by IRS balance (<strong>$1,495 to $26,495</strong>; custom above $300K). Pay-in-full discount of 10&ndash;20%.</li>
+          <li>Payment: pay in full (10&ndash;15% of clients), a loan (35&ndash;40%), or a down payment plus up to 12 monthly payments (about 50%).</li>
+          <li>About <strong>70%</strong> of funded Phase 1 clients go on to fund Phase 2 (Milestone's average).</li>
+          <li>Documents: blanket Client Service Agreement + Payment Authorization (you), Form 2848 power of attorney (welcome call team).</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="margin:30px 0 14px;font-size:20px;">The whole journey</h3>
+    <div class="flow">
+      <div class="flow-node"><div class="fn-label">1 &middot; Discovery</div><p>Why are they calling now? Letters, garnishments, levies, unfiled years.</p></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node"><div class="fn-label">2 &middot; Financial interview</div><p>Income, household, IRS-allowable expenses, what they could pay.</p></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node"><div class="fn-label">3 &middot; Close P1</div><p>CSA &rarr; payment auth &rarr; invoice &rarr; warm transfer to welcome call.</p></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node"><div class="fn-label">4 &middot; Investigation</div><p>Milestone pulls transcripts, runs compliance check, prices the plan.</p></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node"><div class="fn-label">5 &middot; Close P2</div><p>Walk the findings, pitch the plan, CSA &rarr; payment auth &rarr; welcome call.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>Two hats: intake specialist, then performer</h3>
+      <p>Milestone's top closers describe the job as two different roles. On Phase 1 you are an <strong>intake specialist</strong>: your only job is to understand the client's situation deeply enough to know why they are on the phone today. On Phase 2 you are a <strong>performer</strong>: you deliver Milestone's resolution script using the pain the client told you in Phase 1. A well-run Phase 1 makes Phase 2 close itself; a Phase 1 sold on promises ("we'll get your debt to zero") produces Phase 1s that never close a Phase 2.</p>
+      <p>Phase 1 is sold on protection and representation. Phase 2 is sold on peace of mind, not on savings. Do not build a savings calculator pitch around tax &mdash; the IRS numbers are not known until the investigation is done.</p>
+    </div>
+
+    <h3 style="margin:30px 0 14px;font-size:20px;">Pricing at a glance</h3>
+    <div class="card">
+      <table class="tiers">
+        <tr><th>Client IRS balance</th><th>Phase 2 fee</th><th>Pay-in-full price</th></tr>
+        <tr><td>$10,000 &ndash; $14,999</td><td>$1,495</td><td>$1,346 (&minus;10%)</td></tr>
+        <tr><td>$15,000 &ndash; $19,999</td><td>$2,295</td><td>$2,066 (&minus;10%)</td></tr>
+        <tr><td>$20,000 &ndash; $29,999</td><td>$2,795</td><td>$2,516 (&minus;10%)</td></tr>
+        <tr><td>$30,000 &ndash; $39,999</td><td>$3,495</td><td>$3,146 (&minus;10%)</td></tr>
+        <tr><td>$40,000 &ndash; $49,999</td><td>$5,695</td><td>$4,983 (&minus;12.5%)</td></tr>
+        <tr><td>$50,000 &ndash; $59,999</td><td>$7,295</td><td>$6,383 (&minus;12.5%)</td></tr>
+        <tr><td>$60,000 &ndash; $69,999</td><td>$7,995</td><td>$6,996 (&minus;12.5%)</td></tr>
+        <tr><td>$70,000 &ndash; $79,999</td><td>$8,495</td><td>$7,221 (&minus;15%)</td></tr>
+        <tr><td>$80,000 &ndash; $89,999</td><td>$9,295</td><td>$7,901 (&minus;15%)</td></tr>
+        <tr><td>$90,000 &ndash; $99,999</td><td>$10,495</td><td>$8,921 (&minus;15%)</td></tr>
+        <tr><td>$100,000 &ndash; $119,999</td><td>$13,295</td><td>$11,301 (&minus;15%)</td></tr>
+        <tr><td>$120,000 &ndash; $149,999</td><td>$14,995</td><td>$12,746 (&minus;15%)</td></tr>
+        <tr><td>$150,000 &ndash; $179,999</td><td>$16,995</td><td>$13,596 (&minus;20%)</td></tr>
+        <tr><td>$180,000 &ndash; $199,999</td><td>$17,995</td><td>$14,396 (&minus;20%)</td></tr>
+        <tr><td>$200,000 &ndash; $224,999</td><td>$19,295</td><td>$15,436 (&minus;20%)</td></tr>
+        <tr><td>$225,000 &ndash; $250,000</td><td>$21,495</td><td>$17,196 (&minus;20%)</td></tr>
+        <tr><td>$250,000 &ndash; $300,000</td><td>$26,495</td><td>$21,196 (&minus;20%)</td></tr>
+      </table>
+      <p style="margin-top:14px;">The Phase 2 opportunity in the CRM always shows the exact price Milestone set for that client &mdash; quote that, not this grid. Milestone can adjust price for case complexity. Pay-in-full discounts are not offered to clients who finance through a loan. Tax return preparation is <strong>$195 per return</strong> on top of the resolution fee (most clients need about two). Processing fees are billed to the client: <strong>$4 per ACH payment</strong>, <strong>3% per card payment</strong>, up to <strong>$25</strong> on a returned payment.</p>
+    </div>
+
+    <h3 style="margin:30px 0 14px;font-size:20px;">Who we are looking for</h3>
+    <div class="card">
+      <p>Milestone does not take every case, and the script says so. The best cases are clients with a real, pressing reason to fix it now (a letter, a garnishment, a license, a job, a home purchase, a passport) and enough income to pay for help.</p>
+      <ul style="color:var(--ink-soft);font-size:16.5px;line-height:1.8;padding-left:18px;margin:6px 0 0;">
+        <li><strong>Strong fits:</strong> small trade-business owners (plumbing, HVAC, contractors) who are good at the work and behind on the books; truck drivers and other 1099 contractors, often hit with a Substitute for Return; clients with multiple unfiled years.</li>
+        <li><strong>Poor fits:</strong> clients with high disposable income and a small balance who only want the debt "taken to zero" (they will not get a reduction), and clients with no income and no reason to act.</li>
+        <li><strong>Federal first.</strong> Most cases are federal. A state-only case should owe at least $20,000 to the state; states are slower and offer fewer options.</li>
+        <li><strong>Seasonality:</strong> demand peaks mid-February to April 15, stays strong through June (people who filed and can't pay), dips July&ndash;August, and bumps before the October 15 extension deadline.</li>
+      </ul>
+    </div>
+
+    <h3 style="margin:30px 0 14px;font-size:20px;">How Funding Tier gets paid (from the signed agreement)</h3>
+    <div class="card">
+      <ul style="color:var(--ink-soft);font-size:16.5px;line-height:1.8;padding-left:18px;margin:0;">
+        <li><strong>Phase 1:</strong> 50% of the cleared investigation fee.</li>
+        <li><strong>Phase 2:</strong> 40% / 50% / 60% of what the client has <em>actually paid</em>. The tier is set by how many Phase 2 deals funded the prior month (1&ndash;24 / 25&ndash;49 / 50+). A deal counts as funded when the full payment or first installment clears, and its rate locks at that moment.</li>
+        <li><strong>Installments</strong> pay Funding Tier as each one clears. If a client stops paying, charges back or cancels, that commission is clawed back.</li>
+        <li><strong>Nothing pays until Milestone's recorded welcome call is done</strong> &mdash; so a clean handoff is part of getting paid.</li>
+        <li><strong>Refund window:</strong> 15 days from signing; <strong>3 business days in California, Texas and Indiana</strong>. A refund inside the window claws back the commission.</li>
+        <li>Paid weekly by ACH, about two weeks after the client's payment clears; Milestone can hold 10% for 180 days.</li>
+      </ul>
+    </div>
+
+    <div class="callout needinput">
+      <strong>Still open before go-live</strong>
+      <ul class="open-list" style="margin:6px 0 0;padding-left:18px;">
+        <li>Milestone must <b>approve our sales script</b> before we use it (Agreement &sect;1 and &sect;3.1), including the "Tax Resolution Services Department" opener below.</li>
+        <li>The warm-transfer number for the Las Vegas welcome call team (shown on the training slide, never read out).</li>
+        <li>The three Phase 2 scripts (Compliance, Collection, Compliance &amp; Collections) and the loan-financing process.</li>
+        <li>Which forms we collect vs. Milestone: the Agreement (&sect;1) puts the CSA, Form 2848 and the &sect;7216 tax-information consents on the affiliate; the training said the welcome team sends the 8821 after Phase 1 and the 2848 after Phase 2.</li>
+        <li>Written approval of every lead source, dialer, SMS program and AI voice tool before tax calls start (see Compliance tab).</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- =================== PHASE 1 CALL =================== -->
+  <div class="panel" id="p1call">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span>Phase 1 &middot; talk track</div>
+      <h2>The Phase 1 call, start to finish</h2>
+      <p>Milestone's Phase 1 enrollment script (updated 03/17/2026), with the coaching from the Milestone training call built in. Enter the answers into the CRM intake form as you go &mdash; see the next tab for the field-by-field walkthrough.</p>
+    </div>
+
+    <div class="stepnav">
+      <a href="#c1"><b>1</b>Open &amp; discovery</a>
+      <a href="#c2"><b>2</b>Intro email &amp; transition</a>
+      <a href="#c3"><b>3</b>Financial interview</a>
+      <a href="#c4"><b>4</b>Hold &amp; the pivot</a>
+      <a href="#c5"><b>5</b>The pitch</a>
+      <a href="#c6"><b>6</b>Recap, deposit, close</a>
+      <a href="#c7"><b>7</b>Handoff</a>
+    </div>
+
+    <section class="es" id="c1">
+      <div class="es-head"><div class="es-num">1</div><div><span class="pill req">Discovery</span><h3>Open the call and find the problem</h3><p>Aim to learn why they are calling today within the first five minutes.</p></div></div>
+      <div class="talk"><span class="who">Agent &middot; inbound</span>&ldquo;Thank you for calling the Tax Resolution Services Department, this is ____. This call is recorded for quality and compliance. How can I help you today?&rdquo;</div>
+      <div class="talk"><span class="who">Agent &middot; outbound (required at the start of every outbound call)</span>&ldquo;Hi ____, this is ____ with the Tax Resolution Services Department. I'm calling on behalf of Milestone Tax Solutions, LLC about tax-resolution services &mdash; helping people who owe the IRS or the state get represented and resolve their tax accounts. This call is recorded for quality and compliance. Do you have a few minutes?&rdquo;</div>
+      <div class="talk"><span class="who">Agent &middot; verbal opt-in (before giving any program details)</span>&ldquo;Based on your situation, we have a tax-resolution program from Milestone Tax Solutions that may help resolve your tax accounts, but I need a verbal opt-in to provide more details. Do you opt in to hearing about Milestone Tax Solutions and its services, and to being contacted directly by us or our representatives?&rdquo;</div>
+      <div class="talk"><span class="who">Agent</span>&ldquo;Great. Tell me about your tax issue.&rdquo;</div>
+      <div class="callout warn">
+        <strong>Why the opener has three parts</strong>
+        The Milestone agreement requires the recorded verbal opt-in on every call (Exhibit C) and, on outbound calls, naming Milestone Tax Solutions as the seller and saying the call is about tax-resolution services right at the start (16 C.F.R. &sect;310.4(d)). The recording notice covers all-party-consent states, including California. Never say or imply you're with the IRS, the Treasury or a state tax agency &mdash; if a caller asks, "No &mdash; we're a private company, on your side of the table."
+      </div>
+      <ol class="qlist">
+        <li>What tax years are you dealing with?</li>
+        <li>Do you have any unfiled tax returns? What years are unfiled?</li>
+        <li>How much do you currently owe &mdash; or how much do you think you owe?</li>
+        <li>Is this a federal tax debt, state, or both?</li>
+        <li>Is your tax debt personal or business related?</li>
+        <li>Is the tax debt from 1099 or W-2 income?</li>
+        <li>Are you currently employed? Are you 1099 or W-2?</li>
+        <li>Have you received any letters from the IRS <em>yet</em>?
+          <ul><li>Did the letter come standard mail or certified?</li><li>There's a notice number in the upper right-hand corner &mdash; can you read that out, and the due date? (Ask them to photograph or scan it and email it to you.)</li></ul></li>
+        <li>Are any of your wages being garnished <em>yet</em>?
+          <ul><li>Would a wage garnishment jeopardize your job or put you in a hard financial situation?</li></ul></li>
+        <li>Have any of your bank accounts been seized <em>yet</em>?</li>
+        <li>What are your expectations or goals to resolve your tax debt? Why now? Any concerns?</li>
+      </ol>
+      <div class="callout">
+        <strong>Dig to the second and third level</strong>
+        "I owe $15,000" is not an answer. Ask how they know, where the number came from, what happens if it doesn't get handled, and why now. Real clients with a real problem will answer; paid actors and tire-kickers self-select out when the questions get specific. If they mention something big in passing (a death in the family, a job, a license), stop and ask about it.
+      </div>
+      <div class="callout warn">
+        <strong>Use the word "yet" &mdash; and nothing more</strong>
+        "Have they garnished your paycheck yet?" makes the client realize enforcement is coming without you having to threaten anything. Do not pile on intimidation.
+      </div>
+      <div class="callout needinput">
+        <strong>Urgent flags &mdash; note these now</strong>
+        If the client says a paycheck garnishment is about to start, a bank account is about to be levied, they have an audit coming, or a <b>revenue officer</b> is assigned, the case is urgent. Tick the urgent box in the CRM (Phase 1 becomes $995) and tell the welcome call team so they get the Form 2848 on file within days instead of weeks. Ask for the revenue officer's business card if they have one.
+      </div>
+    </section>
+
+    <section class="es" id="c2">
+      <div class="es-head"><div class="es-num">2</div><div><span class="pill req">Rapport</span><h3>Send the intro email, then the introduction transition</h3></div></div>
+      <div class="talk"><span class="who">Agent</span>&ldquo;So next, I want to send you my contact information just in case we get disconnected, and some information about Milestone Tax and who we are. What is your email address?&rdquo; <em>(Send the intro email.)</em></div>
+      <div class="talk"><span class="who">Agent</span>&ldquo;Milestone Tax Solutions is a tax resolution company. Our team is committed to providing transparent and ethical services. We help our clients resolve tax issues. Our goal is to provide the best possible solution for people who owe taxes and have tax issues. That said, we do not take on every case. We only take on those we can be successful with. At this point, my job is to analyze your case and determine whether we can take you on as a client. I will need to gather some information that will help us determine if we can take your case.&rdquo;</div>
+    </section>
+
+    <section class="es" id="c3">
+      <div class="es-head"><div class="es-num">3</div><div><span class="pill req">Financial interview</span><h3>Build the budget the way the IRS will</h3><p>The IRS judges ability to pay using its own allowable-expense standards, not the client's real spending. Collect the categories the IRS counts.</p></div></div>
+      <ol class="qlist">
+        <li>Marital status &mdash; how do you file? Single, married filing jointly or separately? <span class="why">Married filing jointly means a co-client and two signatures on the documents.</span></li>
+        <li>How many are in your household? Any dependents?</li>
+        <li>How much do you make per month (gross)? W-2 or 1099? What do you do for work? How often are you paid? <span class="why">The CRM asks pay frequency and the amount per paycheck.</span></li>
+        <li>Do you rent or own? How much per month? Any equity in your home? A home equity line? Any other properties or rental income?</li>
+        <li>On average, how much do you pay for utilities per month? <span class="why">Power, gas, water, sewer, electric only. Cable, internet and cell phone do not count.</span></li>
+        <li>Do you have a car payment? How much? Car insurance? Gas? </li>
+        <li>Any childcare or child support, going in or coming out?</li>
+        <li>Monthly medical expenses &mdash; co-pays, prescriptions?</li>
+        <li>Do you have any credit cards? Available credit? How much? <span class="why">Only log unsecured loans if they come up.</span></li>
+        <li>How much do you spend on groceries per month? <span class="why">Goes in the CRM's "food" field.</span></li>
+      </ol>
+      <div class="talk"><span class="who">Agent</span>&ldquo;If the IRS demanded a monthly payment from you, how much could you afford to pay? Even if it were tight?&rdquo;</div>
+      <div class="talk"><span class="who">Agent</span>&ldquo;Our protection extends to your assets as well. We need to be able to identify any assets that may be vulnerable. Do you have any other assets we should be mindful of, that may need protection?&rdquo; <em>(e.g. 401(k), stocks, rental property)</em></div>
+    </section>
+
+    <section class="es" id="c4">
+      <div class="es-head"><div class="es-num">4</div><div><span class="pill req">The pivot</span><h3>Brief hold, then present what the IRS will see</h3></div></div>
+      <div class="talk"><span class="who">Agent</span>&ldquo;I'm going to put you on a brief hold and review your case. When I come back, we'll discuss the details. Assuming everything looks good on our end, we will go over our process and discuss pricing.&rdquo; <em>(Mute for at least a minute.)</em></div>
+      <p>When you come back, the call forks on the client's disposable income (net income minus expenses, from the CRM calculation):</p>
+      <div class="fork">
+        <div>
+          <b>More than $400 a month left over</b>
+          <div class="talk"><span class="who">Agent</span>&ldquo;Let me explain what I am seeing. Your net income is $4,500, your expenses are $3,500. If you were to contact the IRS and try to deal with this, they are going to ask you similar questions and see similar numbers. You owe the IRS $35,000. After they analyze your expenses and realize you have about $1,000 of disposable income, what do you think they are going to tell you?&rdquo;</div>
+          <p style="margin:10px 0 0;font-size:15.5px;color:var(--ink-soft);"><strong>Pause. Let them speak first.</strong> They will say "they'll want all of it." Then: &ldquo;We wouldn't want our client to have that conversation with the IRS, agreed? The good news is we can take this case on and represent you. Let me explain our process.&rdquo;</p>
+        </div>
+        <div>
+          <b>Less than $400, or negative</b>
+          <div class="talk"><span class="who">Agent</span>&ldquo;It's obvious that you need help. After expenses, you have approximately $100 of disposable income. I have to ask &mdash; how are you surviving?&rdquo;</div>
+          <p style="margin:10px 0 0;font-size:15.5px;color:var(--ink-soft);"><strong>Pause and let them describe the hardship again.</strong> This is where you learn what discovery missed: maxed cards, family helping, another income. Then: &ldquo;You certainly need someone to make this argument to the IRS on your behalf. Let me explain how our process works.&rdquo;</p>
+        </div>
+      </div>
+      <div class="callout">
+        <strong>If the client pushes back on the number</strong>
+        "I don't have that much &mdash; I've got kids." Agree that those things matter to them, then return to the point: "If the IRS sees that you have that money left over, what do you think they're going to say?"
+      </div>
+    </section>
+
+    <section class="es" id="c5">
+      <div class="es-head"><div class="es-num">5</div><div><span class="pill req">The pitch</span><h3>Explain the two-phase process</h3><p>Never say "it's called" &mdash; just describe what happens.</p></div></div>
+      <div class="talk"><span class="who">Agent</span>&ldquo;We work in a two-phase process. The first phase is investigation and representation. We contact the IRS on your behalf and file all the necessary documents to take over all communications. At this point we will identify and address any collection activity you may need protection against &mdash; wage garnishments, account levies and property seizures. Once under our representation, we will conduct a full investigation into your case:<br>1. We will order the transcripts from the IRS and identify exactly how much you owe and how many penalties and interest were applied.<br>2. We will conduct a full compliance check, looking for any red flags &mdash; missing returns, audits and other IRS corrections.<br>We are also going to build a full financial profile that accurately represents your current financial situation.<br><br>We'll take all of that and use it in the second phase of our process, which is the resolution. Once we know the full extent of the tax issue and everything you are facing, we will be able to devise a full resolution plan for your case. There are many ways to resolve a tax issue &mdash; penalty abatement programs that address the penalties and interest you absorbed, non-collectible status programs, installment agreement negotiations, and offer in compromise, which is an IRS settlement process. A tax company cannot responsibly promise a resolution upfront; identifying the right solution requires a proper investigation of your tax issues.&rdquo;</div>
+      <div class="callout">
+        <strong>Lean on "the IRS knows, not us"</strong>
+        "You say you owe $20,000 and you got the letter. I'd love to take your word for it, but what matters is what the IRS says. We're going to find that out, then build a plan to solve it." This works on the client who is sure of the number and on the client who has no idea.
+      </div>
+    </section>
+
+    <section class="es" id="c6">
+      <div class="es-head"><div class="es-num">6</div><div><span class="pill req">Close</span><h3>Recap the pain, state the fee, assume the sale</h3></div></div>
+      <div class="talk"><span class="who">Agent</span>&ldquo;So, your current situation is ____, your concern is ____, and if we fix this it will help with ____.&rdquo;</div>
+      <div class="talk"><span class="who">Agent</span>&ldquo;In order to take you on as a new client, review for a collection hold, and conduct the investigation, we require a deposit of $500. That deposit will go towards any work we need to do on your case. <em>(pause)</em> The resolution phase will require more services, so there will be more cost. Those costs are very hard to quote right now because we don't know how much work we'll be doing or how much trouble you may be facing. At this point we have established that we can take your case on and represent you. Let's get the representation started and get you enrolled. I am going to send your enrollment package to your email now &mdash; are you able to pay the deposit today?&rdquo;</div>
+      <div class="kv">
+        <div><b>Assume the sale</b><span>Never ask whether they want to move forward.</span></div>
+        <div><b>$500 deposit</b><span>Standard Phase 1 fee. $995 when urgent or federal + state &mdash; confirm in the CRM before you say it.</span></div>
+        <div><b>2-week rule</b><span>Manager / team lead approval for any payment scheduled more than two weeks out.</span></div>
+      </div>
+      <div class="callout warn">
+        <strong>Federal and state, but they balk at $995</strong>
+        "Let's start with federal &mdash; it's the faster, bigger lever. We'll prepare the state returns as a courtesy for you to file, and once federal is resolved we can take a look at the state." Then enroll federal only at $500.
+      </div>
+      <div class="card" style="border-color:var(--warn-line);">
+        <h3>Read the required disclosures before you send documents</h3>
+        <p style="margin-bottom:10px;">Every enrollment, every client (Agreement, Exhibit B). Milestone's welcome call will have the client re-affirm each one &mdash; if they sound surprised, the file stalls.</p>
+        <ol class="qlist">
+          <li>Results depend on your circumstances and on what the IRS and state decide. No particular result is promised or guaranteed.</li>
+          <li>Fees are for the professional services performed. They are not a percentage of, or contingent on, how much tax, penalty or interest is reduced.</li>
+          <li>Enrolling doesn't by itself stop IRS or state collection activity. Milestone acts for you once authorized but can't guarantee all collection activity stops.</li>
+          <li>Whether you qualify for an Offer in Compromise, Currently Not Collectible status, penalty abatement or an installment agreement is decided by the taxing authority based on your finances.</li>
+          <li>I work for an independent marketing company, not for Milestone, and we're paid by Milestone for referring your enrollment.</li>
+          <li>Milestone is a tax-resolution firm. It's not a law firm, doesn't give legal advice or representation, and no attorney-client relationship is created.</li>
+          <li>You can cancel for a full refund within 15 days of signing &mdash; or within 3 business days if you live in California, Texas or Indiana. After that the fee is earned and isn't refundable.</li>
+          <li>If you later add another entity or more tax years, the fee goes up, and any increase is quoted and agreed in writing before that work starts.</li>
+        </ol>
+      </div>
+      <p>Now run the enrollment in the CRM (next tab): Client Service Agreement, payment authorization, invoice.</p>
+    </section>
+
+    <section class="es" id="c7">
+      <div class="es-head"><div class="es-num">7</div><div><span class="pill req">Handoff</span><h3>Thank them, set expectations, warm transfer</h3></div></div>
+      <div class="talk"><span class="who">Agent</span>&ldquo;Before we wrap up, I want to personally thank you for trusting Milestone Tax to help you with your tax situation. We take that seriously, and you're in good hands.<br><br>What happens next is our investigation phase. During this time, we'll be reaching out to the IRS to gather your filing history and balance information so we can put together the best possible resolution plan for you in the next phase.<br><br>From here, our Resolution Team will be working directly on your case. You'll be receiving calls from <strong>833-720-8080</strong> &mdash; please save that number in your phone under Milestone Tax so you don't miss anything important.<br><br>I'm also going to schedule your welcome call, which is a quick call to confirm details and walk you through next steps. The investigation typically takes about three weeks, and during that time we may need additional documents from you. It's very important that you respond to any calls, emails, or requests you receive so we can keep your case moving smoothly. We'll be with you every step of the way.&rdquo;</div>
+      <div class="callout">
+        <strong>Schedule the welcome call only after the payment is scheduled to post.</strong>
+        Then warm transfer the client to Milestone's welcome call team in Las Vegas. This is Milestone's recorded compliance and suitability call: they verify the client's full legal name, send the IRS authorization form and have the client re-affirm the disclosures. No commission is payable on the client until it's done.
+      </div>
+    </section>
+  </div>
+
+  <!-- =================== PHASE 1 CRM =================== -->
+  <div class="panel" id="p1crm">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span>Phase 1 &middot; step-by-step</div>
+      <h2>Enrolling Phase 1 in the Milestone CRM</h2>
+      <p>Milestone's partner CRM is a portal laid over their Salesforce &mdash; you never log in to Salesforce itself, and it is hard-coded to Funding Tier as the affiliate. Almost everything can be edited after the client is converted, so don't stall the call over a field.</p>
+    </div>
+
+    <div class="stepnav">
+      <a href="#m1"><b>Step 1</b>Client &amp; filing</a>
+      <a href="#m2"><b>Step 2</b>Tax situation</a>
+      <a href="#m3"><b>Step 3</b>Financial interview</a>
+      <a href="#m4"><b>Step 4</b>Convert the lead</a>
+      <a href="#m5"><b>Step 5</b>Send the CSA</a>
+      <a href="#m6"><b>Step 6</b>Payment authorization</a>
+      <a href="#m7"><b>Step 7</b>Create the invoice</a>
+      <a href="#m8"><b>Step 8</b>Welcome call &amp; tracking</a>
+    </div>
+
+    <section class="es" id="m1">
+      <div class="es-head"><div class="es-num">1</div><div><span class="pill req">Intake form</span><h3>Client details and filing status</h3></div></div>
+      <ol class="subs">
+        <li>Sign in to the Milestone platform at <a href="https://platform.milestonetax.com/platform/login.php" target="_blank" rel="noopener">platform.milestonetax.com</a> and open the intake form. Enter the client's <strong>full legal name</strong> exactly as the IRS has it. <span class="note">"Bill" instead of "William", a missing middle initial or a missing "Jr." gets the 8821 rejected by the IRS.</span></li>
+        <li><strong>SSN and date of birth.</strong> The form will save without the SSN, but the Agreement lists SSN and DOB as required client information, so get both before the file is submitted. Explain why honestly ("so Milestone can pull your IRS transcripts") &mdash; never collect them under any other pretext. Don't copy them into app.krestmarketing.com notes.</li>
+        <li>Pick the <span class="ui">Filing status</span>: single, married filing jointly, married filing separately, head of household, or qualifying surviving spouse. <span class="note">Married filing jointly adds a co-client: enter their details and email. Both people must sign. If they share one email, each signs from the same inbox in turn.</span></li>
+        <li>Enter the address (with unit number), mobile phone and email.</li>
+        <li>Add the <strong>consent record</strong> in the notes: lead source and its certificate ID, the originating URL or source with timestamp, and the recorded-call ID from our phone system. Milestone requires it with every client (Exhibit A and C).</li>
+      </ol>
+    </section>
+
+    <section class="es" id="m2">
+      <div class="es-head"><div class="es-num">2</div><div><span class="pill req">Intake form</span><h3>Tax situation</h3></div></div>
+      <ol class="subs">
+        <li><span class="ui">Federal / State</span>: tick federal, and add the state if they owe the state too. <span class="note">The price updates on its own &mdash; adding a state raises the Phase 1 fee; removing it drops it back.</span></li>
+        <li><span class="ui">Tax type</span>: personal, business, both, or other. Milestone handles business cases including payroll tax.</li>
+        <li><span class="ui">Issue</span>: pick <strong>one</strong> &mdash; the most serious thing going on. Put anything else in the notes.</li>
+        <li>Amount owed, and every tax year involved (select as many as apply). Milestone verifies these later.</li>
+      </ol>
+    </section>
+
+    <section class="es" id="m3">
+      <div class="es-head"><div class="es-num">3</div><div><span class="pill req">Intake form</span><h3>Financial interview fields</h3><p>These feed the budget calculation you present after the hold.</p></div></div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table>
+          <tr><th>Field</th><th>What to ask / enter</th></tr>
+          <tr><td><p>Occupation &amp; employment</p></td><td><p>What they do; employed, self-employed/contractor, retired; W-2 or 1099.</p></td></tr>
+          <tr><td><p>Pay frequency &amp; amount</p></td><td><p>How often they're paid and roughly what each paycheck is (e.g. bi-weekly, $2,500).</p></td></tr>
+          <tr><td><p>Housing</p></td><td><p>Rent or own, monthly amount, renters insurance.</p></td></tr>
+          <tr><td><p>Vehicle</p></td><td><p>Car payment, gas, car insurance.</p></td></tr>
+          <tr><td><p>Unsecured loans</p></td><td><p>Only if it came up on the call and needs to be accounted for.</p></td></tr>
+          <tr><td><p>Utilities</p></td><td><p>Power, gas, water, sewer, electric only &mdash; not cable, internet or cell.</p></td></tr>
+          <tr><td><p>Childcare / child support</p></td><td><p>Ask "any going in or coming out?" &mdash; it can be income or expense.</p></td></tr>
+          <tr><td><p>Medical</p></td><td><p>Monthly co-pays, prescriptions.</p></td></tr>
+          <tr><td><p>Food</p></td><td><p>Household groceries.</p></td></tr>
+          <tr><td><p>Could afford</p></td><td><p>"If the IRS demanded a monthly payment, how much could you afford, even if tight?" Zero is a common answer &mdash; record it.</p></td></tr>
+          <tr><td><p>Notes</p></td><td><p>Anything off the form that could support a hardship argument (serious illness, other issues, second letters). Milestone's resolution team reads these.</p></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="es" id="m4">
+      <div class="es-head"><div class="es-num">4</div><div><span class="pill req">Convert</span><h3>Urgent box, first payment date, create the client</h3></div></div>
+      <ol class="subs">
+        <li>If there is an imminent garnishment, bank levy, audit or revenue officer, tick the <span class="ui">urgent</span> checkbox. <span class="tag-urgent">$995</span> <span class="note">This also tells Milestone to get the 2848 on file early.</span></li>
+        <li>Enter a <span class="ui">First payment date</span> &mdash; it is required to convert the lead. If it isn't settled yet, put any future date and fix it in step 7.</li>
+        <li>Click to create the client. The screen opens the client's custom opportunity (<strong>OPP</strong>).</li>
+        <li>To change anything now (payment date, statuses), click <span class="ui">Edit</span>, change it, then <span class="ui">Save</span> at the very bottom.</li>
+      </ol>
+    </section>
+
+    <section class="es" id="m5">
+      <div class="es-head"><div class="es-num">5</div><div><span class="pill req">Document 1</span><h3>Send the Client Service Agreement (DocuSign)</h3></div></div>
+      <ol class="subs">
+        <li>Top right of the opportunity: <span class="ui">Send CSA</span> &rarr; confirm <span class="ui">Yes, send it</span>.</li>
+        <li>Walk the client into their email: open the DocuSign, tick <span class="ui">I agree</span> &rarr; <span class="ui">Continue</span>. <span class="note">Keep it light: "Have you used DocuSign before? Great, go ahead and sign it."</span></li>
+        <li>They sign and click <span class="ui">Finish</span> (top right or bottom). <span class="note">The two cancellation pages at the end need no signature &mdash; they are only a mail-in form if the client ever wants to cancel.</span></li>
+        <li>Back in the opportunity, click <span class="ui">Refresh</span> until the progress bar moves from sent &rarr; viewed &rarr; <strong>signed</strong>. It can take several refreshes.</li>
+      </ol>
+      <div class="callout">
+        <strong>If the client asks about the address on the agreement</strong>
+        It's Milestone's California mail house. Their offices are in Las Vegas and Phoenix; the phone number on the letter is their customer service line.
+      </div>
+    </section>
+
+    <section class="es" id="m6">
+      <div class="es-head"><div class="es-num">6</div><div><span class="pill req">Document 2</span><h3>Send the payment authorization</h3></div></div>
+      <ol class="subs">
+        <li>After the CSA shows signed, click the payment authorization button and confirm the pop-up.</li>
+        <li>The client signs and finishes, same as the CSA. On Phase 1 this form simply authorizes the fee ($500 or $995) and discloses the processing fee: <strong>$4 per ACH</strong> or <strong>3% on a card</strong>, billed to the client. There is no schedule on it.</li>
+      </ol>
+    </section>
+
+    <section class="es" id="m7">
+      <div class="es-head"><div class="es-num">7</div><div><span class="pill req">Payment</span><h3>Create the invoice (capture payment details)</h3><p>This doesn't email an invoice &mdash; it stores the payment method and date.</p></div></div>
+      <ol class="subs">
+        <li>Click <span class="ui">Create invoice</span> and choose <span class="ui">Card</span> or <span class="ui">ACH</span>. <span class="note">Payment details go only into Milestone's portal &mdash; the client pays Milestone directly through UnityFi. Never take a payment, or store card or bank numbers, in any Funding Tier system.</span></li>
+        <li><strong>Card payments charge immediately</strong> &mdash; that moment, not tonight. Any future-dated payment must be ACH. <span class="note">Milestone is working on allowing future-dated card payments.</span></li>
+        <li>For ACH: routing, account number, checking or savings, and the address on the account (it can differ from their home address &mdash; mismatches get payments kicked back).</li>
+        <li><strong>Have the client read the account and routing numbers to you, twice.</strong> If they say it, they own it.</li>
+        <li>Set the payment date. More than two weeks out needs manager / team lead approval.</li>
+        <li>Click <span class="ui">Create invoice</span>. The stage changes to <strong>Ready for Payments</strong>.</li>
+      </ol>
+    </section>
+
+    <section class="es" id="m8">
+      <div class="es-head"><div class="es-num">8</div><div><span class="pill req">Handoff</span><h3>Warm transfer, then watch the payment</h3></div></div>
+      <ol class="subs">
+        <li>Deliver the handoff script (Phase 1 call, step 7), then warm transfer to Milestone's welcome call team. <span class="note">They confirm the legal name, set expectations and send Form 8821. For urgent cases, make sure they know to send the 2848 now.</span></li>
+        <li>Open the opportunity's <span class="ui">Related</span> tab to see the payment, amount, date and status (pending &rarr; cleared or failed).</li>
+        <li>Done when the stage reads <strong>Closed Won &middot; Paid in Full</strong>. Funding Tier earns 50% once the payment clears and the welcome call is done; Milestone pays weekly by ACH about two weeks later. A refund inside the window (15 days; 3 business days in CA, TX, IN) is clawed back.</li>
+        <li>Milestone updates case status within 2 business days. The portal has no API, so check it rather than waiting on a sync.</li>
+        <li>In app.krestmarketing.com, log the outcome on the contact so the pipeline and agent reporting stay current.</li>
+      </ol>
+    </section>
+  </div>
+
+  <!-- =================== PHASE 2 =================== -->
+  <div class="panel" id="p2">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span>Phase 2 &middot; resolution</div>
+      <h2>Selling and enrolling Phase 2</h2>
+      <p>About 2.5 weeks after Phase 1 clears (four to five for a state case), Milestone finishes the investigation and hands the client back to you for the resolution sale. Phase 2 is where most of the revenue is &mdash; and when Phase 1 was done well, it is the easiest large-ticket sale you'll make.</p>
+    </div>
+
+    <div class="stepnav">
+      <a href="#r1"><b>Step 1</b>The case is ready</a>
+      <a href="#r2"><b>Step 2</b>Read the case analysis</a>
+      <a href="#r3"><b>Step 3</b>Pitch the plan</a>
+      <a href="#r4"><b>Step 4</b>Stage &amp; CSA</a>
+      <a href="#r5"><b>Step 5</b>Build the payment plan</a>
+      <a href="#r6"><b>Step 6</b>Authorization &amp; handoff</a>
+    </div>
+
+    <section class="es" id="r1">
+      <div class="es-head"><div class="es-num">1</div><div><span class="pill req">Trigger</span><h3>Wait for "Ready for Pitch"</h3></div></div>
+      <ol class="subs">
+        <li>Milestone creates a second opportunity (Phase 2) on the same client. It starts at stage <strong>New</strong>.</li>
+        <li>When the analysis is done, the stage changes to <strong>Ready for Pitch</strong> and you get an email: "<em>[Client]</em> is ready for your resolution sale."</li>
+        <li>Call the client back promptly &mdash; the pain from Phase 1 is still fresh.</li>
+        <li>If the results don't appear, check that the client's <strong>&sect;7216 tax-information consent</strong> is on file: Milestone won't release investigation results or Phase 2 pricing without it. The client can't be required to sign it to enroll.</li>
+      </ol>
+    </section>
+
+    <section class="es" id="r2">
+      <div class="es-head"><div class="es-num">2</div><div><span class="pill req">Prep</span><h3>Read Milestone's case analysis before you dial</h3></div></div>
+      <p>The Phase 2 opportunity carries screenshots from Milestone's team. Know every line before the call.</p>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table>
+          <tr><th>Item</th><th>What it tells you</th></tr>
+          <tr><td><p>Tax year grid</p></td><td><p>One row per year: <strong>Return filed</strong> (no, yes, or the date the IRS accepted it), <strong>Filing status</strong>, <strong>Collections active</strong>.</p></td></tr>
+          <tr><td><p>Federal / state liabilities</p></td><td><p>Straight from the IRS or state transcripts &mdash; exactly what is owed today.</p></td></tr>
+          <tr><td><p>Estimated mock balances</p></td><td><p>Milestone's projection of what unfiled years will add once filed. Liabilities + mock balances = the total liability.</p></td></tr>
+          <tr><td><p>Unfiled years / SFR / active collections</p></td><td><p>Whether a Substitute for Return exists and whether enforcement is live (e.g. an active levy).</p></td></tr>
+          <tr><td><p>Plan notes</p></td><td><p>What Milestone will do: e.g. hold the levy, prepare and file 4&ndash;6 years of returns, then evaluate currently-not-collectible status.</p></td></tr>
+          <tr><td><p>Price</p></td><td><p>The resolution fee and the pay-in-full price (e.g. $17,995 or $14,396 paid in full).</p></td></tr>
+          <tr><td><p>Script</p></td><td><p>Which Phase 2 script to perform: <strong>Compliance</strong>, <strong>Collection</strong>, or <strong>Compliance &amp; Collections</strong>.</p></td></tr>
+        </table>
+      </div>
+      <div class="callout">
+        <strong>Compliance comes first</strong>
+        The IRS will not accept any resolution until the client is compliant &mdash; every required return filed. That is why so many plans start with tax preparation ($195 per return, billed on top of the resolution fee).
+      </div>
+    </section>
+
+    <section class="es" id="r3">
+      <div class="es-head"><div class="es-num">3</div><div><span class="pill req">Pitch</span><h3>Perform the script, year by year</h3></div></div>
+      <div class="talk"><span class="who">Agent &middot; required at the start of the Phase 2 call</span>&ldquo;Hi ____, this is ____ with the Tax Resolution Services Department, calling on behalf of Milestone Tax Solutions, LLC. Milestone has finished the investigation on your tax accounts, and I'm calling to go over the results and the resolution services they recommend. This call is recorded.&rdquo;</div>
+      <ol class="subs">
+        <li>Open with what they told you in Phase 1 &mdash; their words, their reason for fixing it now.
+        <li>Walk the tax year grid from <strong>oldest to newest</strong>: "For 2021, this is the situation&hellip;" Build up to today's total.</li>
+        <li>Explain the plan in Milestone's notes: protection first (holds, power of attorney on file), compliance (returns), then the resolution path.</li>
+        <li>Give the price, then the pay-in-full price. Quote only the Milestone price on the opportunity &mdash; we can't change or discount it.</li>
+        <li>Expect the big number to take time to sink in. Answer "what am I getting for this?" by going back to the part of the script they missed: professional representation, collections stopped, someone negotiating for them.</li>
+      </ol>
+      <div class="callout">
+        <strong>Take-away beats hard push</strong>
+        When the problem is real, you rarely need pressure. "If this isn't important to you right now, we're happy to step back" is stronger than pushing. Remind them of what they said they need &mdash; you can't tell them their pain, only repeat it back.
+      </div>
+      <div class="callout needinput">
+        <strong>Scripts pending</strong>
+        Milestone is sending the three Phase 2 scripts and the loan-financing process separately. They'll be added here when received.
+      </div>
+    </section>
+
+    <section class="es" id="r4">
+      <div class="es-head"><div class="es-num">4</div><div><span class="pill req">CRM</span><h3>Move the stage and send the Phase 2 agreement</h3></div></div>
+      <ol class="subs">
+        <li>On the Phase 2 opportunity click <span class="ui">Edit</span>, change the stage from <strong>Ready for Pitch</strong> to <strong>Ready for Payments</strong>, scroll down and <span class="ui">Save Changes</span>.</li>
+        <li>Top right: <span class="ui">Send CSA</span> &rarr; <span class="ui">Yes, send it</span>. The client signs in DocuSign as before.</li>
+      </ol>
+      <div class="callout">
+        <strong>It's a blanket agreement</strong>
+        The Phase 2 CSA lists every resolution service &mdash; offer in compromise, installment agreement, currently not collectible, audit defense, appeals &mdash; for one flat fee. That's deliberate: if the path changes, no new paperwork and no upcharge (except rare cases). If the client asks why services they don't need are listed, that's why.
+      </div>
+    </section>
+
+    <section class="es" id="r5">
+      <div class="es-head"><div class="es-num">5</div><div><span class="pill req">Payment</span><h3>Build the payment plan in "Create invoice"</h3></div></div>
+      <ol class="subs">
+        <li><strong>Paid in full:</strong> enter the pay-in-full price as the deposit, set remaining payments to <strong>0</strong>, pick the date.</li>
+        <li><strong>Payment plan:</strong> "How much can you put down today?" Enter the down payment, then the number of remaining payments &mdash; up to <strong>12</strong> (13 payments total including the down payment). The monthly amount and processing fees calculate as you type; the client doesn't see this panel. <span class="note">Example from training: $11,301 with $2,200 down and 12 payments = $758.42/month + $4 ACH fee each.</span></li>
+        <li>Set the down payment date. Leave the recurring date blank to repeat that same day each month, or enter a different day (e.g. the 15th).</li>
+        <li>Payment method: reuse the Phase 1 bank account, or add new details. A card can be used for the first payment only, and it charges immediately.</li>
+        <li>If every payment uses the same account, tick the <span class="ui">all payments on the same account</span> box &mdash; the authorization won't send without it.</li>
+        <li>Read the terms back: "$2,200 down this Friday the 25th, then 12 payments of $758.42 starting October 15th, ACH from the account ending 5678 &mdash; correct?"</li>
+      </ol>
+      <div class="callout warn">
+        <strong>Loans and the discount</strong>
+        Roughly 35&ndash;40% of clients finance with a loan. They pay the standard fee &mdash; no pay-in-full discount &mdash; and the loan funds in about a week. Milestone will cover the loan process separately.
+      </div>
+    </section>
+
+    <section class="es" id="r6">
+      <div class="es-head"><div class="es-num">6</div><div><span class="pill req">Close</span><h3>Payment authorization, welcome call, done</h3></div></div>
+      <ol class="subs">
+        <li>Click the payment authorization button; the client signs and finishes.</li>
+        <li>Check the schedule in the opportunity's <span class="ui">Related</span> tab. <span class="note">Known glitch: the authorization PDF can list payments after the down payment in reverse order and drop one. The Related tab is correct; Milestone is fixing the PDF.</span></li>
+        <li>Warm transfer to the welcome call team. They send Form 2848 (power of attorney) and explain next steps, e.g. "we're sending you to tax preparation first, then your case manager takes it from there."</li>
+        <li>The deal counts as <strong>funded</strong> the moment the full payment or first installment clears. That's what counts toward next month's tier, and it locks this deal's rate (40 / 50 / 60%) for every installment.</li>
+        <li>Funding Tier earns its rate on each payment as it clears &mdash; never on the unpaid balance. Stopped payments, NSFs and chargebacks are clawed back. Loans fund in about a week; installment clients should make the first payment within 14 days.</li>
+        <li>Done when the Phase 2 opportunity reaches <strong>Closed Won &middot; Paid in Full</strong>.</li>
+      </ol>
+    </section>
+  </div>
+
+  <!-- =================== IRS KNOWLEDGE =================== -->
+  <div class="panel" id="irs">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span>Reference</div>
+      <h2>IRS knowledge for agents</h2>
+      <p>Enough to hold an intelligent conversation, not to give tax advice. When a question goes beyond this, the answer is: "Great question &mdash; I want you to get the right answer from the right person. Once you're enrolled, our tax professionals will walk you through it."</p>
+    </div>
+
+    <h3 style="margin:10px 0 14px;font-size:20px;">Resolution options</h3>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <tr><th>Option</th><th>What it is</th><th>Agent notes</th></tr>
+        <tr><td><p><strong>Streamlined installment agreement</strong></p></td><td><p>A payment plan with less paperwork, set up quickly.</p></td><td><p>Typically W-2 clients with lower balances.</p></td></tr>
+        <tr><td><p><strong>Non-streamlined installment agreement</strong></p></td><td><p>A payment plan where Milestone argues for a lower monthly amount than the IRS standards produce.</p></td><td><p>Takes longer; relies on the financial interview and notes.</p></td></tr>
+        <tr><td><p><strong>Offer in compromise (OIC)</strong></p></td><td><p>Settling for less than owed, based on ability to pay. The closest thing to debt settlement.</p></td><td><p>About 6 months to a first review; first offers are usually rejected; can take up to 18 months. A client with high income and a small balance won't get a reduction.</p></td></tr>
+        <tr><td><p><strong>Currently not collectible (CNC)</strong></p></td><td><p>A "pause button": enforcement, letters, levies and garnishments stop. The debt is not forgiven.</p></td><td><p>Interest keeps accruing; future refunds are applied to the balance; the IRS can revoke it if new income is reported. Awareness only on Phase 1 &mdash; don't pitch it.</p></td></tr>
+        <tr><td><p><strong>Penalty abatement</strong></p></td><td><p>Removing penalties, including first-time abatement.</p></td><td><p>Don't oversell. <strong>Interest cannot be removed.</strong></p></td></tr>
+        <tr><td><p><strong>Lien withdrawal</strong></p></td><td><p>Requested after the tax problem is resolved.</p></td><td><p>No fast track &mdash; don't promise removal in time for a sale.</p></td></tr>
+      </table>
+    </div>
+
+    <h3 style="margin:30px 0 14px;font-size:20px;">Letters and enforcement</h3>
+    <div class="flow">
+      <div class="flow-node"><div class="fn-label">CP14</div><p>Balance due notice.</p></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node"><div class="fn-label">CP501 / CP503</div><p>Reminder notices.</p></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node"><div class="fn-label">CP504</div><p>Notice of intent to levy.</p></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node"><div class="fn-label">LT11 / Letter 1058</div><p>Final notice of intent to levy &amp; right to a hearing. Levy can follow 30 days later.</p></div>
+    </div>
+    <div class="card">
+      <ul style="color:var(--ink-soft);font-size:16.5px;line-height:1.8;padding-left:18px;margin:0;">
+        <li><strong>Always get the letter:</strong> notice number (top right), date and due date. A photo or scan by email is fine.</li>
+        <li><strong>Bank levy:</strong> takes only what is in the account that day, then the bank holds it for <strong>21 days</strong> before sending it to the IRS &mdash; the best window to get it released. The IRS can levy again.</li>
+        <li><strong>Wage garnishment:</strong> most people lose 50&ndash;80% of a paycheck. Ask when payroll is processed (often Wednesday for a Friday payday). If it's too late to stop this one, the pitch is stopping the next one: "the sooner we start, the sooner that money stays in your pocket."</li>
+        <li><strong>Commonly seized:</strong> bank accounts, wages, up to 15% of Social Security. Passport revocation is increasingly common.</li>
+        <li><strong>Revenue officer vs ACS:</strong> most cases sit with the Automated Collection System (call centers). Higher balances (around $50K for business, $200K+ personal) get a revenue officer who can visit, levy and seize. A revenue officer is an urgent case.</li>
+        <li><strong>Lien vs levy:</strong> a lien is a claim on assets; a levy is taking them.</li>
+        <li><strong>Married filing jointly:</strong> both spouses are liable for joint federal debt.</li>
+      </ul>
+    </div>
+
+    <h3 style="margin:30px 0 14px;font-size:20px;">Penalties, interest and the 10-year clock</h3>
+    <div class="kv">
+      <div><b>0.5% / month</b><span>Failure-to-pay penalty</span></div>
+      <div><b>5% / month</b><span>Failure-to-file penalty (10&times; worse &mdash; always file)</span></div>
+      <div><b>Daily</b><span>Interest compounds daily</span></div>
+      <div><b>25&ndash;50%</b><span>Share of the balance that is often penalties</span></div>
+      <div><b>10 years</b><span>Collection window (CSED) from the <em>assessment</em> date</span></div>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <p>The collection statute runs from when the IRS <strong>assesses</strong> the debt, not the tax year. A 2014 return filed in 2019 is assessed in 2019, so an "old" letter may still be very collectible. Pulling transcripts is a passive request and does not reset any clock. Don't raise the statute on calls &mdash; it only teaches clients to wait. It matters when a client is within months of expiry, where Milestone may simply monitor the file.</p>
+    </div>
+
+    <h3 style="margin:30px 0 14px;font-size:20px;">How the IRS decides what a client can pay</h3>
+    <div class="card">
+      <p>The IRS takes income, subtracts its allowable expenses and calls the rest monthly disposable income. That number decides whether a client fits an installment agreement, an offer in compromise or hardship (CNC).</p>
+      <ul style="color:var(--ink-soft);font-size:16.5px;line-height:1.8;padding-left:18px;margin:6px 0 0;">
+        <li><strong>National standards</strong> (by household size): food, clothing, housekeeping, personal care, miscellaneous.</li>
+        <li><strong>Local standards</strong> (by county): housing, utilities, vehicle ownership and operating costs, public transit. The client can claim the standard even if they spend less.</li>
+        <li><strong>Actual expenses, if documented:</strong> health insurance, medical, child or dependent care, court-ordered payments, minimum student loan payments, necessary business expenses.</li>
+        <li>Luxury or excessive expenses don't count. Standards change every year. The closer a client is to IRS hardship, the more options they usually qualify for &mdash; even with a good income in a high-cost area.</li>
+      </ul>
+    </div>
+
+    <h3 style="margin:30px 0 14px;font-size:20px;">Things clients get wrong</h3>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <tr><th>Client believes</th><th>Reality</th></tr>
+        <tr><td><p>"If I ignore it, it'll go away."</p></td><td><p>Penalties and interest keep growing and enforcement escalates.</p></td></tr>
+        <tr><td><p>"Bankruptcy wipes it out."</p></td><td><p>Most IRS debt doesn't qualify unless strict timing rules are met. Don't advise on bankruptcy.</p></td></tr>
+        <tr><td><p>"The IRS already knows everything, so why file?"</p></td><td><p>Unfiled years can become Substitutes for Return with inflated balances and no deductions.</p></td></tr>
+        <tr><td><p>"I have income, so I can't get relief."</p></td><td><p>Relief is based on ability to pay after allowable expenses, not zero income.</p></td></tr>
+        <tr><td><p>"They haven't contacted me, so I'm safe."</p></td><td><p>The IRS is slow, then aggressive.</p></td></tr>
+        <tr><td><p>"I can't pay, so I won't file."</p></td><td><p>Not filing costs 10&times; more in penalties and blocks resolution options.</p></td></tr>
+        <tr><td><p>"The IRS will tell me what to do."</p></td><td><p>Long holds, general help, no strategy.</p></td></tr>
+        <tr><td><p>"Tariffs mean no more income tax."</p></td><td><p>Nothing changed; waiting only grew the balance.</p></td></tr>
+      </table>
+    </div>
+
+    <h3 style="margin:30px 0 14px;font-size:20px;">Federal vs state</h3>
+    <div class="card">
+      <p>Milestone handles federal, state, or both; most clients are federal only. States require their own power of attorney, accept it at their own pace, and offer different options (some only installment agreements). A client can owe a state they don't live in &mdash; e.g. gambling winnings in Oklahoma for a Texas resident. Winnings in a no-income-tax state like Nevada are reported to the IRS instead.</p>
+    </div>
+  </div>
+
+  <!-- =================== COMPLIANCE =================== -->
+  <div class="panel" id="compliance">
+    <div class="section-head">
+      <div class="eyebrow"><span class="dot"></span>Say this, not that</div>
+      <h2>Compliance &amp; objections</h2>
+      <p>Tax resolution is regulated advertising territory. Promise the process, never the outcome. These rules come from the Milestone Independent Marketing Agreement (Exhibits B and C) and apply to every call.</p>
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <tr><th>Never say</th><th>Say instead</th></tr>
+        <tr><td><p>"We'll get your tax debt to zero," "pennies on the dollar," "wipe out your tax debt," "make it like it never happened," or any "most likely" outcome or savings number.</p></td><td><p>"A tax company can't responsibly promise a resolution upfront. The investigation tells us which programs you qualify for."</p></td></tr>
+        <tr><td><p>"You qualify for the Fresh Start program."</p></td><td><p>"Fresh Start is the umbrella name for the IRS relief programs. Our job is to find which ones you qualify for." (It improved payment terms in 2011&ndash;12 &mdash; it's not a debt-wiping program.)</p></td></tr>
+        <tr><td><p>"An attorney will handle your case."</p></td><td><p>"Your case is handled by Milestone's tax professionals, who can include enrolled agents and CPAs authorized to practice before the IRS." Milestone is not a law firm &mdash; never call it one or promise an attorney.</p></td></tr>
+        <tr><td><p>"We can remove the interest."</p></td><td><p>"We pursue penalty relief wherever possible. Interest can't be waived."</p></td></tr>
+        <tr><td><p>"We'll get the lien off by next week."</p></td><td><p>"We resolve the tax problem first, then request lien release. It takes time."</p></td></tr>
+        <tr><td><p>"You won't be audited, levied, sued or liened."</p></td><td><p>"Nobody can control what the IRS does. What we can do is put representation in place and act for you."</p></td></tr>
+        <tr><td><p>"You'll definitely qualify for an Offer in Compromise."</p></td><td><p>"The IRS decides eligibility based on your finances. The investigation tells us which options fit."</p></td></tr>
+        <tr><td><p>"I'm with the IRS / the government" &mdash; or anything that implies it.</p></td><td><p>"We're a private company. I work for an independent marketing company that refers clients to Milestone Tax Solutions."</p></td></tr>
+        <tr><td><p>"I'm an enrolled agent / tax professional."</p></td><td><p>"I'm on the enrollment side. Milestone's tax professionals handle your case."</p></td></tr>
+        <tr><td><p>"You have to sign the tax-information consent to enroll."</p></td><td><p>Present it; never make enrollment conditional on it.</p></td></tr>
+        <tr><td><p>Advice on bankruptcy, renouncing citizenship, or waiting out the statute.</p></td><td><p>"That's a great question for our tax professionals once you're enrolled."</p></td></tr>
+      </table>
+    </div>
+
+    <h3 style="margin:30px 0 14px;font-size:20px;">Common objections</h3>
+    <div class="card">
+      <table>
+        <tr><th>Client says&hellip;</th><th>Agent responds&hellip;</th></tr>
+        <tr><td><p>"Why pay you? I'll just call the IRS."</p></td><td><p>"You can. They'll ask the same income and expense questions and see the same numbers we just went through &mdash; and they won't build a strategy for you. We take over all communication and put protection in place first."</p></td></tr>
+        <tr><td><p>"I know exactly what I owe."</p></td><td><p>"You may be 100% right. What matters is what the IRS has on record &mdash; that's what we confirm in the investigation, then we build the plan around it."</p></td></tr>
+        <tr><td><p>"They're not going to do anything to me."</p></td><td><p>"They're slow until they aren't. You told me ____ [their reason]. The investigation fee is small next to a levy on your account."</p></td></tr>
+        <tr><td><p>"What's the power of attorney &mdash; is there a lawyer?"</p></td><td><p>"It's what lets us speak to the IRS for you and do the work we just described. Your case is handled by tax professionals."</p></td></tr>
+        <tr><td><p>"I can't swing $995 for federal and state."</p></td><td><p>"Let's start with federal &mdash; it's the bigger lever. We'll prepare the state returns for you, and once federal is resolved we'll look at the state."</p></td></tr>
+        <tr><td><p>"$17,000? What am I getting?" (Phase 2)</p></td><td><p>Go back to the script: protection, representation, the collections holds, returns filed, and someone negotiating the resolution. Weigh it against what they owe and what enforcement takes. Offer the payment plan.</p></td></tr>
+        <tr><td><p>"Do I qualify? I heard you need $10K."</p></td><td><p>Clients often round up to $10K because of ads. Get the real number and the letter; the grid starts at $10,000.</p></td></tr>
+        <tr><td><p>"Are you the IRS? An auditor?"</p></td><td><p>"No &mdash; we're on your side of the table. Tell me about your situation and I'll see whether we can help."</p></td></tr>
+      </table>
+    </div>
+
+    <h3 style="margin:30px 0 14px;font-size:20px;">Marketing and calling rules for tax leads</h3>
+    <div class="card">
+      <ul style="color:var(--ink-soft);font-size:16.5px;line-height:1.8;padding-left:18px;margin:0;">
+        <li><strong>Get Milestone's written approval first</strong> for every purchased, aggregated or warm-transfer lead source, every dialer, any SMS program (it also needs a registered 10DLC campaign), and any AI or prerecorded voice. An AI voice counts as a prerecorded message.</li>
+        <li><strong>Consent:</strong> prior express written consent naming Milestone as the seller before any autodialed or prerecorded call or text; check the FCC Reassigned Numbers Database; scrub the National DNC Registry at least every 31 days; honor opt-outs within 5 days and send them to Milestone within 24 hours. Funding Tier owns TCPA liability on our leads.</li>
+        <li><strong>Calling hours:</strong> 8 a.m.&ndash;9 p.m. in the client's local time. Maryland limits us to three calls in 24 hours.</li>
+        <li><strong>Records:</strong> keep every call recording and transcript, opt-in and consent record for at least 6 years.</li>
+        <li><strong>Ads:</strong> nothing that looks like an IRS or government notice &mdash; no seals, "final notice" styling or deadline language, and no Milestone name without written consent. Milestone says affiliates self-certify ad copy, but the signed agreement (&sect;3.4) requires its written approval of tax-resolution marketing, so get approval in writing.</li>
+        <li><strong>Client funds:</strong> Funding Tier never takes, holds or processes client payments. Clients pay Milestone directly through UnityFi.</li>
+        <li><strong>Complaints:</strong> any complaint Milestone refers to us must be answered within 3 business days; any regulator contact goes to Milestone within 24 hours.</li>
+      </ul>
+    </div>
+
+    <div class="callout warn">
+      <strong>Cross-sell from debt calls</strong>
+      Debt relief clients often mention a tax balance mid-call. Note it on the contact in app.krestmarketing.com and run the tax intake as its own call. Remember that forgiven debt from settlement can create taxable income (a 1099-C) &mdash; don't advise on it; route tax questions to Milestone once enrolled.
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Funding Tier &middot; Tax Resolution Backend: Milestone Tax Solutions, LLC &middot; Internal training use only
+</footer>
+
+<script>
+  const tabButtons = document.querySelectorAll('.tabbtn');
+  const panels = document.querySelectorAll('.panel');
+  const tabSelect = document.getElementById('tab-select-mobile');
+  function goTab(id){
+    tabButtons.forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+    panels.forEach(p=>p.classList.toggle('active', p.id===id));
+    if (tabSelect) tabSelect.value = id;
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  window.goTab = goTab;
+  if (tabSelect) tabSelect.addEventListener('change', function(){ goTab(tabSelect.value); });
+  tabButtons.forEach(btn=>btn.addEventListener('click', ()=>goTab(btn.dataset.tab)));
+  // Deep links: #p2, #irs, or a step anchor such as #r5
+  (function(){
+    var h = location.hash.slice(1); if (!h) return;
+    var panel = document.getElementById(h);
+    if (panel && panel.classList.contains('panel')) { goTab(h); return; }
+    var el = document.getElementById(h);
+    var host = el && el.closest('.panel');
+    if (host) { goTab(host.id); setTimeout(function(){ el.scrollIntoView(); }, 50); }
+  })();
+  document.querySelectorAll('.stepnav a').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var t = document.querySelector(a.getAttribute('href'));
+      if (t) { e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
+    });
+  });
+</script>
+
+<script src="https://ai.fundingtier.com/toolkit.js" defer></script>
+
+</body>
+</html>

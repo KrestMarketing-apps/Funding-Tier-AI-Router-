@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0f9b8e" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milestone Tax Resolution Profit Forecast | Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green:#0f9d8a; --greend:#0b7d6e; --greenl:#f0fdf9;
+      --navy:#2c4f8c; --navyl:#eef3fb;
+      --bg:#f8fafc; --surface:#ffffff; --border:#e2e8f0; --bord2:#cbd5e1;
+      --text:#0f172a; --text2:#475569; --text3:#64748b;
+      --amber:#b7791f; --amberl:#fff8ec; --red:#b3261e; --redl:#fbecea;
+      --dark:#0f172a; --dark2:#0b3b50; --dark3:#0b7d6e;
+    }
+    body { font-family:'Inter',Arial,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; }
+    input[type=number] { -moz-appearance:textfield; }
+
+    .page { max-width:1440px; margin:0 auto; padding:24px 24px 80px; }
+    .tabs { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 20px; border-bottom:1px solid var(--border); }
+    .tab { background:none; border:0; border-bottom:3px solid transparent; font:inherit; font-weight:700; font-size:14.5px;
+           color:var(--text2); padding:12px 14px; cursor:pointer; }
+    .tab:hover { color:var(--text); }
+    .tab.on { color:var(--greend); border-bottom-color:var(--green); }
+    .panel { display:none; } .panel.on { display:block; }
+
+    .layout { display:grid; grid-template-columns:360px minmax(0,1fr); gap:20px; align-items:start; }
+    @media (max-width:1060px){ .layout { grid-template-columns:1fr; } }
+    @media (max-width:700px){ .kpis { grid-template-columns:1fr 1fr; } }
+
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:18px; }
+    .card h2 { font-size:17px; font-weight:800; letter-spacing:-.01em; margin-bottom:4px; }
+    .card .sub { font-size:13.5px; color:var(--text2); line-height:1.5; margin-bottom:14px; }
+    .inputs { position:sticky; top:calc(var(--ft-toolkit-height,0px) + 16px); max-height:calc(100vh - var(--ft-toolkit-height,0px) - 32px); overflow:auto; }
+    @media (max-width:1060px){ .inputs { position:static; max-height:none; } }
+    .grp { border-top:1px solid var(--border); padding-top:14px; margin-top:14px; }
+    .grp:first-of-type { border-top:0; margin-top:0; padding-top:0; }
+    .grp h3 { font-size:11.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--greend); margin-bottom:10px; }
+    .fld { display:grid; grid-template-columns:1fr 128px; align-items:center; gap:10px; margin-bottom:9px; }
+    .fld label { font-size:13.5px; color:var(--text); line-height:1.3; }
+    .fld label small { display:block; font-size:11.5px; color:var(--text3); }
+    .fld .in { display:flex; align-items:center; border:1px solid var(--bord2); border-radius:8px; background:#fff; padding:0 8px; height:34px; }
+    .fld .in:focus-within { border-color:var(--green); box-shadow:0 0 0 3px rgba(15,157,138,.15); }
+    .fld .in span { font-size:12.5px; color:var(--text3); }
+    .fld input, .fld select { border:0; outline:0; font:inherit; font-size:14px; font-weight:600; width:100%; text-align:right; background:transparent; color:var(--text); }
+    .fld select { text-align:left; }
+    .mix-sum { font-size:12px; color:var(--text3); text-align:right; margin-top:-4px; }
+    .mix-sum.bad { color:var(--red); font-weight:700; }
+    .reset { margin-top:10px; font:inherit; font-size:13px; font-weight:700; color:var(--greend); background:var(--greenl); border:1px solid #bfe9e0; border-radius:8px; padding:8px 12px; cursor:pointer; }
+
+    .kpis { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+    .kpi { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; border-left:3px solid var(--green); }
+    .kpi.navy { border-left-color:var(--navy); }
+    .kpi.neutral { border-left-color:var(--bord2); }
+    .kpi .l { font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--text3); margin-bottom:6px; }
+    .kpi .v { font-size:24px; font-weight:800; letter-spacing:-.02em; color:var(--text); }
+    .kpi .s { font-size:12.5px; color:var(--text2); margin-top:3px; line-height:1.4; }
+
+    .legend { display:flex; gap:16px; flex-wrap:wrap; font-size:13px; color:var(--text2); margin:0 0 8px; }
+    .legend i { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
+    .chart-wrap { position:relative; }
+    svg.chart { width:100%; height:300px; display:block; }
+    .tip { position:absolute; pointer-events:none; background:#0f172a; color:#fff; border-radius:8px; padding:9px 11px; font-size:12.5px; line-height:1.5; box-shadow:0 8px 24px rgba(0,0,0,.25); opacity:0; transition:opacity .1s; white-space:nowrap; z-index:5; }
+    .tip b { font-size:13.5px; }
+    .tip .row { display:flex; align-items:center; gap:7px; }
+    .tip .row i { width:10px; height:2px; display:inline-block; }
+
+    table { width:100%; border-collapse:collapse; font-size:13.5px; }
+    th, td { padding:8px 10px; border-bottom:1px solid var(--border); text-align:right; white-space:nowrap; }
+    th { font-size:11px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--text3); background:#f1f5f9; }
+    th:first-child, td:first-child { text-align:left; }
+    tr.tot td { font-weight:800; background:#f8fafc; border-top:2px solid var(--bord2); }
+    tr.hi td { background:var(--greenl); }
+    .scroll { overflow-x:auto; }
+    td.neg { color:var(--red); }
+
+    .note { font-size:13.5px; line-height:1.6; color:var(--text2); background:var(--amberl); border-left:4px solid var(--amber); padding:12px 14px; border-radius:0 10px 10px 0; margin:12px 0; }
+    .note.info { background:var(--greenl); border-left-color:var(--green); }
+    .note.need { background:var(--redl); border-left-color:var(--red); }
+    .note b { color:var(--text); }
+    ul.plain { padding-left:18px; font-size:14px; line-height:1.75; color:var(--text2); }
+    ul.plain b { color:var(--text); }
+
+    .deal { display:grid; grid-template-columns:320px minmax(0,1fr); gap:20px; }
+    @media (max-width:900px){ .deal { grid-template-columns:1fr; } }
+    .seg { display:inline-flex; border:1px solid var(--bord2); border-radius:9px; overflow:hidden; }
+    .seg button { font:inherit; font-size:13px; font-weight:700; border:0; background:#fff; color:var(--text2); padding:7px 12px; cursor:pointer; }
+    .seg button.on { background:var(--green); color:#fff; }
+    .tierbar { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .tierbar div { border:1.5px solid var(--border); border-radius:11px; padding:12px 14px; }
+    .tierbar div.on { border-color:var(--green); background:var(--greenl); }
+    .tierbar b { display:block; font-size:20px; }
+    .tierbar span { font-size:12.5px; color:var(--text2); }
+  </style>
+  <script>
+    window.FT_TOOL = {
+      eyebrow: "ADMIN · TAX RESOLUTION",
+      title: "Milestone Tax Resolution — Profit Forecast",
+      subtitle: "What Funding Tier earns selling Phase 1 investigations and Phase 2 resolutions for Milestone Tax Solutions: per deal, per month and over the first year.",
+      badge: { text: "ADMIN ONLY" }
+    };
+  </script>
+</head>
+<body>
+<div class="page">
+
+  <div class="tabs" role="tablist">
+    <button class="tab on" data-p="forecast">Profit forecast</button>
+    <button class="tab" data-p="deal">Deal calculator</button>
+    <button class="tab" data-p="grid">Pricing &amp; payout grid</button>
+    <button class="tab" data-p="rules">Rules &amp; assumptions</button>
+  </div>
+
+  <!-- ================= FORECAST ================= -->
+  <section class="panel on" id="forecast">
+    <div class="layout">
+      <aside class="card inputs" id="inputs">
+        <h2>Assumptions</h2>
+        <p class="sub">Every number is editable. Phase 2 conversion and the payment mix default to Milestone's reported averages; call volume, cost and close rates are placeholders &mdash; replace them with real results.</p>
+
+        <div class="grp"><h3>Lead flow &amp; Phase 1</h3>
+          <div class="fld"><label>Qualified tax calls / month</label><div class="in"><input id="calls" type="number" min="0" step="10" value="150"></div></div>
+          <div class="fld"><label>Cost per call</label><div class="in"><span>$</span><input id="cpc" type="number" min="0" step="5" value="45"></div></div>
+          <div class="fld"><label>Phase 1 close rate</label><div class="in"><input id="p1close" type="number" min="0" max="100" step="1" value="20"><span>%</span></div></div>
+          <div class="fld"><label>Phase 1 payment clears<small>share of P1 sales that fund</small></label><div class="in"><input id="p1clear" type="number" min="0" max="100" step="1" value="90"><span>%</span></div></div>
+          <div class="fld"><label>Phase 1 refunds<small>15 days; 3 business days CA/TX/IN</small></label><div class="in"><input id="p1refund" type="number" min="0" max="100" step="1" value="5"><span>%</span></div></div>
+          <div class="fld"><label>Share at $995<small>urgent or federal + state</small></label><div class="in"><input id="p1urgent" type="number" min="0" max="100" step="1" value="20"><span>%</span></div></div>
+          <div class="fld"><label>Standard Phase 1 fee</label><div class="in"><span>$</span><input id="p1fee" type="number" min="0" step="1" value="500"></div></div>
+        </div>
+
+        <div class="grp"><h3>Phase 2 conversion</h3>
+          <div class="fld"><label>Funded P1 &rarr; funded P2<small>Milestone average: 70%</small></label><div class="in"><input id="conv" type="number" min="0" max="100" step="1" value="70"><span>%</span></div></div>
+          <div class="fld"><label>Commission tier<small>auto = prior month's funded P2s</small></label><div class="in"><select id="tierMode"><option value="auto">Auto by volume</option><option value="0.4">Force 40%</option><option value="0.5">Force 50%</option><option value="0.6">Force 60%</option></select></div></div>
+        </div>
+
+        <div class="grp"><h3>IRS balance mix (Phase 2 clients)</h3>
+          <div class="fld"><label>$10K &ndash; $29,999<small>avg fee $2,195</small></label><div class="in"><input id="mixA" type="number" min="0" max="100" step="1" value="35"><span>%</span></div></div>
+          <div class="fld"><label>$30K &ndash; $59,999<small>avg fee $5,495</small></label><div class="in"><input id="mixB" type="number" min="0" max="100" step="1" value="30"><span>%</span></div></div>
+          <div class="fld"><label>$60K &ndash; $99,999<small>avg fee $9,070</small></label><div class="in"><input id="mixC" type="number" min="0" max="100" step="1" value="20"><span>%</span></div></div>
+          <div class="fld"><label>$100K &ndash; $300K<small>avg fee $18,652</small></label><div class="in"><input id="mixD" type="number" min="0" max="100" step="1" value="15"><span>%</span></div></div>
+          <div class="mix-sum" id="mixSum"></div>
+        </div>
+
+        <div class="grp"><h3>How Phase 2 is paid</h3>
+          <div class="fld"><label>Pay in full<small>discounted price &middot; Milestone: 10&ndash;15%</small></label><div class="in"><input id="pif" type="number" min="0" max="100" step="0.5" value="12.5"><span>%</span></div></div>
+          <div class="fld"><label>Loan-funded<small>standard fee, funds ~1 week &middot; 35&ndash;40%</small></label><div class="in"><input id="loan" type="number" min="0" max="100" step="0.5" value="37.5"><span>%</span></div></div>
+          <div class="fld"><label>Installments<small>the rest &middot; Milestone: ~50%</small></label><div class="in" style="background:#f1f5f9;justify-content:flex-end;"><b id="instShare" style="font-size:14px;"></b></div></div>
+          <div class="fld"><label>Down payment<small>on installment plans</small></label><div class="in"><input id="down" type="number" min="0" max="100" step="1" value="20"><span>%</span></div></div>
+          <div class="fld"><label>Monthly payments after down<small>max 12</small></label><div class="in"><input id="nPay" type="number" min="0" max="12" step="1" value="12"></div></div>
+          <div class="fld"><label>Plan attrition / month<small>payments that stop (clawed back)</small></label><div class="in"><input id="attr" type="number" min="0" max="100" step="0.5" value="3"><span>%</span></div></div>
+        </div>
+
+        <div class="grp"><h3>Costs &amp; cash timing</h3>
+          <div class="fld"><label>Agent pay<small>% of commission earned</small></label><div class="in"><input id="agent" type="number" min="0" max="100" step="1" value="20"><span>%</span></div></div>
+          <div class="fld"><label>Payout lag<small>weekly ACH ~1.5&ndash;2 wks after clearing</small></label><div class="in"><input id="lagW" type="number" min="0" max="8" step="0.5" value="2"><span>wks</span></div></div>
+          <div class="fld"><label>Rolling reserve<small>held 180 days (&sect;5.6)</small></label><div class="in"><input id="reserve" type="number" min="0" max="100" step="1" value="10"><span>%</span></div></div>
+        </div>
+        <button class="reset" id="reset" type="button">Reset to defaults</button>
+      </aside>
+
+      <div>
+        <div class="kpis" id="kpis"></div>
+
+        <div class="card">
+          <h2>Cash Funding Tier receives by month &mdash; first 12 months</h2>
+          <p class="sub">Steady call volume from month 1. Milestone pays weekly on what cleared, about two weeks later, and holds back 10% for 180 days. Phase 2 funds about a month after Phase 1 (2.5-week investigation, first payment within 14 days of the sale). Installment plans keep paying for up to 13 months, the tier steps up a month after volume does, and the reserve starts coming back in month 7 &mdash; so cash keeps climbing after call volume is flat.</p>
+          <div class="legend"><span><i style="background:#0F9D8A"></i>Phase 1 commission</span><span><i style="background:#2C4F8C"></i>Phase 2 commission</span><span>(cash received)</span></div>
+          <div class="chart-wrap"><svg class="chart" id="chart" role="img" aria-label="Monthly revenue chart"></svg><div class="tip" id="tip"></div></div>
+        </div>
+
+        <div class="card">
+          <h2>12-month cash table</h2>
+          <p class="sub">"Commission earned" is what cleared that month; "cash received" is what actually lands after the payout lag and the rolling reserve. Agent pay is charged on commission earned.</p>
+          <div class="scroll"><table id="cashTable"></table></div>
+        </div>
+
+        <div class="card">
+          <h2>Volume tier &mdash; what the next tier is worth</h2>
+          <p class="sub">Milestone pays 40% / 50% / 60% of Phase 2 fees collected. The tier for a month is set by how many Phase 2 deals funded in the <b>prior calendar month</b> (1&ndash;24 / 25&ndash;49 / 50+); a deal counts as funded when its full payment or first installment clears. Each deal's rate is locked when it funds. New affiliates start at 40%. Phase 1 is a flat 50% and doesn't count toward the tier.</p>
+          <div class="tierbar" id="tierbar"></div>
+          <div id="tierNote" class="note info" style="margin-top:14px;"></div>
+        </div>
+
+        <div class="card">
+          <h2>What one month of calls is worth</h2>
+          <p class="sub">Follows a single month's calls through to the last installment &mdash; the true value of the leads you buy this month.</p>
+          <div class="scroll"><table id="cohortTable"></table></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DEAL CALCULATOR ================= -->
+  <section class="panel" id="deal">
+    <div class="deal">
+      <div class="card">
+        <h2>One client</h2>
+        <p class="sub">Pick the client's IRS balance and how they pay.</p>
+        <div class="fld"><label>IRS balance band</label><div class="in"><select id="dBand"></select></div></div>
+        <div class="fld"><label>Phase 1 fee</label><div class="in"><select id="dP1"><option value="500">$500 standard</option><option value="995">$995 urgent / fed + state</option></select></div></div>
+        <div class="fld"><label>Commission tier</label><div class="in"><select id="dTier"><option value="0.4">40% (1&ndash;24/mo)</option><option value="0.5">50% (25&ndash;49/mo)</option><option value="0.6">60% (50+/mo)</option></select></div></div>
+        <div style="margin:12px 0 10px;"><div class="seg" id="dPay"><button data-v="pif" class="on">Pay in full</button><button data-v="plan">Payment plan</button><button data-v="loan">Loan</button></div></div>
+        <div id="planFields">
+          <div class="fld"><label>Down payment</label><div class="in"><input id="dDown" type="number" min="0" max="100" step="1" value="20"><span>%</span></div></div>
+          <div class="fld"><label>Monthly payments after down</label><div class="in"><input id="dN" type="number" min="0" max="12" step="1" value="12"></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="kpis" id="dKpis" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));"></div>
+        <div class="card">
+          <h2>When Funding Tier gets paid on this client</h2>
+          <p class="sub">Month 0 is the Phase 1 sale. Commission is earned as each client payment clears and paid by weekly ACH about two weeks later; 10% of each payment is held for 180 days.</p>
+          <div class="scroll"><table id="dSched"></table></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GRID ================= -->
+  <section class="panel" id="grid">
+    <div class="card">
+      <h2>Phase 2 pricing and Funding Tier payout</h2>
+      <p class="sub">From Milestone's Affiliate Pricing &amp; Commission sheet. Payout is 40/50/60% of the fee collected at your monthly volume tier; on a pay-in-full client it is calculated on the discounted price. Loan-financed clients pay the standard fee.</p>
+      <div class="scroll"><table id="gridTable"></table></div>
+      <div class="note info">Custom pricing above $300K. Milestone can adjust any price for case complexity &mdash; the Phase 2 opportunity shows the actual price.</div>
+    </div>
+  </section>
+
+  <!-- ================= RULES ================= -->
+  <section class="panel" id="rules">
+    <div class="card">
+      <h2>How Milestone pays Funding Tier</h2>
+      <p class="sub">From the Independent Marketing Agreement signed 9/10/2026 (Sections 2, 5.6, 9.3; Exhibits D and E) and Milestone's written answers to our due-diligence questions.</p>
+      <ul class="plain">
+        <li><b>Phase 1:</b> flat 50% of the collected investigation fee at every tier, paid when the payment clears through UnityFi. Standard fee <b>$500</b> (confirmed); $995 for urgent or federal + state cases.</li>
+        <li><b>Phase 2:</b> 40% / 50% / 60% of the resolution fee <b>actually collected</b>. The tier is set by Phase 2 deals funded in the <b>prior calendar month</b> (1&ndash;24 / 25&ndash;49 / 50+). Tiers reset monthly; crossing a threshold mid-month only changes the following month. New affiliates start at 40%.</li>
+        <li><b>What "funded" means:</b> the Phase 2 payment, or the first installment, has cleared through UnityFi. A first installment counts toward the tier, but commission is only paid on dollars the client has actually paid.</li>
+        <li><b>Rate lock:</b> the tier in force when a deal funds applies to every installment on that deal, even if the tier changes later.</li>
+        <li><b>Installments:</b> paid in the same pattern as the client pays &mdash; the locked percentage of each installment as it clears.</li>
+        <li><b>Pay in full:</b> payout on the discounted price. <b>Loans:</b> standard fee, no discount; funding takes about a week.</li>
+        <li><b>Nothing is commissionable until it clears</b>: signed agreements, pending or authorized charges and engagements that never fund earn nothing.</li>
+        <li><b>Suitability call:</b> Milestone's recorded compliance and suitability (welcome) call &mdash; after Phase 1 and again after Phase 2 &mdash; is a condition before any commission on that client becomes payable.</li>
+        <li><b>Clawbacks:</b> any payment reversed by chargeback, NSF, refund or cancellation has its commission reversed and offset against future commissions. Refunds caused by our conduct or non-compliance are fully recoverable from us.</li>
+        <li><b>Refund window:</b> full refund if the client cancels within 15 days of signing, or 3 business days in California, Texas and Indiana. After that the fee is earned. A Phase 1 client whose case doesn't qualify is refunded only inside that window (Milestone says the only disqualifier is too little tax debt).</li>
+        <li><b>Rolling reserve:</b> Milestone may hold 10% of commissions, released 180 days after they would have been paid, and can hold more against any claim or anticipated loss.</li>
+        <li><b>Payment schedule:</b> weekly. Payments that clear Saturday&ndash;Friday get a statement by the Monday after next and ACH by that Tuesday (Milestone's own example: cleared Oct 13&ndash;17 &rarr; statement Oct 27 &rarr; ACH Oct 29). Dispute a statement within 30 days or it's final.</li>
+        <li><b>If we exit:</b> either side can end it on 60 days' notice (1-year initial term, then month-to-month). Commissions on active, funded clients keep paying for up to 12 months after termination &mdash; forfeited entirely if Milestone terminates for cause. Clients who haven't bought Phase 2 yet go to Milestone.</li>
+        <li><b>Not shared revenue:</b> tax preparation ($195 per return) and UnityFi processing fees ($4 ACH, 3% card, up to $25 on a return).</li>
+        <li><b>Eligibility:</b> at least $10,000 owed for federal cases, $20,000 for state-only. No excluded states today.</li>
+        <li><b>Clients are Milestone's:</b> once accepted, we keep only the commission right and can't contact, solicit or resell the client (2 years in &sect;2.6, 3 years in &sect;10.3). A client who is already a current or former Milestone client earns no commission.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Milestone's reported averages (used as defaults)</h2>
+      <ul class="plain">
+        <li><b>70%</b> of funded Phase 1 investigations convert to a funded Phase 2.</li>
+        <li>Phase 2 payment mix: <b>10&ndash;15%</b> pay in full, <b>35&ndash;40%</b> finance with a loan, <b>~50%</b> installments.</li>
+        <li>About <b>2.5 weeks</b> from Phase 1 payment clearing to completed investigation. Loans fund in about a week; installment clients should schedule the first payment within 14 days.</li>
+        <li>Case status updates to us within <b>48 hours / 2 business days</b>. The CRM is <b>portal-only</b> &mdash; no webhook or API access.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Modeling assumptions on this page</h2>
+      <ul class="plain">
+        <li>Phase 2 deals fund the month after their Phase 1; month 1 has no prior-month volume, so month 2's deals are at Tier 1.</li>
+        <li>Phase 1 fee is a blend: standard fee &times; (1 &minus; $995 share) + $995 &times; $995 share.</li>
+        <li>Balance-band fees are the simple average of the grid rows in each band (pay-in-full the same way).</li>
+        <li>Installment attrition compounds monthly: installment <i>k</i> is collected at (1 &minus; attrition)<sup>k</sup>. Stopped payments earn nothing.</li>
+        <li>Payout lag moves (lag &divide; 4.35 weeks) of each month's commission into the next month. The reserve comes back 6 months later.</li>
+        <li>Agent pay is a flat share of commission earned &mdash; a placeholder until tax rep pay is defined. Lead cost is paid in the month the calls happen.</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  // Milestone Affiliate Pricing & Commission grid: [label, standard fee, pay-in-full price]
+  var GRID = [
+    ["$10,000 – $14,999",1495,1346],["$15,000 – $19,999",2295,2066],["$20,000 – $29,999",2795,2516],
+    ["$30,000 – $39,999",3495,3146],["$40,000 – $49,999",5695,4983],["$50,000 – $59,999",7295,6383],
+    ["$60,000 – $69,999",7995,6996],["$70,000 – $79,999",8495,7221],["$80,000 – $89,999",9295,7901],
+    ["$90,000 – $99,999",10495,8921],["$100,000 – $119,999",13295,11301],["$120,000 – $149,999",14995,12746],
+    ["$150,000 – $179,999",16995,13596],["$180,000 – $199,999",17995,14396],["$200,000 – $224,999",19295,15436],
+    ["$225,000 – $250,000",21495,17196],["$250,000 – $300,000",26495,21196]
+  ];
+  function avg(a){ return a.reduce(function(s,x){return s+x;},0)/a.length; }
+  function band(i,j){ var r=GRID.slice(i,j); return { fee:avg(r.map(function(x){return x[1];})), pif:avg(r.map(function(x){return x[2];})) }; }
+  var BANDS = { A:band(0,3), B:band(3,6), C:band(6,10), D:band(10,17) };
+  var P1_RATE = 0.5, URGENT_FEE = 995, MONTHS = 12;
+  function tierRate(n){ return n>=50?0.6:(n>=25?0.5:0.4); }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var money = function(v,dp){ return (v<0?"-$":"$")+Math.abs(v).toLocaleString("en-US",{minimumFractionDigits:dp||0,maximumFractionDigits:dp||0}); };
+  var num = function(v,dp){ return v.toLocaleString("en-US",{minimumFractionDigits:dp||0,maximumFractionDigits:dp||0}); };
+  var IDS = ["calls","cpc","p1close","p1clear","p1refund","p1urgent","p1fee","conv","tierMode","mixA","mixB","mixC","mixD","pif","loan","down","nPay","attr","agent","lagW","reserve"];
+  var DEFAULTS = {}; IDS.forEach(function(id){ DEFAULTS[id]=$(id).value; });
+  function v(id){ var x=parseFloat($(id).value); return isNaN(x)?0:x; }
+  function pct(id){ return Math.min(Math.max(v(id),0),100)/100; }
+  var RESERVE_MONTHS = 6; // Section 5.6: 10% rolling reserve released 180 days later
+
+  function model(){
+    var calls=v("calls"), p1n=calls*pct("p1close"), p1funded=p1n*pct("p1clear");
+    var p1kept=p1funded*(1-pct("p1refund"));
+    var p1fee=v("p1fee")*(1-pct("p1urgent"))+URGENT_FEE*pct("p1urgent");
+    var p1rev=p1kept*p1fee*P1_RATE;
+    var p2n=p1kept*pct("conv");
+    var mixTot=v("mixA")+v("mixB")+v("mixC")+v("mixD");
+    var w=mixTot>0?{A:v("mixA")/mixTot,B:v("mixB")/mixTot,C:v("mixC")/mixTot,D:v("mixD")/mixTot}:{A:1,B:0,C:0,D:0};
+    var avgFee=0, avgPif=0; for(var k in w){ avgFee+=w[k]*BANDS[k].fee; avgPif+=w[k]*BANDS[k].pif; }
+    var pif=pct("pif"), loan=Math.min(pct("loan"),1-pif), inst=Math.max(1-pif-loan,0);
+    var down=pct("down"), nPay=Math.round(Math.min(Math.max(v("nPay"),0),12)), attr=pct("attr");
+    // Client dollars collected per funded P2 client, by months after funding (index 0 = funding month)
+    var coll=[]; for(var i=0;i<=nPay;i++) coll.push(0);
+    coll[0]+=pif*avgPif + loan*avgFee;           // pay-in-full (discounted) and loan-funded (standard fee)
+    var planFee=avgFee*inst;
+    if(nPay===0){ coll[0]+=planFee; }
+    else { coll[0]+=planFee*down; var each=planFee*(1-down)/nPay; for(var j=1;j<=nPay;j++) coll[j]+=each*Math.pow(1-attr,j); }
+    var perClientCollected=coll.reduce(function(s,x){return s+x;},0);
+
+    // Earned commissions by calendar month. Steady volume from month 1; P2 funds the month after P1.
+    // Tier for deals funded in month t = funded P2 count in month t-1 (Exhibit D); month before start = 0 → Tier 1.
+    var forced=$("tierMode").value==="auto"?null:parseFloat($("tierMode").value);
+    var fundedIn=[], tierIn=[], e1=[], e2=[];
+    for(var m=0;m<MONTHS+RESERVE_MONTHS+2;m++){ fundedIn.push(m>=1?p2n:0); e1.push(0); e2.push(0); }
+    for(m=0;m<fundedIn.length;m++) tierIn.push(forced!=null?forced:tierRate(m>0?fundedIn[m-1]:0));
+    for(var c=0;c<MONTHS;c++){
+      e1[c]+=p1rev;
+      var t0=c+1; for(var q=0;q<coll.length;q++){ if(t0+q<e2.length) e2[t0+q]+=p2n*coll[q]*tierIn[t0]; }
+    }
+    // Cash: weekly pay ~lagW weeks after clearing (Exhibit E) → that share slips to next month; 10% reserve held 6 months.
+    var f=Math.min(Math.max(v("lagW"),0)/4.345,1), res=pct("reserve");
+    function cash(e){ var out=[]; for(var i=0;i<e.length+RESERVE_MONTHS+2;i++) out.push(0);
+      e.forEach(function(x,i){ var net=x*(1-res); out[i]+=net*(1-f); out[i+1]+=net*f; out[i+RESERVE_MONTHS]+=x*res; }); return out; }
+    var c1=cash(e1), c2=cash(e2);
+    var rows=[]; for(m=0;m<MONTHS;m++){
+      var r={p1:c1[m],p2:c2[m],earned:e1[m]+e2[m],lead:calls*v("cpc"),tier:tierIn[m]};
+      r.rev=r.p1+r.p2; r.agent=r.earned*pct("agent"); r.net=r.rev-r.agent-r.lead; r.held=(e1[m]+e2[m])*res; rows.push(r);
+    }
+    var steadyTier=forced!=null?forced:tierRate(p2n);
+    var cohortP2=p2n*perClientCollected*steadyTier;
+    return { calls:calls,p1n:p1n,p1funded:p1funded,p1kept:p1kept,p1fee:p1fee,p1rev:p1rev,p2n:p2n,avgFee:avgFee,avgPif:avgPif,
+             tier:steadyTier,coll:coll,perClientCollected:perClientCollected,rows:rows,cohortP2:cohortP2,
+             lead:calls*v("cpc"),mixTot:mixTot,nPay:nPay,pif:pif,loan:loan,inst:inst,res:res };
+  }
+
+  function kpi(label,value,sub,cls){ return '<div class="kpi '+(cls||"")+'"><div class="l">'+label+'</div><div class="v">'+value+'</div><div class="s">'+sub+'</div></div>'; }
+
+  function render(){
+    var M=model();
+    var ms=$("mixSum"); ms.textContent="Mix total "+num(M.mixTot)+"%"+(Math.abs(M.mixTot-100)>0.01?" — scaled to 100%":""); ms.className="mix-sum"+(Math.abs(M.mixTot-100)>0.01?" bad":"");
+    $("instShare").textContent=num(M.inst*100,1).replace(/\.0$/,"")+"%";
+    var last=M.rows[MONTHS-1], yr=M.rows.reduce(function(a,r){a.rev+=r.rev;a.net+=r.net;a.lead+=r.lead;a.earned+=r.earned;a.agent+=r.agent;return a;},{rev:0,net:0,lead:0,earned:0,agent:0});
+    var cohortRev=M.p1rev+M.cohortP2;
+    $("kpis").innerHTML=
+      kpi("Phase 1 funded / mo",num(M.p1funded,1),num(M.p1n,1)+" sold · "+money(M.p1fee)+" avg fee")+
+      kpi("Phase 2 funded / mo",num(M.p2n,1),"Tier "+Math.round(M.tier*100)+"% once volume settles · "+money(M.avgFee)+" avg fee","navy")+
+      kpi("Cash in month 12",money(last.rev),money(last.net)+" net after agents &amp; leads")+
+      kpi("Year-1 cash received",money(yr.rev),money(yr.earned)+" earned · "+money(yr.earned-yr.rev)+" still in reserve or in transit","navy")+
+      kpi("Value per call",money(M.calls?cohortRev/M.calls:0,2),"Break-even cost per call "+money(M.calls?cohortRev*(1-pct("agent"))/M.calls:0,2),"neutral")+
+      kpi("Cost per Phase 2 client",money(M.p2n?M.lead/M.p2n:0),"FT earns "+money(M.p2n?M.cohortP2/M.p2n:0)+" per P2 client","neutral");
+    drawChart(M.rows);
+    var h='<tr><th>Month</th><th>P2 tier</th><th>Commission earned</th><th>Phase 1 cash</th><th>Phase 2 cash</th><th>Cash received</th><th>Agent pay</th><th>Lead spend</th><th>Net cash</th><th>Cumulative</th></tr>', cum=0;
+    M.rows.forEach(function(r,i){ cum+=r.net; h+='<tr><td>Month '+(i+1)+'</td><td>'+Math.round(r.tier*100)+'%</td><td>'+money(r.earned)+'</td><td>'+money(r.p1)+'</td><td>'+money(r.p2)+'</td><td><b>'+money(r.rev)+'</b></td><td>'+money(-r.agent)+'</td><td>'+money(-r.lead)+'</td><td class="'+(r.net<0?"neg":"")+'">'+money(r.net)+'</td><td class="'+(cum<0?"neg":"")+'">'+money(cum)+'</td></tr>'; });
+    h+='<tr class="tot"><td>Year 1</td><td></td><td>'+money(yr.earned)+'</td><td>'+money(M.rows.reduce(function(s,r){return s+r.p1;},0))+'</td><td>'+money(M.rows.reduce(function(s,r){return s+r.p2;},0))+'</td><td>'+money(yr.rev)+'</td><td>'+money(-yr.agent)+'</td><td>'+money(-yr.lead)+'</td><td>'+money(yr.net)+'</td><td></td></tr>';
+    $("cashTable").innerHTML=h;
+    var tb=""; [[0.4,"1–24 / mo"],[0.5,"25–49 / mo"],[0.6,"50+ / mo"]].forEach(function(t){
+      var mo=M.p2n*M.perClientCollected*t[0];
+      tb+='<div class="'+(Math.abs(t[0]-M.tier)<0.001?"on":"")+'"><span>'+t[1]+' · '+Math.round(t[0]*100)+'%</span><b>'+money(mo)+'</b><span>lifetime P2 commission on one month of deals at your volume</span></div>'; });
+    $("tierbar").innerHTML=tb;
+    var nextN=M.p2n<25?25:(M.p2n<50?50:null), perDealBase=M.perClientCollected;
+    $("tierNote").innerHTML = nextN===null ? "<b>You're at the top tier.</b> Every Phase 2 deal funded next month locks in at 60%."
+      : "<b>"+num(Math.max(nextN-M.p2n,0),1)+" more funded Phase 2 deals a month</b> reaches the "+(nextN===25?"50%":"60%")+" tier. The higher rate applies to deals funded the <b>following</b> month and stays locked on them. At "+nextN+" deals a month, that's "+money(nextN*perDealBase*tierRate(nextN))+" vs "+money(nextN*perDealBase*tierRate(nextN-1))+" in lifetime commission per month of deals &mdash; "+money(nextN*perDealBase*0.1)+" more. That takes about "+num(M.calls*(nextN/Math.max(M.p2n,0.0001))-M.calls,0)+" more calls a month at today's conversion rates.";
+    var ch='<tr><th>Step</th><th>Count</th><th>Funding Tier revenue</th></tr>';
+    ch+='<tr><td>Calls bought</td><td>'+num(M.calls)+'</td><td class="neg">'+money(-M.lead)+'</td></tr>';
+    ch+='<tr><td>Phase 1 sold → funded → kept after refunds</td><td>'+num(M.p1n,1)+' → '+num(M.p1funded,1)+' → '+num(M.p1kept,1)+'</td><td>'+money(M.p1rev)+'</td></tr>';
+    ch+='<tr><td>Phase 2 funded ('+num(M.pif*100,1).replace(/\.0$/,"")+'% pay in full · '+num(M.loan*100,1).replace(/\.0$/,"")+'% loan · '+num(M.inst*100,1).replace(/\.0$/,"")+'% installments)</td><td>'+num(M.p2n,1)+'</td><td>'+money(M.cohortP2)+'</td></tr>';
+    ch+='<tr><td>Agent pay ('+num(v("agent"))+'%)</td><td></td><td class="neg">'+money(-(M.p1rev+M.cohortP2)*pct("agent"))+'</td></tr>';
+    var cnet=(M.p1rev+M.cohortP2)*(1-pct("agent"))-M.lead;
+    ch+='<tr class="tot"><td>Net from one month of calls</td><td></td><td class="'+(cnet<0?"neg":"")+'">'+money(cnet)+'</td></tr>';
+    ch+='<tr><td>Return on lead spend</td><td></td><td>'+(M.lead?num(cnet/M.lead*100,0)+'%':'—')+'</td></tr>';
+    ch+='<tr><td>Held in the 10% rolling reserve for 180 days</td><td></td><td>'+money((M.p1rev+M.cohortP2)*M.res)+'</td></tr>';
+    $("cohortTable").innerHTML=ch;
+  }
+
+  // ---- chart: stacked bars, one $ axis, hover tooltip ----
+  function drawChart(rows){
+    var svg=$("chart"), W=svg.clientWidth||900, H=300, pad={l:64,r:12,t:12,b:30};
+    var max=Math.max.apply(null,rows.map(function(r){return r.rev;}))||1;
+    var step=Math.pow(10,Math.floor(Math.log10(max))), nice=Math.ceil(max/step)*step; if(nice/step<=2) nice=Math.ceil(max/(step/2))*(step/2);
+    var iw=W-pad.l-pad.r, ih=H-pad.t-pad.b, bw=iw/rows.length, barW=Math.min(46,bw*0.62);
+    var y=function(val){ return pad.t+ih-(val/nice)*ih; };
+    var NS="http://www.w3.org/2000/svg"; svg.setAttribute("viewBox","0 0 "+W+" "+H); svg.innerHTML="";
+    function mk(tag,attrs,text){ var e=document.createElementNS(NS,tag); for(var a in attrs) e.setAttribute(a,attrs[a]); if(text!=null) e.textContent=text; svg.appendChild(e); return e; }
+    for(var g=0;g<=4;g++){ var gv=nice*g/4, gy=y(gv);
+      mk("line",{x1:pad.l,x2:W-pad.r,y1:gy,y2:gy,stroke:"#e2e8f0","stroke-width":1});
+      mk("text",{x:pad.l-8,y:gy+4,"text-anchor":"end","font-size":11,fill:"#64748b"},gv>=1000?"$"+num(gv/1000,gv%1000?1:0)+"K":"$"+num(gv)); }
+    var tip=$("tip");
+    rows.forEach(function(r,i){
+      var cx=pad.l+bw*i+bw/2, x=cx-barW/2;
+      mk("text",{x:cx,y:H-10,"text-anchor":"middle","font-size":11,fill:"#64748b"},"M"+(i+1));
+      var y1=y(r.p1), h1=pad.t+ih-y1, y2=y(r.rev), h2=y1-y2;
+      if(h1>0) mk("rect",{x:x,y:y1,width:barW,height:h1,fill:"#0F9D8A",rx:0});
+      if(h2>2) mk("rect",{x:x,y:y2,width:barW,height:Math.max(h2-2,0),fill:"#2C4F8C",rx:4});
+      if(h1>0 && h2<=2) { /* top segment too thin: round the P1 bar instead */ }
+      var hit=mk("rect",{x:pad.l+bw*i,y:pad.t,width:bw,height:ih,fill:"transparent",tabindex:0});
+      function show(){
+        tip.innerHTML=""; var t=document.createElement("div"); t.innerHTML="<b></b>"; t.firstChild.textContent="Month "+(i+1)+" · "+money(r.rev); tip.appendChild(t);
+        [["#0F9D8A","Phase 1",r.p1],["#2C4F8C","Phase 2",r.p2],["#94a3b8","Net after agents & leads",r.net]].forEach(function(s){
+          var row=document.createElement("div"); row.className="row"; var k=document.createElement("i"); k.style.background=s[0]; row.appendChild(k);
+          row.appendChild(document.createTextNode(money(s[2])+"  "+s[1])); tip.appendChild(row); });
+        var bx=cx/W*svg.getBoundingClientRect().width; tip.style.left=Math.min(Math.max(bx-80,0),svg.getBoundingClientRect().width-190)+"px"; tip.style.top="8px"; tip.style.opacity=1;
+      }
+      hit.addEventListener("pointermove",show); hit.addEventListener("focus",show);
+      hit.addEventListener("pointerleave",function(){tip.style.opacity=0;}); hit.addEventListener("blur",function(){tip.style.opacity=0;});
+    });
+    mk("line",{x1:pad.l,x2:W-pad.r,y1:pad.t+ih,y2:pad.t+ih,stroke:"#94a3b8","stroke-width":1});
+  }
+
+  // ---- deal calculator ----
+  var payMode="pif";
+  function dealRender(){
+    var b=GRID[parseInt($("dBand").value,10)], p1=parseFloat($("dP1").value), rate=parseFloat($("dTier").value);
+    var price = payMode==="pif" ? b[2] : b[1];
+    var n=Math.round(Math.min(Math.max(parseFloat($("dN").value)||0,0),12)), d=Math.min(Math.max(parseFloat($("dDown").value)||0,0),100)/100;
+    $("planFields").style.display = payMode==="plan" ? "" : "none";
+    var sched=[["Phase 1 fee clears", p1, p1*P1_RATE]];
+    if(payMode==="plan" && n>0){
+      var dn=price*d, inst=(price-dn)/n;
+      sched.push(["Phase 2 down payment", dn, dn*rate]);
+      for(var i=1;i<=n;i++) sched.push(["Phase 2 payment "+i+" of "+n, inst, inst*rate]);
+    } else sched.push([payMode==="loan"?"Phase 2 loan-funded (standard fee)":"Phase 2 paid in full", price, price*rate]);
+    var p2pay=price*rate, total=p1*P1_RATE+p2pay;
+    $("dKpis").innerHTML=kpi("Phase 2 price",money(price),payMode==="pif"?"Pay-in-full · standard "+money(b[1]):"Standard resolution fee")+
+      kpi("Phase 1 payout",money(p1*P1_RATE),"50% of "+money(p1))+
+      kpi("Phase 2 payout",money(p2pay),Math.round(rate*100)+"% of "+money(price),"navy")+
+      kpi("Total to Funding Tier",money(total),payMode==="plan"&&n>0?"over "+(n+1)+" Phase 2 payments":"once funds clear","neutral");
+    var h='<tr><th>Month</th><th style="text-align:left">Event</th><th>Client pays</th><th>Funding Tier earns</th></tr>', run=0;
+    sched.forEach(function(s,i){ run+=s[2]; h+='<tr'+(i===0?' class="hi"':'')+'><td>'+(i===0?"0":(i)) +'</td><td style="text-align:left">'+s[0]+'</td><td>'+money(s[1],2)+'</td><td>'+money(s[2],2)+'</td></tr>'; });
+    h+='<tr class="tot"><td></td><td style="text-align:left">Total</td><td>'+money(p1+price,2)+'</td><td>'+money(run,2)+'</td></tr>';
+    $("dSched").innerHTML=h;
+  }
+
+  function gridRender(){
+    var h='<tr><th>Client IRS balance</th><th>P2 fee</th><th>Pay-in-full</th><th>Std @40%</th><th>Std @50%</th><th>Std @60%</th><th>PIF @40%</th><th>PIF @50%</th><th>PIF @60%</th></tr>';
+    GRID.forEach(function(g){ h+='<tr><td>'+g[0]+'</td><td><b>'+money(g[1])+'</b></td><td>'+money(g[2])+' ('+num((1-g[2]/g[1])*100,1).replace(/\.0$/,"")+'% off)</td>'+
+      [0.4,0.5,0.6].map(function(r){return '<td>'+money(Math.floor(g[1]*r))+'</td>';}).join("")+[0.4,0.5,0.6].map(function(r){return '<td>'+money(Math.floor(g[2]*r))+'</td>';}).join("")+'</tr>'; });
+    $("gridTable").innerHTML=h;
+  }
+
+  // ---- wiring ----
+  IDS.forEach(function(id){ $(id).addEventListener("input",render); $(id).addEventListener("change",render); });
+  $("reset").addEventListener("click",function(){ IDS.forEach(function(id){ $(id).value=DEFAULTS[id]; }); render(); });
+  GRID.forEach(function(g,i){ var o=document.createElement("option"); o.value=i; o.textContent=g[0]; $("dBand").appendChild(o); });
+  $("dBand").value=10;
+  ["dBand","dP1","dTier","dDown","dN"].forEach(function(id){ $(id).addEventListener("input",dealRender); $(id).addEventListener("change",dealRender); });
+  Array.prototype.forEach.call(document.querySelectorAll("#dPay button"),function(b){ b.addEventListener("click",function(){
+    payMode=b.dataset.v; Array.prototype.forEach.call(document.querySelectorAll("#dPay button"),function(x){x.classList.toggle("on",x===b);}); dealRender(); }); });
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){ t.addEventListener("click",function(){
+    Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(x){x.classList.toggle("on",x===t);});
+    Array.prototype.forEach.call(document.querySelectorAll(".panel"),function(p){p.classList.toggle("on",p.id===t.dataset.p);});
+    if(t.dataset.p==="forecast") render(); }); });
+  window.addEventListener("resize",function(){ drawChart(model().rows); });
+  render(); dealRender(); gridRender();
+})();
+</script>
+<script src="https://ai.fundingtier.com/toolkit.js" defer></script>
+</body>
+</html>
