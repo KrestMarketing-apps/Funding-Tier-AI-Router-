@@ -9,8 +9,9 @@
  *    - Lender/company acceptance lookups
  *    - Stipulation enforcement
  *    - Support contact resolution
+ *    - Payout models, software fees and chargeback terms (Exhibit D)
  *
- *  Last updated: September 22, 2025
+ *  Last updated: September 23, 2026
  * ============================================================
  */
 
@@ -501,6 +502,119 @@ export const SUPPORT_CONTACTS = {
 };
 
 // ─────────────────────────────────────────────────────────────
+//  7b. PAYOUT MODELS, SOFTWARE FEES & CHARGEBACKS
+//      Source: LCS Exhibit D — Payout Model Election
+//      (doc 20260601EXD6065), signed by Nathan Pottish 9/23/2026.
+//      Funding Tier elected ALL THREE: Residual, Accelerated, Defender.
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Every payout is calculated on the SERVICE FEE BASE: the lead's cleared
+ * payment, less the monthly maintenance fee, less returns / refunds /
+ * chargebacks, less processing, drafting and software fees — then multiplied by
+ * the model's rate. Litigation awards, bankruptcy and other attorney services
+ * are excluded. Active Leads at termination keep paying out on this schedule.
+ */
+export const SERVICE_FEE_BASE = {
+  deductions: [
+    "Monthly maintenance fee",
+    "Returns, refunds and claw backs (chargebacks)",
+    "Payment processing, drafting ($4 per draft) and software fees",
+  ],
+  excludes: ["Litigation awards and fees", "Bankruptcy and other additional attorney services"],
+  sourceOfPayment: "Paid by LCS from any source; owed once the lead pays, whether or not LCS is paid by the law firm.",
+};
+
+export const PAYOUT_MODELS = {
+  residual: {
+    name: "Residual Model (Option 1 — New Billable Payout)",
+    maxMonths: 48, // Service Fee is calculated on the first 48 months of MMP (or the term, if shorter)
+    tiers: [
+      { tier: 1, filesPerMonth: "1-99", rate: 0.60 },
+      { tier: 2, filesPerMonth: "100+", rate: 0.65 },
+    ],
+    // Months 1-2: the equivalent of up to two maintenance fees is paid back
+    // ("Additional Compensation"), so the payment passes through less only the
+    // draft fee. From month 3 the maintenance fee also comes off.
+    additionalCompensation: "First 2 months: maintenance fees paid back (up to two maintenance fees).",
+    tier2Rules:
+      "100+ qualified enrollments in a month (accepted, not cancelled, becoming Active Leads by month end) earns Tier 2 on enrollments from the FOLLOWING month. Falls back to Tier 1 after 3 consecutive months under 100. The rate in effect in the enrollment month holds for the life of the lead.",
+    discrepancy:
+      "Exhibit D's Tier 1 paragraph says 55% while its tier table says 60%. Tools use 60%; confirm with LCS.",
+  },
+  accelerated: {
+    name: "Accelerated Model (Option 2 — hybrid payout)",
+    frontRate: 0.90,   // 90% of the lead's payment...
+    frontMonths: 7,    // ...for months 1-7
+    backRate: 0.25,    // 25%...
+    backMonths: 17,    // ...for months 8-24
+    maxMonths: 24,     // nothing is paid after month 24
+    minTerm: 24,       // leads written under 24 months are paid on the Residual model only
+    base:
+      "Tools default to the Service Fee base (payment less maintenance and fees). Option 2 itself says 'the Active Lead's payment' — confirm with LCS whether maintenance comes off first; it decides whether Accelerated beats Residual.",
+    whenItHelps:
+      "Front-loads cash into months 1-7 and stops at 24. It trades away months 25-48 of residual income, so it pays best on files likely to cancel early.",
+  },
+  defender: {
+    name: "Defender Model",
+    eliteDefenderRate: 0.50, // Limited Legal Representation Plan: 50% of the monthly fee per Active Lead
+    myDefenderPlan: "My Defender Plan (My Defender Plan LLC): 50% of the set-up fee + 50% of the monthly fee per Active Lead.",
+  },
+  electedModels: ["residual", "accelerated", "defender"],
+  expectedActiveLeads:
+    "LCS expects 100 Active Leads per month starting 120 days after execution — not a strict requirement, but weighed in performance reviews.",
+};
+
+/** Software fees LCS deducts from Service Fees. 30 days' notice to change (sooner if the software vendor changes). */
+export const SOFTWARE_FEES = {
+  eSign: 0,           // per application generated
+  creditPull: 2.60,   // per credit pull through LCS and/or its software
+  seatFeesPerUserPerMonth: [
+    { files: "over 50 in the month", fee: 25 },
+    { files: "1 to 49 in the month", fee: 50 },
+    { files: "0 in the month", fee: 100 },
+  ],
+  seatFeeGap: "Exhibit D does not price exactly 50 files; tools charge $50 until LCS confirms.",
+};
+
+/** An "Active Lead" has paid its Monthly Maintenance Fee AND its Legal Service Fee that month. */
+export const ACTIVE_LEAD_RULES = {
+  notActive: [
+    "Cancelled, paused or rejected",
+    "Completed Legal Service Fee payments",
+    "Moved to litigation-only or other services (e.g. bankruptcy)",
+    "Missed that month's Legal Service Fee payment",
+  ],
+  chargebackPeriod:
+    "Two fully cleared MMPs (4+ payments on a split schedule). If a client fails to make or clear 2 full MMPs, everything paid on that lead is charged back against any future payment.",
+  confidentiality:
+    "After enrollment, any client who contacts Funding Tier is directed back to the law firm — no involvement or discussion of the client.",
+  mmp: "Minimum Monthly Payment per the client's agreement with the law firm; the law firm may change it.",
+};
+
+/**
+ * Funding Tier's monthly payout on one lead for a given deal month.
+ * @param {{ serviceFeeMonthly:number, maintenanceFee:number, draftFees:number, term:number, model:'residual'|'accelerated', tierRate?:number, base?:'net'|'draft' }} p
+ * @param {number} month - 1-based deal month
+ */
+export function payoutForMonth(p, month) {
+  const { serviceFeeMonthly, maintenanceFee, term } = p;
+  if (month < 1 || month > term) return 0;
+  const net = serviceFeeMonthly;                       // payment − maintenance − draft fees
+  const withMaint = serviceFeeMonthly + maintenanceFee; // payment − draft fees
+  const residual = () => {
+    if (month > PAYOUT_MODELS.residual.maxMonths) return 0;
+    return month <= 2 ? withMaint : net * (p.tierRate ?? PAYOUT_MODELS.residual.tiers[0].rate);
+  };
+  if (p.model !== "accelerated" || term < PAYOUT_MODELS.accelerated.minTerm) return residual();
+  const A = PAYOUT_MODELS.accelerated;
+  const base = p.base === "draft" ? withMaint : net;
+  if (month <= A.frontMonths) return base * A.frontRate;
+  if (month <= A.frontMonths + A.backMonths) return base * A.backRate;
+  return 0;
+}
+
+// ─────────────────────────────────────────────────────────────
 //  8. HELPER FUNCTIONS
 // ─────────────────────────────────────────────────────────────
 
@@ -737,7 +851,12 @@ export default {
   COMPANIES_NOT_ACCEPTED,
   COMPANIES_ACCEPTED,
   SUPPORT_CONTACTS,
+  SERVICE_FEE_BASE,
+  PAYOUT_MODELS,
+  SOFTWARE_FEES,
+  ACTIVE_LEAD_RULES,
   // Functions
+  payoutForMonth,
   checkStateEligibility,
   checkProgramMinimums,
   getAcceptableDebt,

@@ -77,7 +77,7 @@
     .mbtn.active-amber{background:rgba(245,158,11,0.2);border-color:rgba(245,158,11,0.45);color:#fcd34d;}
     .hbig{font-family:'Inconsolata',monospace;font-size:17px;font-weight:700;color:#fff;line-height:1;white-space:nowrap;}
     .accent-bar{height:3px;background:linear-gradient(90deg,var(--green),#0891b2);}
-    .content{max-width:1100px;margin:0 auto;padding:24px 20px 60px;}
+    .content{max-width:1600px;margin:0 auto;padding:24px 20px 60px;}
     .card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 3px 12px rgba(15,23,42,0.05);}
     .mcard-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:7px;}
     .mcard-value{font-size:24px;font-weight:800;color:var(--text);line-height:1.1;}
@@ -201,6 +201,26 @@
       <div style="font-size:9px;color:rgba(255,255,255,0.28);margin-top:2px;white-space:nowrap">Split = 2 drafts &times; half payment</div>
     </div>
 
+    <!-- Payout model (Exhibit D) -->
+    <div class="hgrp" style="min-width:150px">
+      <label class="ilbl">Payout model</label>
+      <div class="mbtns" id="modelBtns">
+        <div class="mbtn active" data-val="residual">Residual</div>
+        <div class="mbtn" data-val="accelerated">Accelerated</div>
+      </div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.28);margin-top:2px;white-space:nowrap">Accel. = 90% &times; 7 mo, 25% &times; 17 mo</div>
+    </div>
+
+    <!-- Accelerated base -->
+    <div class="hgrp" style="min-width:150px" id="accBaseGrp">
+      <label class="ilbl">Accel. paid on</label>
+      <div class="mbtns" id="accBaseBtns">
+        <div class="mbtn active" data-val="net">Net</div>
+        <div class="mbtn" data-val="draft">Pmt &minus; draft</div>
+      </div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.28);margin-top:2px;white-space:nowrap">Net = less maint. + fees &middot; confirm w/ LCS</div>
+    </div>
+
     <div class="hdiv"></div>
 
     <!-- Computed -->
@@ -241,12 +261,12 @@
       <div id="scClientPmtSub" class="mcard-sub"></div>
     </div>
     <div class="card">
-      <div class="mcard-label">P1&ndash;2 affiliate payout / mo</div>
+      <div class="mcard-label" id="scM12lbl">P1&ndash;2 affiliate payout / mo</div>
       <div id="scM12" class="mcard-value" style="color:var(--green)">&#8212;</div>
       <div id="scM12sub" class="mcard-sub">100% pass-through &middot; draft fee only</div>
     </div>
     <div class="card">
-      <div class="mcard-label">P3+ affiliate payout / mo</div>
+      <div class="mcard-label" id="scM3lbl">P3+ affiliate payout / mo</div>
       <div id="scM3" class="mcard-value" style="color:var(--green)">&#8212;</div>
       <div id="scM3sub" class="mcard-sub"></div>
     </div>
@@ -255,6 +275,16 @@
       <div id="scSteady" class="mcard-value" style="color:var(--greend)">&#8212;</div>
       <div id="scSteadySub" class="mcard-sub"></div>
     </div>
+  </div>
+
+  <!-- Residual vs Accelerated (Exhibit D) -->
+  <div class="card mb" id="modelCompareCard">
+    <h2 class="section-head">Residual vs Accelerated &mdash; this enrollment</h2>
+    <p class="section-sub">LCS Exhibit D lets Funding Tier elect either model per file. <strong>Accelerated</strong> pays 90% of the payment for months 1&ndash;7, then 25% for months 8&ndash;24, and nothing after &mdash; files written under 24 months can only be paid <strong>Residual</strong>. Residual pays months 1&ndash;2 in full (less the draft fee), then the tier rate on the service fee, for up to 48 months. No cancellations are assumed here &mdash; the Operating Model&rsquo;s <em>ELP Accelerated</em> section weights both by the survival curve.</p>
+    <div style="overflow-x:auto">
+      <table class="tbl" style="width:100%;border-collapse:collapse;font-size:13px" id="modelCompareTbl"></table>
+    </div>
+    <div id="modelCompareNote" style="font-size:12px;color:#64748b;line-height:1.7;font-weight:500;margin-top:10px"></div>
   </div>
 
   <!-- Chart 1 -->
@@ -462,6 +492,18 @@
   let maintFee = 80;
   let isSplit  = false;
 
+  // Exhibit D (Payout Model Election, 20260601EXD6065)
+  //   Residual    : Service Fee on the first 48 months only.
+  //   Accelerated : 90% x months 1-7, 25% x months 8-24, nothing after;
+  //                 only for terms of 24+ months, otherwise Residual.
+  // The accelerated base defaults to the Service Fee base (payment less
+  // maintenance and fees). Option 2's own wording is "the Active Lead's
+  // payment", so 'draft' keeps maintenance in until LCS confirms.
+  const RESIDUAL_MAX_MONTHS = 48;
+  const ACCEL = { frontRate: 0.90, frontMonths: 7, backRate: 0.25, backMonths: 17, minTerm: 24 };
+  let payoutModel = "residual";
+  let accBase     = "net";
+
   // The term defaults to the longest one this deal can run. It stays pinned to
   // that ceiling until the user moves the term control themselves, and re-pins
   // whenever a term-defining input (debt, service fee, maintenance fee,
@@ -517,6 +559,19 @@
     update();
   });
 
+  // payout model toggle
+  document.getElementById("modelBtns").addEventListener("click",e=>{
+    const b=e.target.closest(".mbtn");if(!b)return;
+    document.querySelectorAll("#modelBtns .mbtn").forEach(x=>x.classList.remove("active","active-amber"));
+    if(b.dataset.val==="accelerated"){b.classList.add("active-amber");}else{b.classList.add("active");}
+    payoutModel=b.dataset.val;update();
+  });
+  document.getElementById("accBaseBtns").addEventListener("click",e=>{
+    const b=e.target.closest(".mbtn");if(!b)return;
+    document.querySelectorAll("#accBaseBtns .mbtn").forEach(x=>x.classList.remove("active","active-amber"));
+    b.classList.add("active");accBase=b.dataset.val;update();
+  });
+
   // ── CORE CALCULATION ──────────────────────────────────────
   //
   // Gross monthly payment = sfeeMonthly + maintFee + procFeeMonthly
@@ -531,7 +586,9 @@
   //
   // Affiliate payout = net × payRate  (every month, both phases)
 
-  function calcPerEnrollment(debt, feeRate, term, maint, payRate, split){
+  function calcPerEnrollment(debt, feeRate, term, maint, payRate, split, model, base){
+    model = model || "residual";
+    const accelOn = model === "accelerated" && term >= ACCEL.minTerm;
     const sfeeTotal    = debt * (feeRate / 100);
     const sfeeMonthly  = sfeeTotal / term;
     const procMonthly  = split ? PROC_FEE * 2 : PROC_FEE;          // $8 split / $4 monthly
@@ -549,12 +606,24 @@
     let cumPayout = 0;
 
     for(let m = 1; m <= term; m++){
-      const deduction  = m <= 2 ? earlyDeduct : lateDeduct;
-      const net        = grossPmt - deduction;
-      // P1-2: 100% pass-through — full net, no tier rate reduction
-      // P3+:  tier rate applied to net after maint + draft backout
-      const effectRate = m <= 2 ? 1.0 : payRate;
-      const mpay       = net * effectRate;
+      let deduction, net, effectRate, mpay;
+      if(accelOn){
+        // Accelerated: one base every month — the Service Fee base (maint +
+        // draft backed out) or, on the alternate reading, draft fee only.
+        deduction  = base === "draft" ? earlyDeduct : lateDeduct;
+        net        = grossPmt - deduction;
+        effectRate = m <= ACCEL.frontMonths ? ACCEL.frontRate
+                   : m <= ACCEL.frontMonths + ACCEL.backMonths ? ACCEL.backRate : 0;
+        mpay       = net * effectRate;
+      } else {
+        deduction  = m <= 2 ? earlyDeduct : lateDeduct;
+        net        = grossPmt - deduction;
+        // P1-2: 100% pass-through — full net, no tier rate reduction
+        // P3+:  tier rate applied to net after maint + draft backout
+        // Past month 48 the Service Fee is no longer calculated (Exhibit D).
+        effectRate = m > RESIDUAL_MAX_MONTHS ? 0 : m <= 2 ? 1.0 : payRate;
+        mpay       = net * effectRate;
+      }
       cumPayout       += mpay;
       rows.push({ m, grossPmt, deduction, net, mpay, cumPayout, payRate: effectRate });
     }
@@ -564,6 +633,8 @@
     const beMonth     = rows.find(r => r.cumPayout >= upfront)?.m ?? null;
 
     return {
+      model: accelOn ? "accelerated" : "residual", accelOn,
+      m8payout  : rows[7]?.mpay   || 0,
       sfeeMonthly, grossPmt, procMonthly,
       // The months 3+ tier rate. The deduction callout reads R.payRate; it was
       // only ever set per row, so that callout rendered "NaN% = $NaN/mo".
@@ -578,6 +649,24 @@
   // ── DEDUCTION CALLOUT ─────────────────────────────────────
   function renderDeductCard(R, maint, split){
     const grid = document.getElementById("deductGrid");
+    if(R.accelOn){
+      const ded = accBase === "draft" ? R.earlyDeduct : R.lateDeduct;
+      const netA = R.grossPmt - ded;
+      grid.innerHTML = `
+      <div class="deduct-box">
+        <div class="deduct-lbl">Accelerated &mdash; payments 1&ndash;${ACCEL.frontMonths}</div>
+        <div class="deduct-val">&minus;${fmtD(ded)} / month</div>
+        <div class="deduct-sub">${accBase === "draft" ? "Draft fee only" : "Maintenance + draft fee"} backed out<br>
+          Net ${fmtD(netA)} &times; ${(ACCEL.frontRate*100).toFixed(0)}% = <strong>${fmtD(netA*ACCEL.frontRate)}/mo</strong></div>
+      </div>
+      <div class="deduct-box late">
+        <div class="deduct-lbl late">Accelerated &mdash; payments ${ACCEL.frontMonths+1}&ndash;${ACCEL.frontMonths+ACCEL.backMonths}</div>
+        <div class="deduct-val">&minus;${fmtD(ded)} / month</div>
+        <div class="deduct-sub">Net ${fmtD(netA)} &times; ${(ACCEL.backRate*100).toFixed(0)}% = <strong>${fmtD(netA*ACCEL.backRate)}/mo</strong><br>
+          Nothing is paid after payment ${ACCEL.frontMonths+ACCEL.backMonths}.</div>
+      </div>`;
+      return;
+    }
     const phaseADeduct = R.earlyDeduct;
     const phaseBDeduct = R.lateDeduct;
     const netA = R.grossPmt - phaseADeduct;
@@ -749,6 +838,40 @@
     svg.addEventListener("mouseleave",()=>removeTooltip(svg));
   }
 
+  // ── RESIDUAL vs ACCELERATED ──────────────────────────────
+  function renderModelCompare(Rr, Ra, term){
+    const tbl  = document.getElementById("modelCompareTbl");
+    const note = document.getElementById("modelCompareNote");
+    const at   = (R, m) => R.rows[Math.min(m, R.rows.length) - 1]?.cumPayout || 0;
+    const N    = ACCEL.frontMonths;
+    let catchUp = null;
+    if(Ra.accelOn){
+      for(let m = 1; m <= term; m++){
+        let ahead = true;
+        for(let k = m; k <= term; k++){ if(at(Rr,k) < at(Ra,k)){ ahead = false; break; } }
+        if(ahead){ catchUp = m; break; }
+      }
+    }
+    const rows = [
+      [`Paid by payment ${N}`, at(Rr,N), at(Ra,N)],
+      ["Paid by payment 12", at(Rr,12), at(Ra,12)],
+      ["Paid by payment 24", at(Rr,24), at(Ra,24)],
+      [`Full term (${term} mo)`, Rr.totalPayout, Ra.totalPayout],
+    ];
+    const cell = "padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:Inconsolata,monospace";
+    tbl.innerHTML =
+      `<tr><th style="${cell};text-align:left;font-family:inherit">Per enrolled client</th><th style="${cell};font-family:inherit">Residual</th><th style="${cell};font-family:inherit">Accelerated</th><th style="${cell};font-family:inherit">Accelerated vs residual</th></tr>` +
+      rows.map(([l,r,a]) => {
+        const d = a - r;
+        return `<tr><td style="${cell};text-align:left;font-family:inherit;font-weight:600">${l}</td><td style="${cell}">${fmt(r)}</td><td style="${cell};font-weight:800;color:${AMBER}">${fmt(a)}</td><td style="${cell};color:${d>=0?GREEND:RED}">${d>=0?"+":""}${fmt(d)}</td></tr>`;
+      }).join("");
+    note.innerHTML = !Ra.accelOn
+      ? `This deal is written at <strong>${term} months</strong>, under the ${ACCEL.minTerm}-month minimum, so it can only be paid on the Residual model.`
+      : `Accelerated pays <strong>${fmt(at(Ra,N) - at(Rr,N))}</strong> more by payment ${N}. `
+        + (catchUp ? `Residual overtakes it for good at payment <strong>${catchUp}</strong> &mdash; elect Accelerated on files you expect to cancel before then.` : `Residual never catches up on this deal.`)
+        + ` Accelerated is ${accBase === "draft" ? "paid on the payment less the draft fee (alternate reading)" : "paid on the Service Fee base &mdash; payment less maintenance and fees"}; confirm the base with LCS.`;
+  }
+
   // ── MAIN UPDATE ───────────────────────────────────────────
   function update(){
     const debt  = +document.getElementById("debtField").value  || 0;
@@ -785,7 +908,11 @@
     const tierLbl = document.getElementById("tierLbl");
     if(tierLbl) tierLbl.textContent = files>=100 ? "Enrollments / mo (Tier 2 \u2014 65%)" : "Enrollments / mo (Tier 1 \u2014 60%)";
 
-    const R = calcPerEnrollment(debt, fee, term, maintFee, payRate, isSplit);
+    const R = calcPerEnrollment(debt, fee, term, maintFee, payRate, isSplit, payoutModel, accBase);
+    const Rres = payoutModel === "residual" ? R : calcPerEnrollment(debt, fee, term, maintFee, payRate, isSplit, "residual", accBase);
+    const Racc = calcPerEnrollment(debt, fee, term, maintFee, payRate, isSplit, "accelerated", accBase);
+    renderModelCompare(Rres, Racc, term);
+    document.getElementById("accBaseGrp").style.opacity = payoutModel === "accelerated" ? "1" : "0.45";
 
     // ── Header ────────────────────────────────────────────
     document.getElementById("hClientPmt").textContent   = fmtD(R.grossPmt) + (isSplit ? "\u00d72" : "");
@@ -799,10 +926,21 @@
     document.getElementById("scClientPmtSub").textContent = isSplit
       ? `2 drafts of ${fmtD(R.grossPmt/2)} each (${fee}% fee + $${maintFee} maint + $${PROC_FEE}/draft)`
       : `${fee}% of ${fmt(debt)} \u00f7 ${term} months + $${maintFee} + $${PROC_FEE}`;
-    document.getElementById("scM12").textContent    = fmtD(R.m12payout) + "/mo";
-    document.getElementById("scM12sub").textContent = `100% pass\u2011through \u2014 \u2212${fmtD(R.earlyDeduct)} draft fee only`;
-    document.getElementById("scM3").textContent     = fmtD(R.m3payout) + "/mo";
-    document.getElementById("scM3sub").textContent  = `\u2212${fmtD(R.lateDeduct)} (maint+draft) \u00d7 ${(payRate*100).toFixed(0)}% pay rate`;
+    if(R.accelOn){
+      document.getElementById("scM12lbl").textContent = `P1\u2013${ACCEL.frontMonths} affiliate payout / mo`;
+      document.getElementById("scM3lbl").textContent  = `P${ACCEL.frontMonths+1}\u2013${ACCEL.frontMonths+ACCEL.backMonths} affiliate payout / mo`;
+      document.getElementById("scM12").textContent    = fmtD(R.m12payout) + "/mo";
+      document.getElementById("scM12sub").textContent = `Accelerated \u2014 ${(ACCEL.frontRate*100).toFixed(0)}% of the ${accBase === "draft" ? "payment less draft fee" : "Service Fee base"}`;
+      document.getElementById("scM3").textContent     = fmtD(R.m8payout) + "/mo";
+      document.getElementById("scM3sub").textContent  = `${(ACCEL.backRate*100).toFixed(0)}% \u2014 then $0 after payment ${ACCEL.frontMonths+ACCEL.backMonths}`;
+    } else {
+      document.getElementById("scM12lbl").textContent = "P1\u20132 affiliate payout / mo";
+      document.getElementById("scM3lbl").textContent  = "P3+ affiliate payout / mo";
+      document.getElementById("scM12").textContent    = fmtD(R.m12payout) + "/mo";
+      document.getElementById("scM12sub").textContent = `100% pass\u2011through \u2014 \u2212${fmtD(R.earlyDeduct)} draft fee only`;
+      document.getElementById("scM3").textContent     = fmtD(R.m3payout) + "/mo";
+      document.getElementById("scM3sub").textContent  = `\u2212${fmtD(R.lateDeduct)} (maint+draft) \u00d7 ${(payRate*100).toFixed(0)}% pay rate${term > RESIDUAL_MAX_MONTHS ? ` \u00b7 stops after P${RESIDUAL_MAX_MONTHS}` : ""}`;
+    }
     const steadyMo = files * R.totalPayout;
     document.getElementById("scSteady").textContent    = fmt(steadyMo) + "/mo";
     document.getElementById("scSteadySub").textContent = `${files} enrollments \u00d7 ${fmt(R.totalPayout)}/ea \u00b7 reached at month ${term}`;

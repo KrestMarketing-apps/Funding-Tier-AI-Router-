@@ -435,6 +435,33 @@
     .callout{padding-left:42px;font-size:13.5px;}
     .callout::before{left:12px;top:14px;width:17px;height:17px;}
   }
+
+  /* ===== WIDE LAYOUT — use the full screen (Funding Tier SOP system) ===== */
+  .wrap{max-width:1600px !important;width:auto !important;padding:48px 0 110px !important;overflow-x:clip !important;}
+  .section-head h2{font-size:34px;}
+  .section-head p{font-size:18px;line-height:1.65;max-width:100ch;}
+  .eyebrow{font-size:14.5px;}
+  .card p{font-size:17px;line-height:1.7;}
+  .card h3{font-size:20px;}
+  .callout{font-size:17px;line-height:1.65;}
+  .callout strong{font-size:15px;}
+  .step-body h4{font-size:22px;}
+  .step-body p,.step-body ul{font-size:17px;line-height:1.7;max-width:100ch;}
+  .mini-stat{font-size:15px;}
+  .mini-stat strong{font-size:16px;}
+  .flow-node p{font-size:15px;}
+  .flow-node .fn-label{font-size:14px;}
+  table{font-size:16px;}
+  th{font-size:13.5px;}
+  .shot img,figure.shot img{max-height:80vh;object-fit:contain;}
+  .shot-cap,figcaption{font-size:14.5px;}
+  video{max-height:80vh;}
+  @media (max-width:640px){
+    .section-head h2{font-size:26px;}
+    .section-head p,.card p,.callout,.step-body p,.step-body ul{font-size:16px;}
+  }
+  .wrap{margin-left:calc(var(--rail-w) + clamp(24px,3vw,56px)) !important;margin-right:clamp(24px,3vw,56px) !important;}
+  @media (max-width:900px){ .wrap{margin-left:0 !important;margin-right:0 !important;padding:76px 16px 80px !important;} }
 </style>
 </head>
 <body>

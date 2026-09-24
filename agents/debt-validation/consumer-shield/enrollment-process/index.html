@@ -334,6 +334,120 @@
     ol.subs > li{padding-left:34px;font-size:14px;}
     .ui{white-space:normal;}
   }
+
+  /* ---------- VIDEO FEATURE ---------- */
+  .vid-feature{margin:4px 0 26px;border:2px solid var(--green);border-radius:16px;background:linear-gradient(180deg,#ECFDF5 0%,#FFFFFF 70%);padding:18px 18px 16px;box-shadow:0 6px 22px rgba(15,157,138,.14);}
+  .vid-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+  .vid-badge{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;padding:7px 12px 7px 10px;border-radius:8px;}
+  .vid-badge svg{width:15px;height:15px;}
+  .vid-len{margin-left:auto;font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;color:var(--forest);background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 10px;}
+  .vid-title{font-family:'Montserrat',sans-serif;font-size:20px !important;margin:10px 0 12px !important;color:var(--forest);}
+  .vid-feature video{display:block;width:100%;height:auto;background:#000;border-radius:12px;}
+  .vid-note{margin:12px 2px 0 !important;font-size:15px !important;color:var(--ink-soft) !important;}
+  .vid-full{margin-top:10px;}
+  .vids-callout{border-color:var(--green);}
+
+  /* ---------- MISSING-DEBT FLOW (Step 2.D) ---------- */
+  .gap-types{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0 6px;}
+  .gap-type{border:1px solid var(--line);border-top:4px solid var(--forest-2);border-radius:12px;padding:14px 16px;background:#fff;}
+  .gap-type > b{display:block;font-family:'Montserrat',sans-serif;font-size:16px;color:var(--forest);margin-bottom:4px;}
+  .gap-type > span{display:block;font-size:15px;line-height:1.55;color:var(--ink-soft);}
+  figure.gapflow{margin:22px 0;padding:20px;border:1px solid var(--line);border-radius:16px;background:#F7F9FC;}
+  .gf-row{display:flex;align-items:stretch;gap:10px;}
+  .gf-node{flex:1 1 0;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:15px;line-height:1.5;color:var(--ink);}
+  .gf-node.gf-start{border-color:var(--forest-2);}
+  .gf-node.gf-end{border-color:var(--green);background:var(--accent-soft);}
+  .gf-k{display:block;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase;color:var(--green);margin-bottom:4px;}
+  .gf-arrow{align-self:center;color:var(--green);font-size:22px;font-weight:700;flex:0 0 auto;}
+  .gf-branches{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;padding:12px;border:2px dashed #9FD8CF;border-radius:14px;background:#fff;}
+  .gf-branch{padding:6px 8px;font-size:15px;line-height:1.5;color:var(--ink-soft);}
+  .gf-branch b{display:block;font-family:'Montserrat',sans-serif;font-size:16px;color:var(--forest);margin:4px 0 2px;}
+  .gf-tag{display:inline-block;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;background:var(--forest-2);color:#fff;border-radius:6px;padding:3px 8px;}
+  @media (max-width:900px){
+    .gf-row{flex-direction:column;}
+    .gf-arrow{transform:rotate(90deg);align-self:center;}
+    .gf-branches,.gap-types{grid-template-columns:1fr;}
+  }
+
+  /* ---------- READABILITY: larger type, wider page ---------- */
+  .shot-pair{align-items:start;}
+  .shot-pair figure.shot img{max-height:640px;object-fit:contain;}
+  .section-head h2{font-size:34px;}
+  .section-head p{font-size:18px;max-width:80ch;}
+  .eyebrow{font-size:14.5px;}
+  .card p,.es > p,.es-body > p{font-size:17px;line-height:1.7;}
+  .card h3{font-size:20px;}
+  .callout{font-size:17px;line-height:1.65;}
+  .callout strong{font-size:15px;}
+  .talk{font-size:17px;line-height:1.7;}
+  .talk .who{font-size:13px;}
+  ol.subs > li{font-size:17px;line-height:1.65;padding-left:42px;}
+  ol.subs > li::before{width:28px;height:28px;font-size:14px;}
+  ol.subs > li span.note{font-size:15.5px;}
+  .es{padding:32px 34px 28px;}
+  .es-head h3{font-size:26px;}
+  .es-head p{font-size:15.5px;}
+  .es-num{width:52px;height:52px;font-size:22px;}
+  .es h4{font-size:19px;margin:30px 0 12px;}
+  .pill{font-size:12px;}
+  .stepnav a{font-size:15.5px;padding:13px 15px;}
+  .stepnav a b{font-size:13.5px;}
+  .legend{font-size:14.5px;}
+  figure.shot figcaption{font-size:14.5px;}
+  .mini-stat{font-size:15px;}
+  .mini-stat strong{font-size:16px;}
+  .flow-node p{font-size:15px;}
+  .flow-node .fn-label{font-size:14px;}
+  table{font-size:16px;}
+  th{font-size:13.5px;}
+  table.tiers td{font-size:15.5px;}
+  @media (max-width:900px){
+    .wrap{margin-left:0;max-width:none;padding:76px 16px 80px;}
+  }
+  @media (max-width:640px){
+    .section-head h2{font-size:26px;}
+    .section-head p{font-size:16px;}
+    .card p,.es > p,.es-body > p,.callout,.talk,ol.subs > li{font-size:16px;}
+    .es{padding:20px 16px 16px;}
+    .es-head h3{font-size:20px;}
+    .vid-feature{padding:14px 12px 12px;}
+    .vid-len{margin-left:0;}
+  }
+
+  /* ===== WIDE LAYOUT — use the full screen (Funding Tier SOP system) ===== */
+  .wrap{max-width:1600px !important;width:auto !important;padding:48px 0 110px !important;overflow-x:clip !important;}
+  .section-head h2{font-size:34px;}
+  .section-head p{font-size:18px;line-height:1.65;max-width:100ch;}
+  .eyebrow{font-size:14.5px;}
+  .card p{font-size:17px;line-height:1.7;}
+  .card h3{font-size:20px;}
+  .callout{font-size:17px;line-height:1.65;}
+  .callout strong{font-size:15px;}
+  .step-body h4{font-size:22px;}
+  .step-body p,.step-body ul{font-size:17px;line-height:1.7;max-width:100ch;}
+  .mini-stat{font-size:15px;}
+  .mini-stat strong{font-size:16px;}
+  .flow-node p{font-size:15px;}
+  .flow-node .fn-label{font-size:14px;}
+  table{font-size:16px;}
+  th{font-size:13.5px;}
+  .shot img,figure.shot img{max-height:80vh;object-fit:contain;}
+  .shot-cap,figcaption{font-size:14.5px;}
+  video{max-height:80vh;}
+  @media (max-width:640px){
+    .section-head h2{font-size:26px;}
+    .section-head p,.card p,.callout,.step-body p,.step-body ul{font-size:16px;}
+  }
+  .wrap{margin-left:calc(var(--rail-w) + clamp(24px,3vw,56px)) !important;margin-right:clamp(24px,3vw,56px) !important;}
+  @media (max-width:900px){ .wrap{margin-left:0 !important;margin-right:0 !important;padding:76px 16px 80px !important;} }
+
+  /* Wide screens: instructions on the left, the step's training video pinned on the right */
+  @media (min-width:1400px){
+    .es{display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,40%);column-gap:36px;align-items:start;}
+    .es > *{grid-column:1;min-width:0;}
+    .es > .es-head{grid-column:1 / -1;}
+    .es > .vid-feature{grid-column:2;grid-row:2 / span 400;position:sticky;top:calc(var(--ft-toolkit-height,0px) + 20px);margin:0;}
+  }
 </style>
 </head>
 <body>
@@ -402,9 +516,15 @@
     <div class="stepnav">
       <a href="#es-1" class="skip"><b>Step 1 &middot; usually skipped</b>Create customer</a>
       <a href="#es-2"><b>Step 2</b>Pull credit &amp; creditors</a>
+      <a href="#es-2d"><b>Step 2 &middot; D</b>Debts missing from the report</a>
       <a href="#es-3"><b>Step 3</b>Budget</a>
       <a href="#es-4"><b>Step 4</b>Quote, payment dates &amp; ACH</a>
       <a href="#es-5"><b>Step 5</b>Send &amp; sign documents</a>
+    </div>
+
+    <div class="callout vids-callout">
+      <strong>Every step has a training video &mdash; watch them</strong>
+      Each step below opens with its training video from the Consumer Shield CRM series. Watch all five before your first live enrollment (about 12 minutes in total), and use them as your reference whenever you're unsure of a screen. The full start-to-finish walkthrough is at the bottom of this tab.
     </div>
 
     <div class="legend">
@@ -427,6 +547,16 @@
           <h3>Create the customer in the CRM</h3>
           <p>Training clip: &ldquo;1. Create Customer In CRM&rdquo; &middot; 1:08</p>
         </div>
+      </div>
+
+      <div class="vid-feature">
+        <div class="vid-head">
+          <span class="vid-badge"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg>Training video &middot; watch before you do this step</span>
+          <span class="vid-len">1:08</span>
+        </div>
+        <h4 class="vid-title">1. Create Customer In CRM</h4>
+        <video controls aria-label="Training video: 1. Create Customer In CRM" preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step1.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690ff484614db8c59bb.mp4" type="video/mp4"></video>
+        <p class="vid-note">Watch it once before your first live enrollment, then come back to it any time as your reference for this step.</p>
       </div>
 
       <div class="callout">
@@ -457,10 +587,6 @@
         <figcaption><b>Add New Contact.</b> The only fields needed: (1) first and last name, (2) mobile, (3) email, (4) address, city, state, zip, then (5) Save.</figcaption>
       </figure>
 
-      <details class="clip">
-        <summary>Watch the training clip <em>1. Create Customer In CRM &middot; 1:08</em></summary>
-        <video controls preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step1.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690ff484614db8c59bb.mp4" type="video/mp4"></video>
-      </details>
     </section>
 
     <!-- ===== STEP 2 ===== -->
@@ -472,6 +598,16 @@
           <h3>Pull credit and review the creditors</h3>
           <p>Training clip: &ldquo;2. How to pull credit&rdquo; &middot; 3:17</p>
         </div>
+      </div>
+
+      <div class="vid-feature">
+        <div class="vid-head">
+          <span class="vid-badge"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg>Training video &middot; watch before you do this step</span>
+          <span class="vid-len">3:17</span>
+        </div>
+        <h4 class="vid-title">2. How to pull credit</h4>
+        <video controls aria-label="Training video: 2. How to pull credit" preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step2.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690825a8484f2e53e8e.mp4" type="video/mp4"></video>
+        <p class="vid-note">Watch it once before your first live enrollment, then come back to it any time as your reference for this step.</p>
       </div>
 
       <p>You need two things to pull credit: the client's <b>date of birth</b> and <b>Social Security number</b>. On a pushed file these should already be filled in &mdash; confirm them before you pull.</p>
@@ -542,10 +678,89 @@
       </div>
       <p>The <b>Total Debts</b> figure is what sets the program payment in Step 3, so make sure every account the client is enrolling is on this tab.</p>
 
-      <details class="clip">
-        <summary>Watch the training clip <em>2. How to pull credit &middot; 3:17</em></summary>
-        <video controls preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step2.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690825a8484f2e53e8e.mp4" type="video/mp4"></video>
-      </details>
+      <h4 id="es-2d">D. Debts that don't show on the credit report &mdash; get the statement</h4>
+      <p>Not every eligible debt is on the credit report. Consumer Shield pulls <b>Equifax only</b>, and several kinds of debt the program accepts often never report to a bureau at all:</p>
+      <div class="gap-types">
+        <div class="gap-type"><b>Personal loans</b><span>Smaller banks, credit unions and online lenders that don't report to Equifax.</span></div>
+        <div class="gap-type"><b>Tribal loans</b><span>Almost never on a credit report. Still conditional &mdash; confirm there is <b>no wage assignment</b> before you enroll one.</span></div>
+        <div class="gap-type"><b>Hospital &amp; medical bills</b><span>Most never reach the report, and smaller or paid medical collections are left off it.</span></div>
+      </div>
+
+      <div class="callout warn">
+        <strong>Why the numbers don't match</strong>
+        When we qualify, we ask for total unsecured debt and name <b>personal loans, medical bills, personal credit cards, store cards and accounts in collections</b>. So when a prospect says &ldquo;about $15,000,&rdquo; that estimate usually includes those loans and bills. If the report comes back lower, it doesn't mean they overstated. It means some of their debt doesn't show on this report. Always compare what they told you with the <b>Total Debts</b> on the Creditors tab.
+      </div>
+
+      <div class="callout" style="border-color:#16a34a;background:#F2FAF6;">
+        <strong>This is the moment to go get it</strong>
+        By now the prospect is engaged, has given you their Social Security number and has watched you pull their credit. That's real trust, so use it. Spending an extra <b>10&ndash;15 minutes</b> to find a missing statement can add thousands in eligible debt to the program, and it covers debts that would otherwise keep calling them. Don't end the call to &ldquo;have them look for it later&rdquo; unless you've tried the options below.
+      </div>
+
+      <figure class="gapflow" aria-label="Process for adding debts that are missing from the credit report">
+        <div class="gf-row">
+          <div class="gf-node gf-start"><span class="gf-k">1 &middot; Compare</span>Stated debt vs. <b>Total Debts</b> on the Creditors tab</div>
+          <div class="gf-arrow" aria-hidden="true">&rarr;</div>
+          <div class="gf-node"><span class="gf-k">2 &middot; Name it</span>Ask which loans or bills are missing: lender, rough balance, in collections?</div>
+          <div class="gf-arrow" aria-hidden="true">&rarr;</div>
+          <div class="gf-node"><span class="gf-k">3 &middot; Get proof</span>Find a statement using one of the three ways below</div>
+        </div>
+        <div class="gf-branches">
+          <div class="gf-branch"><span class="gf-tag">Way A</span><b>Online account</b><span>They log in on their own phone or computer and download the latest statement.</span></div>
+          <div class="gf-branch"><span class="gf-tag">Way B</span><b>3-way call</b><span>Find the creditor's number on its website. Conference the creditor in so they email the client a copy.</span></div>
+          <div class="gf-branch"><span class="gf-tag">Way C</span><b>Another credit report</b><span>A report from another bureau (or the client's own) that shows the debt.</span></div>
+        </div>
+        <div class="gf-row">
+          <div class="gf-node"><span class="gf-k">4 &middot; Add it</span><span class="ui">Creditors</span> &rarr; <span class="ui">Add New</span> with the details from the statement</div>
+          <div class="gf-arrow" aria-hidden="true">&rarr;</div>
+          <div class="gf-node"><span class="gf-k">5 &middot; Upload it</span>Attach the statement or report to the client's file</div>
+          <div class="gf-arrow" aria-hidden="true">&rarr;</div>
+          <div class="gf-node gf-end"><span class="gf-k">6 &middot; Re-check</span>New <b>Total Debts</b>, then use the new tier in Step 3</div>
+        </div>
+      </figure>
+
+      <div class="talk">
+        <span class="who">Talk track &mdash; when the report comes back short</span>
+        &ldquo;Okay, I've got your report up. Earlier you mentioned about <b>$15,000</b>, and I'm seeing about <b>$9,200</b> here. That's really common. Personal loans, tribal or online loans and medical bills often don't show on the credit report. Which of your loans or bills am I not seeing? &hellip; Let's get those added so they're covered too. It only takes a few minutes, and I'll walk you through it.&rdquo;
+      </div>
+
+      <h4>Way A &mdash; the client's online account</h4>
+      <ol class="subs">
+        <li>Ask: &ldquo;Do you have an online account or app with <i>[lender]</i> that you can log into?&rdquo;</li>
+        <li>Have the client log in <b>on their own device</b> and open their most recent statement (or the account summary page showing the balance).<span class="note">Never ask for their username or password, and never log in for them. They do the login; you guide them.</span></li>
+        <li>Have them download it as a PDF or take a screenshot, then email or text it to you while you stay on the line.</li>
+      </ol>
+
+      <h4>Way B &mdash; call the creditor together on a 3-way call</h4>
+      <ol class="subs">
+        <li>Look up the creditor's customer-service number on the creditor's <b>own website</b> (not a search ad or a third-party directory). For a medical bill, use the billing number on the hospital's or provider's site, or the collection agency's number if it's in collections.</li>
+        <li>Offer the call:<span class="note">&ldquo;Would you like me to get <i>[creditor]</i> on a 3-way call with us so they can email you a copy of your statement? You'd just need to verify it's you.&rdquo;</span></li>
+        <li>Conference the creditor in. <b>The client does the talking.</b> They verify their identity and ask for a copy of their latest statement to be emailed to them.<span class="note">Don't speak for the client, don't discuss the program, the balance or a settlement with the creditor, and don't give the creditor your contact details. You're only there to help the client ask for a copy.</span></li>
+        <li>Stay on the line until the email arrives, then have the client forward it to you.</li>
+      </ol>
+
+      <h4>Way C &mdash; a separate credit report that shows the debt</h4>
+      <p>If the debt is on another bureau's report (TransUnion or Experian) but not on the Equifax pull, that report works as documentation. The client can get their own reports from all three bureaus free at <b>AnnualCreditReport.com</b>, or send one they already have (for example, from a credit-monitoring app). Have them send you the page that shows the account.</p>
+
+      <h4>What a good statement shows</h4>
+      <div class="mini-stat-row">
+        <div class="mini-stat"><strong>Client's name</strong>Matches the file</div>
+        <div class="mini-stat"><strong>Creditor / collector</strong>Who is owed now</div>
+        <div class="mini-stat"><strong>Account number</strong>Full or last 4</div>
+        <div class="mini-stat"><strong>Current balance</strong>The most recent statement or letter</div>
+      </div>
+
+      <h4>Add it and upload it</h4>
+      <ol class="subs">
+        <li>On the <span class="ui">Creditors</span> tab, click <span class="ui">Add New</span> and fill in the account from the statement, exactly as in section C above (the account number goes in twice).</li>
+        <li>Upload the statement or report to the client's file in Shield Services so underwriting can see where the account came from.<span class="note">If you can't find an upload option on the file, email the document to your team lead with the client's name and file so it gets attached.</span></li>
+        <li>Check that the new <b>Total Debts</b> is right. It may move the client into a higher payment tier in Step 3.</li>
+      </ol>
+
+      <div class="callout warn">
+        <strong>If you can't get the statement on this call</strong>
+        Don't lose the enrollment over it. Enroll the accounts you've verified, note the missing lender and balance on the file, and set a follow-up for when the client has the statement. Ask your team lead how to add the account once it arrives. Never guess a balance or account number.
+      </div>
+
     </section>
 
     <!-- ===== STEP 3 ===== -->
@@ -557,6 +772,16 @@
           <h3>Build the budget</h3>
           <p>Training clip: &ldquo;3. Budget&rdquo; &middot; 1:33</p>
         </div>
+      </div>
+
+      <div class="vid-feature">
+        <div class="vid-head">
+          <span class="vid-badge"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg>Training video &middot; watch before you do this step</span>
+          <span class="vid-len">1:33</span>
+        </div>
+        <h4 class="vid-title">3. Budget</h4>
+        <video controls aria-label="Training video: 3. Budget" preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step3.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690bdaa5e26a980016d.mp4" type="video/mp4"></video>
+        <p class="vid-note">Watch it once before your first live enrollment, then come back to it any time as your reference for this step.</p>
       </div>
 
       <div class="talk">
@@ -608,10 +833,6 @@
       </div>
       <p style="font-size:13px;color:var(--ink-soft);">Same tiers the AI Deal Router uses. Always confirm eligibility and the tier in the Router before quoting.</p>
 
-      <details class="clip">
-        <summary>Watch the training clip <em>3. Budget &middot; 1:33</em></summary>
-        <video controls preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step3.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690bdaa5e26a980016d.mp4" type="video/mp4"></video>
-      </details>
     </section>
 
     <!-- ===== STEP 4 ===== -->
@@ -623,6 +844,16 @@
           <h3>Quote the payment, set the dates, gather ACH</h3>
           <p>Training clip: &ldquo;4. Quote payment / ACH Gather&rdquo; &middot; 2:08</p>
         </div>
+      </div>
+
+      <div class="vid-feature">
+        <div class="vid-head">
+          <span class="vid-badge"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg>Training video &middot; watch before you do this step</span>
+          <span class="vid-len">2:08</span>
+        </div>
+        <h4 class="vid-title">4. Quote payment / ACH Gather</h4>
+        <video controls aria-label="Training video: 4. Quote payment / ACH Gather" preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step4.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d69030b0f957cccf78cf.mp4" type="video/mp4"></video>
+        <p class="vid-note">Watch it once before your first live enrollment, then come back to it any time as your reference for this step.</p>
       </div>
 
       <div class="talk">
@@ -661,10 +892,6 @@
         <figcaption><b>Banking fields.</b> (1) Routing, (2) account number + CHK/SVG, (3) bank name, (4) last 4 SSN, (5) Save. Account and routing numbers are blurred in this screenshot.</figcaption>
       </figure>
 
-      <details class="clip">
-        <summary>Watch the training clip <em>4. Quote payment / ACH Gather &middot; 2:08</em></summary>
-        <video controls preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step4.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d69030b0f957cccf78cf.mp4" type="video/mp4"></video>
-      </details>
     </section>
 
     <!-- ===== STEP 5 ===== -->
@@ -676,6 +903,16 @@
           <h3>Send the documents and walk the client through signing</h3>
           <p>Training clip: &ldquo;5. Sending Docs&rdquo; &middot; 3:41</p>
         </div>
+      </div>
+
+      <div class="vid-feature">
+        <div class="vid-head">
+          <span class="vid-badge"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg>Training video &middot; watch before you do this step</span>
+          <span class="vid-len">3:41</span>
+        </div>
+        <h4 class="vid-title">5. Sending Docs</h4>
+        <video controls aria-label="Training video: 5. Sending Docs" preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step5.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690bdaa5e26a9800178.mp4" type="video/mp4"></video>
+        <p class="vid-note">Watch it once before your first live enrollment, then come back to it any time as your reference for this step.</p>
       </div>
 
       <p>This is the last step before the disclosure recording. Documents go out in <b>two separate sends</b>: first the National Lit + RAM ACH pair, then the Consumer Shield ATC on its own.</p>
@@ -771,16 +1008,16 @@
         With all documents signed, move on to the disclosure recording (the AI Genie QC call) with the client still on the line.
       </div>
 
-      <details class="clip">
-        <summary>Watch the training clip <em>5. Sending Docs &middot; 3:41</em></summary>
-        <video controls preload="none" playsinline poster="/agents/debt-validation/consumer-shield/enrollment-process/video/cs-step5.jpg"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6ab1d690bdaa5e26a9800178.mp4" type="video/mp4"></video>
-      </details>
     </section>
 
-    <details class="clip" style="margin-top:6px;">
-      <summary>Original full enrollment walkthrough <em>Screen recording</em></summary>
-      <video controls preload="none" playsinline><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6a9df3eb4ea183e8729f65ba.mp4" type="video/mp4"></video>
-    </details>
+    <div class="vid-feature vid-full">
+      <div class="vid-head">
+        <span class="vid-badge"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z" fill="currentColor"/></svg>Full enrollment walkthrough &middot; screen recording</span>
+      </div>
+      <h4 class="vid-title">A complete Consumer Shield enrollment, start to finish</h4>
+      <video controls preload="none" playsinline aria-label="Full Consumer Shield enrollment walkthrough"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6a9df3eb4ea183e8729f65ba.mp4" type="video/mp4"></video>
+      <p class="vid-note">Watch the whole thing once before your first live Consumer Shield call.</p>
+    </div>
   </div>
 
   <!-- =================== COMPLIANCE & OBJECTIONS =================== -->
