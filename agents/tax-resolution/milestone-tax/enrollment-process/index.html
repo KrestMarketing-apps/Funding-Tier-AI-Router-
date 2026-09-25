@@ -481,9 +481,39 @@
   /* No training clips on this SOP yet, so no right-hand video column. */
   @media (min-width:1400px){.es{display:block;}}
   .es .talk,.es .qlist,.es ol.subs{max-width:110ch;}
+
+  /* ===== STICKY STEP NAV — stays pinned under the header while scrolling a phase ===== */
+  .stepnav{
+    position:sticky;top:var(--ft-toolkit-height,0px);z-index:800;
+    flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;
+    margin:6px 0 26px;padding:12px 0;
+    background:var(--brand-gradient-soft);
+    box-shadow:0 1px 0 var(--line);
+  }
+  .stepnav.stuck{box-shadow:0 8px 18px -12px rgba(10,24,46,.35), 0 1px 0 var(--line);}
+  .stepnav a{flex:1 1 0;min-width:96px;}
+  .stepnav a.current{border-color:var(--green);background:var(--accent-soft);box-shadow:inset 0 -3px 0 var(--green);}
+  .es{scroll-margin-top:calc(var(--ft-toolkit-height,0px) + 110px);}
+  @media (max-width:900px){
+    /* the phase picker is fixed at the top on phones/tablets — sit just below it */
+    .stepnav{top:calc(var(--ft-toolkit-height,0px) + var(--picker-h,49px));padding:8px 0;gap:6px;}
+    .stepnav a{flex:0 0 auto;min-width:0;white-space:nowrap;padding:9px 12px;font-size:14px;}
+    .stepnav a b{font-size:12px;}
+    .es{scroll-margin-top:calc(var(--ft-toolkit-height,0px) + 140px);}
+  }
+
+  /* ===== INBOUND / OUTBOUND TOGGLE ===== */
+  .calltype{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 4px;}
+  .calltype-label{font-family:'Montserrat',sans-serif;font-weight:700;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);margin-right:4px;}
+  .calltype button{font:inherit;font-size:15px;font-weight:600;cursor:pointer;background:#fff;color:var(--forest);border:1.5px solid var(--line);border-radius:999px;padding:9px 18px;line-height:1.3;}
+  .calltype button small{font-weight:400;color:var(--ink-soft);font-size:13px;margin-left:4px;}
+  .calltype button:hover{border-color:var(--green);}
+  .calltype button.on{background:var(--brand-gradient-accent);color:#fff;border-color:transparent;}
+  .calltype button.on small{color:rgba(255,255,255,.85);}
+  body.call-inbound [data-call="outbound"], body.call-outbound [data-call="inbound"]{display:none !important;}
 </style>
 </head>
-<body>
+<body class="call-inbound">
 
 <div class="tabbar" id="tabbar">
   <button class="tabbtn active" data-tab="overview"><svg class="tabicon" viewBox="0 0 20 20"><path d="M2.5 10L10 3l7.5 7M4.5 8.5V17h11V8.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Overview</button>
@@ -624,6 +654,12 @@
       <p>Milestone's Phase 1 enrollment script (updated 03/17/2026), with the coaching from the Milestone training call built in. Enter the answers into the CRM intake form as you go &mdash; see the next tab for the field-by-field walkthrough.</p>
     </div>
 
+    <div class="calltype" role="radiogroup" aria-label="Call type">
+      <span class="calltype-label">Call type</span>
+      <button type="button" role="radio" data-calltype="inbound" aria-checked="true" class="on">Inbound <small>callback from SMS / RVM</small></button>
+      <button type="button" role="radio" data-calltype="outbound" aria-checked="false">Outbound <small>we dialed them</small></button>
+    </div>
+
     <div class="stepnav">
       <a href="#c1"><b>1</b>Open &amp; discovery</a>
       <a href="#c2"><b>2</b>Intro email &amp; transition</a>
@@ -636,8 +672,12 @@
 
     <section class="es" id="c1">
       <div class="es-head"><div class="es-num">1</div><div><span class="pill req">Discovery</span><h3>Open the call and find the problem</h3><p>Aim to learn why they are calling today within the first five minutes.</p></div></div>
-      <div class="talk"><span class="who">Agent &middot; inbound</span>&ldquo;Thank you for calling the Tax Resolution Services Department, this is ____. This call is recorded for quality and compliance. How can I help you today?&rdquo;</div>
-      <div class="talk"><span class="who">Agent &middot; outbound (required at the start of every outbound call)</span>&ldquo;Hi ____, this is ____ with the Tax Resolution Services Department. I'm calling on behalf of Milestone Tax Solutions, LLC about tax-resolution services &mdash; helping people who owe the IRS or the state get represented and resolve their tax accounts. This call is recorded for quality and compliance. Do you have a few minutes?&rdquo;</div>
+      <div class="talk" data-call="inbound"><span class="who">Agent &middot; inbound</span>&ldquo;Thank you for calling the Tax Resolution Services Department, this is ____. This call is recorded for quality and compliance. How can I help you today?&rdquo;</div>
+      <div class="callout" data-call="inbound">
+        <strong>Most inbound calls are callbacks</strong>
+        They're returning a text or ringless voicemail. Pull up the contact in app.krestmarketing.com before you dig in so you know which message they're answering. The recording notice and the verbal opt-in below are still required on every inbound call.
+      </div>
+      <div class="talk" data-call="outbound"><span class="who">Agent &middot; outbound (required at the start of every outbound call)</span>&ldquo;Hi ____, this is ____ with the Tax Resolution Services Department. I'm calling on behalf of Milestone Tax Solutions, LLC about tax-resolution services &mdash; helping people who owe the IRS or the state get represented and resolve their tax accounts. This call is recorded for quality and compliance. Do you have a few minutes?&rdquo;</div>
       <div class="talk"><span class="who">Agent &middot; verbal opt-in (before giving any program details)</span>&ldquo;Based on your situation, we have a tax-resolution program from Milestone Tax Solutions that may help resolve your tax accounts, but I need a verbal opt-in to provide more details. Do you opt in to hearing about Milestone Tax Solutions and its services, and to being contacted directly by us or our representatives?&rdquo;</div>
       <div class="talk"><span class="who">Agent</span>&ldquo;Great. Tell me about your tax issue.&rdquo;</div>
       <div class="callout warn">
@@ -1173,6 +1213,45 @@
       if (t) { e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
     });
   });
+  // Inbound / outbound toggle — defaults to inbound (most calls are SMS / RVM callbacks)
+  function setCallType(t){
+    document.body.classList.toggle('call-inbound', t==='inbound');
+    document.body.classList.toggle('call-outbound', t==='outbound');
+    document.querySelectorAll('[data-calltype]').forEach(function(b){
+      var on = b.dataset.calltype===t; b.classList.toggle('on', on); b.setAttribute('aria-checked', on);
+    });
+  }
+  document.querySelectorAll('[data-calltype]').forEach(function(b){
+    b.addEventListener('click', function(){ setCallType(b.dataset.calltype); });
+  });
+  setCallType('inbound');
+  // Sticky step nav: highlight the step on screen, keep it visible in the bar, shade the bar once pinned
+  function syncStepNav(){
+    if (tabSelect) document.documentElement.style.setProperty('--picker-h', (tabSelect.offsetHeight || 49) + 'px');
+    var nav = document.querySelector('.panel.active .stepnav');
+    if (!nav) return;
+    var navBottom = nav.getBoundingClientRect().bottom;
+    var links = nav.querySelectorAll('a'), current = null;
+    links.forEach(function(a){
+      var t = document.querySelector(a.getAttribute('href'));
+      if (t && t.getBoundingClientRect().top <= navBottom + 40) current = a;
+    });
+    links.forEach(function(a){
+      var on = a === current;
+      if (on && !a.classList.contains('current')) {
+        var l = a.offsetLeft, r = l + a.offsetWidth;
+        if (l < nav.scrollLeft || r > nav.scrollLeft + nav.clientWidth) nav.scrollTo({left: l - 16, behavior:'smooth'});
+      }
+      a.classList.toggle('current', on);
+    });
+    var stickTop = parseFloat(getComputedStyle(nav).top) || 0;
+    nav.classList.toggle('stuck', nav.getBoundingClientRect().top <= stickTop + 1 && window.scrollY > 0);
+  }
+  window.addEventListener('scroll', syncStepNav, {passive:true});
+  window.addEventListener('resize', syncStepNav);
+  document.addEventListener('click', function(e){ if (e.target.closest('.tabbtn')) setTimeout(syncStepNav, 400); });
+  if (tabSelect) tabSelect.addEventListener('change', function(){ setTimeout(syncStepNav, 400); });
+  syncStepNav();
 </script>
 
 <script src="https://ai.fundingtier.com/toolkit.js" defer></script>
