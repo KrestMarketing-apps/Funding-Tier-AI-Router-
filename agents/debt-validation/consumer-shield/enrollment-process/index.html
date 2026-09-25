@@ -1191,20 +1191,11 @@
               <option value="debit|es">Spanish &middot; Debit card</option>
             </select>
           </label>
-          <label>Client first name <input id="gs-name" type="text" autocomplete="off" maxlength="30" placeholder="Maria"></label>
+          <label>Client first name <input id="gs-name" type="text" autocomplete="off" maxlength="30" placeholder="Only for the copy-text backup"></label>
         </div>
         <div class="gs-row">
           <label>Mobile <input id="gs-phone" type="tel" autocomplete="off" placeholder="(555) 555-5555"></label>
-          <label>Email <input id="gs-email" type="email" autocomplete="off" placeholder="client@email.com"></label>
-        </div>
-        <div class="gs-row three">
-          <label>Term (months) <input id="gs-term" type="text" inputmode="numeric" maxlength="3" placeholder="36"></label>
-          <label>Monthly payment ($) <input id="gs-amount" type="text" inputmode="decimal" maxlength="8" placeholder="270"></label>
-          <label>Payment date <input id="gs-date" type="text" maxlength="30" placeholder="the 26th"></label>
-        </div>
-        <div class="gs-row checks">
-          <label class="chk"><input id="gs-sms" type="checkbox" checked> Text</label>
-          <label class="chk"><input id="gs-emailon" type="checkbox" checked> Email</label>
+          <label>Email <span style="font-weight:400;color:var(--ink-soft);">(if no mobile match)</span><input id="gs-email" type="email" autocomplete="off" placeholder="client@email.com"></label>
         </div>
         <div class="gs-actions">
           <button type="button" class="gs-btn primary" id="gs-send">Send to client</button>
@@ -1212,7 +1203,12 @@
           <a class="gs-btn" id="gs-open" href="/genie-prep" target="_blank" rel="noopener">Open prep sheet</a>
         </div>
         <div class="gs-status" id="gs-status" role="status" aria-live="polite"></div>
-        <p class="gs-fine">Sends from the Funding Tier sub-account in app.krestmarketing.com to the contact with that mobile number, and tags them <code>cs genie prep sent</code>. If the contact isn't found or a send fails, use <b>Copy text message</b> and send it from the contact's conversation yourself.</p>
+        <p class="gs-fine"><b>Send to client</b> finds the contact in app.krestmarketing.com and adds the matching tag, which fires one of four workflows in the <b>Shield Services-Consumer Shield</b> folder. The workflow texts and emails the client the 16 questions with the expected answers and a link to their prep sheet, then removes the tag so it can be sent again.</p>
+        <p class="gs-fine">You can also send it straight from the contact in app.krestmarketing.com by adding the tag yourself:<br>
+          <code>Shield Services-Consumer Shield-Genie Prep-ACH-English</code><br>
+          <code>Shield Services-Consumer Shield-Genie Prep-ACH-Spanish</code><br>
+          <code>Shield Services-Consumer Shield-Genie Prep-Debit-English</code><br>
+          <code>Shield Services-Consumer Shield-Genie Prep-Debit-Spanish</code></p>
       </div>
 
       <div class="talk">
@@ -1236,7 +1232,7 @@
       </ol>
       <div class="callout">
         <strong>The term, date and amount must match the file</strong>
-        The client must state the same term, monthly payment date and payment amount you set in Steps 3 and 4. Put them in the prep sheet form above so they show at the top of the client's page.
+        The client must state the same term, monthly payment date and payment amount you set in Steps 3 and 4. Remind the client of all three before you dial.
       </div>
 
       <h4>D. The 16 questions and the expected answers</h4>
@@ -1678,55 +1674,45 @@
   var status = $('gs-status');
   function vals(){
     var v = $('gs-version').value.split('|');
-    return { pay: v[0], lang: v[1], firstName: $('gs-name').value.trim(), phone: $('gs-phone').value.trim(), email: $('gs-email').value.trim(),
-      term: $('gs-term').value.replace(/\D/g,''), amount: $('gs-amount').value.replace(/[^0-9.]/g,''), date: $('gs-date').value.trim(),
-      sms: $('gs-sms').checked, email_on: $('gs-emailon').checked };
+    return { pay: v[0], lang: v[1], firstName: $('gs-name').value.trim(), phone: $('gs-phone').value.trim(), email: $('gs-email').value.trim() };
   }
   function link(o){
     var q = new URLSearchParams({v:o.pay, lang:o.lang});
     if (o.firstName) q.set('n', o.firstName);
-    if (o.term) q.set('t', o.term);
-    if (o.amount) q.set('a', o.amount);
-    if (o.date) q.set('d', o.date);
     return location.origin + '/genie-prep?' + q.toString();
   }
   function smsText(o){
     var l = link(o);
     if (o.lang === 'es') {
-      var p1 = o.pay === 'debit' ? 'su n\u00famero de tarjeta de d\u00e9bito y su nombre tal como aparece en la tarjeta' : 'su n\u00famero de ruta bancaria y su n\u00famero de cuenta';
-      return 'Hola' + (o.firstName ? ' ' + o.firstName : '') + ', antes de su llamada de verificaci\u00f3n de Shield Services, revise las 16 preguntas y la respuesta que espera cada una: ' + l + '\nResponda solo S\u00cd o NO, sin altavoz. Tenga listo ' + p1 + '. Si alguna respuesta no aplica a su caso, d\u00edgaselo a su especialista antes de la llamada.';
+      var p1 = o.pay === 'debit' ? 'su número de tarjeta de débito y su nombre tal como aparece en la tarjeta' : 'su número de ruta bancaria y su número de cuenta';
+      return 'Hola' + (o.firstName ? ' ' + o.firstName : '') + ', antes de su llamada de verificación de Shield Services, revise las 16 preguntas y la respuesta que espera cada una: ' + l + '\nResponda solo SÍ o NO, sin altavoz. Tenga listo ' + p1 + '. Si alguna respuesta no aplica a su caso, dígaselo a su especialista antes de la llamada.';
     }
     var p2 = o.pay === 'debit' ? 'your debit card number and your name exactly as it appears on the card' : 'your bank routing number and account number';
-    return 'Hi ' + (o.firstName || 'there') + ', before your Shield Services verification call, please review the 16 questions and the answer each one expects: ' + l + '\nAnswer only YES or NO, and don\u2019t use speakerphone. Have ' + p2 + ' ready. If any answer doesn\u2019t fit your situation, tell your specialist before the call.';
+    return 'Hi ' + (o.firstName || 'there') + ', before your Shield Services verification call, please review the 16 questions and the answer each one expects: ' + l + '\nAnswer only YES or NO, and don’t use speakerphone. Have ' + p2 + ' ready. If any answer doesn’t fit your situation, tell your specialist before the call.';
   }
   function refreshLink(){ $('gs-open').href = link(vals()); }
-  ['gs-version','gs-name','gs-term','gs-amount','gs-date'].forEach(function(id){ $(id).addEventListener('input', refreshLink); $(id).addEventListener('change', refreshLink); });
+  ['gs-version','gs-name'].forEach(function(id){ $(id).addEventListener('input', refreshLink); $(id).addEventListener('change', refreshLink); });
   refreshLink();
 
   $('gs-copy').addEventListener('click', function(){
     var t = smsText(vals());
     (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){
-      status.innerHTML = '<span class="ok">Text message copied.</span> Paste it into the contact\u2019s conversation in app.krestmarketing.com.';
+      status.innerHTML = '<span class="ok">Text message copied.</span> Paste it into the contact’s conversation in app.krestmarketing.com.';
     }).catch(function(){ window.prompt('Copy this text message:', t); });
   });
 
   $('gs-send').addEventListener('click', function(){
     var o = vals(), btn = this;
-    if (!o.sms && !o.email_on) { status.innerHTML = '<span class="bad">Tick Text, Email or both.</span>'; return; }
-    if (o.sms && o.phone.replace(/\D/g,'').length < 10) { status.innerHTML = '<span class="bad">Enter the client\u2019s 10-digit mobile number.</span>'; return; }
-    if (o.email_on && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(o.email)) { status.innerHTML = '<span class="bad">Enter a valid email address.</span>'; return; }
-    btn.disabled = true; status.textContent = 'Sending\u2026';
+    var digits = o.phone.replace(/\D/g,'');
+    if (digits.length < 10 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(o.email)) { status.innerHTML = '<span class="bad">Enter the client’s 10-digit mobile number (or their email).</span>'; return; }
+    btn.disabled = true; status.textContent = 'Sending…';
     fetch('/api/agents/genie-prep-send', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'same-origin', body: JSON.stringify(o) })
       .then(function(r){ return r.json().catch(function(){ return {ok:false, error:'Unexpected response (' + r.status + ')'}; }); })
       .then(function(d){
-        var parts = [];
-        if (d.sms) parts.push(d.sms.ok ? '<span class="ok">Text sent.</span>' : '<span class="bad">Text not sent:</span> ' + esc(d.sms.error || ''));
-        if (d.email) parts.push(d.email.ok ? '<span class="ok">Email sent.</span>' : '<span class="bad">Email not sent:</span> ' + esc(d.email.error || ''));
-        if (!d.sms && !d.email && d.error) parts.push('<span class="bad">' + esc(d.error) + '</span>');
-        if (!d.ok) parts.push('Use <b>Copy text message</b> as a backup.');
-        status.innerHTML = parts.join(' ');
+        if (d.ok) status.innerHTML = '<span class="ok">Sent.</span> Tagged ' + esc(d.contactName || 'the contact') + ' with <code>' + esc(d.tag) + '</code>. The text and email go out within a minute.';
+        else status.innerHTML = '<span class="bad">Not sent:</span> ' + esc(d.error || '') + (d.tag ? ' Add the tag <code>' + esc(d.tag) + '</code> to the contact yourself, or use <b>Copy text message</b>.' : '');
       })
-      .catch(function(){ status.innerHTML = '<span class="bad">Couldn\u2019t reach the server.</span> Use <b>Copy text message</b> instead.'; })
+      .catch(function(){ status.innerHTML = '<span class="bad">Couldn’t reach the server.</span> Add the tag in app.krestmarketing.com or use <b>Copy text message</b>.'; })
       .then(function(){ btn.disabled = false; });
   });
 })();
