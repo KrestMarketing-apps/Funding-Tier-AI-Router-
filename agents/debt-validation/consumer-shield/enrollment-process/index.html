@@ -448,6 +448,37 @@
     .es > .es-head{grid-column:1 / -1;}
     .es > .vid-feature{grid-column:2;grid-row:2 / span 400;position:sticky;top:calc(var(--ft-toolkit-height,0px) + 20px);margin:0;}
   }
+
+  /* ===== STICKY STEP NAV (shared across enrollment SOPs) — pinned under the header while scrolling a tab ===== */
+  .stepnav{
+    display:flex;gap:8px;
+    position:sticky;top:var(--sn-top,0px);z-index:800;
+    flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;
+    margin:6px 0 26px;padding:12px 0;
+    background:rgba(247,249,252,.97);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    box-shadow:0 1px 0 var(--line);
+  }
+  .stepnav.stuck{box-shadow:0 8px 18px -12px rgba(10,24,46,.35), 0 1px 0 var(--line);}
+  .stepnav a{flex:1 1 0;min-width:112px;text-decoration:none;background:#fff;border:1.5px solid var(--line);border-radius:11px;padding:11px 13px;color:var(--forest,#0A182E);font-size:14.5px;line-height:1.35;transition:border-color .15s ease,background-color .15s ease;}
+  .stepnav a:hover{border-color:var(--green);}
+  .stepnav a b{display:block;font-family:'Montserrat',sans-serif;font-size:12.5px;color:var(--green);margin-bottom:2px;white-space:nowrap;}
+  .stepnav a.skip{background:#F3F5F8;border-style:dashed;color:var(--ink-soft);}
+  .stepnav a.skip b{color:var(--ink-soft);}
+  .stepnav a.current{border-color:var(--green);background:var(--accent-soft);box-shadow:inset 0 -3px 0 var(--green);}
+  .stepnav a.skip.current{border-style:solid;}
+  .stepnav.many a{flex:0 0 auto;min-width:0;white-space:nowrap;}
+  .stepnav.many a b{font-size:12px;}
+  .sn-target,.es.sn-target{scroll-margin-top:calc(var(--sn-top,0px) + var(--sn-h,80px) + 14px);}
+  @media (min-width:1400px){
+    /* Consumer Shield: keep each step's pinned training video below the sticky bar */
+    .es > .vid-feature{top:calc(var(--sn-top,0px) + var(--sn-h,80px) + 16px) !important;}
+  }
+  @media (max-width:900px){
+    .stepnav{padding:8px 0;gap:6px;}
+    .stepnav a{flex:0 0 auto;min-width:0;white-space:nowrap;padding:9px 12px;font-size:14px;}
+    .stepnav a b{font-size:12px;}
+  }
 </style>
 </head>
 <body>
@@ -1149,6 +1180,139 @@
     lb.addEventListener('click',function(){ lb.classList.remove('open'); });
     document.addEventListener('keydown',function(e){ if(e.key==='Escape') lb.classList.remove('open'); });
   })();
+</script>
+
+<script>
+/* ===== STICKY STEP NAV (shared across enrollment SOPs) =====
+   - Builds a step bar for each tab that has a numbered step list (unless the tab already has one).
+   - Pins it under the fixed header, highlights the step on screen, keeps that chip visible in the bar.
+   - Deep links (#step-id) open the right tab and land on the step. */
+(function(){
+  var root = document.documentElement;
+
+  function shortTitle(h){
+    var t = (h ? h.textContent : '').replace(/\s+/g,' ').trim();
+    t = t.split(/\s[—–-]\s/)[0];
+    return t.length > 32 ? t.slice(0,30).trim() + '…' : t;
+  }
+
+  // 1. Build navs for tabs with .steps lists
+  document.querySelectorAll('.panel').forEach(function(panel){
+    if (panel.querySelector('.stepnav')) return;
+    var lists = panel.querySelectorAll('.steps');
+    if (!lists.length) return;
+    var items = [], n = 0, stop = false;
+    Array.prototype.forEach.call(lists, function(list, li){
+      var firstNum = list.querySelector('.step-num');
+      var m = firstNum && (firstNum.getAttribute('style')||'').match(/counter-reset:\s*stepnum\s+(\d+)/);
+      if (li > 0 && !m) stop = true;   // a separate, restarted list (e.g. a second how-to) is left out
+      if (stop) return;
+      // optional non-step block sitting between two lists (e.g. Level Coaching)
+      var prev = list.previousElementSibling;
+      while (prev && !prev.classList.contains('steps')) {
+        if (prev.hasAttribute('data-stepnav')) {
+          n++; items.push({el:prev, num:n, title:prev.getAttribute('data-stepnav'), skip:true});
+        }
+        prev = prev.previousElementSibling;
+      }
+      list.querySelectorAll(':scope > .step').forEach(function(step){
+        var sn = step.querySelector('.step-num');
+        var mm = sn && (sn.getAttribute('style')||'').match(/counter-reset:\s*stepnum\s+(\d+)/);
+        n = mm ? parseInt(mm[1],10) + 1 : n + 1;
+        items.push({el:step, num:n, title:shortTitle(step.querySelector('h4'))});
+      });
+    });
+    items.sort(function(a,b){ return a.num - b.num; });
+    if (items.length < 3) return;
+    var nav = document.createElement('div');
+    nav.className = 'stepnav' + (items.length > 7 ? ' many' : '');
+    items.forEach(function(it){
+      if (!it.el.id) it.el.id = panel.id + '-step-' + it.num;
+      var a = document.createElement('a');
+      a.href = '#' + it.el.id;
+      if (it.skip) a.className = 'skip';
+      a.innerHTML = '<b>Step ' + it.num + (it.skip ? ' &middot; optional' : '') + '</b>';
+      a.appendChild(document.createTextNode(it.title));
+      nav.appendChild(a);
+    });
+    lists[0].parentNode.insertBefore(nav, lists[0]);
+  });
+
+  // mark every nav target so it lands below the bar
+  document.querySelectorAll('.stepnav a').forEach(function(a){
+    var t = document.querySelector(a.getAttribute('href'));
+    if (t) t.classList.add('sn-target');
+  });
+
+  // 2. Where the bar pins: below the page-tools bar and any horizontal fixed tab bar / mobile picker
+  function headerBottom(){
+    var b = parseFloat(getComputedStyle(root).getPropertyValue('--ft-toolkit-height')) || 0;
+    document.querySelectorAll('.tabbar, .tab-select-mobile').forEach(function(el){
+      var cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.position !== 'fixed') return;
+      var r = el.getBoundingClientRect();
+      if (r.width > r.height && r.top < 200) b = Math.max(b, r.bottom);   // skip the tall left rail
+    });
+    return Math.round(b);
+  }
+
+  function sync(){
+    root.style.setProperty('--sn-top', headerBottom() + 'px');
+    var nav = document.querySelector('.panel.active .stepnav');
+    if (!nav) return;
+    root.style.setProperty('--sn-h', nav.offsetHeight + 'px');
+    var navBottom = nav.getBoundingClientRect().bottom;
+    var links = nav.querySelectorAll('a'), current = null;
+    links.forEach(function(a){
+      var t = document.querySelector(a.getAttribute('href'));
+      if (t && t.getBoundingClientRect().top <= navBottom + 40) current = a;
+    });
+    links.forEach(function(a){
+      var on = a === current;
+      if (on && !a.classList.contains('current')) {
+        var l = a.offsetLeft - nav.offsetLeft, r = l + a.offsetWidth;
+        if (l < nav.scrollLeft || r > nav.scrollLeft + nav.clientWidth) nav.scrollTo({left: l - 16, behavior:'smooth'});
+      }
+      a.classList.toggle('current', on);
+    });
+    var stickTop = parseFloat(getComputedStyle(nav).top) || 0;
+    nav.classList.toggle('stuck', nav.getBoundingClientRect().top <= stickTop + 1 && window.scrollY > 0);
+  }
+
+  // 3. Chip clicks: smooth scroll + shareable URL
+  document.querySelectorAll('.stepnav a').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var t = document.querySelector(a.getAttribute('href'));
+      if (!t) return;
+      e.preventDefault();
+      t.scrollIntoView({behavior:'smooth'});
+      if (history.replaceState) history.replaceState(null, '', a.getAttribute('href'));
+    });
+  });
+
+  // 4. Deep links: open the tab that holds the anchor, then land on it
+  function openHash(){
+    var h = decodeURIComponent(location.hash.slice(1)); if (!h) return;
+    var el = document.getElementById(h); if (!el) return;
+    var panel = el.classList.contains('panel') ? el : el.closest('.panel');
+    if (!panel) return;
+    if (!panel.classList.contains('active')) {
+      var btn = document.querySelector('.tabbtn[data-tab="' + panel.id + '"]');
+      if (btn) btn.click(); else if (window.goTab) window.goTab(panel.id);
+    }
+    if (el !== panel) setTimeout(function(){ sync(); el.scrollIntoView(); sync(); }, 450);
+  }
+
+  window.addEventListener('scroll', sync, {passive:true});
+  window.addEventListener('resize', sync);
+  window.addEventListener('hashchange', openHash);
+  document.addEventListener('click', function(e){ if (e.target.closest('.tabbtn')) setTimeout(sync, 400); });
+  var sel = document.getElementById('tab-select-mobile');
+  if (sel) sel.addEventListener('change', function(){ setTimeout(sync, 400); });
+  window.addEventListener('load', function(){ sync(); setTimeout(sync, 800); });
+  sync();
+  openHash();
+})();
 </script>
 
 <script src="https://ai.fundingtier.com/toolkit.js" defer></script>
