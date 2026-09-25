@@ -479,6 +479,67 @@
     .stepnav a{flex:0 0 auto;min-width:0;white-space:nowrap;padding:9px 12px;font-size:14px;}
     .stepnav a b{font-size:12px;}
   }
+  /* ---------- STEP 6 · AI GENIE ---------- */
+  .genie-send{background:#F2F5FA;border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0 18px;}
+  .gs-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .gs-row.three{grid-template-columns:1fr 1fr 1fr;}
+  .gs-row.checks{display:flex;gap:18px;}
+  .genie-send label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:600;color:var(--forest);}
+  .genie-send label.chk{flex-direction:row;align-items:center;gap:7px;font-size:14px;}
+  .genie-send input[type=text],.genie-send input[type=tel],.genie-send input[type=email],.genie-send select{font:400 15px 'Inter',sans-serif;padding:9px 11px;border:1px solid #C9D2DE;border-radius:8px;background:#fff;color:var(--ink);width:100%;min-width:0;}
+  .genie-send input:focus,.genie-send select:focus{outline:2px solid var(--green);outline-offset:0;border-color:var(--green);}
+  .gs-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;}
+  .gs-btn{font:600 14px 'Montserrat',sans-serif;padding:10px 16px;border-radius:9px;border:1px solid #C9D2DE;background:#fff;color:var(--forest);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;}
+  .gs-btn:hover{border-color:var(--green);}
+  .gs-btn.primary{background:var(--brand-gradient-accent);color:#fff;border-color:transparent;}
+  .gs-btn[disabled]{opacity:.6;cursor:wait;}
+  .gs-status{font-size:14px;margin-top:10px;min-height:1px;}
+  .gs-status .ok{color:var(--green-dk);font-weight:600;}
+  .gs-status .bad{color:var(--danger);font-weight:600;}
+  .gs-fine{font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;line-height:1.5;}
+  .gs-fine code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px;}
+  .gq{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;padding:11px 0;border-top:1px solid var(--line);font-size:14.5px;line-height:1.55;}
+  .gq:first-child{border-top:0;}
+  .gq .gq-n{font-family:'Montserrat',sans-serif;font-weight:700;color:var(--ink-soft);}
+  .gq .gq-if{display:block;margin-top:6px;font-size:13px;color:#5A3E00;background:var(--warn-bg);border-left:3px solid var(--warn-line);border-radius:0 7px 7px 0;padding:6px 10px;}
+  .gq .gq-a{font-family:'Montserrat',sans-serif;font-weight:700;font-size:12.5px;padding:4px 10px;border-radius:7px;white-space:nowrap;align-self:start;text-align:center;}
+  .gq-a.yes{background:var(--accent-soft);color:var(--green-dk);}
+  .gq-a.no{background:#FBECEA;color:var(--danger);}
+  .gq-a.either{background:#EEF1F6;color:var(--forest-2);}
+  ul.final-check{list-style:none;padding:0;margin:10px 0 6px;}
+  ul.final-check li{position:relative;padding:0 0 8px 30px;font-size:14.5px;}
+  ul.final-check li::before{content:"";position:absolute;left:0;top:2px;width:18px;height:18px;border-radius:5px;border:2px solid var(--green);}
+  @media (max-width:640px){
+    .gs-row,.gs-row.three{grid-template-columns:1fr;}
+    .gq{grid-template-columns:32px minmax(0,1fr);}
+    .gq .gq-a{grid-column:2;justify-self:start;}
+  }
+  /* ---------- POST-ENROLLMENT & EXCEPTIONS TAB ---------- */
+  .tabbtn.alert{color:#FFB4AB;}
+  .tabbtn.alert:hover,.tabbtn.alert.active{color:#fff;}
+  .tabbtn.alert.active{border-left-color:#FF6B5E;background:rgba(179,38,30,.35);}
+  .ex-banner{background:#B3261E;color:#fff;border-radius:14px;padding:20px 22px 18px 64px;position:relative;margin:0 0 24px;box-shadow:0 6px 20px rgba(179,38,30,.25);}
+  .ex-banner::before{content:"!";position:absolute;left:20px;top:20px;width:30px;height:30px;border-radius:50%;background:#fff;color:#B3261E;font:700 19px 'Montserrat',sans-serif;display:flex;align-items:center;justify-content:center;}
+  .ex-banner strong{display:block;font-family:'Montserrat',sans-serif;font-size:17px;margin-bottom:6px;letter-spacing:.01em;}
+  .ex-banner p{margin:0 0 6px;font-size:15px;line-height:1.6;color:#FFE9E6;}
+  .ex-banner p:last-child{margin:0;}
+  .ex-jump{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 26px;}
+  .ex-jump a{display:block;background:#fff;border:1px solid #F1C7C2;border-left:4px solid var(--danger);border-radius:10px;padding:12px 14px;text-decoration:none;color:var(--forest);font-weight:600;font-size:14.5px;line-height:1.4;}
+  .ex-jump a b{display:block;font-family:'Montserrat',sans-serif;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--danger);margin-bottom:3px;}
+  .ex-jump a:hover{background:#FFF6F5;}
+  .ex{border:1px solid #F1C7C2;border-top:5px solid var(--danger);}
+  .ex .es-num{background:linear-gradient(150deg,#D9382C 0%,#B3261E 100%);box-shadow:0 3px 10px rgba(179,38,30,.3);}
+  .pill.alert{background:#FBECEA;color:var(--danger);}
+  .ex ol.subs > li::before{background:var(--danger);box-shadow:0 0 0 1.5px var(--danger);}
+  .ex-flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0 14px;font-size:13px;}
+  .ex-flow span{background:#F2F5FA;border:1px solid var(--line);border-radius:7px;padding:5px 9px;font-weight:600;color:var(--forest);}
+  .ex-flow span.end{background:var(--accent-soft);border-color:#BDEBDD;color:var(--green-dk);}
+  .ex-flow i{font-style:normal;color:var(--danger);font-weight:700;}
+  .tpl{background:#F7F9FC;border:1px dashed #C9D2DE;border-radius:10px;padding:12px 14px;margin:10px 0 14px;font-size:14px;line-height:1.6;}
+  .tpl .tpl-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--forest-2);}
+  .tpl button{font:600 12.5px 'Inter',sans-serif;border:1px solid #C9D2DE;background:#fff;border-radius:7px;padding:4px 10px;cursor:pointer;color:var(--forest);text-transform:none;letter-spacing:0;}
+  .tpl .tpl-body{white-space:pre-wrap;color:var(--ink);}
+  @media (max-width:640px){ .ex-jump{grid-template-columns:1fr;} .ex-banner{padding:18px 16px 16px 56px;} .ex-banner::before{left:14px;} }
 </style>
 </head>
 <body>
@@ -487,11 +548,13 @@
   <button class="tabbtn active" data-tab="overview"><svg class="tabicon" viewBox="0 0 20 20"><path d="M2.5 10L10 3l7.5 7M4.5 8.5V17h11V8.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Overview</button>
   <button class="tabbtn" data-tab="enrollment"><svg class="tabicon" viewBox="0 0 20 20"><rect x="3" y="2.5" width="14" height="15" rx="1.5"/><path d="M6.5 7h7M6.5 10.5h7M6.5 14h4" stroke-linecap="round"/></svg>Enrollment Process</button>
   <button class="tabbtn" data-tab="compliance"><svg class="tabicon" viewBox="0 0 20 20"><rect x="2.5" y="3" width="15" height="14" rx="1.5"/><path d="M6 9l2.5 2.5L14 6.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Compliance &amp; Objections</button>
+  <button class="tabbtn alert" data-tab="exceptions"><svg class="tabicon" viewBox="0 0 20 20"><path d="M10 2.6l8.4 14.6H1.6L10 2.6z" stroke-linejoin="round"/><path d="M10 8v4.2M10 15v.01" stroke-linecap="round"/></svg>Post-Enrollment &amp; Exceptions</button>
 </div>
 <select class="tab-select-mobile" id="tab-select-mobile" aria-label="Choose a section">
   <option value="overview">Overview</option>
   <option value="enrollment">Enrollment Process</option>
   <option value="compliance">Compliance &amp; Objections</option>
+  <option value="exceptions">&#9888; Post-Enrollment &amp; Exceptions</option>
 </select>
 
 <div class="wrap">
@@ -541,7 +604,7 @@
     <div class="section-head">
       <div class="eyebrow"><span class="dot"></span>Step-by-step</div>
       <h2>Enrolling a client in Consumer Shield</h2>
-      <p>Five steps inside the Shield Services CRM (app.consumershield.me), built from the Consumer Shield CRM training series. Every step has the talk track, the exact fields to fill, annotated screenshots of where to click, and the original training clip.</p>
+      <p>Six steps inside the Shield Services CRM (app.consumershield.me). Steps 1&ndash;5 are built from the Consumer Shield CRM training series, with the talk track, the exact fields to fill, annotated screenshots and the original training clip. Step 6, the AI Genie verification call, is required to finalize every enrollment.</p>
     </div>
 
     <div class="stepnav">
@@ -551,6 +614,7 @@
       <a href="#es-3"><b>Step 3</b>Budget</a>
       <a href="#es-4"><b>Step 4</b>Quote, payment dates &amp; ACH</a>
       <a href="#es-5"><b>Step 5</b>Send &amp; sign documents</a>
+      <a href="#es-6"><b>Step 6</b>AI Genie &amp; submit</a>
     </div>
 
     <div class="callout vids-callout">
@@ -1080,11 +1144,138 @@
       </div>
 
       <div class="callout">
-        <strong>Next: the disclosure recording</strong>
-        With all documents signed, move on to the disclosure recording (the AI Genie QC call) with the client still on the line.
+        <strong>Next: the AI Genie verification call (Step 6)</strong>
+        With all documents signed, keep the client on the line, send them the 16 Genie questions and go straight into <a href="#es-6">Step 6</a>. The enrollment isn't final until the Genie passes and the file is submitted.
       </div>
 
     </section>
+
+    <!-- ===== STEP 6 ===== -->
+    <section class="es" id="es-6">
+      <div class="es-head">
+        <div class="es-num">6</div>
+        <div>
+          <span class="pill req">Required &middot; the enrollment isn't done without it</span>
+          <h3>AI Genie verification call, then submit the file</h3>
+          <p>Recorded QC call with &ldquo;Maria,&rdquo; the Shield Services AI Genie &middot; 16 questions &middot; about 5 minutes</p>
+        </div>
+      </div>
+
+      <p>Every Consumer Shield enrollment has to pass the AI Genie before it goes to underwriting. Maria confirms the client's details and payment info, then reads <b>16 compliance questions</b> that need strict YES or NO answers. If the client gives an unexpected answer, Maria transfers the call back to you and the file can't be submitted until the call is redone and passes. Do this right after all documents are signed, with the client still on the line.</p>
+
+      <h4>A. Pick the right Genie</h4>
+      <p>There are four Genie scripts. Pick by <b>how the client pays</b> and <b>the language they're most comfortable in</b>:</p>
+      <div class="card" style="padding:0;overflow-x:auto;">
+      <table class="tiers genie-pick">
+        <tr><th></th><th>English</th><th>Spanish</th></tr>
+        <tr><td><b>ACH</b> (bank routing + account)</td><td>English ACH Genie</td><td>Spanish ACH Genie</td></tr>
+        <tr><td><b>Debit card</b></td><td>English Debit Genie</td><td>Spanish Debit Genie</td></tr>
+      </table>
+      </div>
+      <p>The 16 questions are the same in all four. The only difference is the payment step before them: on ACH, Maria asks for the routing number and then the account number. On debit, she asks for the debit card number and then the name exactly as it's printed on the card.</p>
+      <div class="callout needinput">
+        <strong>Dial-in numbers still needed</strong>
+        The only Genie number on file is <b>434-337-4190</b>, from the April SOP. Confirm it's still current, and whether the Spanish and debit card Genies use the same line or their own numbers, before relying on it.
+      </div>
+
+      <h4>B. Send the client the 16 questions before you dial</h4>
+      <p>The client has to answer every question correctly the first time, so send them the prep sheet and <b>walk through it together on the phone</b> before you dial. The text and email link to a page with the full question list, the answer each one expects and what to have ready, in English or Spanish.</p>
+
+      <div class="genie-send" id="genie-send">
+        <div class="gs-row">
+          <label>Genie
+            <select id="gs-version">
+              <option value="ach|en">English &middot; ACH</option>
+              <option value="ach|es">Spanish &middot; ACH</option>
+              <option value="debit|en">English &middot; Debit card</option>
+              <option value="debit|es">Spanish &middot; Debit card</option>
+            </select>
+          </label>
+          <label>Client first name <input id="gs-name" type="text" autocomplete="off" maxlength="30" placeholder="Maria"></label>
+        </div>
+        <div class="gs-row">
+          <label>Mobile <input id="gs-phone" type="tel" autocomplete="off" placeholder="(555) 555-5555"></label>
+          <label>Email <input id="gs-email" type="email" autocomplete="off" placeholder="client@email.com"></label>
+        </div>
+        <div class="gs-row three">
+          <label>Term (months) <input id="gs-term" type="text" inputmode="numeric" maxlength="3" placeholder="36"></label>
+          <label>Monthly payment ($) <input id="gs-amount" type="text" inputmode="decimal" maxlength="8" placeholder="270"></label>
+          <label>Payment date <input id="gs-date" type="text" maxlength="30" placeholder="the 26th"></label>
+        </div>
+        <div class="gs-row checks">
+          <label class="chk"><input id="gs-sms" type="checkbox" checked> Text</label>
+          <label class="chk"><input id="gs-emailon" type="checkbox" checked> Email</label>
+        </div>
+        <div class="gs-actions">
+          <button type="button" class="gs-btn primary" id="gs-send">Send to client</button>
+          <button type="button" class="gs-btn" id="gs-copy">Copy text message</button>
+          <a class="gs-btn" id="gs-open" href="/genie-prep" target="_blank" rel="noopener">Open prep sheet</a>
+        </div>
+        <div class="gs-status" id="gs-status" role="status" aria-live="polite"></div>
+        <p class="gs-fine">Sends from the Funding Tier sub-account in app.krestmarketing.com to the contact with that mobile number, and tags them <code>cs genie prep sent</code>. If the contact isn't found or a send fails, use <b>Copy text message</b> and send it from the contact's conversation yourself.</p>
+      </div>
+
+      <div class="talk">
+        <span class="who">Talk track &mdash; before you dial</span>
+        &ldquo;Great, all your documents are signed. The last step is a short recorded verification call, about five minutes, with Maria, our automated assistant. I just texted and emailed you the questions she'll ask. Can you open that link? &hellip; She needs a clear yes or no to each one, so let's go through them together now. And if any of these don't match your situation, tell me now so we can fix it before we call.&rdquo;
+      </div>
+      <div class="callout warn">
+        <strong>Prepare the client. Never script a false answer.</strong>
+        The sheet shows the answer that lets the file go through as set up. If the client's true answer is different (a co-signer, an account with fewer than 3 payments, a bank at the same institution as an enrolled card, a credit union they still use, a military account), fix the file first: remove the account, give the disclosure, or stop. Coaching a client to give an untrue answer on a recorded compliance call puts the enrollment and the agent at risk.
+      </div>
+
+      <h4>C. Make the call</h4>
+      <ol class="subs">
+        <li>Confirm the client is <b>not on speakerphone</b> and has the prep sheet open, with their payment info (routing and account number, or debit card) in front of them.</li>
+        <li>Put the client on hold, <b>add a call</b> and dial the Genie.</li>
+        <li>When Maria starts talking, <b>merge the client in</b>.</li>
+        <li>Maria asks the enrollment agent to go first. State your <b>first and last name, then &ldquo;Shield Services&rdquo;</b> as the company name. Then <b>mute</b> and stay on the line.</li>
+        <li>Maria collects: not on speakerphone &rarr; name &rarr; phone &rarr; last 4 of SSN &rarr; DOB &rarr; state &rarr; term in months &rarr; monthly payment date &rarr; exact monthly payment amount &rarr; routing then account number <i>(ACH)</i>, or card number then name on card <i>(debit)</i>.<span class="note">If Maria jumps ahead while the client is still reading a number or name, you or the client say &ldquo;Please repeat the prior question.&rdquo; She restarts that step.</span></li>
+        <li>Billing reminder: charges show on the bank statement as <b>&ldquo;Consumer Shield&rdquo; or &ldquo;Shield Services,&rdquo;</b> with a notification each time a payment goes through. The client answers &ldquo;Yes&rdquo; or &ldquo;I understand.&rdquo;</li>
+        <li>Pre-recording instructions: strict YES or NO answers, questions held until the end. The client answers &ldquo;OK.&rdquo; Then the 16 questions.</li>
+      </ol>
+      <div class="callout">
+        <strong>The term, date and amount must match the file</strong>
+        The client must state the same term, monthly payment date and payment amount you set in Steps 3 and 4. Put them in the prep sheet form above so they show at the top of the client's page.
+      </div>
+
+      <h4>D. The 16 questions and the expected answers</h4>
+      <p>Maria reads these word for word, in this order. <b>YES or NO</b> means either answer is accepted.</p>
+      <div class="gq-table" id="gq-table"><p style="color:var(--ink-soft);">Loading questions&hellip;</p></div>
+
+      <h4>E. How you know it passed</h4>
+      <div class="flow">
+        <div class="flow-node"><div class="fn-label">Passed</div><p>Maria says <b>&ldquo;Your compliance verification is now complete&hellip; Welcome to Shield Services!&rdquo;</b> and transfers the client back to you.</p></div>
+        <div class="flow-node"><div class="fn-label">Didn't pass</div><p>Maria says she's transferring the client back <b>&ldquo;for further clarification&rdquo;</b> without the welcome line. Fix the reason on the file, then call the Genie again from the start.</p></div>
+      </div>
+      <p>Common reasons: an account with fewer than 3 payments (Q2), the client still needs an enrolled card (Q9), a secured account (Q12), a credit union they still bank with (Q15 follow-up), or a military account (Q16). Remove the account in the Creditors tab, resend documents if the enrolled debts changed, and redo the call.</p>
+
+      <h4>F. Enter the Genie code and submit</h4>
+      <ol class="subs">
+        <li>Open the <span class="ui">Adtl. Info</span> tab. In the <b>Genie Contract #</b> field (top right of Custom Fields), enter <b>222222222</b> (nine 2s). It's the same on every enrollment.</li>
+        <li>Check that the <b>1st Payment Date</b> still matches the <b>Recurring Monthly Payment Date</b>, then click <span class="ui">Save</span>.</li>
+        <li>Run the final check below.</li>
+        <li>Change the file's status to <b>Pending Underwriting Review</b>. The file is now submitted.</li>
+      </ol>
+      <ul class="final-check">
+        <li>All documents signed, including the ATC sent on its own</li>
+        <li>Budget shows positive net income after the program payment line</li>
+        <li>Only eligible creditors enrolled; statements uploaded for any added by hand</li>
+        <li>Payment info saved and read back to the client</li>
+        <li>1st Payment Date = Recurring Monthly Payment Date</li>
+        <li>AI Genie passed (&ldquo;Welcome to Shield Services!&rdquo;)</li>
+        <li>Genie Contract # 222222222 entered and saved</li>
+      </ul>
+      <div class="callout needinput">
+        <strong>File declined or cancelled after you submit?</strong>
+        Go to the <a href="#exceptions" data-goto="exceptions">Post-Enrollment &amp; Exceptions</a> tab. A fixed file still needs new documents, client &ldquo;YES&rdquo; texts and the right status or task before it moves.
+      </div>
+      <div class="callout warn">
+        <strong>Don't submit without the Genie code</strong>
+        A file set to Pending Underwriting Review without a passed Genie call and the 222222222 code saved won't be processed.
+      </div>
+    </section>
+
 
     <div class="vid-feature vid-full">
       <div class="vid-head">
@@ -1093,6 +1284,152 @@
       <h4 class="vid-title">A complete Consumer Shield enrollment, start to finish</h4>
       <video controls preload="none" playsinline aria-label="Full Consumer Shield enrollment walkthrough"><source src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/6a9df3eb4ea183e8729f65ba.mp4" type="video/mp4"></video>
       <p class="vid-note">Watch the whole thing once before your first live Consumer Shield call.</p>
+    </div>
+  </div>
+
+  <!-- =================== POST-ENROLLMENT & EXCEPTIONS =================== -->
+  <div class="panel" id="exceptions">
+    <div class="section-head">
+      <div class="eyebrow" style="color:var(--danger);"><span class="dot" style="background:var(--danger);"></span>Post-enrollment &middot; exception management</div>
+      <h2>Declines, NSFs and re-enrollments</h2>
+      <p>What to do when a Consumer Shield file comes back after submission. Follow these steps before you return a file to Underwriting or assign a task to the Payment Changes Department.</p>
+    </div>
+
+    <div class="ex-banner" role="alert">
+      <strong>STOP: fixing the problem is not enough</strong>
+      <p>Never move a file forward just because the underlying issue has been corrected. Every required step below (new documents, signatures, client &ldquo;YES&rdquo; texts, status change, department task) has to be done, in order, before the file or task moves.</p>
+      <p><b>Any correction means ALL documents are resent and signed</b>, never just the corrected page. The only exception is the <b>ATC</b>, which is not resent. A prior signed agreement can never be reused.</p>
+    </div>
+
+    <div class="ex-jump">
+      <a href="#ex-1"><b>Scenario 1</b>Declined: Genie incomplete</a>
+      <a href="#ex-2"><b>Scenario 2</b>Declined: file or document issue</a>
+      <a href="#ex-3"><b>Scenario 3</b>NSF / $0 bank validation failed: new banking needed</a>
+      <a href="#ex-4"><b>Scenario 4</b>Re-enrollment after cancellation</a>
+    </div>
+
+    <!-- 1 -->
+    <section class="es ex" id="ex-1">
+      <div class="es-head">
+        <div class="es-num">1</div>
+        <div>
+          <span class="pill alert">Declined file</span>
+          <h3>Declined: Genie incomplete</h3>
+          <p>Underwriting declined the file because the AI Genie call is missing or incomplete.</p>
+        </div>
+      </div>
+      <div class="ex-flow"><span>Redo Genie</span><i>&rarr;</i><span>Confirm complete</span><i>&rarr;</i><span class="end">Pending Underwriting Review</span></div>
+      <ol class="subs">
+        <li><b>Redo the Genie.</b> Complete all missing or incomplete Genie information. Run the call again from the start, as in <a href="#es-6" data-goto="enrollment">Step 6</a>, and send the client the 16 questions again first.</li>
+        <li><b>Review for accuracy.</b> Confirm the Genie is complete (you heard &ldquo;Welcome to Shield Services!&rdquo;) and the Genie Contract # 222222222 is saved before you resubmit.</li>
+        <li><b>Update the file status</b> to <b>Pending Underwriting Review</b>.</li>
+      </ol>
+    </section>
+
+    <!-- 2 -->
+    <section class="es ex" id="ex-2">
+      <div class="es-head">
+        <div class="es-num">2</div>
+        <div>
+          <span class="pill alert">Declined file</span>
+          <h3>Declined: file or documentation issue</h3>
+          <p>Wrong payment date, wrong payment amount, missing bank information, or any other error on the file.</p>
+        </div>
+      </div>
+      <div class="ex-flow"><span>Fix the issue</span><i>&rarr;</i><span>Resend ALL docs (not ATC)</span><i>&rarr;</i><span>Client signs all</span><i>&rarr;</i><span class="end">Pending Underwriting Review</span></div>
+      <ol class="subs">
+        <li><b>Correct the issue</b> on the file. Examples: an incorrect payment date, an incorrect payment amount, missing bank information, or other file errors.</li>
+        <li><b>Resend ALL documents.</b> A corrected file needs a complete new document package sent to the client for signature, the same way as <a href="#es-5" data-goto="enrollment">Step 5</a>.</li>
+        <li><b>Confirm all documents are signed.</b> Don't resubmit until the whole package shows under Signed Docs.</li>
+        <li><b>Update the file status.</b> Once everything is signed, change the status to <b>Pending Underwriting Review</b>.</li>
+      </ol>
+      <div class="callout needinput">
+        <strong>Never resend only the corrected page</strong>
+        ALL documents must be resent and signed. The ATC is the only exception.
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="es ex" id="ex-3">
+      <div class="es-head">
+        <div class="es-num">3</div>
+        <div>
+          <span class="pill alert">NSF &middot; banking failed</span>
+          <h3>NSF file / $0 banking validation failed: new banking needed</h3>
+          <p>The draft came back NSF, or the $0 bank validation failed, and the client needs to give new banking information.</p>
+        </div>
+      </div>
+      <div class="ex-flow"><span>New banking + new date</span><i>&rarr;</i><span>ALL docs signed (not ATC)</span><i>&rarr;</i><span>Client texts &ldquo;YES&rdquo;</span><i>&rarr;</i><span class="end">Payment Changes task</span></div>
+      <ol class="subs">
+        <li><b>Get the new banking information</b> from the client. Read the routing and account numbers back before you save.</li>
+        <li><b>Update the payment date</b> to the client's new agreed date. The 1st Payment Date and Recurring Monthly Payment Date must still match.</li>
+        <li><b>Send ALL new documents</b>: a complete updated package for signature.</li>
+        <li><b>Confirm all documents are signed.</b></li>
+        <li><b>Text the client to confirm the new payment date.</b> The client must reply <b>&ldquo;YES&rdquo;</b>.</li>
+        <li><b>Create a Payment Changes Department task.</b> Only after every step above is done. State clearly what was corrected and the new payment date.</li>
+      </ol>
+      <div class="tpl">
+        <div class="tpl-h">Text &mdash; new payment date confirmation <button type="button" data-copy>Copy</button></div>
+        <div class="tpl-body">Hi [First name], this is [Your name] with Shield Services. Your banking information has been updated and your new program payment date is [Date]. Please reply YES to confirm your new payment date.</div>
+      </div>
+      <div class="tpl">
+        <div class="tpl-h">Payment Changes task &mdash; note <button type="button" data-copy>Copy</button></div>
+        <div class="tpl-body">NSF / $0 banking validation failed. New banking info entered (bank: [Bank name]). New payment date: [Date]. New payment amount: [$ if changed]. Full new document package sent and signed on [Date] (ATC not resent). Client replied YES to the new payment date by text on [Date].</div>
+      </div>
+      <div class="callout needinput">
+        <strong>Don't create the Payment Changes task early</strong>
+        The task must not be created until the client has signed ALL new documents (ATC excepted) <b>and</b> replied &ldquo;YES&rdquo; to the payment-date text.
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="es ex" id="ex-4">
+      <div class="es-head">
+        <div class="es-num">4</div>
+        <div>
+          <span class="pill alert">Cancelled client</span>
+          <h3>Re-enrollment after cancellation</h3>
+          <p>Applies to clients cancelled for ANY reason, including NSF cancellation and cancellation before the first draft.</p>
+        </div>
+      </div>
+      <div class="ex-flow"><span>Update payment / banking</span><i>&rarr;</i><span>ALL new docs signed (not ATC)</span><i>&rarr;</i><span>Client texts &ldquo;YES&rdquo; to date + re-enrolling</span><i>&rarr;</i><span class="end">Payment Changes task</span></div>
+      <ol class="subs">
+        <li><b>Update the payment information:</b> the new payment amount, payment date and cancel date, as applicable.</li>
+        <li><b>Update the banking information if needed.</b> Confirm the client's current banking details are accurate.</li>
+        <li><b>Send ALL new documents.</b> The client must receive and sign a complete new package.</li>
+        <li><b>Confirm all documents are signed.</b> Don't go further until the full package is signed.</li>
+        <li><b>Text the client to confirm the new payment date.</b></li>
+        <li><b>Confirm the re-enrollment.</b> The same text, or a separate one, must also confirm that the client wants to re-enroll in the program. The client must reply <b>&ldquo;YES&rdquo;</b>.</li>
+        <li><b>Create a Payment Changes Department task.</b> Only after every step above is done. State clearly what was corrected and the new payment date.</li>
+      </ol>
+      <div class="tpl">
+        <div class="tpl-h">Text &mdash; re-enrollment + new payment date <button type="button" data-copy>Copy</button></div>
+        <div class="tpl-body">Hi [First name], this is [Your name] with Shield Services. You're set to re-enroll in your program with a monthly payment of $[Amount], starting [Date]. Please reply YES to confirm you want to re-enroll and that [Date] is your new payment date.</div>
+      </div>
+      <div class="tpl">
+        <div class="tpl-h">Payment Changes task &mdash; note <button type="button" data-copy>Copy</button></div>
+        <div class="tpl-body">Re-enrollment after cancellation (reason: [NSF / cancelled before first draft / other]). New payment amount: $[Amount]. New payment date: [Date]. Cancel date updated to [Date]. Banking [unchanged / updated to Bank name]. Full new document package sent and signed on [Date] (ATC not resent). Client replied YES to re-enrolling and to the new payment date by text on [Date].</div>
+      </div>
+      <div class="callout needinput">
+        <strong>A prior signed agreement can't be reused</strong>
+        Every re-enrollment needs a complete new signed package and the client's &ldquo;YES&rdquo; text, no matter why the client was cancelled.
+      </div>
+    </section>
+
+    <h3 style="margin:30px 0 14px;font-size:17px;">Quick compliance checklist</h3>
+    <div class="card" style="padding:0;overflow-x:auto;">
+      <table>
+        <tr><th>Situation</th><th>Required before submission / task</th></tr>
+        <tr><td><b>Declined &ndash; Genie incomplete</b></td><td>Redo Genie &rarr; Pending Underwriting Review</td></tr>
+        <tr><td><b>Declined &ndash; file/document issue</b></td><td>Fix issue &rarr; Send ALL docs (except ATC) &rarr; Client signs &rarr; Pending Underwriting Review</td></tr>
+        <tr><td><b>NSF / $0 bank failed &ndash; new banking needed</b></td><td>New banking/date &rarr; ALL docs signed (except ATC) &rarr; Client texts &ldquo;YES&rdquo; &rarr; Payment Changes task</td></tr>
+        <tr><td><b>Cancelled client re-enrolling</b></td><td>Update payment/banking &rarr; ALL new docs signed (except ATC) &rarr; Confirm new date + re-enrollment &rarr; Client texts &ldquo;YES&rdquo; &rarr; Payment Changes task</td></tr>
+      </table>
+    </div>
+
+    <div class="callout needinput">
+      <strong>Employee reminder</strong>
+      Never move a file forward just because the underlying issue has been corrected. Follow the full documentation, signature, confirmation, status and task requirements above.
     </div>
   </div>
 
@@ -1323,6 +1660,100 @@
 })();
 </script>
 
+<script>
+/* Step 6: AI Genie question table + send-to-client form */
+(function(){
+  var table = document.getElementById('gq-table');
+  if (!table) return;
+  function esc(t){ var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+  fetch('/genie-prep/genie-data.json', {cache:'no-cache'}).then(function(r){ return r.json(); }).then(function(d){
+    table.innerHTML = d.questions.map(function(q){
+      var cls = q.ans === 'YES' ? 'yes' : q.ans === 'NO' ? 'no' : 'either';
+      var label = q.ans === 'EITHER' ? 'YES or NO' : q.ans;
+      return '<div class="gq"><div class="gq-n">Q' + q.n + '</div><div>' + esc(q.en) + (q.yes_en ? '<span class="gq-if">' + esc(q.yes_en) + '</span>' : '') + '</div><div class="gq-a ' + cls + '">' + label + '</div></div>';
+    }).join('');
+  }).catch(function(){ table.innerHTML = '<p>Couldn\u2019t load the questions. Refresh the page, or open the prep sheet.</p>'; });
+
+  var $ = function(id){ return document.getElementById(id); };
+  var status = $('gs-status');
+  function vals(){
+    var v = $('gs-version').value.split('|');
+    return { pay: v[0], lang: v[1], firstName: $('gs-name').value.trim(), phone: $('gs-phone').value.trim(), email: $('gs-email').value.trim(),
+      term: $('gs-term').value.replace(/\D/g,''), amount: $('gs-amount').value.replace(/[^0-9.]/g,''), date: $('gs-date').value.trim(),
+      sms: $('gs-sms').checked, email_on: $('gs-emailon').checked };
+  }
+  function link(o){
+    var q = new URLSearchParams({v:o.pay, lang:o.lang});
+    if (o.firstName) q.set('n', o.firstName);
+    if (o.term) q.set('t', o.term);
+    if (o.amount) q.set('a', o.amount);
+    if (o.date) q.set('d', o.date);
+    return location.origin + '/genie-prep?' + q.toString();
+  }
+  function smsText(o){
+    var l = link(o);
+    if (o.lang === 'es') {
+      var p1 = o.pay === 'debit' ? 'su n\u00famero de tarjeta de d\u00e9bito y su nombre tal como aparece en la tarjeta' : 'su n\u00famero de ruta bancaria y su n\u00famero de cuenta';
+      return 'Hola' + (o.firstName ? ' ' + o.firstName : '') + ', antes de su llamada de verificaci\u00f3n de Shield Services, revise las 16 preguntas y la respuesta que espera cada una: ' + l + '\nResponda solo S\u00cd o NO, sin altavoz. Tenga listo ' + p1 + '. Si alguna respuesta no aplica a su caso, d\u00edgaselo a su especialista antes de la llamada.';
+    }
+    var p2 = o.pay === 'debit' ? 'your debit card number and your name exactly as it appears on the card' : 'your bank routing number and account number';
+    return 'Hi ' + (o.firstName || 'there') + ', before your Shield Services verification call, please review the 16 questions and the answer each one expects: ' + l + '\nAnswer only YES or NO, and don\u2019t use speakerphone. Have ' + p2 + ' ready. If any answer doesn\u2019t fit your situation, tell your specialist before the call.';
+  }
+  function refreshLink(){ $('gs-open').href = link(vals()); }
+  ['gs-version','gs-name','gs-term','gs-amount','gs-date'].forEach(function(id){ $(id).addEventListener('input', refreshLink); $(id).addEventListener('change', refreshLink); });
+  refreshLink();
+
+  $('gs-copy').addEventListener('click', function(){
+    var t = smsText(vals());
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){
+      status.innerHTML = '<span class="ok">Text message copied.</span> Paste it into the contact\u2019s conversation in app.krestmarketing.com.';
+    }).catch(function(){ window.prompt('Copy this text message:', t); });
+  });
+
+  $('gs-send').addEventListener('click', function(){
+    var o = vals(), btn = this;
+    if (!o.sms && !o.email_on) { status.innerHTML = '<span class="bad">Tick Text, Email or both.</span>'; return; }
+    if (o.sms && o.phone.replace(/\D/g,'').length < 10) { status.innerHTML = '<span class="bad">Enter the client\u2019s 10-digit mobile number.</span>'; return; }
+    if (o.email_on && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(o.email)) { status.innerHTML = '<span class="bad">Enter a valid email address.</span>'; return; }
+    btn.disabled = true; status.textContent = 'Sending\u2026';
+    fetch('/api/agents/genie-prep-send', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'same-origin', body: JSON.stringify(o) })
+      .then(function(r){ return r.json().catch(function(){ return {ok:false, error:'Unexpected response (' + r.status + ')'}; }); })
+      .then(function(d){
+        var parts = [];
+        if (d.sms) parts.push(d.sms.ok ? '<span class="ok">Text sent.</span>' : '<span class="bad">Text not sent:</span> ' + esc(d.sms.error || ''));
+        if (d.email) parts.push(d.email.ok ? '<span class="ok">Email sent.</span>' : '<span class="bad">Email not sent:</span> ' + esc(d.email.error || ''));
+        if (!d.sms && !d.email && d.error) parts.push('<span class="bad">' + esc(d.error) + '</span>');
+        if (!d.ok) parts.push('Use <b>Copy text message</b> as a backup.');
+        status.innerHTML = parts.join(' ');
+      })
+      .catch(function(){ status.innerHTML = '<span class="bad">Couldn\u2019t reach the server.</span> Use <b>Copy text message</b> instead.'; })
+      .then(function(){ btn.disabled = false; });
+  });
+})();
+</script>
+<script>
+/* Exceptions tab: copy buttons + cross-tab links */
+(function(){
+  document.querySelectorAll('.tpl [data-copy]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var t = b.closest('.tpl').querySelector('.tpl-body').textContent;
+      var done = function(){ b.textContent = 'Copied'; setTimeout(function(){ b.textContent = 'Copy'; }, 1500); };
+      if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, function(){ window.prompt('Copy:', t); });
+      else window.prompt('Copy:', t);
+    });
+  });
+  document.querySelectorAll('a[data-goto]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var tab = document.querySelector('.tabbtn[data-tab="' + a.getAttribute('data-goto') + '"]');
+      if (!tab) return;
+      e.preventDefault();
+      tab.click();
+      var id = a.getAttribute('href').slice(1);
+      setTimeout(function(){ var t = document.getElementById(id); if (t && t.scrollIntoView) t.scrollIntoView({behavior:'smooth', block:'start'}); }, 80);
+    });
+  });
+})();
+</script>
 <script src="https://ai.fundingtier.com/toolkit.js" defer></script>
 
 </body>
