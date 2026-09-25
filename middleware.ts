@@ -133,6 +133,11 @@ const PUBLIC: Array<{ prefix: string; why: string }> = [
   { prefix: "/plan", why: "prospect-facing, token in URL is the credential" },
   { prefix: "/api/plan", why: "backs /plan" },
 
+  // Consumer Shield clients open their AI Genie prep sheet from a text or
+  // email the agent sends in Step 6 of the Consumer Shield SOP. The page and
+  // its question list carry no client data beyond what is in the link.
+  { prefix: "/genie-prep", why: "client-facing Genie call prep sheet, no stored data" },
+
   // Sign-in itself, and the endpoints it posts to.
   { prefix: "/login", why: "the sign-in page" },
   { prefix: "/no-access", why: "the wrong-level page" },
