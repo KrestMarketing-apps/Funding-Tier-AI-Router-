@@ -1418,11 +1418,19 @@
     if (!nav) return;
     root.style.setProperty('--sn-h', nav.offsetHeight + 'px');
     var navBottom = nav.getBoundingClientRect().bottom;
-    var links = nav.querySelectorAll('a'), current = null;
-    links.forEach(function(a){
+    var links = nav.querySelectorAll('a'), current = null, line = navBottom + 60;
+    var tops = Array.prototype.map.call(links, function(a){
       var t = document.querySelector(a.getAttribute('href'));
-      if (t && t.getBoundingClientRect().top <= navBottom + 40) current = a;
+      return t ? t.getBoundingClientRect() : null;
     });
+    // a step "owns" the screen from its top until the next step starts
+    for (var i = 0; i < links.length; i++) {
+      if (!tops[i]) continue;
+      var end = (i + 1 < links.length && tops[i+1]) ? tops[i+1].top : tops[i].bottom;
+      if (tops[i].top <= line && end > line) { current = links[i]; break; }
+      if (tops[i].top > line) { current = i ? links[i-1] : null; break; }
+    }
+    if (!current && tops.length && tops[tops.length-1] && tops[tops.length-1].top <= line) current = links[links.length-1];
     links.forEach(function(a){
       var on = a === current;
       if (on && !a.classList.contains('current')) {
@@ -1465,7 +1473,7 @@
   document.addEventListener('click', function(e){ if (e.target.closest('.tabbtn')) setTimeout(sync, 400); });
   var sel = document.getElementById('tab-select-mobile');
   if (sel) sel.addEventListener('change', function(){ setTimeout(sync, 400); });
-  window.addEventListener('load', function(){ sync(); setTimeout(sync, 800); });
+  window.addEventListener('load', function(){ sync(); if (location.hash) openHash(); setTimeout(sync, 800); });
   sync();
   openHash();
 })();
