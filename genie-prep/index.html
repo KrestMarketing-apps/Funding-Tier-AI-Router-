@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Your Verification Call | Shield Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F7F9FC; --panel:#FFFFFF; --ink:#0A182E; --ink-soft:#4A5A6E; --line:#E1E6EE;
+    --navy:#022A51; --green:#0F9D8A; --green-dk:#0B7D6E; --green-soft:#ECFDF5;
+    --red:#B3261E; --red-soft:#FBECEA; --amber:#B7791F; --amber-soft:#FFF8EC;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;font-size:17px;line-height:1.6;}
+  h1,h2,h3{font-family:'Montserrat',sans-serif;font-weight:700;margin:0;letter-spacing:-0.01em;}
+  .hero{background:linear-gradient(150deg,#0A182E 0%,#022A51 55%,#0F9D8A 100%);color:#fff;padding:36px 16px 40px;}
+  .hero .in{max-width:720px;margin:0 auto;}
+  .hero .kicker{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9FE7DA;}
+  .hero h1{font-size:30px;line-height:1.2;margin:8px 0 10px;color:#fff;}
+  .hero p{margin:0;color:#D6E4F0;font-size:16.5px;}
+  .lang{margin-top:18px;display:inline-flex;background:rgba(255,255,255,.12);border-radius:999px;padding:3px;}
+  .lang button{background:none;border:0;color:#fff;font:600 14px 'Inter',sans-serif;padding:7px 16px;border-radius:999px;cursor:pointer;}
+  .lang button.on{background:#fff;color:var(--navy);}
+  main{max-width:720px;margin:0 auto;padding:24px 16px 64px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin:0 0 18px;}
+  .card h2{font-size:20px;margin-bottom:10px;color:var(--navy);}
+  .card p{margin:0 0 10px;color:var(--ink-soft);}
+  .yours{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:6px;}
+  .yours div{background:var(--green-soft);border-radius:12px;padding:12px;}
+  .yours b{display:block;font-family:'Montserrat',sans-serif;font-size:19px;color:var(--green-dk);}
+  .yours span{font-size:13px;color:var(--ink-soft);}
+  ul.ready,ol.ask{margin:6px 0 0;padding-left:22px;}
+  ul.ready li,ol.ask li{margin:0 0 6px;}
+  .rule{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);}
+  .rule:first-of-type{border-top:0;}
+  .rule i{flex:0 0 28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;font:700 13px 'Montserrat',sans-serif;font-style:normal;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+  .q{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:start;padding:16px 0;border-top:1px solid var(--line);}
+  .q:first-of-type{border-top:0;padding-top:4px;}
+  .q .num{font:700 14px 'Montserrat',sans-serif;color:var(--ink-soft);padding-top:3px;}
+  .q .txt{color:var(--ink);}
+  .q .yes-note{margin-top:8px;font-size:14.5px;color:#5A3E00;background:var(--amber-soft);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:8px 12px;}
+  .badge{font:700 14px 'Montserrat',sans-serif;border-radius:8px;padding:6px 12px;white-space:nowrap;text-align:center;}
+  .badge.yes{background:var(--green-soft);color:var(--green-dk);}
+  .badge.no{background:var(--red-soft);color:var(--red);}
+  .badge.either{background:#EEF1F6;color:var(--navy);font-size:12.5px;line-height:1.3;}
+  .honest{background:var(--amber-soft);border:1px solid #F0D9A8;border-radius:14px;padding:16px 18px;margin:0 0 18px;color:#5A3E00;font-size:15.5px;}
+  .honest strong{display:block;font-family:'Montserrat',sans-serif;margin-bottom:4px;}
+  .done{background:var(--green-soft);border:1px solid #BDEBDD;border-radius:14px;padding:16px 18px;color:#0F3325;}
+  .done strong{font-family:'Montserrat',sans-serif;}
+  footer{max-width:720px;margin:0 auto;padding:0 16px 40px;color:var(--ink-soft);font-size:13px;}
+  @media (max-width:560px){
+    body{font-size:16px;}
+    .hero h1{font-size:25px;}
+    .yours{grid-template-columns:1fr;}
+    .q{grid-template-columns:32px minmax(0,1fr);}
+    .q .badge{grid-column:2;justify-self:start;}
+  }
+  @media print{.lang{display:none;} .hero{background:#022A51;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="in">
+    <div class="kicker" data-t="kicker"></div>
+    <h1 id="title"></h1>
+    <p data-t="intro"></p>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="en">English</button>
+      <button type="button" data-lang="es">Español</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="card" id="yours-card" hidden>
+    <h2 data-t="yoursH"></h2>
+    <p data-t="yoursP"></p>
+    <div class="yours" id="yours"></div>
+  </section>
+
+  <section class="card">
+    <h2 data-t="readyH"></h2>
+    <ul class="ready" id="ready"></ul>
+  </section>
+
+  <section class="card">
+    <h2 data-t="rulesH"></h2>
+    <div id="rules"></div>
+  </section>
+
+  <section class="card">
+    <h2 data-t="askH"></h2>
+    <p data-t="askP"></p>
+    <ol class="ask" id="ask"></ol>
+  </section>
+
+  <div class="honest"><strong data-t="honestH"></strong><span data-t="honestP"></span></div>
+
+  <section class="card">
+    <h2 data-t="qH"></h2>
+    <p data-t="qP"></p>
+    <div id="questions"><p>Loading…</p></div>
+  </section>
+
+  <div class="done"><strong data-t="doneH"></strong> <span data-t="doneP"></span></div>
+</main>
+<footer data-t="footer"></footer>
+
+<script>
+(function(){
+  var params = new URLSearchParams(location.search);
+  var pay = (params.get('v') || 'ach').toLowerCase() === 'debit' ? 'debit' : 'ach';
+  var lang = (params.get('lang') || 'en').toLowerCase() === 'es' ? 'es' : 'en';
+  var clean = function(s, max){ return String(s || '').replace(/[<>]/g,'').trim().slice(0, max || 40); };
+  var name = clean(params.get('n'), 30);
+  var term = clean(params.get('t'), 4).replace(/[^0-9]/g,'');
+  var amount = clean(params.get('a'), 10).replace(/[^0-9.]/g,'');
+  var date = clean(params.get('d'), 30);
+  var DATA = null;
+
+  var T = {
+    en: {
+      kicker: 'Shield Services · Verification call',
+      title: function(){ return name ? name + ', here’s your verification call, question by question' : 'Your verification call, question by question'; },
+      intro: 'To finish your enrollment, you’ll take a short recorded call with Maria, our automated verification assistant, while your enrollment specialist stays on the line. It takes about 5 minutes. Read this page before the call so nothing catches you off guard.',
+      yoursH: 'Your program details',
+      yoursP: 'Maria will ask you for these. Have them in front of you.',
+      termL: 'Program term', amountL: 'Monthly payment', dateL: 'Monthly payment date', months: ' months',
+      readyH: 'Have these ready before the call',
+      ready: {
+        common: ['Your first and last name', 'The best phone number to reach you', 'The last 4 digits of your Social Security number', 'Your date of birth', 'The state you live in', 'Your program term in months, your monthly payment date and your exact monthly payment amount'],
+        ach: ['Your bank routing number and your account number (the account your payments come from)'],
+        debit: ['Your debit card number, and your name exactly as it’s printed on the card']
+      },
+      rulesH: 'How the call works',
+      rules: [
+        'Don’t use speakerphone. Maria will ask you to confirm you’re not on speakerphone.',
+        'Your enrollment specialist will say their name first, then Maria talks to you directly.',
+        'Maria will remind you that your monthly payments show on your bank statement as “Consumer Shield” or “Shield Services,” and that you’ll get a notification each time a payment goes through. Answer “Yes” or “I understand.”',
+        'For the 16 questions, answer with only YES or NO. Phrases like “I think so” or “sure” aren’t accepted.',
+        'Hold any questions until the end. If Maria moves ahead while you’re still reading a number, say “Please repeat the prior question.”'
+      ],
+      askH: 'What Maria asks first',
+      askP: 'Before the recorded questions, Maria confirms your details in this order:',
+      ask: {
+        ach: ['Confirm you’re not on speakerphone', 'First and last name', 'Best phone number', 'Last 4 of your Social', 'Date of birth', 'State you live in', 'Program term in months', 'Monthly payment date', 'Exact monthly payment amount', 'Bank routing number, read clearly and slowly', 'Bank account number', 'The billing reminder: answer “Yes”'],
+        debit: ['Confirm you’re not on speakerphone', 'First and last name', 'Best phone number', 'Last 4 of your Social', 'Date of birth', 'State you live in', 'Program term in months', 'Monthly payment date', 'Exact monthly payment amount', 'Debit card number, read clearly and slowly', 'Your name exactly as it appears on the card', 'The billing reminder: answer “Yes”']
+      },
+      honestH: 'Always answer truthfully',
+      honestP: 'The answer shown next to each question is the one that lets your enrollment go through as set up. If your true answer is different, tell your enrollment specialist before the call. Some answers only need an extra disclosure, and some accounts may need to come off the program. Your specialist will sort it out with you first, so the call doesn’t have to be redone.',
+      qH: 'The 16 recorded questions',
+      qP: 'Maria reads these word for word, in this order.',
+      yes: 'YES', no: 'NO', either: 'YES or NO<br>(either is OK)',
+      doneH: 'You’re done when you hear “Welcome to Shield Services!”',
+      doneP: 'If Maria says she’s transferring you back to your enrollment specialist before that, something needs to be fixed first. Your specialist will walk you through it and redo the call.',
+      footer: 'Shield Services verification call guide. Questions? Reply to the text or email you got this link from, or ask your enrollment specialist.'
+    },
+    es: {
+      kicker: 'Shield Services · Llamada de verificación',
+      title: function(){ return name ? name + ', esta es su llamada de verificación, pregunta por pregunta' : 'Su llamada de verificación, pregunta por pregunta'; },
+      intro: 'Para terminar su inscripción, tendrá una breve llamada grabada con María, nuestra asistente automática de verificación, mientras su especialista de inscripción sigue en la línea. Dura unos 5 minutos. Lea esta página antes de la llamada para que nada lo tome por sorpresa.',
+      yoursH: 'Los datos de su programa',
+      yoursP: 'María le pedirá estos datos. Téngalos a la mano.',
+      termL: 'Plazo del programa', amountL: 'Pago mensual', dateL: 'Fecha de pago mensual', months: ' meses',
+      readyH: 'Tenga esto listo antes de la llamada',
+      ready: {
+        common: ['Su nombre y apellido', 'El mejor número de teléfono para comunicarse con usted', 'Los últimos 4 dígitos de su número de Seguro Social', 'Su fecha de nacimiento', 'El estado donde vive', 'El plazo de su programa en meses, su fecha de pago mensual y el monto exacto de su pago mensual'],
+        ach: ['Su número de ruta bancaria y su número de cuenta (la cuenta de donde salen sus pagos)'],
+        debit: ['El número de su tarjeta de débito y su nombre tal como aparece impreso en la tarjeta']
+      },
+      rulesH: 'Cómo funciona la llamada',
+      rules: [
+        'No use el altavoz. María le pedirá que confirme que no está en altavoz.',
+        'Su especialista de inscripción dirá su nombre primero y luego María hablará directamente con usted.',
+        'María le recordará que sus pagos mensuales aparecerán en su estado de cuenta como “Consumer Shield” o “Shield Services”, y que recibirá una notificación cada vez que se procese un pago. Responda “Sí” o “Entiendo”.',
+        'En las 16 preguntas, responda solamente SÍ o NO. Frases como “creo que sí” o “claro” no son válidas.',
+        'Guarde sus preguntas para el final. Si María avanza mientras usted todavía está leyendo un número, diga “Please repeat the prior question”.'
+      ],
+      askH: 'Lo que María pregunta primero',
+      askP: 'Antes de las preguntas grabadas, María confirma sus datos en este orden:',
+      ask: {
+        ach: ['Confirmar que no está en altavoz', 'Nombre y apellido', 'Mejor número de teléfono', 'Últimos 4 dígitos de su Seguro Social', 'Fecha de nacimiento', 'Estado donde vive', 'Plazo del programa en meses', 'Fecha de pago mensual', 'Monto exacto del pago mensual', 'Número de ruta bancaria, claro y pausado', 'Número de cuenta bancaria', 'El recordatorio de facturación: responda “Sí”'],
+        debit: ['Confirmar que no está en altavoz', 'Nombre y apellido', 'Mejor número de teléfono', 'Últimos 4 dígitos de su Seguro Social', 'Fecha de nacimiento', 'Estado donde vive', 'Plazo del programa en meses', 'Fecha de pago mensual', 'Monto exacto del pago mensual', 'Número de tarjeta de débito, claro y pausado', 'Su nombre tal como aparece en la tarjeta', 'El recordatorio de facturación: responda “Sí”']
+      },
+      honestH: 'Siempre responda con la verdad',
+      honestP: 'La respuesta que aparece junto a cada pregunta es la que permite que su inscripción siga como está preparada. Si su respuesta verdadera es diferente, dígaselo a su especialista de inscripción antes de la llamada. Algunas respuestas solo necesitan una divulgación adicional y algunas cuentas quizás deban salir del programa. Su especialista lo resolverá con usted primero, para no tener que repetir la llamada.',
+      qH: 'Las 16 preguntas grabadas',
+      qP: 'María las lee palabra por palabra, en este orden.',
+      yes: 'SÍ', no: 'NO', either: 'SÍ o NO<br>(cualquiera es válida)',
+      doneH: 'Terminó cuando escuche “¡Bienvenido a Shield Services!”',
+      doneP: 'Si antes de eso María dice que lo va a transferir de regreso con su especialista de inscripción, hay algo que corregir primero. Su especialista le ayudará y repetirán la llamada.',
+      footer: 'Guía de la llamada de verificación de Shield Services. ¿Preguntas? Responda al mensaje o correo con el que recibió este enlace, o pregúntele a su especialista de inscripción.'
+    }
+  };
+
+  function el(tag, cls, html){ var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function li(list, items){ list.innerHTML = ''; items.forEach(function(t){ list.appendChild(el('li', null, t)); }); }
+
+  function render(){
+    var t = T[lang];
+    document.documentElement.lang = lang;
+    document.title = (lang === 'es' ? 'Su llamada de verificación' : 'Your Verification Call') + ' | Shield Services';
+    document.querySelectorAll('[data-t]').forEach(function(n){ var v = t[n.getAttribute('data-t')]; if (typeof v === 'string') n.textContent = v; });
+    document.getElementById('title').textContent = t.title();
+    document.querySelectorAll('.lang button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-lang') === lang); });
+
+    var yours = [];
+    if (term) yours.push([term + t.months, t.termL]);
+    if (amount) yours.push(['$' + amount, t.amountL]);
+    if (date) yours.push([date, t.dateL]);
+    var yc = document.getElementById('yours-card'), yb = document.getElementById('yours');
+    yc.hidden = !yours.length; yb.innerHTML = '';
+    yours.forEach(function(y){ var d = el('div'); d.appendChild(el('b')).textContent = y[0]; d.appendChild(el('span')).textContent = y[1]; yb.appendChild(d); });
+
+    li(document.getElementById('ready'), t.ready.common.concat(t.ready[pay]));
+    li(document.getElementById('ask'), t.ask[pay]);
+    var rules = document.getElementById('rules'); rules.innerHTML = '';
+    t.rules.forEach(function(r, i){ var d = el('div', 'rule'); d.appendChild(el('i', null, String(i + 1))); d.appendChild(el('div')).textContent = r; rules.appendChild(d); });
+
+    var qs = document.getElementById('questions');
+    if (!DATA) return;
+    qs.innerHTML = '';
+    DATA.questions.forEach(function(q){
+      var row = el('div', 'q');
+      row.appendChild(el('div', 'num', 'Q' + q.n));
+      var txt = el('div', 'txt'); txt.textContent = q[lang];
+      var note = q['yes_' + lang];
+      if (note) { var yn = el('div', 'yes-note'); yn.textContent = note; txt.appendChild(yn); }
+      row.appendChild(txt);
+      var cls = q.ans === 'YES' ? 'yes' : q.ans === 'NO' ? 'no' : 'either';
+      row.appendChild(el('div', 'badge ' + cls, q.ans === 'YES' ? t.yes : q.ans === 'NO' ? t.no : t.either));
+      qs.appendChild(row);
+    });
+  }
+
+  document.querySelectorAll('.lang button').forEach(function(b){
+    b.addEventListener('click', function(){
+      lang = b.getAttribute('data-lang');
+      params.set('lang', lang);
+      try { history.replaceState(null, '', location.pathname + '?' + params.toString()); } catch (e) {}
+      render();
+    });
+  });
+
+  render();
+  fetch('/genie-prep/genie-data.json', { cache: 'no-cache' })
+    .then(function(r){ return r.json(); })
+    .then(function(d){ DATA = d; render(); })
+    .catch(function(){ document.getElementById('questions').innerHTML = '<p>Couldn’t load the questions. Please refresh the page.</p>'; });
+})();
+</script>
+</body>
+</html>
