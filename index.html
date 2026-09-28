@@ -262,6 +262,7 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .dp-metrics{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
 .dp-metrics span{background:rgba(255,255,255,.14);border-radius:999px;padding:2px 9px;font-weight:800;font-size:11px;}
 .dp-save{margin-top:5px;font-size:11px;font-weight:800;color:#5eead4;}
+.dp-mini{font-size:10px;color:rgba(255,255,255,.55);font-weight:700;margin-bottom:3px;}
 .dp-empty{font-size:12px;color:rgba(255,255,255,.7);font-weight:600;}
 @media(max-width:760px){.delivery-fab{right:12px;left:12px;align-items:stretch;}.delivery-fab-panel,.support-fab-panel{width:100%;}.delivery-fab-btn,.support-fab-btn{justify-content:center;width:100%;}}
 .tip-wrap .tip-box,.ttp .ttp-body{z-index:9999;}
@@ -665,6 +666,7 @@ body{top:0!important;}
         <button type="button" onclick="toggleDeliveryFab(false)" style="border:none;background:rgba(255,255,255,.12);color:#fff;width:28px;height:28px;border-radius:999px;cursor:pointer;font-size:16px;">×</button>
       </div>
       <div id="deliveryProgramBox" class="dp-box"></div>
+      <div id="deliveryCardBox" class="dp-box"></div>
       <div class="delivery-fab-grid">
         <div style="flex:0 0 auto;width:120px;"><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.55);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">First Name</label><input id="fName" class="fi" style="font-size:13px;padding:7px 10px;background:rgba(255,255,255,.95);border-color:rgba(255,255,255,.18);" type="text" placeholder="John"/></div>
         <div style="flex:0 0 auto;width:120px;"><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.55);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Last Name</label><input id="lName" class="fi" style="font-size:13px;padding:7px 10px;background:rgba(255,255,255,.95);border-color:rgba(255,255,255,.18);" type="text" placeholder="Smith"/></div>
@@ -2205,7 +2207,7 @@ function getLDForthPlanRule(totalDebt) {
 }
 function toggleAcc(bodyId,btnId){const b=$(bodyId),btn=$(btnId);if(!b||!btn)return;const open=b.classList.contains('open');b.classList.toggle('open',!open);btn.classList.toggle('open',!open);}
 let nextId=2;
-const app={sel:'CA',rows:[{id:1,cred:'Visa Credit Card',amount:'10000',dt:'Unsecured',secured:false,collections:false,litigation:false,paid:true,bizUnprof:false}],selectedProgramRoute:'',ccApr:28,fixedMonthlyPayment:null};
+const app={sel:'CA',rows:[{id:1,cred:'Visa Credit Card',amount:'10000',dt:'Unsecured',secured:false,collections:false,litigation:false,paid:true,bizUnprof:false}],selectedProgramRoute:'',ccApr:28,fixedMonthlyPayment:null,openCardLimit:null,openCardPayment:null};
 function newRow(id){return{id,cred:'',amount:'',dt:'Unsecured',secured:false,collections:false,litigation:false,paid:true,bizUnprof:false};}
 function getRouterCreditCardAPR(){
   const el=$('cmpAprAssumption') || $('ccAprAssumption');
@@ -3185,6 +3187,49 @@ function deliveryProgramContent(route){
   const lib=window.FT_PROGRAM_CONTENT;
   return lib&&lib.programContentFor?lib.programContentFor(route):null;
 }
+// ── Credit runway: how fast interest can use up available credit on open cards ──
+// Open cards = revolving rows ('Unsecured' / 'Unsecured Line of Credit') that are
+// not secured and not in 3rd-party collections. Monthly compounding at APR/12.
+const OPEN_CARD_TYPES=new Set(['Unsecured','Unsecured Line of Credit']);
+function openCardBalance(){return app.rows.filter(r=>num(r.amount)>0&&!r.collections&&!r.secured&&OPEN_CARD_TYPES.has(r.dt||'Unsecured')).reduce((a,r)=>a+num(r.amount),0);}
+function defaultOpenCardPayment(c,bal){const t=c.total||0;return t>0?Math.round((c.dn.mp||0)*bal/t):0;}
+function computeCreditRunway(c){
+  const bal=openCardBalance();
+  const limit=num(app.openCardLimit);
+  const apr=c.dn.apr||0, r=apr/12;
+  const pay=app.openCardPayment!=null&&app.openCardPayment!==''?num(app.openCardPayment):defaultOpenCardPayment(c,bal);
+  const out={openBalance:Math.round(bal),creditLimit:Math.round(limit),availableCredit:Math.max(0,Math.round(limit-bal)),apr,aprPercent:Math.round(apr*10000)/100,monthlyPayment:Math.round(pay),paymentIsEstimate:!(app.openCardPayment!=null&&app.openCardPayment!==''),monthlyInterest:Math.round(bal*r),hasLimit:limit>bal&&bal>0};
+  out.interestShareOfPayment=pay>0?Math.min(100,Math.round(bal*r/pay*100)):null;
+  if(!out.hasLimit)return out;
+  const sim=(p)=>{let b=bal,m=0;const pts={};const marks=[3,6,12,18,24,36];let interest12=0;
+    while(m<600){const i=b*r;b=b+i-p;m++;if(m<=12)interest12+=i;if(marks.includes(m))pts[m]=Math.round(Math.max(0,limit-b));if(b>=limit)break;if(b<=0){b=0;break;}}
+    marks.forEach(k=>{if(pts[k]==null)pts[k]=b>=limit&&k>m?0:(b<=0?Math.round(limit):Math.round(Math.max(0,limit-b)));});
+    return {monthsToMaxOut:b>=limit?m:null,availableAt:pts,interestNext12:Math.round(interest12)};};
+  out.atCurrentPayment=sim(pay);
+  out.ifPaymentsStop=sim(0);
+  out.paymentCoversInterest=pay>bal*r;
+  return out;
+}
+function renderDeliveryCards(c){
+  const box=$('deliveryCardBox');if(!box)return;
+  const bal=openCardBalance();
+  if(!box.dataset.built){
+    box.dataset.built='1';
+    box.innerHTML=`<label class="dp-lbl">Open cards (not in collections) — credit runway</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div style="flex:1 1 110px;"><div class="dp-mini">Total credit limit</div><input id="ocLimit" class="fi dp-select" type="number" min="0" step="100" placeholder="e.g. 12000"/></div>
+        <div style="flex:1 1 110px;"><div class="dp-mini">Paying now / mo</div><input id="ocPay" class="fi dp-select" type="number" min="0" step="10"/></div>
+      </div><div id="ocSummary" class="dp-save" style="color:#fecaca;"></div>`;
+    $('ocLimit').oninput=e=>{app.openCardLimit=e.target.value;renderDeliveryCards(computeScenario());};
+    $('ocPay').oninput=e=>{app.openCardPayment=e.target.value===''?null:e.target.value;renderDeliveryCards(computeScenario());};
+  }
+  const pi=$('ocPay');if(pi)pi.placeholder=`est. ${defaultOpenCardPayment(c,bal)}`;
+  const cr=computeCreditRunway(c);const sm=$('ocSummary');if(!sm)return;
+  if(bal<=0){sm.textContent='No open card balances (all rows are in collections or not revolving).';return;}
+  if(!cr.hasLimit){sm.textContent=`Open card balance ${fmt(bal)}. Enter the total credit limit (above the balance) to show the runway in the PDF and webpage.`;return;}
+  const cur=cr.atCurrentPayment, stop=cr.ifPaymentsStop;
+  sm.textContent=`${fmt(cr.availableCredit)} available · ${cur.monthsToMaxOut?`maxed in ~${cur.monthsToMaxOut} mo at ${fmt(cr.monthlyPayment)}/mo`:`${cr.interestShareOfPayment}% of ${fmt(cr.monthlyPayment)}/mo goes to interest`} · if payments stop, maxed in ~${stop.monthsToMaxOut||'—'} mo`;
+}
 function renderDeliveryProgram(c){
   const box=$('deliveryProgramBox');if(!box)return;
   const routes=selectableProgramRoutes(c);
@@ -3644,7 +3689,7 @@ function onAmtChange(e){const i=Number(e.target.dataset.i);if(!app.rows[i])retur
 function addRow(){if(app.rows.length>=MAX_ROWS)return;app.rows.push(newRow(nextId++));renderRows();render();}
 function removeRow(i){if(app.rows.length<=1)return;app.rows.splice(i,1);renderRows();render();}
 let lastScenario=null;
-function render(){const c=computeScenario();lastScenario=c;$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCSCard(c);renderLDCard(c);renderLegacyCard(c);renderPlanCards(c);renderProgramChoice(c);renderDeliveryProgram(c);renderCmpTable(c);renderClocks();const can=!!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION');['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}
+function render(){const c=computeScenario();lastScenario=c;$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCSCard(c);renderLDCard(c);renderLegacyCard(c);renderPlanCards(c);renderProgramChoice(c);renderDeliveryProgram(c);renderDeliveryCards(c);renderCmpTable(c);renderClocks();const can=!!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION');['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}
 async function loadImageAsDataURL(url){
   try{
     const res = await fetch(url, {mode:'cors'});
@@ -3732,7 +3777,7 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
   // ── Program summary strip ──
   const pc=deliveryProgramContent(selRoute);
   const contentW=pageW-margin*2;
-  const ensure=(h)=>{if(y+h>pageH-16){doc.addPage();y=20;}};
+  const ensure=(h)=>{if(y+h>pageH-24){doc.addPage();y=20;}};
   if(est){
     doc.setFillColor(...TEAL);doc.roundedRect(margin,y,contentW,16,2,2,'F');
     doc.setFont(undefined,'bold');doc.setFontSize(11);doc.setTextColor(255,255,255);
@@ -3781,7 +3826,7 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
     startY:y,
     head:[['Detail','Current Situation','Fastest Payoff',pc?pc.publicName:'Recommended']],
     body:primaryRows,
-    margin:{left:margin,right:margin},
+    margin:{left:margin,right:margin,bottom:24},
     styles:{fontSize:8.5,cellPadding:3,textColor:[15,23,42],lineColor:[226,232,240],lineWidth:0.2},
     headStyles:{fillColor:NAVY,textColor:255,fontStyle:'bold',halign:'left'},
     alternateRowStyles:{fillColor:[248,250,252]},
@@ -3831,6 +3876,62 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
     y+=boxH+8;
   }
 
+  // ── Credit runway on open cards (not in collections) ──
+  const cr=computeCreditRunway(c);
+  if(cr.hasLimit){
+    const rc=(window.FT_PROGRAM_CONTENT&&window.FT_PROGRAM_CONTENT.CREDIT_RUNWAY_COPY)||{heading:'How fast interest can use up your available credit',intro:'',disclosure:''};
+    const cur=cr.atCurrentPayment, stop=cr.ifPaymentsStop;
+    doc.setFont(undefined,'normal');doc.setFontSize(8.2);
+    const intro=rc.intro?doc.splitTextToSize(rc.intro,contentW-8):[];
+    ensure(40+intro.length*3.9);
+    doc.setFont(undefined,'bold');doc.setFontSize(10.5);doc.setTextColor(...RED);
+    doc.text(rc.heading.toUpperCase()+' (ESTIMATED)',margin,y+4);
+    doc.setFont(undefined,'normal');doc.setFontSize(8.2);doc.setTextColor(...NAVY);
+    if(intro.length)doc.text(intro,margin,y+9.5);
+    y+=11+intro.length*3.9;
+
+    // headline stats
+    const tiles=[
+      ['Open card balance',fmt(cr.openBalance)],
+      ['Total credit limit',fmt(cr.creditLimit)],
+      ['Available credit today',fmt(cr.availableCredit)],
+      [`Interest added / mo (${cr.aprPercent}% APR)`,`~${fmt(cr.monthlyInterest)}`]
+    ];
+    const tw=(contentW-9)/4;
+    ensure(20);
+    tiles.forEach(([l,v],i)=>{const tx=margin+i*(tw+3);
+      doc.setDrawColor(226,232,240);doc.setLineWidth(0.3);doc.roundedRect(tx,y,tw,16,2,2,'S');
+      doc.setFont(undefined,'bold');doc.setFontSize(6.6);doc.setTextColor(...GRAY);doc.text(l.toUpperCase(),tx+2.5,y+5,{maxWidth:tw-5});
+      doc.setFontSize(11.5);doc.setTextColor(i===2?TEAL_DK[0]:NAVY[0],i===2?TEAL_DK[1]:NAVY[1],i===2?TEAL_DK[2]:NAVY[2]);doc.text(v,tx+2.5,y+12.5);});
+    y+=21;
+
+    const payTxt=`${fmt(cr.monthlyPayment)}/mo${cr.paymentIsEstimate?' (est. minimum)':''}`;
+    const maxTxt=(r)=>r.monthsToMaxOut?`about ${r.monthsToMaxOut} months`:'not within 50 years';
+    const marks=[3,6,12,18,24,36];
+    doc.autoTable({
+      startY:y,
+      head:[['Estimated available credit left',...marks.map(m=>`${m} mo`),'Credit maxed out in']],
+      body:[
+        [`At current payment: ${payTxt}`,...marks.map(m=>fmt(cur.availableAt[m])),maxTxt(cur)],
+        ['If payments stop',...marks.map(m=>fmt(stop.availableAt[m])),maxTxt(stop)]
+      ],
+      margin:{left:margin,right:margin,bottom:24},
+      styles:{fontSize:7.8,cellPadding:2.4,textColor:[15,23,42],lineColor:[226,232,240],lineWidth:0.2,halign:'right'},
+      headStyles:{fillColor:[127,29,29],textColor:255,fontStyle:'bold',halign:'right'},
+      columnStyles:{0:{halign:'left',cellWidth:44,fontStyle:'bold'},7:{fontStyle:'bold',textColor:RED}},
+      didParseCell:(d)=>{if(d.section==='head'&&d.column.index===0)d.cell.styles.halign='left';}
+    });
+    y=doc.lastAutoTable.finalY+5;
+
+    const note=cr.paymentCoversInterest
+      ?`At ${payTxt}, about ${cr.interestShareOfPayment}% of each payment is estimated to go to interest — roughly ${fmt(cur.interestNext12)} over the next 12 months — so the balance comes down slowly. If a payment is missed, interest is still added and the estimated available credit is used up in ${maxTxt(stop)}.`
+      :`At ${payTxt}, the estimated payment does not cover the ${fmt(cr.monthlyInterest)} of interest added each month, so the balance grows and available credit is estimated to run out in ${maxTxt(cur)} (${fmt(cur.interestNext12)} of interest over the next 12 months).`;
+    doc.setFont(undefined,'bold');doc.setFontSize(8.2);doc.setTextColor(...RED);
+    const nl=doc.splitTextToSize(note,contentW);ensure(nl.length*3.9+4);doc.text(nl,margin,y+2);y+=nl.length*3.9+4;
+    if(rc.disclosure){doc.setFont(undefined,'normal');doc.setFontSize(7.2);doc.setTextColor(...GRAY);
+      const dl2=doc.splitTextToSize(rc.disclosure,contentW);ensure(dl2.length*3.5+6);doc.text(dl2,margin,y+1);y+=dl2.length*3.5+7;}
+  }
+
   // ── Program disclosure ──
   if(pc&&pc.disclosure){
     doc.setFont(undefined,'normal');doc.setFontSize(7.4);doc.setTextColor(...GRAY);
@@ -3855,7 +3956,7 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
   doc.autoTable({
     startY:y,
     body:secondaryRows,
-    margin:{left:margin,right:margin},
+    margin:{left:margin,right:margin,bottom:24},
     theme:'plain',
     styles:{fontSize:8,cellPadding:2,textColor:[100,116,139]},
     columnStyles:{0:{fontStyle:'bold',textColor:[51,65,85]},1:{halign:'right'}}
@@ -3876,10 +3977,13 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
   const pageCount=doc.internal.getNumberOfPages();
   for(let p=1;p<=pageCount;p++){
     doc.setPage(p);
+    const estNote=(window.FT_PROGRAM_CONTENT&&window.FT_PROGRAM_CONTENT.ESTIMATE_DISCLOSURE)||'All figures are estimates for illustration only. Actual results and outcomes may change and are not guaranteed.';
+    doc.setFont(undefined,'italic');doc.setFontSize(6.6);doc.setTextColor(100,116,139);
+    doc.text(doc.splitTextToSize(estNote,pageW-margin*2),margin,pageH-18);
     doc.setFillColor(...NAVY);
     doc.rect(0,pageH-10,pageW,10,'F');
     doc.setFont(undefined,'normal');doc.setFontSize(7.5);doc.setTextColor(255,255,255);
-    doc.text('Funding Tier · Debt Resolution Estimator',margin,pageH-4);
+    doc.text('Funding Tier · Debt Resolution Estimator · Estimates only',margin,pageH-4);
     doc.text(`Page ${p} of ${pageCount}`,pageW-margin,pageH-4,{align:'right'});
   }
 
@@ -4016,7 +4120,7 @@ function updateLegacyCalc(newFee,newMo,newSplitPay){
 }
 
 let _lastPlanUrl=null,_lastPlanKey=null;
-function _prospectKey(){const c=computeScenario();const r=selectedProgramRoute(c);const e=programEstimate(c,r)||{};return [$('fName').value.trim(),$('lName').value.trim(),$('pEmail').value.trim(),app.sel||'',r,Math.round(c.total||0),e.term||'',Math.round(e.mp||0),Math.round(e.tc||0),app.ccApr||''].join('|').toLowerCase();}
+function _prospectKey(){const c=computeScenario();const r=selectedProgramRoute(c);const e=programEstimate(c,r)||{};return [$('fName').value.trim(),$('lName').value.trim(),$('pEmail').value.trim(),app.sel||'',r,Math.round(c.total||0),e.term||'',Math.round(e.mp||0),Math.round(e.tc||0),app.ccApr||'',app.openCardLimit||'',app.openCardPayment||''].join('|').toLowerCase();}
 function _modalShow(viewId){['modalConfirmView','modalSendingView','modalSuccessView','modalErrorView'].forEach(id=>{const el=$(id);if(el)el.style.display=id===viewId?'block':'none';});const m=$('sendModal');if(m)m.style.display='flex';}
 function _progressTo(pct,label){const p=$('modalProgress'),l=$('modalProgressLabel');if(p)p.style.width=pct+'%';if(l)l.textContent=label||'';}
 function _showSuccessModal(pageUrl,email){const se=$('modalSuccessEmail');if(se)se.textContent=email&&email!=='(no email)'?'Sent to '+email:'Plan URL generated';const ur=$('modalUrlRow'),ui=$('modalUrlInput'),ul=$('modalUrlLink');if(pageUrl&&ur&&ui&&ul){ui.value=pageUrl;ul.href=pageUrl;ur.style.display='block';}_modalShow('modalSuccessView');}
@@ -4132,6 +4236,7 @@ function buildFullPayload(sendEmail){
     },
     currentCreditCardSituation:c.dn.currentSituation||null,
     programKey:selRoute,
+    creditRunway:(()=>{const cr=computeCreditRunway(c);return cr.hasLimit?cr:null;})(),
     programSelection:app.selectedProgramRoute==='LOWEST'?'lowest_price':(app.selectedProgramRoute?'agent_selected':'default'),
     doNothingMinimumOnly:{
       startingMinimumPayment:Math.round(c.dn.mp||0),

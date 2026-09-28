@@ -90,7 +90,20 @@ export const DO_NOTHING_COPY = {
   intro:
     'Credit card and loan interest compounds — you are charged interest on top of interest every month. Minimum payments are designed to keep you paying for years, and most of each payment goes to interest instead of your balance.',
   disclosure:
-    'Current-path figures are estimates that assume no new purchases, no late payments, no added fees, no penalty APR and no APR changes. Collection agencies may add their own interest or fees.'
+    'Current-path figures are estimates that assume no new purchases, no late payments, no added fees, no penalty APR and no APR changes. Collection agencies may add their own interest or fees. Actual results may differ.'
+};
+
+// Shown on every PDF page and on the plan webpage. Everything the prospect
+// sees is an estimate — say so plainly and often.
+export const ESTIMATE_DISCLOSURE =
+  'All figures are estimates for illustration only, based on the information provided and the assumptions noted. Actual balances, interest, fees, program terms, savings, timelines and outcomes may change and are not guaranteed.';
+
+export const CREDIT_RUNWAY_COPY = {
+  heading: 'How fast interest can use up your available credit',
+  intro:
+    'On cards that are still open (not in collections), interest is added to your balance every month. When your payment does not keep up with that interest — or if payments stop — the balance climbs toward your credit limit and your available credit disappears.',
+  disclosure:
+    'Estimates assume monthly compounding at the APR shown, no new purchases and no APR changes. Late fees, over-limit fees or a penalty APR, if charged, would use up available credit faster. Card issuers may also lower credit limits or close accounts at any time. Actual results may differ.'
 };
 
 export function programContentFor(key) {
@@ -100,5 +113,11 @@ export function programContentFor(key) {
 }
 
 if (typeof window !== 'undefined') {
-  window.FT_PROGRAM_CONTENT = { PROGRAM_CONTENT, DO_NOTHING_COPY, programContentFor };
+  window.FT_PROGRAM_CONTENT = {
+    PROGRAM_CONTENT,
+    DO_NOTHING_COPY,
+    ESTIMATE_DISCLOSURE,
+    CREDIT_RUNWAY_COPY,
+    programContentFor
+  };
 }
