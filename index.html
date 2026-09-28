@@ -254,6 +254,15 @@ input[type=range].rng-p::-webkit-slider-thumb{-webkit-appearance:none;width:16px
 .delivery-fab-panel.open{display:block;}
 .delivery-fab-body{padding:16px;background:linear-gradient(135deg,#0f172a 0%,#0f2a5e 45%,#0f766e 100%);}
 .delivery-fab-grid{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;}
+.dp-box{margin-bottom:12px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);}
+.dp-lbl{display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;}
+.dp-select{width:100%;font-size:12px;padding:7px 10px;background:rgba(255,255,255,.95);border-color:rgba(255,255,255,.18);}
+.dp-summary{margin-top:8px;font-size:12px;color:#fff;line-height:1.5;}
+.dp-muted{color:rgba(255,255,255,.6);font-weight:600;font-size:11px;}
+.dp-metrics{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.dp-metrics span{background:rgba(255,255,255,.14);border-radius:999px;padding:2px 9px;font-weight:800;font-size:11px;}
+.dp-save{margin-top:5px;font-size:11px;font-weight:800;color:#5eead4;}
+.dp-empty{font-size:12px;color:rgba(255,255,255,.7);font-weight:600;}
 @media(max-width:760px){.delivery-fab{right:12px;left:12px;align-items:stretch;}.delivery-fab-panel,.support-fab-panel{width:100%;}.delivery-fab-btn,.support-fab-btn{justify-content:center;width:100%;}}
 .tip-wrap .tip-box,.ttp .ttp-body{z-index:9999;}
 .plan-body{padding:18px;min-height:185px;display:flex;flex-direction:column;justify-content:flex-start;}
@@ -655,6 +664,7 @@ body{top:0!important;}
         </div>
         <button type="button" onclick="toggleDeliveryFab(false)" style="border:none;background:rgba(255,255,255,.12);color:#fff;width:28px;height:28px;border-radius:999px;cursor:pointer;font-size:16px;">×</button>
       </div>
+      <div id="deliveryProgramBox" class="dp-box"></div>
       <div class="delivery-fab-grid">
         <div style="flex:0 0 auto;width:120px;"><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.55);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">First Name</label><input id="fName" class="fi" style="font-size:13px;padding:7px 10px;background:rgba(255,255,255,.95);border-color:rgba(255,255,255,.18);" type="text" placeholder="John"/></div>
         <div style="flex:0 0 auto;width:120px;"><label style="display:block;font-size:10px;font-weight:700;color:rgba(255,255,255,.55);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;">Last Name</label><input id="lName" class="fi" style="font-size:13px;padding:7px 10px;background:rgba(255,255,255,.95);border-color:rgba(255,255,255,.18);" type="text" placeholder="Smith"/></div>
@@ -3153,11 +3163,56 @@ function programRouteAvailable(c,route){
   return false;
 }
 function selectableProgramRoutes(c){return ['LEVEL','CONSUMER SHIELD','LEGACY'].filter(r=>programRouteAvailable(c,r));}
+// Lowest-priced eligible program = lowest total program cost (ties → lower monthly).
+function lowestCostProgramRoute(c){
+  let best='',bt=Infinity,bm=Infinity;
+  selectableProgramRoutes(c).forEach(r=>{const e=programEstimate(c,r);if(!e)return;if(e.tc<bt||(e.tc===bt&&e.mp<bm)){best=r;bt=e.tc;bm=e.mp;}});
+  return best;
+}
+// Prospect program selection. app.selectedProgramRoute is '' (default),
+// 'LOWEST', or a route key the agent picked. Default = Shield Services
+// (Debt Validation) whenever the prospect's state/debt makes it eligible,
+// otherwise the router's best route.
 function selectedProgramRoute(c){
   const routes=selectableProgramRoutes(c);
+  if(app.selectedProgramRoute==='LOWEST'){const r=lowestCostProgramRoute(c);if(r)return r;}
   if(app.selectedProgramRoute&&routes.includes(app.selectedProgramRoute))return app.selectedProgramRoute;
+  if(routes.includes('CONSUMER SHIELD'))return 'CONSUMER SHIELD';
   if(c.route&&c.route.route&&routes.includes(c.route.route))return c.route.route;
   return routes[0]||'';
+}
+function deliveryProgramContent(route){
+  const lib=window.FT_PROGRAM_CONTENT;
+  return lib&&lib.programContentFor?lib.programContentFor(route):null;
+}
+function renderDeliveryProgram(c){
+  const box=$('deliveryProgramBox');if(!box)return;
+  const routes=selectableProgramRoutes(c);
+  if(!(app.sel&&c.total>0)||!routes.length){
+    box.innerHTML=`<div class="dp-empty">${app.sel&&c.total>0?'No eligible program for this scenario.':'Enter a state and debts to choose a program.'}</div>`;
+    return;
+  }
+  const sel=selectedProgramRoute(c);
+  const lowest=lowestCostProgramRoute(c);
+  const mode=app.selectedProgramRoute==='LOWEST'?'LOWEST':(app.selectedProgramRoute&&routes.includes(app.selectedProgramRoute)?app.selectedProgramRoute:'');
+  const opt=(r)=>{const e=programEstimate(c,r);return e?`${internalProgramName(r)} — ${publicProgramName(r)} · ${fmt(e.mp)}/mo · ${e.term} mo · ${fmt(e.tc)} total`:internalProgramName(r);};
+  const defaultLabel=routes.includes('CONSUMER SHIELD')?'Default — Shield Services (Debt Validation)':`Default — router best (${internalProgramName(sel)})`;
+  const est=programEstimate(c,sel);
+  const dnTotal=Math.round(c.dn.fixedTotal||0), dnMinTotal=Math.round(c.dn.total||0);
+  const save=est?Math.max(0,dnTotal-Math.round(est.tc)):0;
+  const saveMin=est?Math.max(0,dnMinTotal-Math.round(est.tc)):0;
+  const pc=deliveryProgramContent(sel);
+  box.innerHTML=`<label class="dp-lbl">Program to present</label>
+    <select id="deliveryProgramSelect" class="fi dp-select">
+      <option value="" ${mode===''?'selected':''}>${esc(defaultLabel)}</option>
+      <option value="LOWEST" ${mode==='LOWEST'?'selected':''}>Lowest price — ${esc(lowest?internalProgramName(lowest):'n/a')} (lowest total cost)</option>
+      ${routes.map(r=>`<option value="${r}" ${mode===r?'selected':''}>${esc(opt(r))}</option>`).join('')}
+    </select>
+    ${est?`<div class="dp-summary"><div><strong>${esc(pc?pc.publicName:publicProgramName(sel))}</strong> <span class="dp-muted">(${esc(internalProgramName(sel))} — prospect sees program type only)</span></div>
+      <div class="dp-metrics"><span>${fmt(est.mp)}/mo</span><span>${est.term} months</span><span>${fmt(est.tc)} total</span></div>
+      <div class="dp-save">Saves ~${fmt(save)} vs paying their current ${fmt(Math.round(c.dn.fixedMonthlyPayment||c.dn.mp))}/mo · ~${fmt(saveMin)} vs minimum-only</div></div>`:''}`;
+  const dd=$('deliveryProgramSelect');
+  if(dd)dd.onchange=()=>{app.selectedProgramRoute=dd.value;render();};
 }
 function programEstimate(c,route){
   const total=c.total||0;
@@ -3589,7 +3644,7 @@ function onAmtChange(e){const i=Number(e.target.dataset.i);if(!app.rows[i])retur
 function addRow(){if(app.rows.length>=MAX_ROWS)return;app.rows.push(newRow(nextId++));renderRows();render();}
 function removeRow(i){if(app.rows.length<=1)return;app.rows.splice(i,1);renderRows();render();}
 let lastScenario=null;
-function render(){const c=computeScenario();lastScenario=c;$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCSCard(c);renderLDCard(c);renderLegacyCard(c);renderPlanCards(c);renderProgramChoice(c);renderCmpTable(c);renderClocks();const can=!!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION');['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}
+function render(){const c=computeScenario();lastScenario=c;$('totalDebt').textContent=fmt(c.total);refreshRowVisuals();renderPanel(c);renderCSCard(c);renderLDCard(c);renderLegacyCard(c);renderPlanCards(c);renderProgramChoice(c);renderDeliveryProgram(c);renderCmpTable(c);renderClocks();const can=!!(app.sel&&c.total>0&&c.route&&c.route.route&&c.route.route!=='NO OPTION');['pdfBtn','sendBtn'].forEach(id=>{const b=$(id);if(b){b.disabled=!can;b.style.opacity=can?1:.5;}});}
 async function loadImageAsDataURL(url){
   try{
     const res = await fetch(url, {mode:'cors'});
@@ -3675,13 +3730,41 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
   y=cardY+cardH+12;
 
   // ── Program summary strip ──
+  const pc=deliveryProgramContent(selRoute);
+  const contentW=pageW-margin*2;
+  const ensure=(h)=>{if(y+h>pageH-16){doc.addPage();y=20;}};
   if(est){
-    doc.setFillColor(...TEAL);doc.roundedRect(margin,y,pageW-margin*2,16,2,2,'F');
+    doc.setFillColor(...TEAL);doc.roundedRect(margin,y,contentW,16,2,2,'F');
     doc.setFont(undefined,'bold');doc.setFontSize(11);doc.setTextColor(255,255,255);
-    doc.text(`${progType} Program`,margin+5,y+6.5);
+    doc.text(pc?pc.publicName:`${progType} Program`,margin+5,y+6.5);
     doc.setFont(undefined,'normal');doc.setFontSize(9);
-    doc.text(`Monthly: ${fmt(est.mp)}   |   Term: ${est.term} months   |   Total: ${fmt(est.tc)}`,margin+5,y+12.5);
-    y+=24;
+    const payLbl=pc&&pc.paymentLabel?pc.paymentLabel.replace(/^./,m=>m.toUpperCase()):'Monthly';
+    doc.text(`${payLbl}: ${fmt(est.mp)}   |   Length: ${est.term} months   |   Total program price: ${fmt(est.tc)}`,margin+5,y+12.5);
+    y+=22;
+  }
+
+  // ── How the program works + key benefits ──
+  if(est&&pc){
+    const tag=doc.splitTextToSize(pc.tagline,contentW);
+    doc.setFont(undefined,'italic');doc.setFontSize(9.5);doc.setTextColor(...NAVY);
+    ensure(tag.length*4.4+4);doc.text(tag,margin,y);y+=tag.length*4.4+4;
+
+    const colGap=6, colW=(contentW-colGap)/2;
+    const hiw=pc.howItWorks.map((t,i)=>doc.splitTextToSize(`${i+1}.  ${t}`,colW-6));
+    const ben=pc.benefits.map(t=>doc.splitTextToSize(`•  ${t}`,colW-6));
+    const hH=hiw.reduce((a,l)=>a+l.length*3.9+1.6,0), bH=ben.reduce((a,l)=>a+l.length*3.9+1.6,0);
+    const boxH=Math.max(hH,bH)+13;
+    ensure(boxH+4);
+    [[margin,'HOW IT WORKS',hiw],[margin+colW+colGap,'KEY BENEFITS',ben]].forEach(([x,title,items])=>{
+      doc.setFillColor(240,253,250);doc.setDrawColor(...TEAL);doc.setLineWidth(0.3);
+      doc.roundedRect(x,y,colW,boxH,2,2,'FD');
+      doc.setFont(undefined,'bold');doc.setFontSize(8);doc.setTextColor(...TEAL_DK);
+      doc.text(title,x+3,y+6);
+      doc.setFont(undefined,'normal');doc.setFontSize(8.2);doc.setTextColor(...NAVY);
+      let iy=y+11.5;
+      items.forEach(lines=>{doc.text(lines,x+3,iy);iy+=lines.length*3.9+1.6;});
+    });
+    y+=boxH+8;
   }
 
   // ── Primary comparison table (fixed-payment based — this is the fix) ──
@@ -3696,7 +3779,7 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
   ];
   doc.autoTable({
     startY:y,
-    head:[['Detail','Current Situation','Fastest Payoff','Recommended']],
+    head:[['Detail','Current Situation','Fastest Payoff',pc?pc.publicName:'Recommended']],
     body:primaryRows,
     margin:{left:margin,right:margin},
     styles:{fontSize:8.5,cellPadding:3,textColor:[15,23,42],lineColor:[226,232,240],lineWidth:0.2},
@@ -3712,6 +3795,49 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
     }
   });
   y=doc.lastAutoTable.finalY+10;
+
+  // ── The cost of doing nothing ──
+  {
+    const apr=(c.dn.apr||0), daily=(c.total||0)*apr/365, monthlyInt=(c.total||0)*apr/12;
+    const saveFixed=est?Math.max(0,(c.dn.fixedTotal||0)-est.tc):0;
+    const saveMin=est?Math.max(0,(c.dn.total||0)-est.tc):0;
+    const dnc=(window.FT_PROGRAM_CONTENT&&window.FT_PROGRAM_CONTENT.DO_NOTHING_COPY)||{heading:'The cost of doing nothing',intro:''};
+    const intro=dnc.intro?doc.splitTextToSize(dnc.intro,contentW-8):[];
+    const boxH=16+intro.length*3.9+22;
+    ensure(boxH+4);
+    doc.setFillColor(254,242,242);doc.setDrawColor(...RED);doc.setLineWidth(0.4);
+    doc.roundedRect(margin,y,contentW,boxH,2,2,'FD');
+    doc.setFont(undefined,'bold');doc.setFontSize(10.5);doc.setTextColor(...RED);
+    doc.text(dnc.heading.toUpperCase(),margin+4,y+7);
+    doc.setFont(undefined,'normal');doc.setFontSize(8.2);doc.setTextColor(...NAVY);
+    if(intro.length)doc.text(intro,margin+4,y+12.5);
+    const my=y+14+intro.length*3.9;
+    const stats=[
+      ['Interest charged daily',`~$${daily.toFixed(2)}/day`],
+      ['Interest per month',`~${fmt(Math.round(monthlyInt))}`],
+      ['Minimum-only payoff',c.dn.yearsMonths||'N/A'],
+      ['Minimum-only interest',fmt(c.dn.interest||0)]
+    ];
+    const sw=(contentW-8)/4;
+    stats.forEach(([l,v],i)=>{
+      const sx=margin+4+i*sw;
+      doc.setFont(undefined,'bold');doc.setFontSize(6.8);doc.setTextColor(...GRAY);doc.text(l.toUpperCase(),sx,my+3);
+      doc.setFont(undefined,'bold');doc.setFontSize(11.5);doc.setTextColor(...RED);doc.text(String(v),sx,my+9.5);
+    });
+    if(est){
+      doc.setFont(undefined,'bold');doc.setFontSize(8.6);doc.setTextColor(...TEAL_DK);
+      doc.text(`Estimated savings with the ${pc?pc.publicName:progType}: ${fmt(saveFixed)} vs paying your current ${fmt(fixedMp)}/mo · ${fmt(saveMin)} vs minimum payments only`,margin+4,my+16,{maxWidth:contentW-8});
+    }
+    y+=boxH+8;
+  }
+
+  // ── Program disclosure ──
+  if(pc&&pc.disclosure){
+    doc.setFont(undefined,'normal');doc.setFontSize(7.4);doc.setTextColor(...GRAY);
+    const dl=doc.splitTextToSize(pc.disclosure,contentW);
+    ensure(dl.length*3.6+6);
+    doc.text(dl,margin,y);y+=dl.length*3.6+6;
+  }
 
   // ── Secondary: declining minimum-payment reference ──
   if(y>250){doc.addPage();y=20;}
@@ -3890,7 +4016,7 @@ function updateLegacyCalc(newFee,newMo,newSplitPay){
 }
 
 let _lastPlanUrl=null,_lastPlanKey=null;
-function _prospectKey(){return [$('fName').value.trim(),$('lName').value.trim(),$('pEmail').value.trim(),app.sel||'',app.selectedProgramRoute||''].join('|').toLowerCase();}
+function _prospectKey(){const c=computeScenario();const r=selectedProgramRoute(c);const e=programEstimate(c,r)||{};return [$('fName').value.trim(),$('lName').value.trim(),$('pEmail').value.trim(),app.sel||'',r,Math.round(c.total||0),e.term||'',Math.round(e.mp||0),Math.round(e.tc||0),app.ccApr||''].join('|').toLowerCase();}
 function _modalShow(viewId){['modalConfirmView','modalSendingView','modalSuccessView','modalErrorView'].forEach(id=>{const el=$(id);if(el)el.style.display=id===viewId?'block':'none';});const m=$('sendModal');if(m)m.style.display='flex';}
 function _progressTo(pct,label){const p=$('modalProgress'),l=$('modalProgressLabel');if(p)p.style.width=pct+'%';if(l)l.textContent=label||'';}
 function _showSuccessModal(pageUrl,email){const se=$('modalSuccessEmail');if(se)se.textContent=email&&email!=='(no email)'?'Sent to '+email:'Plan URL generated';const ur=$('modalUrlRow'),ui=$('modalUrlInput'),ul=$('modalUrlLink');if(pageUrl&&ur&&ui&&ul){ui.value=pageUrl;ul.href=pageUrl;ur.style.display='block';}_modalShow('modalSuccessView');}
@@ -4005,6 +4131,17 @@ function buildFullPayload(sendEmail){
       assumption:c.dn.assumption
     },
     currentCreditCardSituation:c.dn.currentSituation||null,
+    programKey:selRoute,
+    programSelection:app.selectedProgramRoute==='LOWEST'?'lowest_price':(app.selectedProgramRoute?'agent_selected':'default'),
+    doNothingMinimumOnly:{
+      startingMinimumPayment:Math.round(c.dn.mp||0),
+      monthsToPayoff:Math.round(c.dn.months||0),
+      yearsMonths:c.dn.yearsMonths||'',
+      interestCost:Math.round(c.dn.interest||0),
+      totalPayback:Math.round(c.dn.total||0),
+      dailyInterest:Math.round(((c.total||0)*(c.dn.apr||0)/365)*100)/100,
+      monthlyInterest:Math.round((c.total||0)*(c.dn.apr||0)/12)
+    },
     shortest:est&&est.shortest?{term:est.shortest.term,monthlyPayment:Math.round(est.shortest.mp),totalCost:Math.round(est.shortest.tc)}:null,
     recommended,
     route:publicProgramName(selRoute),
@@ -4371,6 +4508,7 @@ if(planContainer){
   </div>
 </div>
 <script src="/agents/scripting-and-lead-handling.js"></script>
+<script type="module" src="/agents/prospect-program-content.js" onload="try{render()}catch(e){}"></script>
 <script src="https://ai.fundingtier.com/toolkit.js" defer></script>
   
 </body>
