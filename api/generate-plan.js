@@ -1,5 +1,6 @@
 import { put } from '@vercel/blob';
 import { randomUUID } from 'node:crypto';
+import { programContentFor } from '../agents/prospect-program-content.js';
 
 // How long a generated plan link stays viewable.
 const PLAN_TTL_DAYS = 45;
@@ -48,16 +49,80 @@ export default async function handler(req, res) {
       recommended = {},
       route = '',
       routeReason = '',
-      rows = []
+      rows = [],
+      programKey = '',
+      programSelection = 'default',
+      doNothingMinimumOnly = {},
+      creditRunway = null
     } = req.body || {};
+
+    const n = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
+
+    // Program copy comes from the server-side library, keyed by a whitelisted
+    // route key — the browser never supplies prospect-facing wording.
+    const content = programContentFor(String(programKey || ''));
+    const program = content
+      ? {
+          key: content.key,
+          publicName: content.publicName,
+          paymentLabel: content.paymentLabel,
+          tagline: content.tagline,
+          howItWorks: content.howItWorks,
+          benefits: content.benefits,
+          disclosure: content.disclosure,
+          monthlyPayment: Math.round(n(recommended.monthlyPayment)),
+          term: Math.round(n(recommended.term)),
+          totalCost: Math.round(n(recommended.totalCost)),
+          selection: ['default', 'lowest_price', 'agent_selected'].includes(programSelection)
+            ? programSelection
+            : 'default'
+        }
+      : null;
+
+    const minimumOnly = {
+      startingMinimumPayment: Math.round(n(doNothingMinimumOnly.startingMinimumPayment)),
+      monthsToPayoff: Math.round(n(doNothingMinimumOnly.monthsToPayoff)),
+      yearsMonths: String(doNothingMinimumOnly.yearsMonths || '').slice(0, 60),
+      interestCost: Math.round(n(doNothingMinimumOnly.interestCost)),
+      totalPayback: Math.round(n(doNothingMinimumOnly.totalPayback)),
+      dailyInterest: Math.round(n(doNothingMinimumOnly.dailyInterest) * 100) / 100,
+      monthlyInterest: Math.round(n(doNothingMinimumOnly.monthlyInterest))
+    };
 
     const safeRows = Array.isArray(rows) ? rows.slice(0, MAX_ROWS) : [];
 
     const fullName = `${firstName} ${lastName}`.trim();
     const token = randomUUID();
+    // Credit runway on open (not-in-collections) cards — numbers only.
+    const cleanRunwayScenario = (sc) => {
+      const at = {};
+      [3, 6, 12, 18, 24, 36].forEach((m) => { at[m] = Math.round(n(sc?.availableAt?.[m])); });
+      const mm = n(sc?.monthsToMaxOut);
+      return { monthsToMaxOut: mm > 0 ? Math.round(mm) : null, availableAt: at, interestNext12: Math.round(n(sc?.interestNext12)) };
+    };
+    const runway = creditRunway && n(creditRunway.creditLimit) > n(creditRunway.openBalance) && n(creditRunway.openBalance) > 0
+      ? {
+          openBalance: Math.round(n(creditRunway.openBalance)),
+          creditLimit: Math.round(n(creditRunway.creditLimit)),
+          availableCredit: Math.round(n(creditRunway.availableCredit)),
+          aprPercent: Math.round(n(creditRunway.aprPercent) * 100) / 100,
+          monthlyPayment: Math.round(n(creditRunway.monthlyPayment)),
+          paymentIsEstimate: !!creditRunway.paymentIsEstimate,
+          monthlyInterest: Math.round(n(creditRunway.monthlyInterest)),
+          interestShareOfPayment: creditRunway.interestShareOfPayment == null ? null : Math.round(n(creditRunway.interestShareOfPayment)),
+          paymentCoversInterest: !!creditRunway.paymentCoversInterest,
+          atCurrentPayment: cleanRunwayScenario(creditRunway.atCurrentPayment),
+          ifPaymentsStop: cleanRunwayScenario(creditRunway.ifPaymentsStop)
+        }
+      : null;
+
     const savings = Math.max(
       0,
       Number(doNothing.totalPayback || 0) - Number(recommended.totalCost || 0)
+    );
+    const savingsVsMinimumOnly = Math.max(
+      0,
+      minimumOnly.totalPayback - Number(recommended.totalCost || 0)
     );
 
     const now = new Date();
@@ -78,6 +143,10 @@ export default async function handler(req, res) {
       routeReason,
       rows: safeRows,
       savings,
+      savingsVsMinimumOnly,
+      program,
+      minimumOnly,
+      creditRunway: runway,
       createdAt: now.toISOString(),
       expiresAt: expiresAt.toISOString()
     };

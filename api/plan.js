@@ -1,4 +1,5 @@
 import { get } from '@vercel/blob';
+import { ESTIMATE_DISCLOSURE, CREDIT_RUNWAY_COPY } from '../agents/prospect-program-content.js';
 
 function currency(value) {
   return new Intl.NumberFormat('en-US', {
@@ -66,8 +67,102 @@ export default async function handler(req, res) {
       recommended = {},
       routeReason = '',
       rows = [],
-      savings = 0
+      savings = 0,
+      savingsVsMinimumOnly = 0,
+      program = null,
+      minimumOnly = null,
+      creditRunway = null
     } = data;
+
+    const list = (items) => (Array.isArray(items) ? items : []).map((t) => escapeHtml(t));
+    const programName = program && program.publicName ? program.publicName : 'Recommended Program';
+
+    const programSection = program
+      ? `
+    <section class="section program">
+      <span class="pill">Your recommended program</span>
+      <h2>${escapeHtml(programName)}</h2>
+      <p class="lead">${escapeHtml(program.tagline || '')}</p>
+      <div class="kpi-grid kpi-3">
+        <div class="kpi kpi-green">
+          <div class="label">${escapeHtml(program.paymentLabel || 'Monthly program payment')}</div>
+          <div class="value">${currency(program.monthlyPayment || recommended.monthlyPayment || 0)}</div>
+        </div>
+        <div class="kpi kpi-green">
+          <div class="label">Program length</div>
+          <div class="value">${escapeHtml(String(program.term || recommended.term || '—'))} months</div>
+        </div>
+        <div class="kpi kpi-green">
+          <div class="label">Total program price</div>
+          <div class="value">${currency(program.totalCost || recommended.totalCost || 0)}</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3>How it gets you out of debt</h3>
+          <ol>${list(program.howItWorks).map((t) => `<li>${t}</li>`).join('')}</ol>
+        </div>
+        <div class="card">
+          <h3>Key benefits</h3>
+          <ul class="checks">${list(program.benefits).map((t) => `<li>${t}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <div class="footer-note">${escapeHtml(program.disclosure || '')}</div>
+    </section>`
+      : '';
+
+    const mo = minimumOnly || {};
+    const cr = creditRunway;
+    const marks = [3, 6, 12, 18, 24, 36];
+    const maxTxt = (r) => (r && r.monthsToMaxOut ? `about ${r.monthsToMaxOut} months` : 'not within 50 years');
+    const payTxt = cr ? `${currency(cr.monthlyPayment)}/mo${cr.paymentIsEstimate ? ' (estimated minimum)' : ''}` : '';
+    const runwaySection = !cr ? '' : `
+    <section class="section do-nothing">
+      <h2>${escapeHtml(CREDIT_RUNWAY_COPY.heading)} <span class="est-tag">estimated</span></h2>
+      <p class="lead">${escapeHtml(CREDIT_RUNWAY_COPY.intro)}</p>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="label">Open card balance</div><div class="value">${currency(cr.openBalance)}</div></div>
+        <div class="kpi"><div class="label">Total credit limit</div><div class="value">${currency(cr.creditLimit)}</div></div>
+        <div class="kpi"><div class="label">Available credit today</div><div class="value">${currency(cr.availableCredit)}</div></div>
+        <div class="kpi kpi-warn"><div class="label">Interest added each month</div><div class="value">~${currency(cr.monthlyInterest)}</div><div class="sub">at ${escapeHtml(String(cr.aprPercent))}% APR</div></div>
+      </div>
+      <div class="compare">
+        <table>
+          <thead><tr><th>Estimated available credit left</th>${marks.map((m) => `<th>${m} mo</th>`).join('')}<th>Credit maxed out in</th></tr></thead>
+          <tbody>
+            <tr><td>At current payment: ${escapeHtml(payTxt)}</td>${marks.map((m) => `<td>${currency(cr.atCurrentPayment.availableAt[m])}</td>`).join('')}<td class="danger">${escapeHtml(maxTxt(cr.atCurrentPayment))}</td></tr>
+            <tr><td>If payments stop</td>${marks.map((m) => `<td>${currency(cr.ifPaymentsStop.availableAt[m])}</td>`).join('')}<td class="danger">${escapeHtml(maxTxt(cr.ifPaymentsStop))}</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="explain-box warn">
+        <div class="check-icon">!</div>
+        <div>${cr.paymentCoversInterest
+          ? `At ${escapeHtml(payTxt)}, about ${escapeHtml(String(cr.interestShareOfPayment))}% of each payment is estimated to go to interest — roughly ${currency(cr.atCurrentPayment.interestNext12)} over the next 12 months — so the balance comes down slowly. If a payment is missed, interest is still added and your estimated available credit could be used up in ${escapeHtml(maxTxt(cr.ifPaymentsStop))}.`
+          : `At ${escapeHtml(payTxt)}, your estimated payment does not cover the ${currency(cr.monthlyInterest)} of interest added each month, so the balance grows and your available credit is estimated to run out in ${escapeHtml(maxTxt(cr.atCurrentPayment))}.`}</div>
+      </div>
+      <div class="footer-note">${escapeHtml(CREDIT_RUNWAY_COPY.disclosure)}</div>
+    </section>`;
+
+    // Plans generated before this section existed carry no minimumOnly data.
+    const doNothingSection = !minimumOnly ? '' : `
+    <section class="section do-nothing">
+      <h2>The cost of doing nothing <span class="est-tag">estimated</span></h2>
+      <p class="lead">
+        Credit card and loan interest compounds — you are charged interest on top of interest every month. Minimum payments are designed to keep you paying for years, and most of each payment goes to interest instead of your balance.
+      </p>
+      <div class="kpi-grid">
+        ${mo.dailyInterest ? `<div class="kpi kpi-warn"><div class="label">Interest charged every day</div><div class="value">~$${Number(mo.dailyInterest).toFixed(2)}</div></div>` : ''}
+        ${mo.monthlyInterest ? `<div class="kpi kpi-warn"><div class="label">Interest per month</div><div class="value">~${currency(mo.monthlyInterest)}</div></div>` : ''}
+        <div class="kpi kpi-warn"><div class="label">Paying minimums only</div><div class="value">${escapeHtml(mo.yearsMonths || (doNothing.minimumOnlyYearsMonths || '—'))}</div><div class="sub">to pay it off</div></div>
+        <div class="kpi kpi-warn"><div class="label">Interest paid on minimums</div><div class="value">${currency(mo.interestCost || 0)}</div><div class="sub">total paid ${currency(mo.totalPayback || 0)}</div></div>
+      </div>
+      <div class="savings-strip">
+        <div><div class="label">Estimated savings vs your current payment</div><div class="value">${currency(savings)}</div><div class="sub">vs paying ${currency(doNothing.monthlyPayment || 0)}/mo until paid off (${currency(doNothing.totalPayback || 0)} total)</div></div>
+        <div><div class="label">Estimated savings vs minimum payments only</div><div class="value">${currency(savingsVsMinimumOnly)}</div><div class="sub">vs ${currency(mo.totalPayback || 0)} total on minimum payments</div></div>
+      </div>
+      <div class="footer-note">Current-path figures are estimates that assume no new purchases, no late payments, no added fees, no penalty APR and no APR changes. Collection agencies may add their own interest or fees.</div>
+    </section>`;
 
     const userFriendlyEstimateNote =
       'These estimated program details are based on projected settlement assumptions, program fees, and the creditor accounts that were selected to be included in this review. Final terms may vary after full review.';
@@ -332,7 +427,31 @@ export default async function handler(req, res) {
       line-height: 1.8;
       color: #64748b;
     }
+    .est-banner { margin:18px 0 0; padding:12px 16px; border-radius:14px; background:#fffbeb; border:1px solid #fcd34d; color:#92400e; font-size:13px; line-height:1.6; }
+    .est-tag { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:#92400e; background:#fef3c7; border-radius:999px; padding:3px 9px; vertical-align:middle; }
+    .explain-box.warn { background:#fef2f2; border-color:#fecaca; }
+    .explain-box.warn .check-icon { background:#dc2626; }
+    .pill { display:inline-block; padding:6px 12px; border-radius:999px; background:#ccfbf1; color:#0f766e; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+    .program h2 { margin-top:12px; }
+    .kpi-grid.kpi-3 { grid-template-columns: repeat(3, 1fr); }
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:22px; }
+    .card { border:1px solid #ccfbf1; background:#f0fdfa; border-radius:18px; padding:20px 22px; }
+    .card h3 { margin:0 0 10px; font-size:17px; color:#0f766e; }
+    .card ol, .card ul { margin:0; padding-left:20px; line-height:1.7; font-size:15px; }
+    .card li { margin-bottom:6px; }
+    ul.checks { list-style:none; padding-left:0; }
+    ul.checks li { padding-left:26px; position:relative; }
+    ul.checks li::before { content:'✓'; position:absolute; left:0; top:0; color:#0f766e; font-weight:900; }
+    .kpi-warn { background:#fef2f2; border:1px solid #fecaca; }
+    .kpi-warn .label { color:#991b1b; }
+    .kpi-warn .value { color:#b91c1c; }
+    .kpi .sub { margin-top:6px; font-size:12px; font-weight:600; color:#64748b; }
+    .savings-strip { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:20px; padding:20px 22px; border-radius:18px; background:linear-gradient(135deg,#0f766e,#14b8a6); color:#fff; }
+    .savings-strip .label { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; opacity:.85; }
+    .savings-strip .value { font-size:32px; font-weight:900; margin-top:6px; }
+    .savings-strip .sub { font-size:13px; opacity:.9; margin-top:4px; }
     @media (max-width: 900px) {
+      .kpi-grid.kpi-3, .two-col, .savings-strip { grid-template-columns: 1fr; }
       .hero-grid, .kpi-grid, .debt-item {
         grid-template-columns: 1fr;
       }
@@ -370,6 +489,10 @@ export default async function handler(req, res) {
         </div>
       </div>
     </section>
+
+    <div class="est-banner"><strong>Estimates only.</strong> ${escapeHtml(ESTIMATE_DISCLOSURE)}</div>
+
+    ${programSection}
 
     <section class="section">
       <h2>Your Estimated Snapshot</h2>
@@ -421,7 +544,7 @@ export default async function handler(req, res) {
               <th>Detail</th>
               <th>Current Financial Situation</th>
               <th>Fastest Available Payoff</th>
-              <th class="best-col">Recommended Program</th>
+              <th class="best-col">${escapeHtml(programName)}</th>
             </tr>
           </thead>
           <tbody>
@@ -473,6 +596,10 @@ export default async function handler(req, res) {
       </div>
     </section>
 
+    ${doNothingSection}
+
+    ${runwaySection}
+
     <section class="section">
       <h2>UNSECURED DEBTS / ACCOUNTS</h2>
       <p class="lead">
@@ -508,7 +635,7 @@ export default async function handler(req, res) {
       </div>
 
       <div class="footer-note">
-        These estimates are illustrative only and final terms may vary based on a full review of the account profile and the debts elected to be included.
+        These estimates are illustrative only and final terms may vary based on a full review of the account profile and the debts elected to be included. ${escapeHtml(ESTIMATE_DISCLOSURE)}
       </div>
     </section>
   </div>
