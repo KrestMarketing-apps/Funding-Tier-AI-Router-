@@ -8,10 +8,6 @@ import {
   programContentFor
 } from '../agents/prospect-program-content.js';
 
-// Booking link shown on the prospect page. Placeholder — swap for the live
-// scheduling URL when it is ready. Used by every "Schedule" button below.
-const BOOKING_URL = 'https://fundingtier.com/book';
-
 // Funding Tier phone line, as a tel: href and as display text.
 const PHONE_TEL = 'tel:+18337163863';
 const PHONE_TEXT = '(833) 716-3863';
@@ -576,8 +572,7 @@ export default async function handler(req, res) {
             This page is designed to help you clearly understand how your current debt path compares to a potential new structured resolution program, including the estimated monthly payment difference and estimated total cost.
           </p>
           <div class="cta-wrap">
-            <a class="btn btn-primary" href="${BOOKING_URL}" target="_blank" rel="noopener noreferrer">Schedule Your Next Step</a>
-            <a class="btn btn-secondary" href="${PHONE_TEL}">Call Funding Tier ${PHONE_TEXT}</a>
+            <a class="btn btn-primary" href="${PHONE_TEL}">Call Funding Tier ${PHONE_TEXT}</a>
           </div>
         </div>
         <div class="hero-card">
@@ -705,12 +700,11 @@ export default async function handler(req, res) {
     <section class="section">
       <h2>Next Step</h2>
       <p class="lead">
-        If this estimated path makes sense to you, the next step is to complete your review so your final program structure can be confirmed.
+        If this estimated path makes sense to you, your Funding Tier specialist will complete your review so your final program structure can be confirmed. Need to pick this back up later? Call us and we will schedule a callback.
       </p>
 
       <div class="cta-wrap">
-        <a class="btn btn-primary" href="${BOOKING_URL}" target="_blank" rel="noopener noreferrer">Schedule Your Next Step</a>
-        <a class="btn btn-secondary" href="${PHONE_TEL}">Call Funding Tier ${PHONE_TEXT}</a>
+        <a class="btn btn-primary" href="${PHONE_TEL}">Call Funding Tier ${PHONE_TEXT}</a>
         <a class="btn btn-secondary" href="${escapeHtml(mailtoHref)}">Email Me This Plan</a>
       </div>
 
