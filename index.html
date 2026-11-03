@@ -15,6 +15,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="/lib/program-pricing.js"></script>
 <style>
 :root{--g:#0f9d8a;--gd:#0b7d6e;--dk:#0f172a;--bl:#1a6ed8;--am:#f59e0b;--rd:#ef4444;--br:#e2e8f0;--bg:#f8fafc;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -481,14 +482,14 @@ body{top:0!important;}
     <div class="state-cov-head">
       <div>
         <div class="state-cov-title">State Coverage Map</div>
-        <div class="state-cov-sub">Geographic U.S. map showing backend state rules for Level Debt, Elite Legal Practice, and Consumer Shield.</div>
+        <div class="state-cov-sub">Geographic U.S. map showing backend state rules for Level Debt, Elite Legal Practice, and Shield Services.</div>
       </div>
       <button type="button" class="state-cov-close" onclick="toggleStateCoverageMenu(false)">×</button>
     </div>
     <div class="state-cov-tabs">
       <button type="button" class="state-cov-tab active" data-cov-view="level" onclick="renderStateCoverageMap('level')">Level Debt Rules</button>
       <button type="button" class="state-cov-tab" data-cov-view="legacy" onclick="renderStateCoverageMap('legacy')">Elite Legal Practice Rules</button>
-      <button type="button" class="state-cov-tab" data-cov-view="cs" onclick="renderStateCoverageMap('cs')">Consumer Shield Rules</button>
+      <button type="button" class="state-cov-tab" data-cov-view="cs" onclick="renderStateCoverageMap('cs')">Shield Services Rules</button>
       <button type="button" class="state-cov-tab" data-cov-view="all" onclick="renderStateCoverageMap('all')">All Backend Coverage</button>
     </div>
     <div class="state-cov-body">
@@ -576,12 +577,12 @@ body{top:0!important;}
     </div>
   </div>
 
-  <!-- FULL WIDTH: Consumer Shield Programs - collapsible accordion -->
+  <!-- FULL WIDTH: Shield Services Programs - collapsible accordion -->
   <div class="card workspace-full" id="csProgramCard" style="display:none;padding:0;overflow:hidden;">
     <button class="acc-btn" id="csBtn" onclick="toggleAcc('csBody','csBtn')" style="padding:18px 20px;font-size:15px;font-weight:900;border-radius:16px;background:#fff;">
       <span style="display:flex;align-items:center;gap:10px;">
         <div class="logo-sm" style="width:50px;height:26px;"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69c35b2c25c6995d2d2d21fa.png" alt="CS"/></div>
-        <span>Consumer Shield Programs</span>
+        <span>Shield Services Programs</span>
       </span>
       <span class="acc-chevron">&#8964;</span>
     </button>
@@ -611,7 +612,7 @@ body{top:0!important;}
   <div class="card workspace-full" id="legacyProgramCard" style="display:none;padding:0;overflow:hidden;">
     <button class="acc-btn" id="legacyProgBtn" onclick="toggleAcc('legacyProgBody','legacyProgBtn')" style="padding:18px 20px;font-size:15px;font-weight:900;border-radius:16px;background:#fff;">
       <span style="display:flex;align-items:center;gap:10px;">
-        <div class="logo-sm" style="width:50px;height:26px;"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69e1c95dc56ad279084b3141.png" alt="Legacy" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:8px;font-weight:800;color:#6d28d9;\\'>LCS</span>';"/></div>
+        <div class="logo-sm" style="width:50px;height:26px;"><img src="https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/69e1c95dc56ad279084b3141.png" alt="Legacy" onerror="ftLogoFallback(this,'LCS','#6d28d9',8)"/></div>
         <span>Elite Legal Practice (ELP) Programs</span>
       </span>
       <span class="acc-chevron">&#8964;</span>
@@ -1321,42 +1322,32 @@ function detectRouteFromCards(){
   detectRouteFromRecommendedCard();
 }
 
-const CS_PROGS=[
-  {k:'A',range:'$4,000-$4,999',   min:4000, max:4999,    pay:220,term:18,comm:{p2:150,p4:0,total:150}},
-  {k:'B',range:'$5,000-$8,799',   min:5000, max:8799,    pay:220,term:24,comm:{p2:150,p4:0,total:150}},
-  {k:'C',range:'$8,800-$9,999',   min:8800, max:9999,    pay:220,term:36,comm:{p2:150,p4:0,total:150}},
-  {k:'D',range:'$10,000-$14,999', min:10000,max:14999,   pay:270,term:36,comm:{p2:175,p4:50,total:225}},
-  {k:'E',range:'$15,000-$19,999', min:15000,max:19999,   pay:320,term:36,comm:{p2:200,p4:75,total:275}},
-  {k:'F',range:'$20,000-$24,999', min:20000,max:24999,   pay:370,term:36,comm:{p2:250,p4:100,total:350}},
-  {k:'G',range:'$25,000-$29,999', min:25000,max:29999,   pay:420,term:36,comm:{p2:300,p4:100,total:400}},
-  {k:'H',range:'$30,000-$49,999', min:30000,max:49999,   pay:520,term:36,comm:{p2:375,p4:125,total:500}},
-  {k:'I',range:'$50,000+',        min:50000,max:Infinity,pay:620,term:36,comm:{p2:450,p4:150,total:600}},
-];
-const getCsProg=d=>CS_PROGS.find(p=>d>=p.min&&d<=p.max)||null;
+// Tier tables, fee constants and state lists come from /lib/program-pricing.js
+// (shared with the GoHighLevel webhook in api/router/route.js).
+const CS_PROGS=FT_PRICING.CS_PROGS;
+// Band lookup that has no gaps between tiers: $4,999.50 lands in the band whose
+// max is 4999 because the upper edge is "below the next band's min".
+function findBand(list,d,minKey='min',maxKey='max'){
+  const v=num(d);
+  return list.find(p=>v>=p[minKey]&&(p[maxKey]===Infinity||v<p[maxKey]+1))||null;
+}
+const getCsProg=d=>findBand(CS_PROGS,d);
 const LD_TIERS=[
   {id:1,label:'Tier 1',range:'$0–$999k/mo',  rate:0.010,rl:'1.00%'},
   {id:2,label:'Tier 2',range:'$1M–$1.99M/mo',rate:0.0115,rl:'1.15%'},
   {id:3,label:'Tier 3',range:'$2M+/mo',      rate:0.013, rl:'1.30%'},
 ];
-const LEGACY_COMM=[
-  {code:'L1',min:6000,  max:9999,   total:150, p2:150,p4:0},
-  {code:'L2',min:10000, max:14999,  total:225, p2:175,p4:50},
-  {code:'L3',min:15000, max:19999,  total:275, p2:200,p4:75},
-  {code:'L4',min:20000, max:24999,  total:350, p2:250,p4:100},
-  {code:'L5',min:25000, max:29999,  total:400, p2:300,p4:100},
-  {code:'L6',min:30000, max:49999,  total:500, p2:375,p4:125},
-  {code:'L7',min:50000, max:Infinity,total:600,p2:450,p4:150},
-];
-const getLegacyComm=d=>LEGACY_COMM.find(b=>d>=b.min&&d<=b.max)||null;
+const LEGACY_COMM=FT_PRICING.ELP.commissionBands;
+const getLegacyComm=d=>findBand(LEGACY_COMM,d);
 // Spiff bonuses shared across all programs
 const SPIFF_DAILY=[{min:5,bonus:75},{min:3,bonus:50}];
 const SPIFF_MONTHLY=[{min:30,bonus:2250},{min:23,bonus:1500},{min:17,bonus:1000},{min:12,bonus:600},{min:8,bonus:300}];
 const SPIFF_BALANCED=[{minPct:.7,bonus:500},{minPct:.5,bonus:250},{minPct:.3,bonus:100}];
 const STATE_NAMES={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',GU:'Guam',PR:'Puerto Rico'};
-const LD_BLACKOUT=new Set(['AK','RI','VT','WV','OR','GU','HI','ME','MT','PR','SC','SD','UT','WI','CO']);
-const LD_RED=new Set(['CT','GA','LA','MN','NV','NH','NJ','ND','OH','PA','TN','WA','WY']);
-const CS_BLACKOUT=new Set(['NC','PA','CO','WA','CT','NJ','OR','TX']);
-const LEGACY_BLACKOUT=new Set(['ID','ND','GA']);
+const LD_BLACKOUT=new Set(FT_PRICING.STATES.ldBlackout);
+const LD_RED=new Set(FT_PRICING.STATES.ldAttorney);
+const CS_BLACKOUT=new Set(FT_PRICING.STATES.csBlackout);
+const LEGACY_BLACKOUT=new Set(FT_PRICING.STATES.legacyBlackout);
 const STATE_OPTS=Object.entries(STATE_NAMES).map(([a,n])=>({a,n,l:`${a} - ${n}`})).sort((x,y)=>x.l.localeCompare(y.l));
 const CS_REJ=new Set(['Timeshare','Mortgage','Federal Student Loan','IRS Tax Debt','Cross Collateralized Account','Furniture Store Financing','Loan from Individual','Installment Sales Contract','Credit Union Loan','Direct Furniture Store Loan','Military Account','AFES Account']);
 const CS_COND=new Set(['Judgment','Apartment Back Rent (Collections)','USAA','Deficiency','Tribal Loan','Business Debt']);
@@ -1555,7 +1546,7 @@ const SUPP_HOURS=[
     ]
   },
   {
-    key:'CS',label:'Consumer Shield',logo:CS_LOGO,color:'var(--bl)',
+    key:'CS',label:'Shield Services',logo:CS_LOGO,color:'var(--bl)',
     tz:'America/New_York',
     days:[1,2,3,4,5],oh:9,om:0,ch:19,cm:0,
     contacts:[
@@ -1572,7 +1563,7 @@ const SUPP_HOURS=[
   },
 ];
 const MAX_ROWS=10;
-const legacyState={feeRate:0.49,months:null,splitPay:false};
+const legacyState={feeRate:FT_PRICING.ELP.feeRateDefault,months:null,splitPay:false};
 const levelDebtState={term:null,total:null};
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1596,15 +1587,15 @@ const levelDebtState={term:null,total:null};
    across the term. It does not make month 1 a bigger draft; it just
    leaves $10.95 less in month 1's savings.
    ═══════════════════════════════════════════════════════════════ */
-const LD_SETTLEMENT_PCT           = 0.50;
-const LD_GATEWAY_FEE_MONTHLY      = 10.95;
-const LD_GATEWAY_SETUP_FEE        = 10.95;
-const LD_LEGAL_FEE_MONTHLY        = 19.99;
-const LD_SPLIT_SURCHARGE_PER_PAYMENT = 0.515;
+const LD_SETTLEMENT_PCT           = FT_PRICING.LD.settlementPct;
+const LD_GATEWAY_FEE_MONTHLY      = FT_PRICING.LD.gatewayFeeMonthly;
+const LD_GATEWAY_SETUP_FEE        = FT_PRICING.LD.gatewaySetupFee;
+const LD_LEGAL_FEE_MONTHLY        = FT_PRICING.LD.legalFeeMonthly;
+const LD_SPLIT_SURCHARGE_PER_PAYMENT = FT_PRICING.LD.splitSurchargePerPayment;
 
 /** Success fee rate for a scenario. RED / attorney-model states pay 27%. */
 function getLDSuccessFeeRate(c){
-  return (c && c.lds && c.lds.status === 'RED') ? 0.27 : 0.25;
+  return (c && c.lds && c.lds.status === 'RED') ? FT_PRICING.LD.successFeeAttorney : FT_PRICING.LD.successFeeStandard;
 }
 
 /** Fees that recur every month, and so scale with the term. */
@@ -1681,7 +1672,7 @@ function legacyDraftCount(splitPay){
 }
 
 function legacyMonthlyAdminFees(splitPay){
-  return 80 + (4 * legacyDraftCount(splitPay));
+  return FT_PRICING.legacyMonthlyAdminFees(splitPay);
 }
 
 function legacyTotalServiceFee(d, f){
@@ -1702,13 +1693,14 @@ function legacyMinMonths(){
 function legacyMaxMonths(d, f, splitPay = false){
   const serviceFeeTotal = legacyTotalServiceFee(d, f);
   const adminFees = legacyMonthlyAdminFees(splitPay);
-  const minimumClientPayment = 250;
+  const minimumClientPayment = FT_PRICING.ELP.minClientPayment;
+  const maxTerm = FT_PRICING.ELP.maxTermMonths;
 
   const maxByPayment = Math.floor(
     serviceFeeTotal / Math.max(1, minimumClientPayment - adminFees)
   );
 
-  return Math.max(legacyMinMonths(), Math.min(60, maxByPayment > 0 ? maxByPayment : 60));
+  return Math.max(legacyMinMonths(), Math.min(maxTerm, maxByPayment > 0 ? maxByPayment : maxTerm));
 }
 
 function legacyClampMonths(d, f, mo, splitPay = false){
@@ -1726,6 +1718,36 @@ function legacyMP(d, f, mo, splitPay = false){
     legacyTotalServiceFee(d, f) / months + legacyMonthlyAdminFees(splitPay)
   );
 }
+// ── One pricing path for every surface (cards, comparison table, prospect
+// page, PDF). Monthly payment is rounded to whole dollars and the total is
+// defined as monthly × term, so the two always reconcile on the page. ──
+function ldPriced(total, rate, term){
+  const t=Math.max(1,parseInt(term,10)||1);
+  const mp=Math.round(getLDProgramCost(total, rate, t)/t);
+  return {term:t, mp, tc:mp*t};
+}
+function ldTargetMonthly(c){
+  if(!c||!c.ldAvail) return 0;
+  const rate=getLDSuccessFeeRate(c);
+  return ldPriced(c.total, rate, getLDEffectiveMaxTerm(c.total, rate)).mp;
+}
+function legacyPriced(total, f, mo, splitPay=false){
+  const m=legacyClampMonths(total, f, mo, splitPay);
+  const mp=legacyMP(total, f, m, splitPay);
+  return {term:m, mp, tc:mp*m};
+}
+// The single ELP default term: payment matched to the cheapest alternative
+// program, clamped to the $250 floor / 60-month cap. Remembers the agent's
+// slider choice until the enrolled total changes.
+function legacyEffectiveMonths(c){
+  const total=c.total||0;
+  const def=legacyDefaultMonths(total, legacyState.feeRate, c.csProg?c.csProg.pay:0, ldTargetMonthly(c), legacyState.splitPay);
+  if(!legacyState._init||legacyState._initTotal!==total){legacyState.months=def;legacyState._init=true;legacyState._initTotal=total;}
+  legacyState.months=legacyClampMonths(total, legacyState.feeRate, legacyState.months||def, legacyState.splitPay);
+  return legacyState.months;
+}
+// Shortest realistic ELP term shown as "fastest": never the 1-month edge case.
+function legacyShortestMonths(total, f, splitPay){return legacyClampMonths(total, f, 12, splitPay);}
 function legacyCommAtFee(baseTotal,f){return Math.round(baseTotal*(f/0.40));}
 function legacyDefaultMonths(total, feeRate, csMp, ldMp, splitPay = false){
   const serviceFeeTotal = legacyTotalServiceFee(total, feeRate);
@@ -1833,9 +1855,9 @@ const LEGACY_ACCEPT_RULES=[
   {n:["Gyms / Fitness Centers"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add note, client unerstands will lose membership."},
   {n:["Health clubs"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Add note, client unerstands will lose membership."},
   {n:["Installment Loans / Note Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Issues from Debt Settlement Company. Add Cross Collateral / Repo Note in Sales Force."},
-  {n:["Judgements"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Judgements"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: legal fee $675 (summons within 1 year of enrollment) or $850 (debt not enrolled); no pre-enrollment summons accepted."},
   {n:["Lake Lending"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not tied to Collateral."},
-  {n:["Lawsuits"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Lawsuits"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: legal fee $675 (summons within 1 year of enrollment) or $850 (debt not enrolled); no pre-enrollment summons accepted."},
   {n:["Lending Club"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
   {n:["Lines of Credit"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Must be used like a credit card and include the first page of the statement with client and billing information."},
   {n:["Medical Debt"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Needs to provide the first page of the statement showing both client and billing details.."},
@@ -1848,7 +1870,7 @@ const LEGACY_ACCEPT_RULES=[
   {n:["Payday Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Check for Wage Assignment."},
   {n:["Personal Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
   {n:["Signature Loans"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not Secured to collateral and/or Not Secured to Home."},
-  {n:["Summons"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: $650 applies for enrolling after signing up and can be spread over 2 months."},
+  {n:["Summons"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: legal fee $675 (summons within 1 year of enrollment) or $850 (debt not enrolled); no pre-enrollment summons accepted."},
   {n:["Timeshares"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: MUST BE IN 3RD PARTY COLLECTIONS."},
   {n:["Together Loans (aka Transform Credit)"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
   {n:["Transform Credit"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Not issued by a debt settlement company. No Transform Credit loans under $3,000. No monthly memberships.."},
@@ -1858,70 +1880,70 @@ const LEGACY_ACCEPT_RULES=[
   {n:["Utility Bills"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Items such as power, internet, electric, cellular, and cable require a NOTE confirming the client is aware service will be shut off.."},
   {n:["Velocity"],s:"ok",r:"Elite Legal Practice (ELP) accepted list: Acceptable 3rd party."}
 ];
-// ─── Consumer Shield: Explicit Accepted Named Creditor Rules ───
+// ─── Shield Services: Explicit Accepted Named Creditor Rules ───
 // These prevent broad reject aliases from accidentally blocking normal accepted cards.
 const CS_NAMED_ACCEPT_RULES = [
-  {n:["American Express","AMEX","Amex","American Express Card","American Express Credit Card"], s:"ok", r:"American Express / Amex credit cards are accepted by Consumer Shield unless the specific product is a business loan or otherwise excluded."},
+  {n:["American Express","AMEX","Amex","American Express Card","American Express Credit Card"], s:"ok", r:"American Express / Amex credit cards are accepted by Shield Services unless the specific product is a business loan or otherwise excluded."},
 ];
 
-// ─── Consumer Shield: Named Creditor Reject / Conditional Rules ───
+// ─── Shield Services: Named Creditor Reject / Conditional Rules ───
 const CS_NAMED_REJECT_RULES = [
   // Military / Government
-  {n:["Military Star","Exchange Credit Program","AFES","AAFES"],                        s:"rej", r:"Military Star / AFES accounts are not accepted by Consumer Shield."},
-  {n:["VA Loan","VA Loans","Veterans Affairs Loan","Veterans Administration"],           s:"rej", r:"VA loans are not accepted by Consumer Shield."},
-  {n:["SBA Loan","SBA Loans","Small Business Administration"],                           s:"rej", r:"SBA loans are not accepted by Consumer Shield."},
+  {n:["Military Star","Exchange Credit Program","AFES","AAFES"],                        s:"rej", r:"Military Star / AFES accounts are not accepted by Shield Services."},
+  {n:["VA Loan","VA Loans","Veterans Affairs Loan","Veterans Administration"],           s:"rej", r:"VA loans are not accepted by Shield Services."},
+  {n:["SBA Loan","SBA Loans","Small Business Administration"],                           s:"rej", r:"SBA loans are not accepted by Shield Services."},
   // Solar / Home Improvement
-  {n:["GoodLeap","Good Leap","GoodLeap LLC","GoodLeap Solar","LoanPal","Loan Pal"],      s:"rej", r:"GoodLeap / LoanPal (solar / home improvement) is not accepted by Consumer Shield."},
-  {n:["Solar Mosaic","Mosaic Solar","Mosaic"],                                            s:"rej", r:"Solar Mosaic is not accepted by Consumer Shield."},
-  {n:["Aqua Finance","AquaFinance"],                                                      s:"rej", r:"Aqua Finance (HVAC / home improvement) is not accepted by Consumer Shield."},
-  {n:["EnerBank","EnerBank USA"],                                                         s:"rej", r:"EnerBank (home improvement) is not accepted by Consumer Shield."},
-  {n:["Service Finance Company","Service Finance","SVCFIN","SRVFINCO"],                   s:"rej", r:"Service Finance Company is not accepted by Consumer Shield."},
-  {n:["PowerPay","Power Pay"],                                                            s:"rej", r:"PowerPay is not accepted by Consumer Shield."},
-  {n:["GreenSky","Green Sky"],                                                            s:"rej", r:"GreenSky is not accepted by Consumer Shield."},
+  {n:["GoodLeap","Good Leap","GoodLeap LLC","GoodLeap Solar","LoanPal","Loan Pal"],      s:"rej", r:"GoodLeap / LoanPal (solar / home improvement) is not accepted by Shield Services."},
+  {n:["Solar Mosaic","Mosaic Solar","Mosaic"],                                            s:"rej", r:"Solar Mosaic is not accepted by Shield Services."},
+  {n:["Aqua Finance","AquaFinance"],                                                      s:"rej", r:"Aqua Finance (HVAC / home improvement) is not accepted by Shield Services."},
+  {n:["EnerBank","EnerBank USA"],                                                         s:"rej", r:"EnerBank (home improvement) is not accepted by Shield Services."},
+  {n:["Service Finance Company","Service Finance","SVCFIN","SRVFINCO"],                   s:"rej", r:"Service Finance Company is not accepted by Shield Services."},
+  {n:["PowerPay","Power Pay"],                                                            s:"rej", r:"PowerPay is not accepted by Shield Services."},
+  {n:["GreenSky","Green Sky"],                                                            s:"rej", r:"GreenSky is not accepted by Shield Services."},
   // Auto / Vehicle-secured
-  {n:["Yendo"],                                                                            s:"rej", r:"Yendo (vehicle-equity card) is not accepted by Consumer Shield — secured to vehicle title."},
-  {n:["Toledo Finance","Toledo Financial"],                                               s:"rej", r:"Toledo Finance is not accepted by Consumer Shield."},
+  {n:["Yendo"],                                                                            s:"rej", r:"Yendo (vehicle-equity card) is not accepted by Shield Services — secured to vehicle title."},
+  {n:["Toledo Finance","Toledo Financial"],                                               s:"rej", r:"Toledo Finance is not accepted by Shield Services."},
   // Rent-to-Own / POS
-  {n:["Rent-A-Center","Rent A Center","RentACenter","RAC"],                              s:"rej", r:"Rent-A-Center is not accepted by Consumer Shield."},
-  {n:["Acceptance Now","AcceptanceNow"],                                                  s:"rej", r:"Acceptance Now is not accepted by Consumer Shield."},
-  {n:["Acima","Acima Credit","Acima Digital"],                                           s:"rej", r:"Acima is not accepted by Consumer Shield."},
-  {n:["Koalafi"],                                                                          s:"rej", r:"Koalafi is not accepted by Consumer Shield."},
-  {n:["Farmers Furniture","FRMRS FURN","Farmers Home Furniture"],                        s:"rej", r:"Farmers Furniture is not accepted by Consumer Shield."},
+  {n:["Rent-A-Center","Rent A Center","RentACenter","RAC"],                              s:"rej", r:"Rent-A-Center is not accepted by Shield Services."},
+  {n:["Acceptance Now","AcceptanceNow"],                                                  s:"rej", r:"Acceptance Now is not accepted by Shield Services."},
+  {n:["Acima","Acima Credit","Acima Digital"],                                           s:"rej", r:"Acima is not accepted by Shield Services."},
+  {n:["Koalafi"],                                                                          s:"rej", r:"Koalafi is not accepted by Shield Services."},
+  {n:["Farmers Furniture","FRMRS FURN","Farmers Home Furniture"],                        s:"rej", r:"Farmers Furniture is not accepted by Shield Services."},
   // Retail Furniture
-  {n:["Bobs Discount Furniture","Bob Discount Furniture","Bobs Furniture","Bobs Finance","Bob Finance","Bob S Discount"], s:"rej", r:"Bob's Discount Furniture is not accepted by Consumer Shield."},
-  {n:["Nebraska Furniture","Nebraska Furniture Mart","NFM"],                             s:"rej", r:"Nebraska Furniture Mart is not accepted by Consumer Shield."},
+  {n:["Bobs Discount Furniture","Bob Discount Furniture","Bobs Furniture","Bobs Finance","Bob Finance","Bob S Discount"], s:"rej", r:"Bob's Discount Furniture is not accepted by Shield Services."},
+  {n:["Nebraska Furniture","Nebraska Furniture Mart","NFM"],                             s:"rej", r:"Nebraska Furniture Mart is not accepted by Shield Services."},
   // Tool / Equipment
-  {n:["Snap On Credit","Snap-On Credit","Snapon Credit","Snap On Financial"],             s:"rej", r:"Snap-On Credit is not accepted by Consumer Shield."},
-  {n:["West Creek Financial","WestCreek Financial","West Creek Finance"],                 s:"rej", r:"West Creek Financial is not accepted by Consumer Shield."},
+  {n:["Snap On Credit","Snap-On Credit","Snapon Credit","Snap On Financial"],             s:"rej", r:"Snap-On Credit is not accepted by Shield Services."},
+  {n:["West Creek Financial","WestCreek Financial","West Creek Finance"],                 s:"rej", r:"West Creek Financial is not accepted by Shield Services."},
   // Named Credit Unions
-  {n:["State Employees Credit Union","State Employees C U","STATEEMP","SECU"],           s:"rej", r:"State Employees Credit Union (all state variants) is not accepted by Consumer Shield."},
-  {n:["Empower FCU","Empower Federal Credit Union"],                                      s:"rej", r:"Empower FCU is not accepted by Consumer Shield."},
-  {n:["ESL Credit Union","ESL FCU","ESL Federal Credit Union"],                          s:"rej", r:"ESL Credit Union is not accepted by Consumer Shield."},
-  {n:["Redstone Credit Union","Redstone Federal Credit Union"],                           s:"rej", r:"Redstone Credit Union is not accepted by Consumer Shield."},
-  {n:["Fortera Credit Union","Fortera FCU"],                                              s:"rej", r:"Fortera Credit Union is not accepted by Consumer Shield."},
-  {n:["Local Government Federal Credit Union","Local Government FCU","LGFCU"],           s:"rej", r:"Local Government FCU is not accepted by Consumer Shield."},
-  {n:["Garden Federal Credit Union","Garden FCU"],                                       s:"rej", r:"Garden FCU is not accepted by Consumer Shield."},
-  {n:["Golden One Credit Union","Golden 1 Credit Union","Golden1"],                      s:"rej", r:"Golden One Credit Union is not accepted by Consumer Shield."},
-  {n:["Hawaii Credit Union","Hawaii CU","HCU"],                                          s:"rej", r:"Hawaii Credit Union is not accepted by Consumer Shield."},
-  {n:["WSECU","Washington State Employees Credit Union"],                                s:"rej", r:"WSECU is not accepted by Consumer Shield."},
+  {n:["State Employees Credit Union","State Employees C U","STATEEMP","SECU"],           s:"rej", r:"State Employees Credit Union (all state variants) is not accepted by Shield Services."},
+  {n:["Empower FCU","Empower Federal Credit Union"],                                      s:"rej", r:"Empower FCU is not accepted by Shield Services."},
+  {n:["ESL Credit Union","ESL FCU","ESL Federal Credit Union"],                          s:"rej", r:"ESL Credit Union is not accepted by Shield Services."},
+  {n:["Redstone Credit Union","Redstone Federal Credit Union"],                           s:"rej", r:"Redstone Credit Union is not accepted by Shield Services."},
+  {n:["Fortera Credit Union","Fortera FCU"],                                              s:"rej", r:"Fortera Credit Union is not accepted by Shield Services."},
+  {n:["Local Government Federal Credit Union","Local Government FCU","LGFCU"],           s:"rej", r:"Local Government FCU is not accepted by Shield Services."},
+  {n:["Garden Federal Credit Union","Garden FCU"],                                       s:"rej", r:"Garden FCU is not accepted by Shield Services."},
+  {n:["Golden One Credit Union","Golden 1 Credit Union","Golden1"],                      s:"rej", r:"Golden One Credit Union is not accepted by Shield Services."},
+  {n:["Hawaii Credit Union","Hawaii CU","HCU"],                                          s:"rej", r:"Hawaii Credit Union is not accepted by Shield Services."},
+  {n:["WSECU","Washington State Employees Credit Union"],                                s:"rej", r:"WSECU is not accepted by Shield Services."},
   // Credit Builder
-  {n:["KIKOFF","Kikoff"],                                                                 s:"rej", r:"KIKOFF (credit builder) is not accepted by Consumer Shield."},
-  {n:["OpenSky","Open Sky","OpenSky Secured Visa"],                                      s:"rej", r:"OpenSky (secured card) is not accepted by Consumer Shield."},
+  {n:["KIKOFF","Kikoff"],                                                                 s:"rej", r:"KIKOFF (credit builder) is not accepted by Shield Services."},
+  {n:["OpenSky","Open Sky","OpenSky Secured Visa"],                                      s:"rej", r:"OpenSky (secured card) is not accepted by Shield Services."},
   // MLM / Direct Sales
-  {n:["HC ROYA","HYCITE","Royal Prestige","HC Royal"],                                  s:"rej", r:"HC Roya / Royal Prestige is not accepted by Consumer Shield."},
+  {n:["HC ROYA","HYCITE","Royal Prestige","HC Royal"],                                  s:"rej", r:"HC Roya / Royal Prestige is not accepted by Shield Services."},
   // Regional / PR
-  {n:["Island Finance","Island Finance PR"],                                             s:"rej", r:"Island Finance (PR) is not accepted by Consumer Shield."},
-  {n:["Popular Bank","Banco Popular"],                                                    s:"rej", r:"Popular Bank / Banco Popular is not accepted by Consumer Shield."},
+  {n:["Island Finance","Island Finance PR"],                                             s:"rej", r:"Island Finance (PR) is not accepted by Shield Services."},
+  {n:["Popular Bank","Banco Popular"],                                                    s:"rej", r:"Popular Bank / Banco Popular is not accepted by Shield Services."},
   // Goldman Sachs CC only
-  {n:["Goldman Sachs Credit Card","Marcus Credit Card","Marcus by Goldman Sachs"],       s:"rej", r:"Goldman Sachs credit cards are not accepted by Consumer Shield. Apple Card and GS personal loans ARE accepted."},
+  {n:["Goldman Sachs Credit Card","Marcus Credit Card","Marcus by Goldman Sachs"],       s:"rej", r:"Goldman Sachs credit cards are not accepted by Shield Services. Apple Card and GS personal loans ARE accepted."},
   // BHG
-  {n:["BHG Financial","BHG Money","Bankers Healthcare Group","BHG"],                     s:"rej", r:"All BHG entities are not accepted by Consumer Shield."},
+  {n:["BHG Financial","BHG Money","Bankers Healthcare Group","BHG"],                     s:"rej", r:"All BHG entities are not accepted by Shield Services."},
   // Other
-  {n:["Pinnacle Financial Group","Pinnacle Financial"],                                  s:"rej", r:"Pinnacle Financial Group is not accepted by Consumer Shield."},
-  {n:["Concord Servicing","Concord Servicing Corp"],                                     s:"rej", r:"Concord Servicing is not accepted by Consumer Shield."},
-  {n:["Credologi","Credologi LLC"],                                                       s:"rej", r:"Credologi is not accepted by Consumer Shield."},
-  {n:["Kabbage","Kabbage Loans","AmEx Business Blueprint"],                              s:"rej", r:"Kabbage (small business lending) is not accepted by Consumer Shield."},
-  {n:["Robinhood","Robinhood Financial"],                                                s:"rej", r:"Robinhood (investment / brokerage) is not accepted by Consumer Shield."},
+  {n:["Pinnacle Financial Group","Pinnacle Financial"],                                  s:"rej", r:"Pinnacle Financial Group is not accepted by Shield Services."},
+  {n:["Concord Servicing","Concord Servicing Corp"],                                     s:"rej", r:"Concord Servicing is not accepted by Shield Services."},
+  {n:["Credologi","Credologi LLC"],                                                       s:"rej", r:"Credologi is not accepted by Shield Services."},
+  {n:["Kabbage","Kabbage Loans","AmEx Business Blueprint"],                              s:"rej", r:"Kabbage (small business lending) is not accepted by Shield Services."},
+  {n:["Robinhood","Robinhood Financial"],                                                s:"rej", r:"Robinhood (investment / brokerage) is not accepted by Shield Services."},
   {n:["Alleviate Tax","Alleviate Tax LLC","Alleviate Financial"],                        s:"rej", r:"Alleviate Tax is a tax relief firm — not an enrollable creditor."},
 ];
 
@@ -1931,7 +1953,7 @@ const CS_NAMED_COND_RULES = [
   {n:["OneMain","OneMain Financial","One Main Financial","One Main"],    s:"cond", r:"OneMain — unsecured accounts only. Secured NOT accepted. Verify before enrolling."},
   {n:["Regional Finance","Regional Finance Corp","Regional Management"], s:"cond", r:"Regional Finance — unsecured accounts only. Secured NOT accepted. Verify before enrolling."},
   {n:["Republic Finance","Republic Finance LLC"],                        s:"cond", r:"Republic Finance — unsecured accounts only. Secured NOT accepted. Verify before enrolling."},
-  {n:["USAA","USAA Federal Savings Bank","USAA Bank"],                   s:"cond", r:"USAA is conditional for Consumer Shield — documentation required."},
+  {n:["USAA","USAA Federal Savings Bank","USAA Bank"],                   s:"cond", r:"USAA is conditional for Shield Services — documentation required."},
 ];
 
 const ALL_CRED_RULES=[...CRED_RULES,...LEGACY_REJECT_RULES,...LEGACY_ACCEPT_RULES];
@@ -2037,7 +2059,7 @@ function getLevelCredRule(name) {
   return _ruleSearch(name, [...CRED_RULES, ...LEVEL_DEBT_UNACCEPTED_RULES]);
 }
 
-// Consumer Shield only — explicit accepts override reject/conditional aliases
+// Shield Services only — explicit accepts override reject/conditional aliases
 function getCSNamedRule(name) {
   const accepted = _ruleSearch(name, CS_NAMED_ACCEPT_RULES || []);
   if(accepted) return accepted;
@@ -2068,9 +2090,9 @@ function getCreditorProgramStatus(credName, debtType) {
 
   let csStatus;
   if(CS_REJ.has(dt)) {
-    csStatus = { status: 'rej', rule: `${dt} not accepted by Consumer Shield.` };
+    csStatus = { status: 'rej', rule: `${dt} not accepted by Shield Services.` };
   } else if(CS_COND.has(dt)) {
-    csStatus = { status: 'cond', rule: `${dt} is conditional for Consumer Shield.` };
+    csStatus = { status: 'cond', rule: `${dt} is conditional for Shield Services.` };
   } else {
     const csRule = getCSNamedRule(credName);
     csStatus = csRule ? { status: csRule.s, rule: csRule.r } : { status: 'ok', rule: null };
@@ -2162,21 +2184,11 @@ const LEVEL_DEBT_KNOWLEDGEBASE = {
       'LEVEL DEBT FORTH CRM SETUP: If enrolled debt is under $35,000, use the Debt Settlement Enrollment Plan in FORTH CRM. If enrolled debt is $35,000 or higher, use the corresponding Override Plan in FORTH CRM for terms beyond 48 months. The override plan is intended to lower the monthly program deposit and make the program more affordable for the client on a month-to-month basis. Current minimum monthly program deposit is $250.'
   },
 
-  termRules: [
-    { label: 'Debt enrolled $7,000 – $9,999', debtMin: 7000, debtMax: 9999, maxTerm: 24 },
-    { label: 'Debt enrolled $10,000 – $12,499', debtMin: 10000, debtMax: 12499, maxTerm: 30 },
-    { label: 'Debt enrolled $12,500 – $14,999', debtMin: 12500, debtMax: 14999, maxTerm: 36 },
-    { label: 'Debt enrolled $15,000 – $24,999', debtMin: 15000, debtMax: 24999, maxTerm: 42 },
-    { label: 'Debt enrolled $25,000 – $34,999', debtMin: 25000, debtMax: 34999, maxTerm: 48 },
-    { label: 'Debt enrolled $35,000 – $49,999', debtMin: 35000, debtMax: 49999, maxTerm: 54 },
-    { label: 'Debt enrolled $50,000+', debtMin: 50000, debtMax: Infinity, maxTerm: 60 }
-  ]
+  termRules: FT_PRICING.LD.termRules
 };
 
 function getLDMaxTerm(totalDebt) {
-  const rule = LEVEL_DEBT_KNOWLEDGEBASE.termRules.find(r =>
-    totalDebt >= r.debtMin && totalDebt <= r.debtMax
-  );
+  const rule = findBand(LEVEL_DEBT_KNOWLEDGEBASE.termRules, totalDebt, 'debtMin', 'debtMax');
 
   return rule ? rule.maxTerm : 0;
 }
@@ -2242,28 +2254,68 @@ function buildDebtForecast(balance, aprPercent, monthlyPayment, months=36){
   }
   return {balance:b0,apr,monthlyPayment:pay,months,payoffMonth,remainingBalance:bal,totalPaid,totalInterest,points,firstMonthInterest:b0*mr,isGrowing:pay<=b0*mr};
 }
-function calcDN(d,apr){
+// Debt types that accrue interest on the "do nothing" path. Medical bills,
+// back rent, utilities, deficiencies, judgments and anything already in
+// third-party collections are carried at face value with no interest added.
+const INTEREST_BEARING_TYPES=new Set(['Unsecured','Unsecured Personal Loan','Unsecured Line of Credit','Payday Loan','Tribal Loan','Private Student Loan','Federal Student Loan','Navient Student Loan','Peer-to-Peer Loan','Auto Loan (Secured)','Mortgage','SBA Loan','Business Debt']);
+function interestBearingBalance(rows){
+  return (rows||[]).filter(r=>num(r.amount)>0&&!r.collections&&INTEREST_BEARING_TYPES.has(r.dt||'Unsecured')).reduce((a,r)=>a+num(r.amount),0);
+}
+function yearsMonthsLabel(m){const y=Math.floor(m/12),r=m%12;if(!m)return 'N/A';if(!y)return `${r} month${r===1?'':'s'}`;return `${y} year${y===1?'':'s'}${r?`, ${r} month${r===1?'':'s'}`:''}`;}
+// "Do nothing" path. `rows` decides which dollars accrue interest; `total`
+// is the whole enrolled balance. The agent's entered payment (or the
+// estimated starting minimum) is split across the two buckets in proportion.
+function calcDN(rows,total,apr){
+  const d=num(total);
   const selectedAPR = apr || getRouterCreditCardAPR();
+  const dInt=Math.min(d,interestBearingBalance(rows));
+  const dFlat=Math.max(0,d-dInt);
+  const share=d>0?dInt/d:0;
+  const noInterestNote=dFlat>0?` ${fmt(dFlat)} of the balance (medical, collections, rent or similar) is shown at face value with no interest added.`:'';
+  const assumptionText=`Assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes.${noInterestNote}`;
   if(!window.FundingTierCreditCardCalculator){
     const fallbackAPR=(selectedAPR>1?selectedAPR/100:selectedAPR)||.2799;
-    const mp=d*.03,mr=fallbackAPR/12;
-    if(d<=0||mp<=d*mr)return{mp:0,months:0,apr:fallbackAPR,total:0,interest:0,assumption:'Assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes.'};
-    const months=Math.max(1,Math.round(Math.log(mp/(mp-d*mr))/Math.log(1+mr)));
-    return{mp,months,apr:fallbackAPR,total:mp*months,interest:(mp*months)-d,assumption:'Assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes.'};
+    const mp=dInt*.03,mr=fallbackAPR/12;
+    if(d<=0||mp<=dInt*mr)return{mp:0,months:0,apr:fallbackAPR,total:0,interest:0,assumption:assumptionText};
+    const months=Math.max(1,Math.round(Math.log(mp/(mp-dInt*mr))/Math.log(1+mr)));
+    return{mp,months,apr:fallbackAPR,total:mp*months+dFlat,interest:(mp*months)-dInt,assumption:assumptionText};
   }
-  const current=FundingTierCreditCardCalculator.buildCurrentSituation(d,selectedAPR,{minimumPaymentPercent:.03,lowPercent:.025,highPercent:.035,flatMinimumPayment:35});
-  const minOnly=current.minimumOnlyPayoff||{};
+  const current=FundingTierCreditCardCalculator.buildCurrentSituation(dInt,selectedAPR,{minimumPaymentPercent:.03,lowPercent:.025,highPercent:.035,flatMinimumPayment:35});
+  const minOnlyRaw=current.minimumOnlyPayoff||{};
+  // Non-interest balances are added to the minimum-only totals at face value.
+  const minOnly=Object.assign({},minOnlyRaw,{
+    totalPaid:(minOnlyRaw.totalPaid||0)+dFlat,
+    totalPaidFormatted:FundingTierCreditCardCalculator.money((minOnlyRaw.totalPaid||0)+dFlat)
+  });
   const defaultFixedPayment = minOnly.startingMinimumPayment || minOnly.firstEstimatedMinimumPayment || current.selectedMinimumPayment || 0;
   const fixedPaymentOverride=num(app.fixedMonthlyPayment||0);
   const fixedPayment= fixedPaymentOverride>0 ? fixedPaymentOverride : defaultFixedPayment;
-  const fixed=FundingTierCreditCardCalculator.calculateFixedPaymentPayoff(d, selectedAPR, fixedPayment, {} )||{};
-  const forecast=buildDebtForecast(d, selectedAPR, fixedPayment, 36);
-  const fixedOk = fixed && fixed.ok !== false && fixed.totalPaid != null;
-  const fixedNoPayoffLabel = forecast.isGrowing ? 'No payoff — balance grows' : 'No payoff within 36-month forecast';
-  const fixedTimelineLabel = fixedOk ? (fixed.yearsMonths||'N/A') : fixedNoPayoffLabel;
-  const fixedInterestVal = fixedOk ? (fixed.totalInterest||0) : (forecast.totalInterest||0);
-  const fixedTotalVal = fixedOk ? (fixed.totalPaid||0) : (forecast.totalPaid||0);
+  const paymentIsEntered=fixedPaymentOverride>0;
+  // Split the fixed payment between the interest-bearing and flat buckets.
+  const payInt=fixedPayment*share, payFlat=fixedPayment-payInt;
+  const flatMonths=dFlat>0&&payFlat>0?Math.ceil(dFlat/payFlat):0;
+  const fixedRaw=dInt>0?(FundingTierCreditCardCalculator.calculateFixedPaymentPayoff(dInt, selectedAPR, payInt, {} )||{}):{ok:true,months:0,totalPaid:0,totalInterest:0};
+  const forecast=buildDebtForecast(dInt, selectedAPR, payInt, 36);
+  const fixedOk = fixedRaw && fixedRaw.ok !== false && fixedRaw.totalPaid != null;
+  const neverPaysOff = !fixedOk;
+  const fixedMonthsVal = fixedOk ? Math.max(fixedRaw.months||0, flatMonths) : null;
+  const fixedTimelineLabel = fixedOk ? yearsMonthsLabel(fixedMonthsVal) : 'Does not pay off — balance keeps growing';
+  const fixedInterestVal = fixedOk ? (fixedRaw.totalInterest||0) : null;
+  const fixedTotalVal = fixedOk ? (fixedRaw.totalPaid||0)+dFlat : null;
+  // 36-month snapshot of the current path, used for a like-for-like
+  // comparison against a 36-month program.
+  const flatAt36=Math.max(0,dFlat-payFlat*36);
+  const balanceAt36=Math.round((forecast.remainingBalance||0)+flatAt36);
+  const interestAt36=Math.round(forecast.totalInterest||0);
+  const paidAt36=Math.round((forecast.totalPaid||0)+Math.min(dFlat,payFlat*36));
+  const fixed=fixedRaw;
+  const startMinFmt=minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted || fmt(0);
   return {
+    interestBearingBalance: dInt,
+    noInterestBalance: dFlat,
+    paymentIsEntered,
+    neverPaysOff,
+    balanceAt36, interestAt36, paidAt36,
     mp: (minOnly.startingMinimumPayment || minOnly.firstEstimatedMinimumPayment || current.selectedMinimumPayment || 0),
     selectedMinimumPayment: current.selectedMinimumPayment||0,
     startingMinimumPayment: minOnly.startingMinimumPayment || minOnly.firstEstimatedMinimumPayment || current.selectedMinimumPayment || 0,
@@ -2275,10 +2327,10 @@ function calcDN(d,apr){
     apr: current.apr||FundingTierCreditCardCalculator.normalizeAPR(selectedAPR),
     total: minOnly.totalPaid||0,
     interest: minOnly.totalInterest||0,
-    fixedMonths: fixedOk ? (fixed.months||0) : null,
+    fixedMonths: fixedMonthsVal,
     fixedYearsMonths: fixedTimelineLabel,
-    fixedNoPayoff: !fixedOk,
-    fixedNoPayoffReason: fixed.reason || fixedNoPayoffLabel,
+    fixedNoPayoff: neverPaysOff,
+    fixedNoPayoffReason: fixed.reason || fixedTimelineLabel,
     debtForecast: forecast,
     fixedTotal: fixedTotalVal,
     fixedInterest: fixedInterestVal,
@@ -2289,25 +2341,31 @@ function calcDN(d,apr){
     calculationMode: 'minimum_only_declining_payment',
     startingMinimumLabel: 'Month 1 starting minimum payment',
     minimumOnlyLabel: 'Minimum-only payoff using declining monthly minimum payments',
-    fixedPaymentLabel: 'Fixed-payment payoff if the client keeps paying the Month 1 starting minimum every month',
-    plainEnglishExplanation: `The ${minOnly.yearsMonths||'minimum-only payoff'} estimate assumes the payment starts at ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo, then recalculates downward as the balance gets smaller. It does not mean the client pays that starting amount every month for the full payoff period.`,
-    fixedPaymentExplanation: `If the client kept paying ${FundingTierCreditCardCalculator.money(fixedPayment)}/mo as a fixed payment instead of letting the minimum decline, the estimated payoff time would be ${fixedTimelineLabel} with about ${FundingTierCreditCardCalculator.money(fixedInterestVal)} in estimated interest.`,
+    fixedPaymentLabel: paymentIsEntered ? 'Payoff if the client keeps paying the amount they pay today' : 'Payoff if the client keeps paying the Month 1 starting minimum every month',
+    plainEnglishExplanation: `The ${minOnly.yearsMonths||'minimum-only payoff'} estimate assumes the payment starts at ${startMinFmt}/mo, then recalculates downward as the balance gets smaller. It does not mean the client pays that starting amount every month for the full payoff period.`,
+    fixedPaymentExplanation: neverPaysOff
+      ? `At ${FundingTierCreditCardCalculator.money(fixedPayment)}/mo the payment does not cover the monthly interest, so the balance keeps growing. After 36 months the estimated balance would be about ${fmt(balanceAt36)} with about ${fmt(interestAt36)} paid in interest.`
+      : `If the client kept paying ${FundingTierCreditCardCalculator.money(fixedPayment)}/mo every month, the estimated payoff time would be ${fixedTimelineLabel} with about ${FundingTierCreditCardCalculator.money(fixedInterestVal)} in estimated interest.`,
     minimumOnlyInterestFormatted: FundingTierCreditCardCalculator.money(minOnly.totalInterest||0),
     minimumOnlyTotalPaidFormatted: FundingTierCreditCardCalculator.money(minOnly.totalPaid||0),
-    fixedInterestFormatted: FundingTierCreditCardCalculator.money(fixedInterestVal),
-    fixedTotalPaidFormatted: FundingTierCreditCardCalculator.money(fixedTotalVal),
-    agentTalkTrack: d > 0 ? `Here is the simple way to look at it. If you stay on the regular minimum-payment path, your estimated starting minimum payment is around ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo based on ${FundingTierCreditCardCalculator.money(d)} at ${((current.apr||0)*100).toFixed(2)}% APR. The catch is that the minimum payment usually goes down as your balance goes down, so even though the first payment starts around ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo, the payoff timeline can stretch to about ${minOnly.yearsMonths||'N/A'} and cost you about ${FundingTierCreditCardCalculator.money(minOnly.totalInterest||0)} in interest. If you kept paying that same starting amount every month as a fixed payment instead of letting it drop, payoff is closer to ${fixedTimelineLabel} with about ${FundingTierCreditCardCalculator.money(fixedInterestVal)} in interest. So the big difference is staying on a declining minimum payment versus keeping a fixed payment.` : '',
-    minimumOnlyAgentScript: d > 0 ? `Your Month 1 starting minimum is ${minOnly.startingMinimumPaymentFormatted || minOnly.firstEstimatedMinimumPaymentFormatted || current.selectedMinimumPaymentFormatted}/mo. If you stay on minimum payments only, that payment usually drops as your balance drops, so the payoff timeline stretches out. On this estimate, that path takes about ${minOnly.yearsMonths||'N/A'} and costs about ${FundingTierCreditCardCalculator.money(minOnly.totalInterest||0)} in interest.` : '',
-    fixedPaymentAgentScript: d > 0 ? `If you kept paying the selected fixed monthly amount every month instead of letting it drop, payoff would be much faster — about ${fixedTimelineLabel} — with about ${FundingTierCreditCardCalculator.money(fixedInterestVal)} in interest.` : '',
-    assumption: current.routerText.assumption
+    fixedInterestFormatted: neverPaysOff ? 'Keeps growing' : FundingTierCreditCardCalculator.money(fixedInterestVal),
+    fixedTotalPaidFormatted: neverPaysOff ? 'Never pays off' : FundingTierCreditCardCalculator.money(fixedTotalVal),
+    agentTalkTrack: d > 0 ? (neverPaysOff
+      ? `Here is the simple way to look at it. You told me you are paying about ${FundingTierCreditCardCalculator.money(fixedPayment)} a month. At ${((current.apr||0)*100).toFixed(0)}% APR the interest alone on ${FundingTierCreditCardCalculator.money(dInt)} is about ${fmt(Math.round(dInt*(current.apr||0)/12))} a month, so that payment is not getting ahead of the interest. On this estimate the balance would still be about ${fmt(balanceAt36)} three years from now, and about ${fmt(interestAt36)} of what you paid would have gone to interest.`
+      : `Here is the simple way to look at it. If you keep paying about ${FundingTierCreditCardCalculator.money(fixedPayment)} a month on ${FundingTierCreditCardCalculator.money(d)} at ${((current.apr||0)*100).toFixed(0)}% APR, this estimate has you paying it off in about ${fixedTimelineLabel}, and about ${FundingTierCreditCardCalculator.money(fixedInterestVal)} of that is interest. Over the next three years alone, about ${fmt(interestAt36)} goes to interest and you would still owe about ${fmt(balanceAt36)}.${paymentIsEntered?'':` That is based on the estimated starting minimum payment, so if you are paying more or less than that, tell me and I will adjust it.`}`) : '',
+    minimumOnlyAgentScript: d > 0 ? `Most card companies set the minimum at about 1% of the balance plus the month's interest, and it drops as the balance drops. If you only ever paid the minimum, starting around ${startMinFmt}/mo, this estimate has that path taking about ${minOnly.yearsMonths||'N/A'} and costing about ${FundingTierCreditCardCalculator.money(minOnly.totalInterest||0)} in interest.` : '',
+    fixedPaymentAgentScript: d > 0 ? (neverPaysOff
+      ? `At ${FundingTierCreditCardCalculator.money(fixedPayment)} a month the payment does not cover the interest, so the balance keeps growing instead of going down.`
+      : `Keeping a steady ${FundingTierCreditCardCalculator.money(fixedPayment)} a month, payoff is about ${fixedTimelineLabel} with about ${FundingTierCreditCardCalculator.money(fixedInterestVal)} in interest.`) : '',
+    assumption: assumptionText
   };
 }
 function collectFlags(rows, total, sc) {
   const csF = [], ldF = [], legacyF = [];
 
   // ── State-level checks ──────────────────────────────────
-  if(total > 0 && total < 4000)  csF.push('Consumer Shield requires at least $4,000 total enrolled debt.');
-  if(sc && getCSState(sc).status === 'BLACKOUT') csF.push('Consumer Shield does not service this state.');
+  if(total > 0 && total < 4000)  csF.push('Shield Services requires at least $4,000 total enrolled debt.');
+  if(sc && getCSState(sc).status === 'BLACKOUT') csF.push('Shield Services does not service this state.');
   if(total > 0 && total < 7000)  ldF.push('Level Debt requires at least $7,000 total enrolled debt.');
   if(sc && getLDState(sc).status === 'BLACKOUT') ldF.push('Level Debt does not service this state.');
   if(total > 0 && total < 6000)  legacyF.push('ELP requires at least $6,000 total enrolled debt.');
@@ -2330,8 +2388,8 @@ function collectFlags(rows, total, sc) {
     const ps = getCreditorProgramStatus(r.cred, r.dt);
     const label = r.cred || r.dt;
 
-    // Consumer Shield
-    if(a < 100) csF.push(`${label}: below Consumer Shield $100 minimum.`);
+    // Shield Services
+    if(a < 100) csF.push(`${label}: below Shield Services $100 minimum.`);
     if(ps.cs.status === 'rej') csF.push(`${label}: ${ps.cs.rule}`);
 
     // Level Debt
@@ -2382,36 +2440,36 @@ function chooseRoute(total, sc, flags) {
 
   // ── $4,000–$5,999 band: CS primary ─────────────────────
   if(total >= 4000 && total <= 5999) {
-    if(csOK) return { route:'CONSUMER SHIELD', reason:'Debt between $4,000 and $5,999 routes to Consumer Shield.' };
-    return { route:'NO OPTION', reason:'Debt is in the Consumer Shield band but CS is unavailable for this state or creditor mix.' };
+    if(csOK) return { route:'CONSUMER SHIELD', reason:'Debt between $4,000 and $5,999 routes to Shield Services.' };
+    return { route:'NO OPTION', reason:'Debt is in the Shield Services band but CS is unavailable for this state or creditor mix.' };
   }
 
   // ── $6,000–$6,999 band: Legacy primary, CS fallback ────
   if(total >= 6000 && total <= 6999) {
     if(legacyOK) return { route:'LEGACY', reason:'Debt between $6,000 and $6,999 routes to ELP when state and creditor rules allow.' };
-    if(csOK) return { route:'CONSUMER SHIELD', reason:'Debt is in Legacy\'s preferred band but ELP is unavailable — falling back to Consumer Shield.' };
+    if(csOK) return { route:'CONSUMER SHIELD', reason:'Debt is in Legacy\'s preferred band but ELP is unavailable — falling back to Shield Services.' };
     return { route:'NO OPTION', reason:'No backend available for this debt amount and state combination.' };
   }
 
   // ── Priority: Debt Validation preference ────────────────
   if(total > 6000 && pref === 'debt_validation') {
     if(legacyOK) return { route:'LEGACY', reason:'Prospect prefers debt validation — ELP is available in this state.' };
-    if(csOK)     return { route:'CONSUMER SHIELD', reason:'Prospect prefers debt validation — Legacy unavailable, routing to Consumer Shield.' };
-    return { route:'NO OPTION', reason:'Prospect wants debt validation but neither Legacy nor Consumer Shield is available.' };
+    if(csOK)     return { route:'CONSUMER SHIELD', reason:'Prospect prefers debt validation — Legacy unavailable, routing to Shield Services.' };
+    return { route:'NO OPTION', reason:'Prospect wants debt validation but neither Legacy nor Shield Services is available.' };
   }
 
   // ── Priority: Attorney-led / Legal Support ───────────────
   if(pref === 'legal_support') {
     if(legacyOK) return { route:'LEGACY', reason:'Prospect wants attorney-led support — ELP is the right fit and is available.' };
     if(ldOK)     return { route:'LEVEL', reason:'Prospect wants legal support but ELP is unavailable — Level Debt attorney model is available in this state.' };
-    if(csOK)     return { route:'CONSUMER SHIELD', reason:'Attorney-led programs unavailable — falling back to Consumer Shield.' };
+    if(csOK)     return { route:'CONSUMER SHIELD', reason:'Attorney-led programs unavailable — falling back to Shield Services.' };
     return { route:'NO OPTION', reason:'No backend available for this state and preference combination.' };
   }
 
   // ── Standard routing: Level → Legacy → CS ───────────────
   if(ldOK)     return { route:'LEVEL', reason: ld.status === 'RED' ? 'Best option is Level Debt under the attorney model in this state.' : 'Best option is Level Debt — serviceable standard state.' };
   if(legacyOK) return { route:'LEGACY', reason:'Level Debt not available under current routing rules — ELP is the next best option.' };
-  if(csOK)     return { route:'CONSUMER SHIELD', reason:'Level Debt and ELP are both unavailable — Consumer Shield is the fallback option.' };
+  if(csOK)     return { route:'CONSUMER SHIELD', reason:'Level Debt and ELP are both unavailable — Shield Services is the fallback option.' };
   return { route:'NO OPTION', reason:'No backend is serviceable for this state and scenario.' };
 }
 function computeScenario(){
@@ -2426,24 +2484,22 @@ function computeScenario(){
   const ldAvail = lds.status !== 'BLACKOUT' && total >= 7000 && !flags.ld.some(f => f.includes('not accepted') || f.includes('requires at least') || f.includes('exceeds Level') || f.includes('50%') || f.includes('25%') || f.includes('CA residents') || f.includes('Discover private') || f.includes('does not service'));
   const legacyAvail = lgs.status !== 'BLACKOUT' && total >= 6000 && !(flags.legacy||[]).some(f => f.includes('not accepted') || f.includes('requires at least') || f.includes('does not service'));
 
-  const feeRate = route.route === 'LEVEL' ? (lds.status === 'RED' ? .27 : .25) : 0;
-  const dn = calcDN(total, getRouterCreditCardAPR());
+  // Level Debt success fee for this state; always populated so other surfaces
+  // can price a Level Debt alternative even when it is not the routed program.
+  const feeRate = lds.status === 'RED' ? FT_PRICING.LD.successFeeAttorney : FT_PRICING.LD.successFeeStandard;
+  const dn = calcDN(rows, total, getRouterCreditCardAPR());
   let shortest = null, recommended = null;
 
   if(route.route === 'LEVEL'){
     const minDraft = getLDMinDraft(total);
-    const effTerm = getLDEffectiveMaxTerm(total, feeRate);
-    const tc = getLDProgramCost(total, feeRate, effTerm);
+    const effTerm = getLDSelectedTerm(total, feeRate);
+    const priced = ldPriced(total, feeRate, effTerm);
     const forthPlanRule = getLDForthPlanRule(total);
-    shortest = {
-      term: 12,
-      tc: getLDProgramCost(total, feeRate, 12),
-      mp: getLDMonthlyPayment(total, feeRate, 12),
-    };
+    shortest = ldPriced(total, feeRate, Math.min(12, effTerm));
     recommended = {
-      term: effTerm,
-      tc,
-      mp: Math.round(tc / Math.max(1, effTerm)),
+      term: priced.term,
+      tc: priced.tc,
+      mp: priced.mp,
       minimumMonthlyDeposit: minDraft,
       forthCrmPlanType: forthPlanRule.planType,
       forthCrmInstruction: forthPlanRule.instruction,
@@ -2456,35 +2512,10 @@ function computeScenario(){
     recommended = shortest;
   }
   else if(route.route === 'LEGACY' && legacyAvail){
-    const minMo = legacyMinMonths();
-    const defaultMo = legacyDefaultMonths(
-      total,
-      legacyState.feeRate,
-      csProg ? csProg.pay : 0,
-      ldAvail ? Math.round(getLDMonthlyPayment(total, lds.status === 'RED' ? .27 : .25, getLDMaxTerm(total))) : 0,
-      legacyState.splitPay
-    );
-
-    const mo = legacyClampMonths(
-      total,
-      legacyState.feeRate,
-      legacyState.months || defaultMo,
-      legacyState.splitPay
-    );
-
-    const tc = legacyTotalCost(total, legacyState.feeRate, mo, legacyState.splitPay);
-
-    shortest = {
-      term: minMo,
-      tc: legacyTotalCost(total, legacyState.feeRate, minMo, legacyState.splitPay),
-      mp: legacyMP(total, legacyState.feeRate, minMo, legacyState.splitPay)
-    };
-
-    recommended = {
-      term: mo,
-      tc,
-      mp: legacyMP(total, legacyState.feeRate, mo, legacyState.splitPay)
-    };
+    const partial = {total, csProg, ldAvail, lds};
+    const mo = legacyEffectiveMonths(partial);
+    shortest = legacyPriced(total, legacyState.feeRate, legacyShortestMonths(total, legacyState.feeRate, legacyState.splitPay), legacyState.splitPay);
+    recommended = legacyPriced(total, legacyState.feeRate, mo, legacyState.splitPay);
   }
 
   const activeFlags = [];
@@ -2492,8 +2523,8 @@ function computeScenario(){
   if(rows.some(r => normName(r.cred).includes('DISCOVER'))) activeFlags.push(`Discover selected — apply Level Debt's 60% Discover exposure rule when evaluating routing.`);
   if(route.route === 'CONSUMER SHIELD'){
     activeFlags.push(...flags.cs);
-    activeFlags.push(`Consumer Shield support window: ${fmtHoursInDisplayTZ(SUPP_HOURS.find(x => x.key === 'CS'))}.`);
-    activeFlags.push('Consumer Shield uses Equifax for credit pull.');
+    activeFlags.push(`Shield Services support window: ${fmtHoursInDisplayTZ(SUPP_HOURS.find(x => x.key === 'CS'))}.`);
+    activeFlags.push('Shield Services uses Equifax for credit pull.');
   }
   if(route.route === 'LEGACY'){
     activeFlags.push(...(flags.legacy || []));
@@ -2518,7 +2549,7 @@ function rowAlerts(row, route) {
   if(normName(row.cred).includes('DISCOVER'))
     alerts.push({ label:'Level Discover 60% Rule', tone:'a', detail:'Level caps Discover exposure at 60% of total enrolled.', program:'LEVEL' });
 
-  // ── Consumer Shield badges ──────────────────────────────
+  // ── Shield Services badges ──────────────────────────────
   if(ps.cs.status === 'rej') {
     alerts.push({ label:'CS ✕', tone:'r', detail: ps.cs.rule, program:'CS' });
   } else if(ps.cs.status === 'cond') {
@@ -2600,7 +2631,7 @@ function renderClocks(){
   const rows=SUPP_HOURS.map(c=>{
     const s=clockStatus(c);
     const init=c.label.split(' ').map(w=>w[0]).join('').slice(0,3);
-    const logoHtml=`<div class="logo-sm" style="width:38px;height:20px;border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.95);"><img src="${c.logo}" alt="${c.label}" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-size:9px;font-weight:800;color:#64748b;\'>${init}</span>';"/></div>`;
+    const logoHtml=`<div class="logo-sm" style="width:38px;height:20px;border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.95);"><img src="${c.logo}" alt="${c.label}" onerror="ftLogoFallback(this,'${init}','#64748b',9)"/></div>`;
     const hoursLine=fmtHoursInDisplayTZ(c);
     const scheduleTip=`${todayName}: ${c.days.includes(new Date(new Date().toLocaleString('en-US',{timeZone:c.tz})).getDay())?hoursLine:'Closed'}`;
     const statusBadge=s.txt==='Closed Today'||s.txt==='Closed'
@@ -2716,11 +2747,12 @@ function commContentHtml(comm,isRec){
 }
   
   
-function logoBox(url,name){const init=name.split(' ').map(w=>w[0]).join('').slice(0,3);return `<div class="logo-sm"><img src="${url}" alt="${name}" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:8px;font-weight:800;color:#64748b;\\'>${init}</span>';"/></div>`;}
+function ftLogoFallback(img,txt,color,size){img.style.display='none';img.parentElement.innerHTML='<span style="font-size:'+(size||8)+'px;font-weight:800;color:'+(color||'#64748b')+';">'+txt+'</span>';}
+function logoBox(url,name){const init=name.split(' ').map(w=>w[0]).join('').slice(0,3);return `<div class="logo-sm"><img src="${url}" alt="${name}" onerror="ftLogoFallback(this,'${init}','#64748b',8)"/></div>`;}
 function renderPanel(c){
   // Teal route badge with logo
   const rLogo=c.route.route==='LEVEL'?LD_LOGO:c.route.route==='CONSUMER SHIELD'?CS_LOGO:c.route.route==='LEGACY'?LEGACY_LOGO:'';
-  const rl=c.route.route==='LEVEL'?'Route: Level Debt':c.route.route==='CONSUMER SHIELD'?'Route: Consumer Shield':c.route.route==='LEGACY'?'Route: Elite Legal Practice (ELP)':'No Route Available';
+  const rl=c.route.route==='LEVEL'?'Route: Level Debt':c.route.route==='CONSUMER SHIELD'?'Route: Shield Services':c.route.route==='LEGACY'?'Route: Elite Legal Practice (ELP)':'No Route Available';
   const bc=c.route.route==='LEVEL'?'rb-ld':c.route.route==='CONSUMER SHIELD'?'rb-cs':c.route.route==='LEGACY'?'rb-lg':'rb-no';
   const badgeBg=c.route.route==='LEVEL'?'linear-gradient(135deg,#0f9d8a,#0b7d6e)':c.route.route==='CONSUMER SHIELD'?'linear-gradient(135deg,#0f2a5e,#1a3a8f,#1e52c4)':c.route.route==='LEGACY'?'linear-gradient(135deg,#7f1d1d,#6d28d9,#2563eb)':'';
   const badgeHtml=c.route.route&&c.route.route!=='NO OPTION'
@@ -2733,7 +2765,7 @@ function renderPanel(c){
   // Compact horizontal provider grid
   const providers=[
     {name:'Level Debt',logo:LD_LOGO,avail:c.ldAvail,best:c.route.route==='LEVEL',status:c.lds.status},
-    {name:'Consumer Shield',logo:CS_LOGO,avail:c.csAvail,best:c.route.route==='CONSUMER SHIELD',status:c.css.status},
+    {name:'Shield Services',logo:CS_LOGO,avail:c.csAvail,best:c.route.route==='CONSUMER SHIELD',status:c.css.status},
     {name:'Elite Legal Practice',logo:LEGACY_LOGO,avail:c.legacyAvail,best:c.route.route==='LEGACY',status:c.lgs.status},
   ];
   $('providerAvail').innerHTML=`<div class="prov-grid">${providers.map(p=>{
@@ -2741,7 +2773,7 @@ function renderPanel(c){
     const badgeTxt=p.best?'&#10003; Best':p.avail?'&#10003;':'&#10005;';
     const badgeSty=p.best?'background:rgba(15,157,138,.18);color:#0b7d6e;':p.avail?'background:rgba(26,110,216,.15);color:var(--bl);':'background:#e2e8f0;color:#64748b;';
     const init=p.name.split(' ').map(w=>w[0]).join('').slice(0,3);
-    return `<div class="prov-cell ${cls}"><div class="prov-logo-w"><img src="${p.logo}" alt="${p.name}" style="max-width:40px;max-height:16px;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\\'font-size:9px;font-weight:800;color:#64748b;\\'>${init}</span>';"/></div><div style="font-size:10px;font-weight:800;color:var(--dk);line-height:1.2;">${p.name}</div><span class="prov-badge" style="${badgeSty}">${badgeTxt}</span></div>`;
+    return `<div class="prov-cell ${cls}"><div class="prov-logo-w"><img src="${p.logo}" alt="${p.name}" style="max-width:40px;max-height:16px;object-fit:contain;" onerror="ftLogoFallback(this,'${init}','#64748b',9)"/></div><div style="font-size:10px;font-weight:800;color:var(--dk);line-height:1.2;">${p.name}</div><span class="prov-badge" style="${badgeSty}">${badgeTxt}</span></div>`;
   }).join('')}</div>`;
 
   $('flagsBox').innerHTML=c.flags.map(f=>`<div class="flag flag-a"><span>&#9888;</span><span>${esc(f)}</span></div>`).join('');
@@ -2751,7 +2783,7 @@ function renderCSCard(c){
   if(!c.csAvail||!c.csProg){card.style.display='none';return;}
   card.style.display='block';
   const p=c.csProg;
-  $('csActiveDetail').innerHTML=`<div style="background:rgba(26,110,216,.06);border:2px solid var(--bl);border-radius:12px;padding:16px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:var(--bl);">CS Program ${p.k}</span><span style="font-size:12px;color:#64748b;margin-left:10px;">${p.range}</span></div><span class="pill p-b">Active Program</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;text-align:center;margin-bottom:14px;">${[['Monthly Payment',fmt(p.pay),'per month'],['Program Length',`${p.term} mo`,'total term'],['Total Cost',fmt(p.term*p.pay),`${fmt(p.pay)} x ${p.term}`]].map(([l,v,s])=>`<div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">${l}</div><div style="font-size:22px;font-weight:900;color:var(--bl);margin-top:4px;">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${s}</div></div>`).join('')}</div><div style="font-size:12px;color:#334155;line-height:1.8;"><div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Program Explanation</div><ul style="padding-left:18px;display:grid;gap:6px;"><li>Consumer Shield uses a fixed monthly structure, so the client knows the payment and estimated program term up front.</li><li>This option is often useful when the priority is stability, predictability, and a lower-friction monthly commitment.</li><li>The program is not a loan, and results vary based on the client’s circumstances and enrolled accounts.</li><li>It can help organize unsecured debt into a simpler plan while preserving a clearer monthly budget.</li></ul></div></div>`;
+  $('csActiveDetail').innerHTML=`<div style="background:rgba(26,110,216,.06);border:2px solid var(--bl);border-radius:12px;padding:16px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:var(--bl);">CS Program ${p.k}</span><span style="font-size:12px;color:#64748b;margin-left:10px;">${p.range}</span></div><span class="pill p-b">Active Program</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;text-align:center;margin-bottom:14px;">${[['Monthly Payment',fmt(p.pay),'per month'],['Program Length',`${p.term} mo`,'total term'],['Total Cost',fmt(p.term*p.pay),`${fmt(p.pay)} x ${p.term}`]].map(([l,v,s])=>`<div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">${l}</div><div style="font-size:22px;font-weight:900;color:var(--bl);margin-top:4px;">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${s}</div></div>`).join('')}</div><div style="font-size:12px;color:#334155;line-height:1.8;"><div style="font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Program Explanation</div><ul style="padding-left:18px;display:grid;gap:6px;"><li>Shield Services uses a fixed monthly structure, so the client knows the payment and estimated program term up front.</li><li>This option is often useful when the priority is stability, predictability, and a lower-friction monthly commitment.</li><li>The program is not a loan, and results vary based on the client’s circumstances and enrolled accounts.</li><li>It can help organize unsecured debt into a simpler plan while preserving a clearer monthly budget.</li></ul></div></div>`;
   $('csTileGrid').innerHTML=CS_PROGS.map(pr=>`<div class="cs-tile${pr.k===p.k?' act':''}"><div style="font-size:12px;font-weight:800;color:${pr.k===p.k?'var(--bl)':'#64748b'};">Prog ${pr.k}</div><div style="font-size:9px;color:#94a3b8;margin-top:1px;">${pr.range}</div><div style="font-size:18px;font-weight:900;color:${pr.k===p.k?'var(--bl)':'var(--dk)'};margin-top:5px;">${fmt(pr.pay)}</div><div style="font-size:11px;color:#64748b;margin-top:1px;">${pr.term} mo</div></div>`).join('');
 }
 function renderPlanCards(c){
@@ -2765,7 +2797,7 @@ function renderPlanCards(c){
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="logo-sm"><img src="${CS_LOGO}" alt="CS"/></div>
-            <div><span style="font-size:14px;font-weight:900;">Consumer Shield</span></div>
+            <div><span style="font-size:14px;font-weight:900;">Shield Services</span></div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class="plan-chip-rec">Recommended</span>':'<span class="plan-chip-check">✓</span>'}</div>
         </div>
@@ -2852,22 +2884,16 @@ function renderPlanCards(c){
     const isRec=c.route.route==='LEGACY';
     const total=c.total,feeRate=legacyState.feeRate;
     const maxMo=legacyMaxMonths(total,feeRate,legacyState.splitPay),minMo=legacyMinMonths();
-    const csMp=c.csProg?c.csProg.pay:0;
-    const ldMp=c.ldAvail?Math.round(getLDMonthlyPayment(total,getLDSuccessFeeRate(c),getLDMaxTerm(total))):0;
-    if(total>0 && (!legacyState._init||legacyState._initTotal!==total)){
-      legacyState.months=legacyMaxMonths(total,feeRate,legacyState.splitPay);
-      legacyState._init=true;legacyState._initTotal=total;
-    }
-    const mo=legacyClampMonths(total,feeRate,legacyState.months||maxMo,legacyState.splitPay);legacyState.months=mo;
-    const tc=legacyTotalCost(total,feeRate,mo,legacyState.splitPay);
-    const mp=legacyMP(total,feeRate,mo,legacyState.splitPay);const feeLabel=Math.round(feeRate*100);
+    const mo=total>0?legacyEffectiveMonths(c):minMo;
+    const pricedLg=legacyPriced(total,feeRate,mo,legacyState.splitPay);
+    const tc=pricedLg.tc, mp=pricedLg.mp;const feeLabel=Math.round(feeRate*100);
     const comm=getCommForCard(c,'LEGACY');
     const cardStyle = c.legacyAvail ? '' : ' style="filter:grayscale(1);opacity:.5;"';
     cards.push(`<div class="plan-card-v pc-lg${isRec?' rec':''}" id="legacyPlanCard"${cardStyle}>
       <div class="plan-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
           <div style="display:flex;align-items:center;gap:8px;">
-            <div class="logo-sm"><img src="${LEGACY_LOGO}" alt="Legacy" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-size:8px;font-weight:800;color:#6d28d9;\'>LCS</span>';"/></div>
+            <div class="logo-sm"><img src="${LEGACY_LOGO}" alt="Legacy" onerror="ftLogoFallback(this,'LCS','#6d28d9',8)"/></div>
             <div><span style="font-size:14px;font-weight:900;">Elite Legal Practice (ELP)</span></div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">${isRec?'<span class="plan-chip-rec">Recommended</span>':(c.legacyAvail?'<span class="plan-chip-check">✓</span>':'')}</div>
@@ -2917,7 +2943,7 @@ function renderPlanCards(c){
   }
 
   $('planCards').innerHTML=cards.length?cards.join(''):`<div style="grid-column:1/-1;border:1px solid rgba(239,68,68,.3);background:#fef2f2;color:#b91c1c;border-radius:12px;padding:14px;font-weight:700;">No program options available for this state and debt scenario.</div>`;
-  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:12px;overflow:hidden;"><div style="background:var(--dk);padding:11px 16px;font-size:13px;font-weight:800;color:#fff;">How the Programs Differ</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Consumer Shield</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Elite Legal Practice (ELP)</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$6,000+</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Service Fee</td><td style="padding:10px 14px;">Fixed by program tier</td><td style="padding:10px 14px;">25–27% of enrolled</td><td style="padding:10px 14px;">Adjustable 35–49%</td></tr></tbody></table></div></div>`;
+  $('planDiff').innerHTML=`<div style="border:1.5px solid var(--br);border-radius:12px;overflow:hidden;"><div style="background:var(--dk);padding:11px 16px;font-size:13px;font-weight:800;color:#fff;">How the Programs Differ</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-weight:800;color:#64748b;border-bottom:1px solid var(--br);">Feature</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:var(--bl);border-bottom:1px solid var(--br);">Shield Services</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#0b7d6e;border-bottom:1px solid var(--br);">Level Debt</th><th style="padding:10px 14px;text-align:left;font-weight:800;color:#6d28d9;border-bottom:1px solid var(--br);">Elite Legal Practice (ELP)</th></tr></thead><tbody><tr><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Program Type</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Validation</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Debt Settlement</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">Attorney-Led Resolution</td></tr><tr style="background:var(--bg);"><td style="padding:10px 14px;font-weight:700;border-bottom:1px solid var(--br);">Minimum Debt</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$4,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$7,000</td><td style="padding:10px 14px;border-bottom:1px solid var(--br);">$6,000+</td></tr><tr><td style="padding:10px 14px;font-weight:700;">Service Fee</td><td style="padding:10px 14px;">Fixed by program tier</td><td style="padding:10px 14px;">25–27% of enrolled</td><td style="padding:10px 14px;">Adjustable 35–49%</td></tr></tbody></table></div></div>`;
 }
 
 function renderLDCard(c){
@@ -3030,7 +3056,7 @@ function ftSizzleBox(programKey){
       note:'Do not promise a specific settlement amount, savings percentage, approval, or credit result. Fees may apply and credit impact may occur.'
     },
     legacy:{
-      title:'Introductory summary script — Elite Legal Practice / Debt Waiver',
+      title:'Introductory summary script — Elite Legal Practice / Debt Resolution',
       script:'This option is different because it is built around an attorney-led consumer-rights process. Instead of just assuming every debt is accurate and fully enforceable, the law firm can review the accounts, challenge improper or unverifiable debt activity, request validation, dispute inaccurate reporting, and work through legal-resolution steps when appropriate for the file.',
       bullets:[
         '“Under consumer-protection laws, collectors generally have to be able to validate what they claim you owe.”',
@@ -3083,11 +3109,11 @@ function renderCSCard(c){
   card.style.display='block';
   const totalCost=p.term*p.pay;
   const unavailable = !c.csAvail;
-  const reason = (c.flags&&c.flags.cs&&c.flags.cs[0]) || (c.css&&c.css.status==='BLACKOUT'?'Consumer Shield does not service this state.':'Consumer Shield is not the current routed option for this file.');
+  const reason = (c.flags&&c.flags.cs&&c.flags.cs[0]) || (c.css&&c.css.status==='BLACKOUT'?'Shield Services does not service this state.':'Shield Services is not the current routed option for this file.');
   const blocks=ftProgramBlocks();
   $('csActiveDetail').innerHTML=`<div style="background:rgba(26,110,216,.06);border:2px solid ${unavailable?'#cbd5e1':'var(--bl)'};border-radius:12px;padding:16px;${unavailable?'opacity:.92;':''}">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:var(--bl);">Consumer Shield Program ${p.k}</span><span style="font-size:12px;color:#64748b;margin-left:10px;">${p.range}</span></div><span class="pill ${unavailable?'p-a':'p-b'}">${unavailable?'Available Review':'Active Program'}</span></div>
-    ${unavailable?ftUnavailableBox('Consumer Shield', reason, 'var(--bl)'):''}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><span style="font-size:15px;font-weight:900;color:var(--bl);">Shield Services Program ${p.k}</span><span style="font-size:12px;color:#64748b;margin-left:10px;">${p.range}</span></div><span class="pill ${unavailable?'p-a':'p-b'}">${unavailable?'Available Review':'Active Program'}</span></div>
+    ${unavailable?ftUnavailableBox('Shield Services', reason, 'var(--bl)'):''}
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;text-align:center;margin-bottom:14px;">${[['Monthly Payment',fmt(p.pay),'per month'],['Program Length',`${p.term} mo`,'total term'],['Total Program Amount',fmt(totalCost),`${fmt(p.pay)} x ${p.term}`]].map(([l,v,s])=>`<div><div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">${l}</div><div style="font-size:22px;font-weight:900;color:var(--bl);margin-top:4px;">${v}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px;">${s}</div></div>`).join('')}</div>
     ${ftProgramCloseBox('How to explain this to the prospect', blocks.cs, 'var(--bl)')}
     ${ftSizzleBox('cs')}
@@ -3106,8 +3132,9 @@ function renderLDCard(c){
   const minDraftLD=getLDMinDraft(c.total);
   const termMax=getLDMaxTerm(c.total)||0;
   const effectiveTerm=c.ldAvail?getLDSelectedTerm(c.total, feeRate):(termMax||0);
-  const tc=getLDProgramCost(c.total, feeRate, effectiveTerm||termMax||12);
-  const mp=effectiveTerm?Math.round(tc/Math.max(1,effectiveTerm)):0;
+  const pricedLd=ldPriced(c.total, feeRate, effectiveTerm||termMax||12);
+  const tc=pricedLd.tc;
+  const mp=effectiveTerm?pricedLd.mp:0;
   const forthPlanRule=getLDForthPlanRule(c.total);
   const reason=(c.flags&&c.flags.ld&&c.flags.ld[0]) || (c.lds&&c.lds.status==='BLACKOUT'?'Level Debt does not service this state.':'Level Debt is not available for the current debt amount or creditor mix.');
   const blocks=ftProgramBlocks();
@@ -3129,11 +3156,9 @@ function renderLegacyCard(c){
   const unavailable=!c.legacyAvail;
   const total=c.total;
   const feeRate=legacyState.feeRate;
-  const fallbackMo=legacyDefaultMonths(total,feeRate,c.csProg?c.csProg.pay:0,c.ldAvail?Math.round(getLDMonthlyPayment(total,getLDSuccessFeeRate(c),Math.max(1,getLDMaxTerm(total)))):0,legacyState.splitPay);
-  const mo=legacyClampMonths(total,feeRate,legacyState.months||fallbackMo,legacyState.splitPay);
-  legacyState.months=mo;
-  const tc=legacyTotalCost(total,feeRate,mo,legacyState.splitPay);
-  const mp=legacyMP(total,feeRate,mo,legacyState.splitPay);
+  const mo=legacyEffectiveMonths(c);
+  const pricedLg=legacyPriced(total,feeRate,mo,legacyState.splitPay);
+  const tc=pricedLg.tc, mp=pricedLg.mp;
   const feeLabel=Math.round(feeRate*100);
   const band=getLegacyComm(total);
   const reason=(c.flags&&c.flags.legacy&&c.flags.legacy[0]) || (c.lgs&&c.lgs.status==='BLACKOUT'?'ELP does not service this state.':'ELP is not available for the current debt amount or creditor mix.');
@@ -3154,8 +3179,8 @@ function renderLegacyCard(c){
   if(grid) grid.innerHTML=LEGACY_COMM.map(b=>{const isAct=band&&b.code===band.code;return `<div class="lc-tile${isAct?' lc-act':''}"><div style="font-size:12px;font-weight:800;color:${isAct?'#6d28d9':'#64748b'};">Band ${b.code}</div><div style="font-size:9px;color:#94a3b8;margin-top:1px;">$${b.min.toLocaleString()}${b.max===Infinity?'+':'–$'+b.max.toLocaleString()}</div><div style="font-size:17px;font-weight:900;color:${isAct?'#6d28d9':'var(--dk)'};margin-top:5px;">${fmt(legacyCommAtFee(b.total,feeRate))}</div><div style="font-size:10px;color:#64748b;margin-top:1px;">comm @ ${feeLabel}%</div><div style="font-size:10px;color:#94a3b8;margin-top:2px;">P2: ${fmt(Math.round(b.p2*(feeRate/0.40)))}${b.p4>0?` · P4: ${fmt(Math.round(b.p4*(feeRate/0.40)))}`:''}</div></div>`}).join('');
 }
 
-const PUBLIC_PROGRAM_NAMES={LEVEL:'Debt Settlement','CONSUMER SHIELD':'Debt Validation',LEGACY:'Debt Waiver'};
-const INTERNAL_PROGRAM_NAMES={LEVEL:'Level Debt', 'CONSUMER SHIELD':'Consumer Shield', LEGACY:'Elite Legal Practice (ELP)'};
+const PUBLIC_PROGRAM_NAMES={LEVEL:'Debt Settlement','CONSUMER SHIELD':'Debt Validation',LEGACY:'Debt Resolution'};
+const INTERNAL_PROGRAM_NAMES={LEVEL:'Level Debt', 'CONSUMER SHIELD':'Shield Services', LEGACY:'Elite Legal Practice (ELP)'};
 function publicProgramName(route){return PUBLIC_PROGRAM_NAMES[route]||'Recommended Program';}
 function internalProgramName(route){return INTERNAL_PROGRAM_NAMES[route]||'Recommended Program';}
 function programRouteAvailable(c,route){
@@ -3192,7 +3217,7 @@ function deliveryProgramContent(route){
 // not secured and not in 3rd-party collections. Monthly compounding at APR/12.
 const OPEN_CARD_TYPES=new Set(['Unsecured','Unsecured Line of Credit']);
 function openCardBalance(){return app.rows.filter(r=>num(r.amount)>0&&!r.collections&&!r.secured&&OPEN_CARD_TYPES.has(r.dt||'Unsecured')).reduce((a,r)=>a+num(r.amount),0);}
-function defaultOpenCardPayment(c,bal){const t=c.total||0;return t>0?Math.round((c.dn.mp||0)*bal/t):0;}
+function defaultOpenCardPayment(c,bal){const t=c.total||0;const pay=c.dn.fixedMonthlyPayment||c.dn.mp||0;return t>0?Math.round(pay*bal/t):0;}
 function computeCreditRunway(c){
   const bal=openCardBalance();
   const limit=num(app.openCardLimit);
@@ -3255,24 +3280,24 @@ function renderDeliveryProgram(c){
     </select>
     ${est?`<div class="dp-summary"><div><strong>${esc(pc?pc.publicName:publicProgramName(sel))}</strong> <span class="dp-muted">(${esc(internalProgramName(sel))} — prospect sees program type only)</span></div>
       <div class="dp-metrics"><span>${fmt(est.mp)}/mo</span><span>${est.term} months</span><span>${fmt(est.tc)} total</span></div>
-      <div class="dp-save">Saves ~${fmt(save)} vs paying their current ${fmt(Math.round(c.dn.fixedMonthlyPayment||c.dn.mp))}/mo · ~${fmt(saveMin)} vs minimum-only</div></div>`:''}`;
+      <div class="dp-save">${c.dn.neverPaysOff?`At ${fmt(Math.round(c.dn.fixedMonthlyPayment||c.dn.mp))}/mo the current path never pays off — still ~${fmt(c.dn.balanceAt36||0)} owed after 36 months`:`Saves ~${fmt(save)} vs paying their current ${fmt(Math.round(c.dn.fixedMonthlyPayment||c.dn.mp))}/mo`} · ~${fmt(saveMin)} vs minimum-only</div></div>`:''}`;
   const dd=$('deliveryProgramSelect');
   if(dd)dd.onchange=()=>{app.selectedProgramRoute=dd.value;render();};
 }
 function programEstimate(c,route){
   const total=c.total||0;
   if(route==='LEVEL'&&c.ldAvail){
-    const rate=c.lds&&c.lds.status==='RED'?.27:.25;
-    const tc=getLDProgramCost(total, rate);
+    const rate=getLDSuccessFeeRate(c);
     const minDraft=getLDMinDraft(total);
     const effTerm=getLDSelectedTerm(total, rate);
+    const priced=ldPriced(total, rate, effTerm);
     const forthPlanRule=getLDForthPlanRule(total);
     return {
       route,
-      term:effTerm,
-      tc,
-      mp:Math.round(tc/Math.max(1,effTerm)),
-      shortest:{term:12,tc,mp:tc/12},
+      term:priced.term,
+      tc:priced.tc,
+      mp:priced.mp,
+      shortest:ldPriced(total, rate, Math.min(12, effTerm)),
       serviceFeePct:Math.round(rate*100),
       minimumMonthlyDeposit:minDraft,
       forthCrmPlanType:forthPlanRule.planType,
@@ -3285,9 +3310,9 @@ function programEstimate(c,route){
     return {route,term:c.csProg.term,tc,mp:c.csProg.pay,shortest:{term:c.csProg.term,tc,mp:c.csProg.pay},csProgramLabel:`Program ${c.csProg.k}`};
   }
   if(route==='LEGACY'&&c.legacyAvail){
-    const mo=legacyClampMonths(total,legacyState.feeRate,legacyState.months||legacyDefaultMonths(total,legacyState.feeRate,c.csProg?c.csProg.pay:0,c.ldAvail?Math.round((total*.5+total*(c.lds&&c.lds.status==='RED'?.27:.25))/getLDMaxTerm(total)):0,legacyState.splitPay),legacyState.splitPay);
-    const tc=legacyTotalCost(total,legacyState.feeRate,mo,legacyState.splitPay);
-    return {route,term:mo,tc,mp:legacyMP(total,legacyState.feeRate,mo,legacyState.splitPay),shortest:{term:legacyMinMonths(),tc:legacyTotalCost(total,legacyState.feeRate,legacyMinMonths(),legacyState.splitPay),mp:legacyMP(total,legacyState.feeRate,legacyMinMonths(),legacyState.splitPay)},serviceFeePct:Math.round((legacyState.feeRate||0)*100),splitPay:!!legacyState.splitPay,monthlyAdminFees:legacyMonthlyAdminFees(legacyState.splitPay)};
+    const mo=legacyEffectiveMonths(c);
+    const priced=legacyPriced(total,legacyState.feeRate,mo,legacyState.splitPay);
+    return {route,term:priced.term,tc:priced.tc,mp:priced.mp,shortest:legacyPriced(total,legacyState.feeRate,legacyShortestMonths(total,legacyState.feeRate,legacyState.splitPay),legacyState.splitPay),serviceFeePct:Math.round((legacyState.feeRate||0)*100),splitPay:!!legacyState.splitPay,monthlyAdminFees:legacyMonthlyAdminFees(legacyState.splitPay)};
   }
   return null;
 }
@@ -3397,28 +3422,34 @@ function renderCmpTable(c){
   const th=`<thead><tr>
     <th style="text-align:left;min-width:180px;">Detail</th>
     <th style="text-align:left;background:#1e293b;min-width:250px;">Current Situation ${currentHeaderTip}</th>
-    <th style="text-align:left;min-width:160px;">Fastest Payoff</th>
     <th style="text-align:left;background:rgba(15,157,138,.06);color:#0b7d6e;min-width:200px;">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <span class="best-program-name"><span>${recName}</span><span style="background:var(--g);color:#fff;border-radius:999px;padding:2px 8px;font-size:10px;white-space:nowrap;">Best Option</span></span>
       </div>
     </th>
   </tr></thead>`;
-  const row=(label,current,fast,reco,cls='')=>`<tr class="${cls}"><td>${label}</td><td>${current}</td><td>${fast}</td><td>${reco}</td></tr>`;
+  const row=(label,current,fast,reco,cls='')=>`<tr class="${cls}"><td>${label}</td><td>${current}</td><td>${reco}</td></tr>`;
+  const never=!!dn.neverPaysOff;
+  const red=(v)=>`<span style="color:var(--rd);font-weight:900;">${v}</span>`;
+  const progInterest=est?'None charged on program payments':'&mdash;';
+  const prog36=est?fmt(Math.round(est.mp*Math.min(36,est.term))):'&mdash;';
 
   const fixedRows=[
-    row('Total Debt / Program Total',fmt(c.total),fT,recTotal),
+    row('Total Debt / Estimated Program Cost',fmt(c.total),fT,recTotal),
     row('APR / Interest Assumption',`<div class="cmp-num-wrap"><button type="button" class="cmp-step-btn" onclick="ftAdjustCmpApr(-1)">−</button><input id="cmpAprAssumption" class="cmp-input apr-input" type="number" inputmode="numeric" step="1" min="5" max="100" value="${aprVal}" oninput="ftStageCmpApr(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();ftCommitCmpApr(this.value,true)}" onchange="ftCommitCmpApr(this.value,true)" onblur="ftCommitCmpApr(this.value,true)"/><button type="button" class="cmp-step-btn" onclick="ftAdjustCmpApr(1)">+</button><span style="font-size:12px;font-weight:800;color:#64748b;">% APR</span></div>`,'N/A','N/A'),
     row('Monthly Payment',`<div class="cmp-num-wrap"><button type="button" class="cmp-step-btn" onclick="ftAdjustCmpPay(-25)">−</button><input id="cmpFixedPayment" class="cmp-input" type="number" inputmode="numeric" step="25" min="1" value="${Math.round(fixedPayment)}" onkeydown="if(event.key==='Enter'){event.preventDefault();ftCommitCmpPay(this.value,true)}" onchange="ftCommitCmpPay(this.value,true)" onblur="ftCommitCmpPay(this.value,true)"/><button type="button" class="cmp-step-btn" onclick="ftAdjustCmpPay(25)">+</button><span style="font-size:12px;font-weight:800;color:#64748b;">/mo</span>${sayTip('Use this box to show what happens if the client keeps paying one fixed monthly amount instead of letting minimum payments decline over time. The default is based on the estimated creditor minimum-payment rule.')}</div>`,fM,recMonthly,'mp-row'),
-    row('Interest Amount Paid / Fixed Monthly Payment',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.fixedInterest||0)}</span>${sayTip(fixedScript)}`,est?'$0 credit-card interest':'&mdash;',selRoute==='LEGACY'?'N/A':(recTotal!=='&mdash;'?'$0 credit-card interest':'&mdash;')),
-    row('Fixed Monthly Payment Timeline / # of Months',`${fixedMonths}${sayTip('This is the estimated payoff timeline if the client keeps paying the selected fixed monthly amount every month.')}`,fMo,recMonths),
-    row('Total Paid — Fixed Monthly Payment',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.fixedTotal||0)}</span>`,fT,recTotal),
-    row('Current Situation vs Estimated Debt Relief Savings','&mdash;',fFixedSavings,recFixedSavings,'sv')
+    row('Interest Paid At This Payment',never?red('Keeps growing — payment does not cover interest')+sayTip(fixedScript):red(fmt(dn.fixedInterest||0))+sayTip(fixedScript),progInterest,progInterest),
+    row('Time To Pay Off At This Payment',`${never?red('Does not pay off'):fixedMonths}${sayTip('Estimated payoff timeline if the client keeps paying the selected monthly amount every month.')}`,fMo,recMonths),
+    row('Total Paid At This Payment',never?red('Never pays off'):red(fmt(dn.fixedTotal||0)),fT,recTotal),
+    row('Next 36 Months — Interest Paid',red(fmt(dn.interestAt36||0))+sayTip('Interest the client would pay over the next 36 months at the selected payment and APR. Compare it with the program cost over the same 36 months.'),'&mdash;',progInterest),
+    row('Next 36 Months — Balance Still Owed',red(fmt(dn.balanceAt36||0)),'&mdash;',est?'Depends on program results':'&mdash;'),
+    row('Next 36 Months — Total Paid',fmt(dn.paidAt36||0),'&mdash;',prog36),
+    row('Current Situation vs Estimated Debt Relief Savings',never?'See 36-month rows':'&mdash;',fFixedSavings,never?'<span style="font-size:12px;color:#64748b;">Not calculated — current path never pays off</span>':recFixedSavings,'sv')
   ].join('');
 
   const decliningRows=[
     row('Declining Minimum-Only Payoff Time',`${dnMonths}${sayTip(minOnlyScript)}`,fMo,recMonths),
-    row('Interest Paid — Declining Minimum',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.interest||0)}</span>${sayTip('This estimates interest if the client follows the required minimum payment only and allows that required payment to decline as the balance gets lower.')}`,est?'$0 credit-card interest':'&mdash;',selRoute==='LEGACY'?'N/A':(recTotal!=='&mdash;'?'$0 credit-card interest':'&mdash;')),
+    row('Interest Paid — Declining Minimum',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.interest||0)}</span>${sayTip('This estimates interest if the client follows the required minimum payment only and allows that required payment to decline as the balance gets lower.')}`,progInterest,progInterest),
     row('Total Paid — Declining Minimum',`<span style="color:var(--rd);font-weight:900;">${fmt(dn.total||0)}</span>`,fT,recTotal),
     row('Declining Minimum Payment Total vs Estimated Debt Relief Savings','&mdash;',fDecliningSavings,recDecliningSavings,'sv'),
     row('Calculation Assumptions',`<span style="font-size:11px;color:#92400e;line-height:1.45;display:block;">${esc(dn.assumption||'Assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes.')}</span>`,'&mdash;','&mdash;')
@@ -3719,8 +3750,10 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
 }
 
   async function buildPlanPdfDoc(c){
-  const fn=$('fName').value.trim()||'Client', ln=$('lName').value.trim()||'';
+  const fn=$('fName').value.trim(), ln=$('lName').value.trim()||'';
   const fullName=`${fn} ${ln}`.trim();
+  const never=!!c.dn.neverPaysOff;
+  const lib=window.FT_PROGRAM_CONTENT||{};
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF({unit:'mm',format:'a4'});
   const pageW=210, pageH=297, margin=14;
@@ -3730,27 +3763,27 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
   const est=programEstimate(c,selRoute);
   const progType=publicProgramName(selRoute);
   const fixedMp=Math.round(c.dn.fixedMonthlyPayment||c.dn.mp);
-  const fixedMoLabel=c.dn.fixedYearsMonths||`${c.dn.fixedMonths||0} mo`;
+  const fixedMoLabel=never?'Does not pay off':(c.dn.fixedYearsMonths||`${c.dn.fixedMonths||0} mo`);
 
   // ── Header banner ──
   pdfGradientBand(doc,0,0,pageW,38,NAVY,TEAL);
   const logoDataUrl=await loadImageAsDataURL('https://assets.cdn.filesafe.space/S4ztIlDxBovAboldwbOR/media/68783cf82035bab4d790ae7e.png');
   if(logoDataUrl){
     try{ doc.addImage(logoDataUrl,'PNG',margin,9,34,18,undefined,'FAST'); }
-    catch(e){ doc.setFont(undefined,'bold');doc.setFontSize(16);doc.setTextColor(255,255,255);doc.text('FUNDING TIER',margin,20); }
+    catch(e){ doc.setFont(undefined,'bold');doc.setFontSize(16);doc.setTextColor(255,255,255);doc.text('Funding Tier',margin,20); }
   } else {
-    doc.setFont(undefined,'bold');doc.setFontSize(16);doc.setTextColor(255,255,255);doc.text('FUNDING TIER',margin,20);
+    doc.setFont(undefined,'bold');doc.setFontSize(16);doc.setTextColor(255,255,255);doc.text('Funding Tier',margin,20);
   }
   doc.setFont(undefined,'bold');doc.setFontSize(17);doc.setTextColor(255,255,255);
   doc.text('Debt Resolution Summary',pageW-margin,17,{align:'right'});
   doc.setFont(undefined,'normal');doc.setFontSize(9);doc.setTextColor(220,240,235);
-  doc.text('AI Deal Router · Personalized Estimate',pageW-margin,24,{align:'right'});
+  doc.text('Personalized Estimate · Figures Are Estimates Only',pageW-margin,24,{align:'right'});
 
   let y=50;
 
   // ── Prepared-for line ──
   doc.setFont(undefined,'bold');doc.setFontSize(12);doc.setTextColor(...NAVY);
-  doc.text(`Prepared for: ${fullName}`,margin,y);
+  doc.text(fullName?`Prepared for: ${fullName}`:'Your Personalized Estimate',margin,y);
   doc.setFont(undefined,'normal');doc.setFontSize(10);doc.setTextColor(...GRAY);
   doc.text(`State: ${app.sel}   |   Program: ${progType}`,margin,y+6);
   y+=16;
@@ -3758,10 +3791,10 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
   // ── Highlight metric cards ──
   const cardW=(pageW-margin*2-9)/4, cardH=24, cardY=y;
   const cards=[
-    {label:'TOTAL DEBT REVIEWED',val:fmt(c.total),accent:NAVY},
-    {label:'CURRENT MONTHLY PAYMENT',val:fmt(fixedMp),accent:RED},
-    {label:est?'RECOMMENDED PAYMENT':'PAYMENT',val:est?fmt(est.mp):'--',accent:TEAL},
-    {label:est?'PROGRAM LENGTH':'LENGTH',val:est?`${est.term} mo`:'--',accent:TEAL}
+    {label:'Total Debt Reviewed',val:fmt(c.total),accent:NAVY},
+    {label:c.dn.paymentIsEntered?'Your Current Payment':'Est. Current Payment',val:fmt(fixedMp),accent:RED},
+    {label:est?'Est. Program Payment':'Payment',val:est?fmt(est.mp):'--',accent:TEAL},
+    {label:est?'Est. Program Length':'Length',val:est?`${est.term} mo`:'--',accent:TEAL}
   ];
   cards.forEach((card,i)=>{
     const cx=margin+i*(cardW+3);
@@ -3784,8 +3817,12 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
     doc.text(pc?pc.publicName:`${progType} Program`,margin+5,y+6.5);
     doc.setFont(undefined,'normal');doc.setFontSize(9);
     const payLbl=pc&&pc.paymentLabel?pc.paymentLabel.replace(/^./,m=>m.toUpperCase()):'Monthly';
-    doc.text(`${payLbl}: ${fmt(est.mp)}   |   Length: ${est.term} months   |   Total program price: ${fmt(est.tc)}`,margin+5,y+12.5);
+    doc.text(`${payLbl}: ${fmt(est.mp)}   |   Estimated length: ${est.term} months   |   Estimated total program cost: ${fmt(est.tc)}`,margin+5,y+12.5);
     y+=22;
+    if(pc&&pc.debtOutcome){
+      doc.setFont(undefined,'normal');doc.setFontSize(8.2);doc.setTextColor(...NAVY);
+      const ol=doc.splitTextToSize(pc.debtOutcome,contentW);ensure(ol.length*3.9+4);doc.text(ol,margin,y);y+=ol.length*3.9+4;
+    }
   }
 
   // ── How the program works + key benefits ──
@@ -3800,7 +3837,7 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
     const hH=hiw.reduce((a,l)=>a+l.length*3.9+1.6,0), bH=ben.reduce((a,l)=>a+l.length*3.9+1.6,0);
     const boxH=Math.max(hH,bH)+13;
     ensure(boxH+4);
-    [[margin,'HOW IT WORKS',hiw],[margin+colW+colGap,'KEY BENEFITS',ben]].forEach(([x,title,items])=>{
+    [[margin,'How It Works',hiw],[margin+colW+colGap,'Key Benefits',ben]].forEach(([x,title,items])=>{
       doc.setFillColor(240,253,250);doc.setDrawColor(...TEAL);doc.setLineWidth(0.3);
       doc.roundedRect(x,y,colW,boxH,2,2,'FD');
       doc.setFont(undefined,'bold');doc.setFontSize(8);doc.setTextColor(...TEAL_DK);
@@ -3812,19 +3849,24 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
     y+=boxH+8;
   }
 
-  // ── Primary comparison table (fixed-payment based — this is the fix) ──
+  // ── Primary comparison table: current path at the stated payment vs the program ──
+  const aprPct=Math.round((c.dn.apr||0)*100);
+  const prog36=est?fmt(Math.round(est.mp*Math.min(36,est.term))):'--';
   const primaryRows=[
-    ['Monthly Payment',fmt(fixedMp),est&&est.shortest?fmt(est.shortest.mp):'--',est?fmt(est.mp):'--'],
-    ['Payment Behavior','Fixed monthly payment','Fixed monthly','Structured program payment'],
-    ['Total Debt',fmt(c.total),fmt(c.total),fmt(c.total)],
-    ['Months to Payoff',fixedMoLabel,est&&est.shortest?`${est.shortest.term} mo`:'--',est?`${est.term} mo`:'--'],
-    ['Interest Paid',fmt(c.dn.fixedInterest||0),'--','--'],
-    ['Total Paid',fmt(c.dn.fixedTotal||0),'--','--'],
-    ['Est. Savings','--',est&&est.shortest?fmt(Math.max(0,(c.dn.fixedTotal||0)-est.shortest.tc)):'--',est?fmt(Math.max(0,(c.dn.fixedTotal||0)-est.tc)):'--'],
+    ['Monthly Payment (Estimated)',fmt(fixedMp),est?fmt(est.mp):'--'],
+    ['Interest On Payments',`${aprPct}% APR`,est?'None charged on program payments':'--'],
+    ['Total Debt / Estimated Program Cost',fmt(c.total),est?fmt(est.tc):'--'],
+    ['Estimated Time To Pay Off',fixedMoLabel,est?`${est.term} mo`:'--'],
+    ['Estimated Interest Paid',never?'Keeps growing':fmt(c.dn.fixedInterest||0),'--'],
+    ['Estimated Total Paid',never?'Never pays off':fmt(c.dn.fixedTotal||0),est?fmt(est.tc):'--'],
+    ['Next 36 Months: Interest Paid',fmt(c.dn.interestAt36||0),'--'],
+    ['Next 36 Months: Balance Still Owed',fmt(c.dn.balanceAt36||0),est?'Depends on program results':'--'],
+    ['Next 36 Months: Total Paid',fmt(c.dn.paidAt36||0),prog36],
+    ['Estimated Savings','--',est?(never?'See 36-month rows above':fmt(Math.max(0,(c.dn.fixedTotal||0)-est.tc))):'--'],
   ];
   doc.autoTable({
     startY:y,
-    head:[['Detail','Current Situation','Fastest Payoff',pc?pc.publicName:'Recommended']],
+    head:[['Detail','Current Situation',pc?pc.publicName:'Recommended']],
     body:primaryRows,
     margin:{left:margin,right:margin,bottom:24},
     styles:{fontSize:8.5,cellPadding:3,textColor:[15,23,42],lineColor:[226,232,240],lineWidth:0.2},
@@ -3843,35 +3885,37 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
 
   // ── The cost of doing nothing ──
   {
-    const apr=(c.dn.apr||0), daily=(c.total||0)*apr/365, monthlyInt=(c.total||0)*apr/12;
+    const apr=(c.dn.apr||0), ib=(c.dn.interestBearingBalance!=null?c.dn.interestBearingBalance:c.total)||0, daily=ib*apr/365, monthlyInt=ib*apr/12;
     const saveFixed=est?Math.max(0,(c.dn.fixedTotal||0)-est.tc):0;
     const saveMin=est?Math.max(0,(c.dn.total||0)-est.tc):0;
-    const dnc=(window.FT_PROGRAM_CONTENT&&window.FT_PROGRAM_CONTENT.DO_NOTHING_COPY)||{heading:'The cost of doing nothing',intro:''};
+    const dnc=lib.DO_NOTHING_COPY||{heading:'The Cost Of Doing Nothing',intro:''};
     const intro=dnc.intro?doc.splitTextToSize(dnc.intro,contentW-8):[];
     const boxH=16+intro.length*3.9+22;
     ensure(boxH+4);
     doc.setFillColor(254,242,242);doc.setDrawColor(...RED);doc.setLineWidth(0.4);
     doc.roundedRect(margin,y,contentW,boxH,2,2,'FD');
     doc.setFont(undefined,'bold');doc.setFontSize(10.5);doc.setTextColor(...RED);
-    doc.text(dnc.heading.toUpperCase(),margin+4,y+7);
+    doc.text(dnc.heading,margin+4,y+7);
     doc.setFont(undefined,'normal');doc.setFontSize(8.2);doc.setTextColor(...NAVY);
     if(intro.length)doc.text(intro,margin+4,y+12.5);
     const my=y+14+intro.length*3.9;
     const stats=[
-      ['Interest charged daily',`~$${daily.toFixed(2)}/day`],
-      ['Interest per month',`~${fmt(Math.round(monthlyInt))}`],
-      ['Minimum-only payoff',c.dn.yearsMonths||'N/A'],
-      ['Minimum-only interest',fmt(c.dn.interest||0)]
+      ['Interest Added Daily (About)',`~$${daily.toFixed(2)}/day`],
+      ['Interest Added Monthly (About)',`~${fmt(Math.round(monthlyInt))}`],
+      ['Minimum-Only Payoff',c.dn.yearsMonths||'N/A'],
+      ['Minimum-Only Interest',fmt(c.dn.interest||0)]
     ];
     const sw=(contentW-8)/4;
     stats.forEach(([l,v],i)=>{
       const sx=margin+4+i*sw;
-      doc.setFont(undefined,'bold');doc.setFontSize(6.8);doc.setTextColor(...GRAY);doc.text(l.toUpperCase(),sx,my+3);
+      doc.setFont(undefined,'bold');doc.setFontSize(6.8);doc.setTextColor(...GRAY);doc.text(l,sx,my+3);
       doc.setFont(undefined,'bold');doc.setFontSize(11.5);doc.setTextColor(...RED);doc.text(String(v),sx,my+9.5);
     });
     if(est){
       doc.setFont(undefined,'bold');doc.setFontSize(8.6);doc.setTextColor(...TEAL_DK);
-      doc.text(`Estimated savings with the ${pc?pc.publicName:progType}: ${fmt(saveFixed)} vs paying your current ${fmt(fixedMp)}/mo · ${fmt(saveMin)} vs minimum payments only`,margin+4,my+16,{maxWidth:contentW-8});
+      doc.text(never
+        ?`At ${fmt(fixedMp)}/mo the current path does not pay off. Estimated balance after 36 months: ${fmt(c.dn.balanceAt36||0)}, with about ${fmt(c.dn.interestAt36||0)} paid in interest. Estimated program cost over the same 36 months: ${prog36}.`
+        :`Estimated savings with the ${pc?pc.publicName:progType}: ${fmt(saveFixed)} vs paying your current ${fmt(fixedMp)}/mo · ${fmt(saveMin)} vs minimum payments only`,margin+4,my+16,{maxWidth:contentW-8});
     }
     y+=boxH+8;
   }
@@ -3879,38 +3923,38 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
   // ── Credit runway on open cards (not in collections) ──
   const cr=computeCreditRunway(c);
   if(cr.hasLimit){
-    const rc=(window.FT_PROGRAM_CONTENT&&window.FT_PROGRAM_CONTENT.CREDIT_RUNWAY_COPY)||{heading:'How fast interest can use up your available credit',intro:'',disclosure:''};
+    const rc=lib.CREDIT_RUNWAY_COPY||{heading:'How Fast Interest Can Use Up Your Available Credit',intro:'',disclosure:''};
     const cur=cr.atCurrentPayment, stop=cr.ifPaymentsStop;
     doc.setFont(undefined,'normal');doc.setFontSize(8.2);
     const intro=rc.intro?doc.splitTextToSize(rc.intro,contentW-8):[];
     ensure(40+intro.length*3.9);
     doc.setFont(undefined,'bold');doc.setFontSize(10.5);doc.setTextColor(...RED);
-    doc.text(rc.heading.toUpperCase()+' (ESTIMATED)',margin,y+4);
+    doc.text(rc.heading+' (Estimated)',margin,y+4);
     doc.setFont(undefined,'normal');doc.setFontSize(8.2);doc.setTextColor(...NAVY);
     if(intro.length)doc.text(intro,margin,y+9.5);
     y+=11+intro.length*3.9;
 
     // headline stats
     const tiles=[
-      ['Open card balance',fmt(cr.openBalance)],
-      ['Total credit limit',fmt(cr.creditLimit)],
-      ['Available credit today',fmt(cr.availableCredit)],
-      [`Interest added / mo (${cr.aprPercent}% APR)`,`~${fmt(cr.monthlyInterest)}`]
+      ['Open Card Balance',fmt(cr.openBalance)],
+      ['Total Credit Limit',fmt(cr.creditLimit)],
+      ['Available Credit Today',fmt(cr.availableCredit)],
+      [`Interest Added / Mo (${cr.aprPercent}% APR)`,`~${fmt(cr.monthlyInterest)}`]
     ];
     const tw=(contentW-9)/4;
     ensure(20);
     tiles.forEach(([l,v],i)=>{const tx=margin+i*(tw+3);
       doc.setDrawColor(226,232,240);doc.setLineWidth(0.3);doc.roundedRect(tx,y,tw,16,2,2,'S');
-      doc.setFont(undefined,'bold');doc.setFontSize(6.6);doc.setTextColor(...GRAY);doc.text(l.toUpperCase(),tx+2.5,y+5,{maxWidth:tw-5});
+      doc.setFont(undefined,'bold');doc.setFontSize(6.6);doc.setTextColor(...GRAY);doc.text(l,tx+2.5,y+5,{maxWidth:tw-5});
       doc.setFontSize(11.5);doc.setTextColor(i===2?TEAL_DK[0]:NAVY[0],i===2?TEAL_DK[1]:NAVY[1],i===2?TEAL_DK[2]:NAVY[2]);doc.text(v,tx+2.5,y+12.5);});
     y+=21;
 
     const payTxt=`${fmt(cr.monthlyPayment)}/mo${cr.paymentIsEstimate?' (est. minimum)':''}`;
-    const maxTxt=(r)=>r.monthsToMaxOut?`about ${r.monthsToMaxOut} months`:'not within 50 years';
+    const maxTxt=(r)=>r.monthsToMaxOut?`about ${r.monthsToMaxOut} months`:'Not projected to max out';
     const marks=[3,6,12,18,24,36];
     doc.autoTable({
       startY:y,
-      head:[['Estimated available credit left',...marks.map(m=>`${m} mo`),'Credit maxed out in']],
+      head:[['Estimated Available Credit Left',...marks.map(m=>`${m} mo`),'Credit Maxed Out In']],
       body:[
         [`At current payment: ${payTxt}`,...marks.map(m=>fmt(cur.availableAt[m])),maxTxt(cur)],
         ['If payments stop',...marks.map(m=>fmt(stop.availableAt[m])),maxTxt(stop)]
@@ -3943,15 +3987,17 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
   // ── Secondary: declining minimum-payment reference ──
   if(y>250){doc.addPage();y=20;}
   doc.setFont(undefined,'bold');doc.setFontSize(9);doc.setTextColor(...GRAY);
-  doc.text('DECLINING MINIMUM PAYMENT REFERENCE',margin,y);
+  doc.text('If You Only Ever Paid The Minimum (Reference)',margin,y);
   doc.setFont(undefined,'normal');doc.setFontSize(7.5);
-  doc.text('Some creditors reduce the automatic minimum payment as the balance drops, which can extend payoff and increase interest.',margin,y+4,{maxWidth:pageW-margin*2});
-  y+=10;
+  const mpn=lib.MINIMUM_PAYMENT_NOTE||'Most credit cards set the minimum payment at about 1% of the balance plus that month\'s interest, and the required minimum drops as the balance drops, which is why minimum-only payoff takes many years.';
+  const mpnLines=doc.splitTextToSize(mpn,pageW-margin*2);
+  doc.text(mpnLines,margin,y+4);
+  y+=6+mpnLines.length*3.5;
   const secondaryRows=[
-    ['Month 1 Starting Minimum',fmt(c.dn.mp)],
-    ['Declining Min Payoff',c.dn.yearsMonths||`${c.dn.months||0} mo`],
-    ['Interest - Declining Min',fmt(c.dn.interest||0)],
-    ['Total Paid - Declining Min',fmt(c.dn.total||0)],
+    ['Month 1 Starting Minimum (Estimated)',fmt(c.dn.mp)],
+    ['Minimum-Only Payoff Time',c.dn.yearsMonths||`${c.dn.months||0} mo`],
+    ['Minimum-Only Interest Paid',fmt(c.dn.interest||0)],
+    ['Minimum-Only Total Paid',fmt(c.dn.total||0)],
   ];
   doc.autoTable({
     startY:y,
@@ -3972,18 +4018,31 @@ function pdfGradientBand(doc,x,y,w,h,fromRGB,toRGB){
   doc.roundedRect(margin,y,pageW-margin*2,noteH,2,2,'FD');
   doc.setFont(undefined,'normal');doc.setFontSize(8);doc.setTextColor(...AMBER);
   doc.text(noteLines,margin+4,y+5.5);
+  y+=noteH+8;
+
+  // ── Important disclosures ──
+  const reqd=Array.isArray(lib.REQUIRED_DISCLOSURES)?lib.REQUIRED_DISCLOSURES:[];
+  if(reqd.length){
+    const dls=reqd.map(t=>doc.splitTextToSize(`•  ${t}`,pageW-margin*2-4));
+    const dH=dls.reduce((a,l)=>a+l.length*3.6+1.2,0)+8;
+    if(y+dH>pageH-24){doc.addPage();y=20;}
+    doc.setFont(undefined,'bold');doc.setFontSize(9);doc.setTextColor(...NAVY);
+    doc.text('Important Disclosures',margin,y);y+=5;
+    doc.setFont(undefined,'normal');doc.setFontSize(7.4);doc.setTextColor(...GRAY);
+    dls.forEach(l=>{doc.text(l,margin+2,y);y+=l.length*3.6+1.2;});
+  }
 
   // ── Footer on every page ──
   const pageCount=doc.internal.getNumberOfPages();
   for(let p=1;p<=pageCount;p++){
     doc.setPage(p);
-    const estNote=(window.FT_PROGRAM_CONTENT&&window.FT_PROGRAM_CONTENT.ESTIMATE_DISCLOSURE)||'All figures are estimates for illustration only. Actual results and outcomes may change and are not guaranteed.';
+    const estNote=lib.ESTIMATE_DISCLOSURE||'All figures are estimates for illustration only. Actual results and outcomes may change and are not guaranteed.';
     doc.setFont(undefined,'italic');doc.setFontSize(6.6);doc.setTextColor(100,116,139);
     doc.text(doc.splitTextToSize(estNote,pageW-margin*2),margin,pageH-18);
     doc.setFillColor(...NAVY);
     doc.rect(0,pageH-10,pageW,10,'F');
     doc.setFont(undefined,'normal');doc.setFontSize(7.5);doc.setTextColor(255,255,255);
-    doc.text('Funding Tier · Debt Resolution Estimator · Estimates only',margin,pageH-4);
+    doc.text('Funding Tier · Personalized Debt Resolution Estimate · Estimates Only',margin,pageH-4);
     doc.text(`Page ${p} of ${pageCount}`,pageW-margin,pageH-4,{align:'right'});
   }
 
@@ -4110,7 +4169,7 @@ function updateLegacyCalc(newFee,newMo,newSplitPay){
   if(newFee!==undefined&&newFee!==null&&newFee!=='')legacyState.feeRate=parseFloat(newFee)/100;
   legacyState.feeRate=Math.max(0.35,Math.min(0.49,legacyState.feeRate||0.40));
   if(newMo!==undefined&&newMo!==null&&newMo!=='')legacyState.months=legacyClampMonths(total,legacyState.feeRate,newMo,legacyState.splitPay);
-  else legacyState.months=legacyClampMonths(total,legacyState.feeRate,legacyState.months||legacyDefaultMonths(total,legacyState.feeRate, lastScenario.csProg?lastScenario.csProg.pay:0, lastScenario.ldAvail?Math.round((total*.5+total*lastScenario.feeRate)/getLDMaxTerm(total)):0,legacyState.splitPay),legacyState.splitPay);
+  else legacyState.months=legacyClampMonths(total,legacyState.feeRate,legacyState.months||legacyDefaultMonths(total,legacyState.feeRate, lastScenario.csProg?lastScenario.csProg.pay:0, ldTargetMonthly(lastScenario),legacyState.splitPay),legacyState.splitPay);
   legacyState._init=true;
   legacyState._initTotal=total;
   renderPlanCards(lastScenario);
@@ -4168,8 +4227,8 @@ function buildFullPayload(sendEmail){
   const total=Math.round(c.total||0);
   const selRoute=selectedProgramRoute(c);
   const est=programEstimate(c,selRoute);
-  const legacyMonths=c.legacyAvail ? legacyClampMonths(total,legacyState.feeRate,legacyState.months||36,legacyState.splitPay) : null;
-  const legacyTotal=c.legacyAvail ? legacyTotalCost(total,legacyState.feeRate,legacyMonths||36,legacyState.splitPay) : 0;
+  const legacyMonths=c.legacyAvail ? legacyEffectiveMonths(c) : null;
+  const legacyTotal=c.legacyAvail ? legacyPriced(total,legacyState.feeRate,legacyMonths,legacyState.splitPay).tc : 0;
   const recommended=est?{
     term:est.term,
     monthlyPayment:Math.round(est.mp),
@@ -4186,7 +4245,7 @@ function buildFullPayload(sendEmail){
     forthCrmAgentNote:est.forthCrmAgentNote||null
   }:null;
   return {
-    firstName:$('fName').value.trim()||'Prospect',
+    firstName:$('fName').value.trim()||'',
     lastName:$('lName').value.trim()||'',
     email,
     recipientEmail:email,
@@ -4204,6 +4263,13 @@ function buildFullPayload(sendEmail){
     deliveryMode:sendEmail?'email_and_pdf':'url_only',
     doNothing:{
       monthlyPayment:Math.round(c.dn.fixedMonthlyPayment||c.dn.mp),
+      paymentIsEntered:!!c.dn.paymentIsEntered,
+      neverPaysOff:!!c.dn.neverPaysOff,
+      balanceAt36:Math.round(c.dn.balanceAt36||0),
+      interestAt36:Math.round(c.dn.interestAt36||0),
+      paidAt36:Math.round(c.dn.paidAt36||0),
+      interestBearingBalance:Math.round(c.dn.interestBearingBalance||0),
+      noInterestBalance:Math.round(c.dn.noInterestBalance||0),
       startingMinimumPayment:Math.round(c.dn.startingMinimumPayment||c.dn.mp),
       startingMinimumPaymentFormatted:c.dn.startingMinimumPaymentFormatted||fmt(c.dn.mp),
       startingMinimumLabel:c.dn.startingMinimumLabel||'Month 1 starting minimum payment',
@@ -4211,7 +4277,7 @@ function buildFullPayload(sendEmail){
       minimumOnlyLabel:c.dn.minimumOnlyLabel||'Minimum-only payoff using declining monthly minimum payments',
       monthsToPayoff:Math.round(c.dn.fixedMonths||0),
       yearsMonths:c.dn.fixedYearsMonths,
-      totalPayback:Math.round(c.dn.fixedTotal),
+      totalPayback:Math.round(c.dn.fixedTotal||0),
       interestCost:Math.round(c.dn.fixedInterest||0),
       apr:c.dn.apr,
       aprPercent:Math.round((c.dn.apr||0)*10000)/100,
@@ -4255,7 +4321,7 @@ function buildFullPayload(sendEmail){
     programType:publicProgramName(selRoute),
     routeReason:c.route.reason,
     csProgramLabel:c.csProg?`Program ${c.csProg.k}`:'',
-    legacy:{available:!!c.legacyAvail,serviceFeePct:Math.round((legacyState.feeRate||0)*100),months:legacyMonths,splitPay:!!legacyState.splitPay,monthlyAdminFees:legacyMonthlyAdminFees(legacyState.splitPay),monthlyPayment:legacyMonths?legacyMP(total,legacyState.feeRate,legacyMonths,legacyState.splitPay):null,totalCost:legacyTotal||null},
+    legacy:{available:!!c.legacyAvail,serviceFeePct:Math.round((legacyState.feeRate||0)*100),months:legacyMonths,splitPay:!!legacyState.splitPay,monthlyAdminFees:legacyMonthlyAdminFees(legacyState.splitPay),monthlyPayment:legacyMonths?legacyPriced(total,legacyState.feeRate,legacyMonths,legacyState.splitPay).mp:null,totalCost:legacyTotal||null},
     rows:app.rows.filter(r=>num(r.amount)>0).map(r=>({creditorName:r.cred,amount:Math.round(num(r.amount)),debtType:r.dt,isSecured:!!r.secured,inCollections:!!r.collections,inLitigation:!!r.litigation,paymentMade:!!r.paid,businessUnprofitable:!!r.bizUnprof})),
     emailOptions:{
       template:'prospect_program_delivery',
@@ -4328,8 +4394,8 @@ function stateCoverageStatus(code, view){
     return{z:2,label:'ELP Serviceable',cls:'green',note:'Elite Legal Practice is serviceable in this state under current state rules.'};
   }
   if(view==='cs'){
-    if(cs.status==='BLACKOUT')return{z:0,label:'Consumer Shield Blackout',cls:'gray',note:'Consumer Shield does not service this state under the current state rules.'};
-    return{z:2,label:'Consumer Shield Serviceable',cls:'blue',note:'Consumer Shield is serviceable in this state under current state rules.'};
+    if(cs.status==='BLACKOUT')return{z:0,label:'Shield Services Blackout',cls:'gray',note:'Shield Services does not service this state under the current state rules.'};
+    return{z:2,label:'Shield Services Serviceable',cls:'blue',note:'Shield Services is serviceable in this state under current state rules.'};
   }
   const count=(ld.status!=='BLACKOUT'?1:0)+(lg.status!=='BLACKOUT'?1:0)+(cs.status!=='BLACKOUT'?1:0);
   return{z:count,label:count===3?'All 3 Backends':count===2?'2 Backends':count===1?'1 Backend':'No Backend',cls:count===3?'green':count===2?'blue':count===1?'red':'gray',note:`${count} backend${count===1?'':'s'} currently serviceable by state rule.`};
@@ -4344,7 +4410,7 @@ function stateCoverageColorscale(view){
 function stateCoverageLegendHtml(view){
   if(view==='level')return '<span><i class="state-cov-dot" style="background:#0f9d8a"></i>Green / Standard</span><span><i class="state-cov-dot" style="background:#ef4444"></i>Red / Attorney Model</span><span><i class="state-cov-dot" style="background:#cbd5e1"></i>Blackout</span>';
   if(view==='legacy')return '<span><i class="state-cov-dot" style="background:#0b1f47"></i>ELP Serviceable — dark blue</span><span><i class="state-cov-dot" style="background:#facc15"></i>Yellow state labels</span><span><i class="state-cov-dot" style="background:#cbd5e1"></i>ELP Blackout</span>';
-  if(view==='cs')return '<span><i class="state-cov-dot" style="background:#1a6ed8"></i>Consumer Shield Serviceable</span><span><i class="state-cov-dot" style="background:#cbd5e1"></i>Consumer Shield Blackout</span>';
+  if(view==='cs')return '<span><i class="state-cov-dot" style="background:#1a6ed8"></i>Shield Services Serviceable</span><span><i class="state-cov-dot" style="background:#cbd5e1"></i>Shield Services Blackout</span>';
   return '<span><i class="state-cov-dot" style="background:#0f9d8a"></i>All 3</span><span><i class="state-cov-dot" style="background:#1a6ed8"></i>2 Backends</span><span><i class="state-cov-dot" style="background:#ef4444"></i>1 Backend</span><span><i class="state-cov-dot" style="background:#cbd5e1"></i>No Backend</span>';
 }
 function renderStateCoverageDetail(code){
@@ -4360,7 +4426,7 @@ function renderStateCoverageDetail(code){
     <div style="display:grid;gap:8px;">
       <div><div style="font-size:10px;font-weight:950;color:#64748b;text-transform:uppercase;letter-spacing:.45px;margin-bottom:4px;">Level Debt</div>${pill(ld.status==='RED'?'Red / Attorney Model':ld.status==='BLACKOUT'?'Blackout':'Green / Standard',ldCls)}</div>
       <div><div style="font-size:10px;font-weight:950;color:#64748b;text-transform:uppercase;letter-spacing:.45px;margin-bottom:4px;">Elite Legal Practice</div>${pill(lg.status==='BLACKOUT'?'Blackout':'Serviceable',lgCls)}</div>
-      <div><div style="font-size:10px;font-weight:950;color:#64748b;text-transform:uppercase;letter-spacing:.45px;margin-bottom:4px;">Consumer Shield</div>${pill(cs.status==='BLACKOUT'?'Blackout':'Serviceable',csCls)}</div>
+      <div><div style="font-size:10px;font-weight:950;color:#64748b;text-transform:uppercase;letter-spacing:.45px;margin-bottom:4px;">Shield Services</div>${pill(cs.status==='BLACKOUT'?'Blackout':'Serviceable',csCls)}</div>
     </div>
     <button type="button" class="state-cov-use" onclick="useCoverageState('${c}')">Use ${c} in Router</button>
     <div class="state-cov-note">State coverage is a routing guide only. Final program fit may still depend on enrolled debt amount, creditor type, hardship, account status, documentation, and backend acceptance.</div>`;
@@ -4612,7 +4678,6 @@ if(planContainer){
     </div>
   </div>
 </div>
-<script src="/agents/scripting-and-lead-handling.js"></script>
 <script type="module" src="/agents/prospect-program-content.js" onload="try{render()}catch(e){}"></script>
 <script src="https://ai.fundingtier.com/toolkit.js" defer></script>
   

@@ -1,5 +1,19 @@
 import { get } from '@vercel/blob';
-import { ESTIMATE_DISCLOSURE, CREDIT_RUNWAY_COPY } from '../agents/prospect-program-content.js';
+import {
+  ESTIMATE_DISCLOSURE,
+  CREDIT_RUNWAY_COPY,
+  DO_NOTHING_COPY,
+  REQUIRED_DISCLOSURES,
+  MINIMUM_PAYMENT_NOTE,
+  programContentFor
+} from '../agents/prospect-program-content.js';
+
+// Funding Tier phone line, as a tel: href and as display text.
+const PHONE_TEL = 'tel:+18337163863';
+const PHONE_TEXT = '(833) 716-3863';
+
+// Where a prospect's "email me this plan" request goes.
+const PLAN_COPY_EMAIL = 'success@fundingtier.com';
 
 function currency(value) {
   return new Intl.NumberFormat('en-US', {
@@ -18,11 +32,27 @@ function escapeHtml(value = '') {
     .replaceAll("'", '&#39;');
 }
 
+function isNum(v) {
+  return typeof v === 'number' && Number.isFinite(v);
+}
+
+// Months cell text. Never prints "— months".
+function monthsText(value, neverPaysOff = false) {
+  if (neverPaysOff) return 'Does not pay off at this payment';
+  const n = Number(value);
+  if (!value || !Number.isFinite(n) || n <= 0) return 'Not available';
+  return `${Math.round(n)} months`;
+}
+
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const EXPIRED_HTML =
   '<h1>This plan link has expired.</h1>' +
   '<p>Please contact your Funding Tier representative for an updated copy.</p>';
+
+const ERROR_HTML =
+  '<h1>We could not load this plan.</h1>' +
+  `<p>Please contact Funding Tier at <a href="${PHONE_TEL}">${PHONE_TEXT}</a>.</p>`;
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -57,15 +87,12 @@ export default async function handler(req, res) {
     }
 
     const {
-      firstName = 'Client',
-      fullName = 'Client',
-      email = '',
+      firstName = '',
+      fullName = '',
       state = '',
       totalDebt = 0,
       doNothing = {},
-      shortest = {},
       recommended = {},
-      routeReason = '',
       rows = [],
       savings = 0,
       savingsVsMinimumOnly = 0,
@@ -74,36 +101,54 @@ export default async function handler(req, res) {
       creditRunway = null
     } = data;
 
+    // generate-plan.js defaults a missing name to 'Client'; treat that the
+    // same as blank so the page never reads "Client, Here Is Your...".
+    const safeFirst = escapeHtml(String(firstName || '').trim());
+    const hasName = safeFirst && safeFirst.toLowerCase() !== 'client';
+    const safeFull = escapeHtml(String(fullName || '').trim() || 'Your');
+    const safeState = escapeHtml(String(state || '').trim() || 'N/A');
+
+    const neverPaysOff = doNothing.neverPaysOff === true;
+    const balanceAt36 = isNum(doNothing.balanceAt36) ? doNothing.balanceAt36 : null;
+    const interestAt36 = isNum(doNothing.interestAt36) ? doNothing.interestAt36 : null;
+    const aprPercent = Math.round((doNothing.apr || 0) * 100);
+
     const list = (items) => (Array.isArray(items) ? items : []).map((t) => escapeHtml(t));
     const programName = program && program.publicName ? program.publicName : 'Recommended Program';
+
+    // Stored plans carry the program copy as it was at generation time; the
+    // debtOutcome sentence is newer, so fall back to the live content module.
+    const liveContent = program ? programContentFor(program.key) : null;
+    const debtOutcome = (program && program.debtOutcome) || (liveContent && liveContent.debtOutcome) || '';
 
     const programSection = program
       ? `
     <section class="section program">
-      <span class="pill">Your recommended program</span>
+      <span class="pill">Your Recommended Program</span>
       <h2>${escapeHtml(programName)}</h2>
       <p class="lead">${escapeHtml(program.tagline || '')}</p>
       <div class="kpi-grid kpi-3">
         <div class="kpi kpi-green">
-          <div class="label">${escapeHtml(program.paymentLabel || 'Monthly program payment')}</div>
+          <div class="label">${escapeHtml(program.paymentLabel || 'Monthly Program Payment')}</div>
           <div class="value">${currency(program.monthlyPayment || recommended.monthlyPayment || 0)}</div>
         </div>
         <div class="kpi kpi-green">
-          <div class="label">Program length</div>
-          <div class="value">${escapeHtml(String(program.term || recommended.term || '—'))} months</div>
+          <div class="label">Estimated Program Length</div>
+          <div class="value">${escapeHtml(monthsText(program.term || recommended.term))}</div>
         </div>
         <div class="kpi kpi-green">
-          <div class="label">Total program price</div>
+          <div class="label">Estimated Total Program Cost</div>
           <div class="value">${currency(program.totalCost || recommended.totalCost || 0)}</div>
         </div>
       </div>
+      ${debtOutcome ? `<p class="outcome-note">${escapeHtml(debtOutcome)}</p>` : ''}
       <div class="two-col">
         <div class="card">
-          <h3>How it gets you out of debt</h3>
+          <h3>How It Works</h3>
           <ol>${list(program.howItWorks).map((t) => `<li>${t}</li>`).join('')}</ol>
         </div>
         <div class="card">
-          <h3>Key benefits</h3>
+          <h3>Key Benefits</h3>
           <ul class="checks">${list(program.benefits).map((t) => `<li>${t}</li>`).join('')}</ul>
         </div>
       </div>
@@ -118,17 +163,17 @@ export default async function handler(req, res) {
     const payTxt = cr ? `${currency(cr.monthlyPayment)}/mo${cr.paymentIsEstimate ? ' (estimated minimum)' : ''}` : '';
     const runwaySection = !cr ? '' : `
     <section class="section do-nothing">
-      <h2>${escapeHtml(CREDIT_RUNWAY_COPY.heading)} <span class="est-tag">estimated</span></h2>
+      <h2>${escapeHtml(CREDIT_RUNWAY_COPY.heading)} <span class="est-tag">Estimated</span></h2>
       <p class="lead">${escapeHtml(CREDIT_RUNWAY_COPY.intro)}</p>
       <div class="kpi-grid">
-        <div class="kpi"><div class="label">Open card balance</div><div class="value">${currency(cr.openBalance)}</div></div>
-        <div class="kpi"><div class="label">Total credit limit</div><div class="value">${currency(cr.creditLimit)}</div></div>
-        <div class="kpi"><div class="label">Available credit today</div><div class="value">${currency(cr.availableCredit)}</div></div>
-        <div class="kpi kpi-warn"><div class="label">Interest added each month</div><div class="value">~${currency(cr.monthlyInterest)}</div><div class="sub">at ${escapeHtml(String(cr.aprPercent))}% APR</div></div>
+        <div class="kpi"><div class="label">Open Card Balance</div><div class="value">${currency(cr.openBalance)}</div></div>
+        <div class="kpi"><div class="label">Total Credit Limit</div><div class="value">${currency(cr.creditLimit)}</div></div>
+        <div class="kpi"><div class="label">Available Credit Today</div><div class="value">${currency(cr.availableCredit)}</div></div>
+        <div class="kpi kpi-warn"><div class="label">Interest Added Each Month</div><div class="value">~${currency(cr.monthlyInterest)}</div><div class="sub">at ${escapeHtml(String(cr.aprPercent))}% APR</div></div>
       </div>
       <div class="compare">
         <table>
-          <thead><tr><th>Estimated available credit left</th>${marks.map((m) => `<th>${m} mo</th>`).join('')}<th>Credit maxed out in</th></tr></thead>
+          <thead><tr><th>Estimated Available Credit Left</th>${marks.map((m) => `<th>${m} mo</th>`).join('')}<th>Credit Maxed Out In</th></tr></thead>
           <tbody>
             <tr><td>At current payment: ${escapeHtml(payTxt)}</td>${marks.map((m) => `<td>${currency(cr.atCurrentPayment.availableAt[m])}</td>`).join('')}<td class="danger">${escapeHtml(maxTxt(cr.atCurrentPayment))}</td></tr>
             <tr><td>If payments stop</td>${marks.map((m) => `<td>${currency(cr.ifPaymentsStop.availableAt[m])}</td>`).join('')}<td class="danger">${escapeHtml(maxTxt(cr.ifPaymentsStop))}</td></tr>
@@ -144,28 +189,62 @@ export default async function handler(req, res) {
       <div class="footer-note">${escapeHtml(CREDIT_RUNWAY_COPY.disclosure)}</div>
     </section>`;
 
+    // Hero figure: savings normally; the 36-month balance when the current
+    // payment never pays the debt off (a savings number would be meaningless).
+    const heroFigure = neverPaysOff
+      ? `<div class="label">Balance After 36 Months At Your Current Payment</div>
+          <div class="value">${balanceAt36 !== null ? currency(balanceAt36) : 'Not available'}</div>
+          <div class="subcopy">Estimate. At your current payment the balance does not pay off.</div>`
+      : `<div class="label">Estimated Savings vs Current Path</div>
+          <div class="value">${currency(savings)}</div>`;
+
+    const currentPathSavingsCell = neverPaysOff
+      ? `<div class="label">Balance After 36 Months At Your Current Payment</div><div class="value">${balanceAt36 !== null ? currency(balanceAt36) : 'Not available'}</div><div class="sub">at ${currency(doNothing.monthlyPayment || 0)}/mo the balance keeps growing (estimate)</div>`
+      : `<div class="label">Estimated Savings vs Your Current Payment</div><div class="value">${currency(savings)}</div><div class="sub">vs paying ${currency(doNothing.monthlyPayment || 0)}/mo until paid off (${currency(doNothing.totalPayback || 0)} total)</div>`;
+
     // Plans generated before this section existed carry no minimumOnly data.
     const doNothingSection = !minimumOnly ? '' : `
     <section class="section do-nothing">
-      <h2>The cost of doing nothing <span class="est-tag">estimated</span></h2>
-      <p class="lead">
-        Credit card and loan interest compounds — you are charged interest on top of interest every month. Minimum payments are designed to keep you paying for years, and most of each payment goes to interest instead of your balance.
-      </p>
+      <h2>${escapeHtml(DO_NOTHING_COPY.heading)} <span class="est-tag">Estimated</span></h2>
+      <p class="lead">${escapeHtml(DO_NOTHING_COPY.intro)}</p>
       <div class="kpi-grid">
-        ${mo.dailyInterest ? `<div class="kpi kpi-warn"><div class="label">Interest charged every day</div><div class="value">~$${Number(mo.dailyInterest).toFixed(2)}</div></div>` : ''}
-        ${mo.monthlyInterest ? `<div class="kpi kpi-warn"><div class="label">Interest per month</div><div class="value">~${currency(mo.monthlyInterest)}</div></div>` : ''}
-        <div class="kpi kpi-warn"><div class="label">Paying minimums only</div><div class="value">${escapeHtml(mo.yearsMonths || (doNothing.minimumOnlyYearsMonths || '—'))}</div><div class="sub">to pay it off</div></div>
-        <div class="kpi kpi-warn"><div class="label">Interest paid on minimums</div><div class="value">${currency(mo.interestCost || 0)}</div><div class="sub">total paid ${currency(mo.totalPayback || 0)}</div></div>
+        ${mo.dailyInterest ? `<div class="kpi kpi-warn"><div class="label">Interest Charged Every Day</div><div class="value">~$${Number(mo.dailyInterest).toFixed(2)}</div></div>` : ''}
+        ${mo.monthlyInterest ? `<div class="kpi kpi-warn"><div class="label">Interest Per Month</div><div class="value">~${currency(mo.monthlyInterest)}</div></div>` : ''}
+        <div class="kpi kpi-warn"><div class="label">Paying Minimums Only</div><div class="value">${escapeHtml(mo.yearsMonths || doNothing.minimumOnlyYearsMonths || 'Not available')}</div><div class="sub">to pay it off</div></div>
+        <div class="kpi kpi-warn"><div class="label">Interest Paid On Minimums</div><div class="value">${currency(mo.interestCost || 0)}</div><div class="sub">total paid ${currency(mo.totalPayback || 0)}</div></div>
       </div>
       <div class="savings-strip">
-        <div><div class="label">Estimated savings vs your current payment</div><div class="value">${currency(savings)}</div><div class="sub">vs paying ${currency(doNothing.monthlyPayment || 0)}/mo until paid off (${currency(doNothing.totalPayback || 0)} total)</div></div>
-        <div><div class="label">Estimated savings vs minimum payments only</div><div class="value">${currency(savingsVsMinimumOnly)}</div><div class="sub">vs ${currency(mo.totalPayback || 0)} total on minimum payments</div></div>
+        <div>${currentPathSavingsCell}</div>
+        <div><div class="label">Estimated Savings vs Minimum Payments Only</div><div class="value">${currency(savingsVsMinimumOnly)}</div><div class="sub">vs ${currency(mo.totalPayback || 0)} total on minimum payments</div></div>
       </div>
-      <div class="footer-note">Current-path figures are estimates that assume no new purchases, no late payments, no added fees, no penalty APR and no APR changes. Collection agencies may add their own interest or fees.</div>
+      ${Number(mo.totalPayback) > 0 ? `<div class="footer-note"><strong>Minimum payment note:</strong> ${escapeHtml(MINIMUM_PAYMENT_NOTE)}</div>` : ''}
+      <div class="footer-note">${escapeHtml(DO_NOTHING_COPY.disclosure)}</div>
+    </section>`;
+
+    const next36Section = interestAt36 === null ? '' : `
+    <section class="section do-nothing">
+      <h2>Over The Next 36 Months <span class="est-tag">Estimated</span></h2>
+      <p class="lead">A like-for-like look at the same 36-month window on your current path and in the program.</p>
+      <div class="kpi-grid kpi-3">
+        <div class="kpi kpi-warn"><div class="label">Interest You Would Pay On The Current Path</div><div class="value">${currency(interestAt36)}</div><div class="sub">over 36 months (estimate)</div></div>
+        <div class="kpi kpi-warn"><div class="label">Balance Still Owed After 36 Months</div><div class="value">${balanceAt36 !== null ? currency(balanceAt36) : 'Not available'}</div><div class="sub">on the current path (estimate)</div></div>
+        <div class="kpi kpi-green"><div class="label">Program Cost Over The Same Period</div><div class="value">${currency(recommended.totalCost || 0)}</div><div class="sub">estimated total program cost</div></div>
+      </div>
+      <div class="footer-note">${escapeHtml(DO_NOTHING_COPY.disclosure)}</div>
     </section>`;
 
     const userFriendlyEstimateNote =
       'These estimated program details are based on projected settlement assumptions, program fees, and the creditor accounts that were selected to be included in this review. Final terms may vary after full review.';
+
+    const h1 = hasName
+      ? `${safeFirst}, Here Is Your Debt Resolution Comparison`
+      : 'Your Debt Resolution Comparison';
+
+    const mailtoHref = `mailto:${PLAN_COPY_EMAIL}?subject=${encodeURIComponent(`Plan copy request ${token}`)}`;
+
+    const programSavingsCell = neverPaysOff
+      ? (interestAt36 !== null ? 'See the 36-month comparison below' : 'Not available')
+      : currency(savings);
 
     const html = `
 <!DOCTYPE html>
@@ -177,7 +256,7 @@ export default async function handler(req, res) {
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <meta name="theme-color" content="#0f9b8e" />
-  <title>${escapeHtml(fullName)} - Debt Resolution Plan</title>
+  <title>${safeFull} - Debt Resolution Plan</title>
   <style>
     body {
       margin: 0;
@@ -210,8 +289,7 @@ export default async function handler(req, res) {
       background: rgba(255,255,255,0.14);
       font-size: 12px;
       font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
+      letter-spacing: .04em;
     }
     h1 {
       margin: 18px 0 10px;
@@ -235,8 +313,7 @@ export default async function handler(req, res) {
     }
     .hero-card .label {
       font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .10em;
+      letter-spacing: .04em;
       opacity: 0.96;
       font-weight: 800;
     }
@@ -284,28 +361,29 @@ export default async function handler(req, res) {
       padding: 18px;
     }
     .kpi-red {
-  background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
-  border: 1px solid #991b1b;
-  color: white;
-  box-shadow: 0 10px 25px rgba(220,38,38,0.35);
-}
-.kpi-red::after {
-  content: "⚠ CURRENT PATH";
-  display: block;
-  margin-top: 10px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .08em;
-  color: rgba(255,255,255,0.9);
-}
-
-    .kpi-red .label {
-  color: #000000;
-}
-
-.kpi-red .value {
-  color: #ffffff;
-}
+      background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+      border: 1px solid #991b1b;
+      color: white;
+      box-shadow: 0 10px 25px rgba(220,38,38,0.35);
+    }
+    .kpi-red::after {
+      content: "Current Path";
+      display: block;
+      margin-top: 10px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      color: rgba(255,255,255,0.9);
+    }
+    .kpi-red .label,
+    .kpi-red .value,
+    .kpi-red .sub,
+    .kpi.kpi-red .label,
+    .kpi.kpi-red .sub {
+      color: #ffffff !important;
+    }
+    .kpi-red .sub {
+      opacity: .92;
     }
     .kpi-green {
       background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
@@ -315,10 +393,12 @@ export default async function handler(req, res) {
     .kpi-green .value {
       color: #0f766e;
     }
+    .kpi-green .sub {
+      color: #065f46;
+    }
     .kpi .label {
       font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
+      letter-spacing: .04em;
       color: #64748b;
       font-weight: 700;
     }
@@ -326,6 +406,16 @@ export default async function handler(req, res) {
       margin-top: 8px;
       font-size: 28px;
       font-weight: 800;
+    }
+    .outcome-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-size: 14px;
+      line-height: 1.7;
     }
     .compare {
       margin-top: 24px;
@@ -336,7 +426,7 @@ export default async function handler(req, res) {
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 900px;
+      min-width: 720px;
     }
     th, td {
       padding: 16px;
@@ -347,8 +437,7 @@ export default async function handler(req, res) {
     th {
       background: #f8fafc;
       font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: .06em;
+      letter-spacing: .03em;
       color: #334155;
     }
     .best-col {
@@ -427,11 +516,19 @@ export default async function handler(req, res) {
       line-height: 1.8;
       color: #64748b;
     }
+    .disclosures ul {
+      margin: 16px 0 0;
+      padding-left: 20px;
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .disclosures li { margin-bottom: 4px; }
     .est-banner { margin:18px 0 0; padding:12px 16px; border-radius:14px; background:#fffbeb; border:1px solid #fcd34d; color:#92400e; font-size:13px; line-height:1.6; }
-    .est-tag { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:#92400e; background:#fef3c7; border-radius:999px; padding:3px 9px; vertical-align:middle; }
+    .est-tag { font-size:11px; font-weight:800; letter-spacing:.04em; color:#92400e; background:#fef3c7; border-radius:999px; padding:3px 9px; vertical-align:middle; }
     .explain-box.warn { background:#fef2f2; border-color:#fecaca; }
     .explain-box.warn .check-icon { background:#dc2626; }
-    .pill { display:inline-block; padding:6px 12px; border-radius:999px; background:#ccfbf1; color:#0f766e; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+    .pill { display:inline-block; padding:6px 12px; border-radius:999px; background:#ccfbf1; color:#0f766e; font-size:11px; font-weight:800; letter-spacing:.04em; }
     .program h2 { margin-top:12px; }
     .kpi-grid.kpi-3 { grid-template-columns: repeat(3, 1fr); }
     .two-col { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:22px; }
@@ -447,7 +544,7 @@ export default async function handler(req, res) {
     .kpi-warn .value { color:#b91c1c; }
     .kpi .sub { margin-top:6px; font-size:12px; font-weight:600; color:#64748b; }
     .savings-strip { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:20px; padding:20px 22px; border-radius:18px; background:linear-gradient(135deg,#0f766e,#14b8a6); color:#fff; }
-    .savings-strip .label { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; opacity:.85; }
+    .savings-strip .label { font-size:12px; font-weight:800; letter-spacing:.04em; opacity:.85; }
     .savings-strip .value { font-size:32px; font-weight:900; margin-top:6px; }
     .savings-strip .sub { font-size:13px; opacity:.9; margin-top:4px; }
     @media (max-width: 900px) {
@@ -469,21 +566,19 @@ export default async function handler(req, res) {
     <section class="hero">
       <div class="hero-grid">
         <div>
-          <span class="eyebrow">Funding Tier AI Generated Debt Resolution Plan</span>
-          <h1>${escapeHtml(firstName)}, here’s your debt resolution comparison</h1>
+          <span class="eyebrow">Funding Tier Personalized Estimate</span>
+          <h1>${h1}</h1>
           <p>
-            This page is designed to help you clearly understand how your current debt path compares to a potential new structured resolution program, including the estimated monthly payment difference and total projected savings.
+            This page is designed to help you clearly understand how your current debt path compares to a potential new structured resolution program, including the estimated monthly payment difference and estimated total cost.
           </p>
           <div class="cta-wrap">
-            <a class="btn btn-primary" href="https://link.krestmarketing.com/widget/booking/vdZtTXpZHCstjMBql4a5" target="_blank" rel="noopener noreferrer">Schedule Your Next Step</a>
-            <a class="btn btn-secondary" href="tel:8337163863">Call Funding Tier</a>
+            <a class="btn btn-primary" href="${PHONE_TEL}">Call Funding Tier ${PHONE_TEXT}</a>
           </div>
         </div>
         <div class="hero-card">
-          <div class="label">Estimated Savings vs Current Path</div>
-          <div class="value">${currency(savings)}</div>
+          ${heroFigure}
           <div class="subcopy">
-            State: <strong>${escapeHtml(state || 'N/A')}</strong><br/>
+            State: <strong>${safeState}</strong><br/>
             Total debt reviewed: <strong>${currency(totalDebt)}</strong>
           </div>
         </div>
@@ -505,35 +600,19 @@ export default async function handler(req, res) {
           <div class="label">Total Debt Reviewed</div>
           <div class="value">${currency(totalDebt)}</div>
         </div>
-<div class="kpi kpi-red">
-<div class="label" style="color: #fff; font-weight: bold; text-decoration: underline;">
-  Your Current Minimum Monthly Payment
-</div>  <div class="value">${currency(doNothing.monthlyPayment || 0)}</div>
-
-  <div style="
-    margin-top:8px;
-    font-size:13px;
-    font-weight:600;
-    color:#000;
-  ">
-    This is what you are currently stuck paying every month
-  </div>
-</div>
-        <div class="kpi kpi-green">
-          <div class="label">New Lower Monthly Payment</div>
-          <div class="value">${currency(recommended.monthlyPayment || 0)}</div>
-          <div style="
-  margin-top:8px;
-  font-size:13px;
-  font-weight:600;
-  color:#065f46;
-">
-  This is your new projected lower payment
-</div>
+        <div class="kpi kpi-red">
+          <div class="label">Your Current Monthly Payment</div>
+          <div class="value">${currency(doNothing.monthlyPayment || 0)}</div>
+          <div class="sub">Based on the payment amount you shared with us (estimate)</div>
         </div>
         <div class="kpi kpi-green">
-          <div class="label">New Program Plan Length</div>
-          <div class="value">${recommended.term ? `${escapeHtml(recommended.term)} mo` : '—'}</div>
+          <div class="label">Estimated Program Payment</div>
+          <div class="value">${currency(recommended.monthlyPayment || 0)}</div>
+          <div class="sub">Your estimated monthly program amount</div>
+        </div>
+        <div class="kpi kpi-green">
+          <div class="label">Estimated Program Length</div>
+          <div class="value">${escapeHtml(monthsText(recommended.term))}</div>
         </div>
       </div>
 
@@ -542,47 +621,40 @@ export default async function handler(req, res) {
           <thead>
             <tr>
               <th>Detail</th>
-              <th>Current Financial Situation</th>
-              <th>Fastest Available Payoff</th>
+              <th>Current Path</th>
               <th class="best-col">${escapeHtml(programName)}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Monthly Payments</td>
+              <td>Monthly Payment</td>
               <td>${currency(doNothing.monthlyPayment || 0)}</td>
-              <td>${currency(shortest.monthlyPayment || 0)}</td>
               <td class="best-col">${currency(recommended.monthlyPayment || 0)}</td>
             </tr>
             <tr>
               <td>Total Estimated Debt</td>
               <td>${currency(totalDebt)}</td>
-              <td>${currency(totalDebt)}</td>
-              <td class="best-col">${currency(totalDebt)}</td>
+              <td class="best-col">Estimated Program Cost: ${currency(recommended.totalCost || 0)}</td>
             </tr>
             <tr>
-              <td>Months to Payoff</td>
-              <td>${escapeHtml(doNothing.monthsToPayoff || '—')} months</td>
-              <td>${escapeHtml(shortest.term || '—')} months</td>
-              <td class="best-col">${escapeHtml(recommended.term || '—')} months</td>
+              <td>Months To Payoff</td>
+              <td>${escapeHtml(monthsText(doNothing.monthsToPayoff, neverPaysOff))}</td>
+              <td class="best-col">${escapeHtml(monthsText(recommended.term))}</td>
             </tr>
             <tr>
-              <td>Estimated Interest Rate</td>
-              <td>${Math.round((doNothing.apr || 0) * 100)}% APR</td>
-              <td>0%</td>
-              <td class="best-col">0%</td>
+              <td>Interest On Program Payments</td>
+              <td>${aprPercent}% APR</td>
+              <td class="best-col">None charged by the program</td>
             </tr>
             <tr>
-              <td>Estimated Total Payback</td>
-              <td class="danger">${currency(doNothing.totalPayback || 0)}</td>
-              <td>${currency(shortest.totalCost || 0)}</td>
+              <td>Estimated Total Paid</td>
+              <td class="danger">${neverPaysOff ? 'Balance keeps growing' : currency(doNothing.totalPayback || 0)}</td>
               <td class="best-col">${currency(recommended.totalCost || 0)}</td>
             </tr>
             <tr>
               <td>Estimated Savings</td>
               <td>—</td>
-              <td class="success">${currency(Math.max(0, (doNothing.totalPayback || 0) - (shortest.totalCost || 0)))}</td>
-              <td class="best-col success">${currency(savings)}</td>
+              <td class="best-col success">${escapeHtml(programSavingsCell)}</td>
             </tr>
           </tbody>
         </table>
@@ -591,17 +663,19 @@ export default async function handler(req, res) {
       <div class="explain-box">
         <div class="check-icon">✓</div>
         <div>
-          <strong>Why this matters:</strong> continuing to make minimum payments can stretch debt out for a long time and materially increase total payback. A structured program may provide a more controlled path with a lower total burden compared with your current financial situation.
+          <strong>Why this matters:</strong> continuing to make minimum payments can stretch debt out for a long time and materially increase the total you pay. A structured program may provide a more controlled path with a lower estimated total cost compared with your current path.
         </div>
       </div>
     </section>
+
+    ${next36Section}
 
     ${doNothingSection}
 
     ${runwaySection}
 
     <section class="section">
-      <h2>UNSECURED DEBTS / ACCOUNTS</h2>
+      <h2>Accounts Reviewed</h2>
       <p class="lead">
         Below are the accounts and debt entries used to prepare this estimate.
       </p>
@@ -613,7 +687,7 @@ export default async function handler(req, res) {
               <strong>${escapeHtml(row.creditorName === 'Other / Manual Entry' ? (row.manualName || 'Manual Creditor') : (row.creditorName || 'Unknown Creditor'))}</strong>
             </div>
             <div>${currency(row.amount || 0)}</div>
-            <div>${escapeHtml(row.debtType || '—')}</div>
+            <div>${escapeHtml(row.debtType || 'Not specified')}</div>
           </div>
         `).join('')}
       </div>
@@ -626,17 +700,25 @@ export default async function handler(req, res) {
     <section class="section">
       <h2>Next Step</h2>
       <p class="lead">
-        If this estimated path makes sense to you, the next step is to complete your review so your final program structure can be confirmed.
+        If this estimated path makes sense to you, your Funding Tier specialist will complete your review so your final program structure can be confirmed. Need to pick this back up later? Call us and we will schedule a callback.
       </p>
 
       <div class="cta-wrap">
-        <a class="btn btn-primary" href="https://link.krestmarketing.com/widget/booking/vdZtTXpZHCstjMBql4a5" target="_blank" rel="noopener noreferrer">Schedule Your Next Step</a>
-        <a class="btn btn-secondary" href="mailto:${escapeHtml(email)}">Email Copy Requested</a>
+        <a class="btn btn-primary" href="${PHONE_TEL}">Call Funding Tier ${PHONE_TEXT}</a>
+        <a class="btn btn-secondary" href="${escapeHtml(mailtoHref)}">Email Me This Plan</a>
       </div>
 
       <div class="footer-note">
-        These estimates are illustrative only and final terms may vary based on a full review of the account profile and the debts elected to be included. ${escapeHtml(ESTIMATE_DISCLOSURE)}
+        These estimates are illustrative only and final terms may vary based on a full review of the account profile and the debts elected to be included.
       </div>
+    </section>
+
+    <section class="section disclosures">
+      <h2>Important Disclosures</h2>
+      <ul>
+        ${REQUIRED_DISCLOSURES.map((d) => `<li>${escapeHtml(d)}</li>`).join('')}
+      </ul>
+      <div class="footer-note">${escapeHtml(ESTIMATE_DISCLOSURE)}</div>
     </section>
   </div>
 </body>
@@ -646,7 +728,8 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(200).send(html);
   } catch (err) {
+    console.error('plan.js failed to render plan:', err);
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(500).send(`<h1>Error loading plan</h1><pre>${escapeHtml(err.message || 'Server error')}</pre>`);
+    return res.status(500).send(ERROR_HTML);
   }
 }
