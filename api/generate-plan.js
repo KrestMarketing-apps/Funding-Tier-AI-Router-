@@ -39,7 +39,7 @@ export default async function handler(req, res) {
   }
   try {
     const {
-      firstName = 'Client',
+      firstName = '',
       lastName = '',
       email = '',
       state = '',
@@ -70,6 +70,7 @@ export default async function handler(req, res) {
           howItWorks: content.howItWorks,
           benefits: content.benefits,
           disclosure: content.disclosure,
+          debtOutcome: content.debtOutcome || '',
           monthlyPayment: Math.round(n(recommended.monthlyPayment)),
           term: Math.round(n(recommended.term)),
           totalCost: Math.round(n(recommended.totalCost)),
@@ -116,10 +117,11 @@ export default async function handler(req, res) {
         }
       : null;
 
-    const savings = Math.max(
-      0,
-      Number(doNothing.totalPayback || 0) - Number(recommended.totalCost || 0)
-    );
+    // No savings figure when the current path never pays off: the comparison
+    // is shown as a 36-month snapshot instead.
+    const savings = doNothing && doNothing.neverPaysOff
+      ? 0
+      : Math.max(0, Number(doNothing.totalPayback || 0) - Number(recommended.totalCost || 0));
     const savingsVsMinimumOnly = Math.max(
       0,
       minimumOnly.totalPayback - Number(recommended.totalCost || 0)

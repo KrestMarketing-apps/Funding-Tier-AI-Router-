@@ -1,5 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { put } from '@vercel/blob';
+import { createRequire } from 'node:module';
+import { programContentFor } from '../../agents/prospect-program-content.js';
+
+const require = createRequire(import.meta.url);
+const pricing = require('../../lib/program-pricing.js');
 
 async function updateGhlContact(contactId, fields = {}) {
   const payload = {};
@@ -71,7 +76,7 @@ function buildRows(body) {
         creditorName: String(creditorName || '').trim() || 'Unknown Creditor',
         manualName: '',
         amount: numericAmount,
-        debtType: 'Unsecured Debt',
+        debtType: 'Unsecured',
       });
     }
   }
@@ -79,80 +84,104 @@ function buildRows(body) {
   return rows;
 }
 
-function recommendedPaymentByDebt(totalDebt) {
-  if (totalDebt < 4000) return 220;
-  if (totalDebt < 8800) return 220;
-  if (totalDebt < 15000) return 270;
-  if (totalDebt < 20000) return 320;
-  if (totalDebt < 25000) return 370;
-  if (totalDebt < 30000) return 420;
-  if (totalDebt < 50000) return 520;
-  return 620;
-}
+// Pricing and "do nothing" math come from the shared module so a webhook plan
+// matches what the router UI would produce for the same debt and state.
+const PLAN_TTL_DAYS = 45;
+const DEFAULT_APR_PERCENT = 28;
 
-function recommendedTermByDebt(totalDebt) {
-  if (totalDebt < 5000) return 18;
-  if (totalDebt < 8800) return 24;
-  return 36;
-}
-
-function buildPlanData({ firstName, lastName, email, state, rows }) {
+function buildPlanData({ firstName, lastName, email, state, rows, currentPayment }) {
   const totalDebt = round(rows.reduce((sum, row) => sum + toNumber(row.amount), 0));
+  const apr = DEFAULT_APR_PERCENT;
 
-  const currentApr = 0.29;
-  const currentMonthly = Math.max(225, round(totalDebt * 0.03));
-  const monthlyInterest = totalDebt * (currentApr / 12);
+  // Every webhook row is an unsecured, not-in-collections account, so the
+  // whole balance accrues interest on the current path.
+  const startMin = Math.round(pricing.startingMinimumPayment(totalDebt, apr));
+  const payment = toNumber(currentPayment) > 0 ? round(currentPayment) : startMin;
+  const paymentIsEntered = toNumber(currentPayment) > 0;
+  const fixed = totalDebt > 0 ? pricing.fixedPaymentPayoff(totalDebt, apr, payment) : null;
+  const minOnly = totalDebt > 0 ? pricing.minimumOnlyPayoff(totalDebt, apr) : null;
 
-  let monthsToPayoff = 0;
-  if (currentMonthly > monthlyInterest && totalDebt > 0) {
-    monthsToPayoff = Math.ceil(
-      -Math.log(1 - (totalDebt * (currentApr / 12)) / currentMonthly) /
-        Math.log(1 + currentApr / 12)
-    );
-  } else if (totalDebt > 0) {
-    monthsToPayoff = 120;
-  }
+  const priced = pricing.priceAll(totalDebt, state);
+  const routeKey = priced.defaultRoute;
+  const est = routeKey ? priced.programs[routeKey] : null;
+  const content = routeKey ? programContentFor(routeKey) : null;
 
-  const currentTotalPayback =
-    totalDebt > 0 ? round(currentMonthly * Math.max(monthsToPayoff, 1)) : 0;
+  const program = content && est
+    ? {
+        key: content.key,
+        publicName: content.publicName,
+        paymentLabel: content.paymentLabel,
+        tagline: content.tagline,
+        howItWorks: content.howItWorks,
+        benefits: content.benefits,
+        disclosure: content.disclosure,
+        debtOutcome: content.debtOutcome || '',
+        monthlyPayment: est.mp,
+        term: est.term,
+        totalCost: est.tc,
+        selection: 'default'
+      }
+    : null;
 
-  const shortestTerm = Math.max(12, Math.min(24, Math.ceil(totalDebt / 1000)));
-  const shortestMonthly =
-    shortestTerm > 0 ? round(totalDebt / shortestTerm) : 0;
-  const shortestTotal = round(shortestMonthly * shortestTerm);
+  const recommended = est
+    ? { monthlyPayment: est.mp, term: est.term, totalCost: est.tc, serviceFeePct: est.serviceFeePct || null }
+    : { monthlyPayment: 0, term: 0, totalCost: 0 };
 
-  const recommendedTerm = recommendedTermByDebt(totalDebt);
-  const recommendedMonthly = recommendedPaymentByDebt(totalDebt);
-  const recommendedTotal = round(recommendedMonthly * recommendedTerm);
+  const doNothing = {
+    monthlyPayment: payment,
+    paymentIsEntered,
+    startingMinimumPayment: startMin,
+    neverPaysOff: !!(fixed && fixed.neverPaysOff),
+    monthsToPayoff: fixed && !fixed.neverPaysOff ? fixed.months : 0,
+    yearsMonths: fixed && !fixed.neverPaysOff ? pricing.yearsMonths(fixed.months) : 'Does not pay off',
+    apr: apr / 100,
+    aprPercent: apr,
+    totalPayback: fixed && !fixed.neverPaysOff ? fixed.paid : 0,
+    interestCost: fixed && !fixed.neverPaysOff ? fixed.interest : 0,
+    balanceAt36: fixed ? fixed.balanceAt36 : 0,
+    interestAt36: fixed ? fixed.interestAt36 : 0,
+    paidAt36: fixed ? fixed.paidAt36 : 0,
+    interestBearingBalance: totalDebt,
+    noInterestBalance: 0,
+    assumption: 'Assumes no new purchases, no late payments, no added fees, no penalty APR, and no APR changes.'
+  };
 
-  const savings = Math.max(0, currentTotalPayback - recommendedTotal);
+  const minimumOnly = minOnly && minOnly.ok
+    ? {
+        startingMinimumPayment: startMin,
+        monthsToPayoff: minOnly.months,
+        yearsMonths: pricing.yearsMonths(minOnly.months),
+        interestCost: minOnly.interest,
+        totalPayback: minOnly.paid,
+        dailyInterest: Math.round((totalDebt * (apr / 100) / 365) * 100) / 100,
+        monthlyInterest: round(totalDebt * (apr / 100) / 12)
+      }
+    : { startingMinimumPayment: startMin, monthsToPayoff: 0, yearsMonths: '', interestCost: 0, totalPayback: 0, dailyInterest: 0, monthlyInterest: 0 };
 
+  const savings = doNothing.neverPaysOff ? 0 : Math.max(0, doNothing.totalPayback - recommended.totalCost);
+  const savingsVsMinimumOnly = Math.max(0, minimumOnly.totalPayback - recommended.totalCost);
+
+  const now = new Date();
   return {
-    firstName: firstName || 'Client',
-    fullName: [firstName, lastName].filter(Boolean).join(' ') || 'Client',
+    firstName: firstName || '',
+    lastName: lastName || '',
+    fullName: [firstName, lastName].filter(Boolean).join(' '),
     email: email || '',
     state: state || '',
     totalDebt,
-    doNothing: {
-      monthlyPayment: currentMonthly,
-      monthsToPayoff,
-      apr: currentApr,
-      totalPayback: currentTotalPayback,
-    },
-    shortest: {
-      monthlyPayment: shortestMonthly,
-      term: shortestTerm,
-      totalCost: shortestTotal,
-    },
-    recommended: {
-      monthlyPayment: recommendedMonthly,
-      term: recommendedTerm,
-      totalCost: recommendedTotal,
-    },
-    routeReason:
-      'Plan created from router webhook and stored to Blob for plan page rendering.',
+    doNothing,
+    shortest: null,
+    recommended,
+    route: routeKey,
+    routeReason: routeKey ? 'Webhook plan priced with the shared program pricing module.' : 'No eligible program for this state and debt amount.',
     rows,
     savings,
+    savingsVsMinimumOnly,
+    program,
+    minimumOnly,
+    creditRunway: null,
+    createdAt: now.toISOString(),
+    expiresAt: new Date(now.getTime() + PLAN_TTL_DAYS * 86400000).toISOString()
   };
 }
 
@@ -206,16 +235,30 @@ export async function POST(req) {
     }
 
     const rows = buildRows(body);
+    const currentPayment =
+      body.currentMonthlyPayment ||
+      body.current_monthly_payment ||
+      body.contact?.currentMonthlyPayment ||
+      '';
     const planData = buildPlanData({
       firstName,
       lastName,
       email,
       state,
       rows,
+      currentPayment,
     });
+
+    if (planData.totalDebt < pricing.ROUTING.csMin || !planData.program) {
+      return Response.json(
+        { ok: false, error: 'No eligible program for this debt amount and state; plan not generated.', totalDebt: planData.totalDebt, state },
+        { status: 422 }
+      );
+    }
 
     const slug = randomUUID();
     const planId = slug;
+    planData.token = slug;
 
     const blob = await put(
       `plans/${slug}.json`,
@@ -226,8 +269,8 @@ export async function POST(req) {
       }
     );
 
-const baseUrl = 'https://ai.fundingtier.com';
-const planUrl = `${baseUrl}/plan/client/${slug}`;
+    const baseUrl = 'https://ai.fundingtier.com';
+    const planUrl = `${baseUrl}/plan/${slugify(firstName) || 'client'}/${slug}`;
     const generatedAt = new Date().toISOString();
 
     const ghlUpdate = await updateGhlContact(contactId, {
