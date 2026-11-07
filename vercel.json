@@ -40,6 +40,10 @@
       "destination": "/admins/legacy-capital-billable-payout-simulator.html"
     },
     {
+      "source": "/admins/state-hiring-map",
+      "destination": "/admins/state-hiring-map.html"
+    },
+    {
       "source": "/admins/Backend-Payout-Process",
       "destination": "/admins/backend-payout-timing.html"
     },
